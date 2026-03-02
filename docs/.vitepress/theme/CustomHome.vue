@@ -29,7 +29,15 @@
               Get Started
             </a>
             <a
-              href="https://github.com/example/wcagify"
+              href="https://demo.wcagify.com/"
+              class="inline-flex items-center justify-center rounded-lg border border-[var(--vp-c-border)] bg-transparent px-6 py-3 text-[0.9375rem] font-semibold text-[var(--vp-c-text-1)] no-underline transition hover:-translate-y-px hover:border-[var(--vp-c-brand-1)] hover:text-[var(--vp-c-brand-1)]"
+              target="_blank"
+              rel="noopener"
+            >
+              Live Demo
+            </a>
+            <a
+              href="https://github.com/focusring/wcagify"
               class="inline-flex items-center justify-center rounded-lg border border-[var(--vp-c-border)] bg-transparent px-6 py-3 text-[0.9375rem] font-semibold text-[var(--vp-c-text-1)] no-underline transition hover:-translate-y-px hover:border-[var(--vp-c-brand-1)] hover:text-[var(--vp-c-brand-1)]"
               target="_blank"
               rel="noopener"

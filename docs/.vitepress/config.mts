@@ -40,7 +40,7 @@ export default defineConfig({
       ]
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/example/wcagify' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/focusring/wcagify' }],
 
     footer: {
       message: 'Released under the MIT License.',
