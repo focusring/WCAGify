@@ -6,6 +6,12 @@ export default defineNuxtConfig({
     weasyprintUrl: 'https://magnificent-encouragement-production.up.railway.app'
   },
 
+  content: {
+    experimental: {
+      sqliteConnector: 'native'
+    }
+  },
+
   devtools: {
     enabled: true
   },
@@ -15,6 +21,15 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: true }
   },
+
+  nitro: {
+    vercel: {
+      functions: {
+        maxDuration: 60
+      }
+    }
+  },
+
   compatibilityDate: '2025-01-15',
 
   i18n: {

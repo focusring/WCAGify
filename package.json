@@ -17,6 +17,9 @@
     "oxfmt": "^0.34.0",
     "oxlint": "^1.49.0"
   },
+  "engines": {
+    "node": ">=22"
+  },
   "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "onlyBuiltDependencies": [
