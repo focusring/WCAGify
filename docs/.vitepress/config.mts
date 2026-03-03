@@ -51,7 +51,8 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Created with 🫶🏼 by <a href="https://focusring.io" target="_blank" rel="noopener">focusring.io</a>'
+      copyright:
+        'Created with 🫶🏼 by <a href="https://focusring.io" target="_blank" rel="noopener">focusring.io</a>'
     },
 
     search: {

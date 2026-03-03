@@ -4,9 +4,7 @@
     <section class="flex min-h-[calc(100vh-64px)] items-center py-16">
       <div class="grid w-full grid-cols-1 items-center gap-16 lg:grid-cols-2">
         <div>
-          <h1
-            class="mb-4 text-sm font-bold tracking-widest uppercase text-[var(--vp-c-brand-1)]"
-          >
+          <h1 class="mb-4 text-sm font-bold tracking-widest uppercase text-[var(--vp-c-brand-1)]">
             WCAGify
           </h1>
           <p
@@ -14,7 +12,9 @@
           >
             Accessible audit reports<br />made simple.
           </p>
-          <ul class="mt-4 list-none space-y-1 p-0 text-lg leading-relaxed text-[var(--vp-c-text-2)]">
+          <ul
+            class="mt-4 list-none space-y-1 p-0 text-lg leading-relaxed text-[var(--vp-c-text-2)]"
+          >
             <li class="font-semibold text-[var(--vp-c-brand-1)]">Free forever.</li>
             <li class="font-semibold text-[var(--vp-c-brand-1)]">No data collection.</li>
             <li class="font-semibold text-[var(--vp-c-brand-1)]">Open source.</li>
