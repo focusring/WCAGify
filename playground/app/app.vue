@@ -1,14 +1,10 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const head = useLocaleHead({ seo: true })
-const colorMode = useColorMode()
 
 useHead({
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
-  link: [
-    { rel: 'icon', href: () => colorMode.value === 'dark' ? '/favicon-dark.ico' : '/favicon-light.ico' },
-    ...(head.value.link || [])
-  ],
+  link: [{ rel: 'icon', href: '/favicon.ico' }, ...(head.value.link || [])],
   htmlAttrs: {
     ...head.value.htmlAttrs
   }
