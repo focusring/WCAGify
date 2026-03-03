@@ -43,7 +43,9 @@ useSeoMeta({
     </UHeader>
 
     <UMain>
-      <NuxtPage />
+      <UContainer>
+        <NuxtPage />
+      </UContainer>
     </UMain>
 
     <USeparator />
