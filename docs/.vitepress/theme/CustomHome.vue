@@ -2,12 +2,55 @@
 import { ref } from 'vue'
 
 const isSaas = ref(false)
+
+const pms = ['pnpm', 'npm', 'yarn', 'bun'] as const
+const activePm = ref<(typeof pms)[number]>('pnpm')
+
+const commands = {
+  pnpm: ['pnpm create wcagify my-audits', 'cd my-audits', 'pnpm dev'],
+  npm: ['npm create wcagify my-audits', 'cd my-audits', 'npm run dev'],
+  yarn: ['yarn create wcagify my-audits', 'cd my-audits', 'yarn dev'],
+  bun: ['bun create wcagify my-audits', 'cd my-audits', 'bun dev'],
+}
+
+function onTabKeydown(event: KeyboardEvent) {
+  const index = pms.indexOf(activePm.value)
+  let newIndex = index
+
+  switch (event.key) {
+    case 'ArrowRight': {
+      newIndex = (index + 1) % pms.length
+      break
+    }
+    case 'ArrowLeft': {
+      newIndex = (index - 1 + pms.length) % pms.length
+      break
+    }
+    case 'Home': {
+      newIndex = 0
+      break
+    }
+    case 'End': {
+      newIndex = pms.length - 1
+      break
+    }
+    default:
+      return
+  }
+
+  event.preventDefault()
+  activePm.value = pms[newIndex]
+  const tab = (event.currentTarget as HTMLElement)
+    .closest('[role="tablist"]')
+    ?.querySelector<HTMLElement>(`[id="tab-${pms[newIndex]}"]`)
+  tab?.focus()
+}
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl px-6">
     <!-- Hero -->
-    <section class="flex min-h-[calc(100vh-64px)] items-center py-16">
+    <section class="py-16">
       <div class="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-2">
         <div>
           <h1 class="mb-4 text-sm font-bold tracking-widest text-[var(--vp-c-brand-1)]">
@@ -29,6 +72,7 @@ const isSaas = ref(false)
             </span>
             <button
               role="switch"
+              aria-label="Hosting type"
               :aria-checked="isSaas"
               class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-(--vp-c-brand-1) focus-visible:ring-offset-2"
               :class="isSaas ? 'bg-(--vp-c-brand-1)' : 'bg-(--vp-c-border)'"
@@ -46,7 +90,7 @@ const isSaas = ref(false)
               Cloud-hosted (<abbr title="Software as a Service">SaaS</abbr>) <small class="align-super text-xs text-(--vp-c-text-2)">Soon 🔮</small>
             </span>
           </div>
-          <ul class="mt-2 list-none space-y-1 p-0 text-lg leading-relaxed text-(--vp-c-text-2)">
+          <ul class="mt-2 list-none space-y-1 p-0 text-lg leading-relaxed">
             <template v-if="!isSaas">
               <li class="font-semibold text-(--vp-c-brand-1)">Free forever.</li>
               <li class="font-semibold text-(--vp-c-brand-1)">Open source.</li>
@@ -54,10 +98,13 @@ const isSaas = ref(false)
               <li class="font-semibold text-(--vp-c-brand-1)">No sign up.</li>
             </template>
             <template v-else>
-              <li class="font-semibold text-(--vp-c-brand-1)">No setup required.</li>
-              <li class="font-semibold text-(--vp-c-brand-1)">Zero maintenance.</li>
-              <li class="font-semibold text-(--vp-c-brand-1)">Always up to date.</li>
-              <li class="font-semibold text-(--vp-c-brand-1)">No technical skills needed.</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">Not free.</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">Still open source.</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">Minimal data collection.</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">Sign up required.</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">Zero maintenance. 🤩</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">Always up to date. 🤩</li>
+              <li class="font-semibold text-(--vp-c-brand-1)">No technical skills needed. 🤩</li>
             </template>
           </ul>
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -91,15 +138,39 @@ const isSaas = ref(false)
             class="w-full overflow-hidden rounded-xl border border-[var(--vp-c-border)] bg-[var(--vp-c-bg-soft)]"
           >
             <div
-              class="border-b border-[var(--vp-c-border)] px-5 py-2.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-[var(--vp-c-brand-1)]"
+              class="flex items-center gap-4 border-b border-(--vp-c-border) px-5 py-2.5"
             >
-              Quick start
+              <span id="quickstart-label" class="text-[0.8125rem] font-semibold tracking-wider uppercase text-(--vp-c-brand-1)">Quick start</span>
+              <span class="text-(--vp-c-border)" aria-hidden="true">|</span>
+              <div role="tablist" aria-labelledby="quickstart-label" class="flex items-center gap-4">
+                <button
+                  v-for="pm in pms"
+                  :id="`tab-${pm}`"
+                  :key="pm"
+                  role="tab"
+                  :aria-selected="activePm === pm"
+                  :aria-controls="`tabpanel-${pm}`"
+                  :tabindex="activePm === pm ? 0 : -1"
+                  class="text-[0.8125rem] font-semibold tracking-wider uppercase transition-colors"
+                  :class="activePm === pm ? 'text-(--vp-c-brand-1)' : 'text-(--vp-c-text-3) hover:text-(--vp-c-text-2)'"
+                  @click="activePm = pm"
+                  @keydown="onTabKeydown"
+                >
+                  {{ pm }}
+                </button>
+              </div>
             </div>
             <pre
+              v-for="pm in pms"
+              v-show="activePm === pm"
+              :id="`tabpanel-${pm}`"
+              :key="pm"
+              role="tabpanel"
+              :aria-labelledby="`tab-${pm}`"
+              tabindex="0"
               class="m-0 overflow-x-auto p-5"
-            ><code class="font-mono text-sm leading-relaxed text-[var(--vp-c-text-1)]"><span class="select-none text-[var(--vp-c-text-3)]">$</span> pnpm create wcagify my-audit
-<span class="select-none text-[var(--vp-c-text-3)]">$</span> cd my-audit
-<span class="select-none text-[var(--vp-c-text-3)]">$</span> pnpm dev</code></pre>
+            ><code class="font-mono text-sm leading-relaxed text-(--vp-c-text-1)"><template v-for="(cmd, i) in commands[pm]" :key="pm + i"><span class="select-none text-(--vp-c-text-3)">$</span> {{ cmd }}
+</template></code></pre>
           </div>
         </div>
       </div>
