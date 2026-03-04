@@ -7,6 +7,7 @@ const nuxtConfig = {
     '@nuxtjs/i18n',
     '@nuxt/icon',
     'nuxt-studio',
+    '@nuxt/a11y',
     '@focusring/wcagify/nuxt'
   ],
 

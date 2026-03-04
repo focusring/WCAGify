@@ -43,7 +43,7 @@ const isSaas = ref(false)
               class="text-lg font-semibold"
               :class="isSaas ? 'text-(--vp-c-brand-1)' : 'text-(--vp-c-text-2)'"
             >
-              SaaS <small class="align-super text-xs text-(--vp-c-text-2)">(Soon)</small>
+              Cloud-hosted (<abbr title="Software as a Service">SaaS</abbr>) <small class="align-super text-xs text-(--vp-c-text-2)">Soon 🔮</small>
             </span>
           </div>
           <ul class="mt-2 list-none space-y-1 p-0 text-lg leading-relaxed text-(--vp-c-text-2)">

@@ -61,6 +61,7 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.90",
     "@iconify-json/simple-icons": "^1.2.70",
+    "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/content": "^3.0.0",
     "@nuxt/icon": "^1.0.0",
     "@nuxt/kit": "^4.0.0",

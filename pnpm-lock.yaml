@@ -63,6 +63,9 @@ importers:
       '@iconify-json/simple-icons':
         specifier: ^1.2.70
         version: 1.2.70
+      '@nuxt/a11y':
+        specifier: 1.0.0-alpha.1
+        version: 1.0.0-alpha.1(magicast@0.5.2)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))
       '@nuxt/content':
         specifier: ^3.0.0
         version: 3.11.2(better-sqlite3@12.6.2)(magicast@0.5.2)
@@ -866,6 +869,9 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@nuxt/a11y@1.0.0-alpha.1':
+    resolution: {integrity: sha512-TwON9I0uI4erv9IJ6cD4nx9QcaxfXnAg7CwcQyjMKfDHCfI3xitezg4CZhQOHl0FGqHYGRf9Y9kSwh6fahCJrQ==}
 
   '@nuxt/cli@3.33.1':
     resolution: {integrity: sha512-/sCrcI0WemING9zASaXPgPDY7PrQTPlRyCXlSgGx8VwRAkWbxGaPhIc3kZQikgLwVAwy+muWVV4Wks8OTtW5Tw==}
@@ -3148,6 +3154,10 @@ packages:
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
+
+  axe-core@4.11.1:
+    resolution: {integrity: sha512-BASOg+YwO2C+346x3LZOeoovTIoTrRqEsqMa6fmfAV0P+U9mFr9NsyOEpiYvFjbc64NMrSswhV50WdXzdb/Z5A==}
+    engines: {node: '>=4'}
 
   b4a@1.7.4:
     resolution: {integrity: sha512-u20zJLDaSWpxaZ+zaAkEIB2dZZ1o+DF4T/MRbmsvGp9nletHOyiai19OzX1fF8xUBYsO1bPXxODvcd0978pnug==}
@@ -7313,6 +7323,16 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
+  '@nuxt/a11y@1.0.0-alpha.1(magicast@0.5.2)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))':
+    dependencies:
+      '@nuxt/devtools-kit': 3.2.1(magicast@0.5.2)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))
+      '@nuxt/kit': 4.3.1(magicast@0.5.2)
+      axe-core: 4.11.1
+      sirv: 3.0.2
+    transitivePeerDependencies:
+      - magicast
+      - vite
+
   '@nuxt/cli@3.33.1(@nuxt/schema@4.3.1)(cac@6.7.14)(commander@13.1.0)(magicast@0.5.2)':
     dependencies:
       '@bomb.sh/tab': 0.0.12(cac@6.7.14)(citty@0.2.1)(commander@13.1.0)
@@ -9604,6 +9624,8 @@ snapshots:
   available-typed-arrays@1.0.7:
     dependencies:
       possible-typed-array-names: 1.1.0
+
+  axe-core@4.11.1: {}
 
   b4a@1.7.4: {}
 
