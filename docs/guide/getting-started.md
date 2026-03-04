@@ -4,7 +4,7 @@ WCAGify is a WCAG accessibility audit tool built with Nuxt 4. It turns markdown 
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) 18 or higher
+- [Node.js](https://nodejs.org/) 22 or higher
 - [pnpm](https://pnpm.io/) package manager
 
 ## Installation
@@ -12,7 +12,7 @@ WCAGify is a WCAG accessibility audit tool built with Nuxt 4. It turns markdown 
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/example/wcagify.git
+git clone https://github.com/focusring/WCAGify.git
 cd wcagify
 pnpm install
 ```

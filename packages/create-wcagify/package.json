@@ -1,6 +1,15 @@
 {
   "name": "create-wcagify",
   "version": "0.1.0",
+  "description": "Scaffold a new WCAGify accessibility audit project",
+  "author": "Focusring",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/focusring/WCAGify.git",
+    "directory": "packages/create-wcagify"
+  },
+  "keywords": ["wcag", "accessibility", "a11y", "scaffold", "cli"],
   "bin": {
     "create-wcagify": "./dist/cli.js"
   },

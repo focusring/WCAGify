@@ -11,8 +11,4 @@ Op de homepage ontbreekt een zichtbare focusstijl op meerdere interactieve eleme
 
 ## Aanbeveling
 
-```js [test.js]
-var test = 100
-```
-
 Voeg een duidelijk zichtbare focusstijl toe aan alle interactieve elementen. Gebruik CSS `:focus-visible` om een focusindicator te tonen die voldoet aan het minimale contrast van 3:1 ten opzichte van de achtergrond.

@@ -13,7 +13,7 @@ const nuxtConfig = {
   css: [`${dir}/app/assets/css/main.css`, `${dir}/print.css`],
 
   runtimeConfig: {
-    weasyprintUrl: 'https://magnificent-encouragement-production.up.railway.app'
+    weasyprintUrl: ''
   },
 
   content: {
