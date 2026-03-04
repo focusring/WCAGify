@@ -30,15 +30,6 @@ useSeoMeta({
       <template #right>
         <LocaleSwitcher />
         <UColorModeButton />
-
-        <UButton
-          to="https://github.com/timdamen/wcagify"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="neutral"
-          variant="ghost"
-        />
       </template>
     </UHeader>
 

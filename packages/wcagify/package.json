@@ -3,17 +3,31 @@
   "version": "0.1.0",
   "files": [
     "dist",
+    "app",
+    "server",
+    "public",
     "locales",
+    "nuxt.config.ts",
     "print.css"
   ],
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./nuxt.config.ts",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./src/index.ts"
+    },
+    "./nuxt": {
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js",
+      "default": "./src/module.ts"
+    },
+    "./content": {
+      "types": "./dist/content.d.ts",
+      "import": "./dist/content.js",
+      "default": "./src/content.ts"
     },
     "./pdf": {
       "types": "./dist/pdf/index.d.ts",
@@ -22,16 +36,27 @@
     },
     "./locales/en": "./locales/en.json",
     "./locales/nl": "./locales/nl.json",
-    "./print.css": "./print.css"
+    "./print.css": "./print.css",
+    "./layer": "./nuxt.config.ts"
   },
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.90",
+    "@iconify-json/simple-icons": "^1.2.70",
+    "@nuxt/content": "^3.0.0",
+    "@nuxt/icon": "^1.0.0",
+    "@nuxt/kit": "^4.0.0",
+    "@nuxt/ui": "^4.0.0",
+    "@nuxtjs/i18n": "^10.0.0",
+    "better-sqlite3": "^12.6.2",
+    "nuxt-studio": "^1.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@nuxt/schema": "^4.0.0",
     "tsdown": "^0.12.5",
     "typescript": "^5.9.3"
   }

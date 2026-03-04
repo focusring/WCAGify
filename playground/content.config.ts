@@ -1,18 +1,8 @@
-import { defineContentConfig, defineCollection } from '@nuxt/content'
-import { reportSchema, issueSchema, contentSources } from 'wcagify'
+import { defineContentConfig } from '@nuxt/content'
+import { defineWcagifyCollections } from 'wcagify/content'
+
+const reportsCwd = new URL('reports', import.meta.url).pathname
 
 export default defineContentConfig({
-  collections: {
-    reports: defineCollection({
-      type: 'page',
-      source: contentSources.reports,
-      schema: reportSchema
-    }),
-
-    issues: defineCollection({
-      type: 'page',
-      source: contentSources.issues,
-      schema: issueSchema
-    })
-  }
+  collections: defineWcagifyCollections(reportsCwd)
 })

@@ -1,10 +1,12 @@
 import DefaultTheme from 'vitepress/theme'
 import CustomHome from './CustomHome.vue'
-import './custom.css'
+import './custom.css' // eslint-disable-line import/no-unassigned-import
 
-export default {
+const theme = {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     app.component('CustomHome', CustomHome)
   }
 }
+
+export default theme

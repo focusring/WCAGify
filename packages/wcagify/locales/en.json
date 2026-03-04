@@ -1,4 +1,10 @@
 {
+  "app": {
+    "title": "WCAGify",
+    "description": "WCAG accessibility reporting tool",
+    "reports": "Reports",
+    "noReports": "No reports found"
+  },
   "report": {
     "accessibilityConformanceReportFor": "Accessibility Conformance Report for {title}",
     "title": "Title",

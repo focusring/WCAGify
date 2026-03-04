@@ -1,39 +1,51 @@
 import type scToSlug from './data/sc-to-slug.json'
 
-export type WcagVersion = keyof typeof scToSlug
-export type Language = keyof (typeof scToSlug)['2.2']
-export type Level = 'A' | 'AA' | 'AAA'
-export type Principle = 'perceivable' | 'operable' | 'understandable' | 'robust'
+type WcagVersion = keyof typeof scToSlug
+type Language = keyof (typeof scToSlug)['2.2']
+type Level = 'A' | 'AA' | 'AAA'
+type Principle = 'perceivable' | 'operable' | 'understandable' | 'robust'
 
-export interface ScEntry {
+interface ScEntry {
   slug: string
   name: string
   level: Level
   obsolete?: boolean
 }
 
-export interface PrincipleCounts {
+interface PrincipleCounts {
   perceivable: number
   operable: number
   understandable: number
   robust: number
 }
 
-export interface Scorecard {
+interface Scorecard {
   conforming: PrincipleCounts & { all: number }
   totals: PrincipleCounts & { all: number }
 }
 
-export interface SamplePage {
+interface SamplePage {
   title: string
   id: string
   url: string
   description: string
 }
 
-export interface IssueGroup<T extends { sc: string }> {
+interface IssueGroup<T extends { sc: string }> {
   sc: string
   name: string
   uri: string
   issues: T[]
+}
+
+export type {
+  WcagVersion,
+  Language,
+  Level,
+  Principle,
+  ScEntry,
+  PrincipleCounts,
+  Scorecard,
+  SamplePage,
+  IssueGroup
 }

@@ -1,19 +1,19 @@
 import type { WcagVersion, Language, IssueGroup } from './types'
 import { scName, scUri } from './wcag'
 
-export function filterIssues<T extends { sc: string }>(issues: T[]): T[] {
+function filterIssues<T extends { sc: string }>(issues: T[]): T[] {
   return issues.filter((issue) => issue.sc !== 'none')
 }
 
-export function sortIssuesBySc<T extends { sc: string }>(issues: T[]): T[] {
+function sortIssuesBySc<T extends { sc: string }>(issues: T[]): T[] {
   return issues.toSorted((a, b) => a.sc.localeCompare(b.sc, undefined, { numeric: true }))
 }
 
-export function filterTips<T extends { sc: string }>(issues: T[]): T[] {
+function filterTips<T extends { sc: string }>(issues: T[]): T[] {
   return issues.filter((issue) => issue.sc === 'none')
 }
 
-export function groupIssuesBySc<T extends { sc: string }>(
+function groupIssuesBySc<T extends { sc: string }>(
   issues: T[],
   wcagVersion: WcagVersion = '2.2',
   language: Language = 'en'
@@ -38,3 +38,5 @@ export function groupIssuesBySc<T extends { sc: string }>(
   }
   return groups
 }
+
+export { filterIssues, sortIssuesBySc, filterTips, groupIssuesBySc }

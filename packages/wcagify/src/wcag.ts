@@ -33,29 +33,21 @@ function getScEntry(sc: string, wcagVersion: WcagVersion, language: Language): S
   ] as ScEntry | undefined
 }
 
-export const PRINCIPLES = ['perceivable', 'operable', 'understandable', 'robust'] as const
+const PRINCIPLES = ['perceivable', 'operable', 'understandable', 'robust'] as const
 
-export function scUri(
-  sc: string,
-  wcagVersion: WcagVersion = '2.2',
-  language: Language = 'en'
-): string {
+function scUri(sc: string, wcagVersion: WcagVersion = '2.2', language: Language = 'en'): string {
   const entry = getScEntry(sc, wcagVersion, language)
   if (!entry) return ''
   return `https://www.w3.org/WAI/WCAG${wcagVersion.replace('.', '')}/quickref/#${entry.slug}`
 }
 
-export function scName(
-  sc: string,
-  wcagVersion: WcagVersion = '2.2',
-  language: Language = 'en'
-): string {
+function scName(sc: string, wcagVersion: WcagVersion = '2.2', language: Language = 'en'): string {
   const entry = getScEntry(sc, wcagVersion, language)
   if (!entry) return sc
   return `${sc}: ${entry.name}`
 }
 
-export function scorecard(
+function scorecard(
   issues: { sc: string }[],
   targetLevel: Level,
   wcagVersion: WcagVersion = '2.2'
@@ -96,7 +88,7 @@ export function scorecard(
   }
 }
 
-export function conformanceSummary(
+function conformanceSummary(
   issues: { sc: string }[],
   targetLevel: Level,
   wcagVersion: WcagVersion = '2.2'
@@ -107,3 +99,5 @@ export function conformanceSummary(
     isFullyConforming: data.conforming.all === data.totals.all
   }
 }
+
+export { PRINCIPLES, scUri, scName, scorecard, conformanceSummary }

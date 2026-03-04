@@ -30,32 +30,38 @@ const data = computed(() =>
         })
       }}
     </p>
-    <table class="w-full text-sm text-left">
+    <table class="w-full border-separate border-spacing-0 text-sm text-left">
       <caption class="sr-only">
         {{
           t('report.resultsPerPrinciple')
         }}
       </caption>
       <thead>
-        <tr class="border-b border-gray-200 dark:border-gray-800">
-          <th scope="col" class="py-2 pr-4 font-medium text-gray-950 dark:text-white">
+        <tr>
+          <th
+            scope="col"
+            class="border-b border-gray-200 py-2 pr-4 font-medium text-gray-950 dark:border-gray-800 dark:text-white"
+          >
             {{ t('report.principle') }}
           </th>
-          <th scope="col" class="py-2 font-medium text-gray-950 dark:text-white">
+          <th
+            scope="col"
+            class="border-b border-gray-200 py-2 font-medium text-gray-950 dark:border-gray-800 dark:text-white"
+          >
             {{ t('report.result') }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="principle in PRINCIPLES"
-          :key="principle"
-          class="border-b border-gray-100 dark:border-gray-900"
-        >
-          <td class="py-2 pr-4 text-gray-700 dark:text-gray-300">
+        <tr v-for="principle in PRINCIPLES" :key="principle">
+          <td
+            class="border-b border-gray-100 py-2 pr-4 text-gray-700 dark:border-gray-900 dark:text-gray-300"
+          >
             {{ t(`report.principles.${principle}`) }}
           </td>
-          <td class="py-2 text-gray-700 dark:text-gray-300">
+          <td
+            class="border-b border-gray-100 py-2 text-gray-700 dark:border-gray-900 dark:text-gray-300"
+          >
             {{
               t('report.criteriaMet', {
                 conforming: data.conforming[principle],
@@ -66,11 +72,16 @@ const data = computed(() =>
         </tr>
       </tbody>
       <tfoot>
-        <tr class="border-t border-gray-200 dark:border-gray-800">
-          <th scope="row" class="py-2 pr-4 font-medium text-gray-950 dark:text-white">
+        <tr>
+          <th
+            scope="row"
+            class="border-t border-gray-200 py-2 pr-4 font-medium text-gray-950 dark:border-gray-800 dark:text-white"
+          >
             {{ t('report.total') }}
           </th>
-          <td class="py-2 font-medium text-gray-950 dark:text-white">
+          <td
+            class="border-t border-gray-200 py-2 font-medium text-gray-950 dark:border-gray-800 dark:text-white"
+          >
             {{
               t('report.criteriaMet', { conforming: data.conforming.all, total: data.totals.all })
             }}

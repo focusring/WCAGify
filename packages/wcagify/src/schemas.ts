@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const evaluationSchema = z.object({
+const evaluationSchema = z.object({
   evaluator: z.string(),
   commissioner: z.string(),
   target: z.string(),
@@ -10,14 +10,14 @@ export const evaluationSchema = z.object({
   specialRequirements: z.string()
 })
 
-export const samplePageSchema = z.object({
+const samplePageSchema = z.object({
   title: z.string(),
   id: z.string(),
   url: z.string(),
   description: z.string()
 })
 
-export const reportSchema = z.object({
+const reportSchema = z.object({
   language: z.enum(['nl', 'en']),
   evaluation: evaluationSchema,
   scope: z.array(z.string()),
@@ -27,9 +27,11 @@ export const reportSchema = z.object({
   sample: z.array(samplePageSchema)
 })
 
-export const issueSchema = z.object({
+const issueSchema = z.object({
   sc: z.string(),
   severity: z.enum(['Low', 'Medium', 'High']),
   difficulty: z.enum(['Low', 'Medium', 'High']),
   sample: z.string()
 })
+
+export { evaluationSchema, samplePageSchema, reportSchema, issueSchema }

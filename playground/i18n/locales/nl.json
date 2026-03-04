@@ -1,8 +1,0 @@
-{
-  "app": {
-    "title": "WCAGify",
-    "description": "WCAG-toegankelijkheidsrapportagetool",
-    "reports": "Rapporten",
-    "noReports": "Geen rapporten gevonden"
-  }
-}
