@@ -10,9 +10,9 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@focusring/wcagify": "workspace:*",
     "@nuxt/content": "^3.11.2",
-    "nuxt": "^4.3.1",
-    "@focusring/wcagify": "workspace:*"
+    "nuxt": "^4.3.1"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
