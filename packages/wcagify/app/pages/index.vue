@@ -49,6 +49,7 @@ function onSelect(_e: Event, row: TableRow<ReportsCollectionItem>) {
       :data="reports"
       :columns="columns"
       class="mt-6"
+      :ui="{ tbody: '[&>tr]:cursor-pointer' }"
       @select="onSelect"
     />
 
