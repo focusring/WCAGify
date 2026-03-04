@@ -1,3 +1,4 @@
 {
-  "buildCommand": "pnpm --filter wcagify build && pnpm build"
+  "installCommand": "pnpm install --ignore-scripts",
+  "buildCommand": "pnpm --filter wcagify build && nuxt prepare && pnpm build"
 }

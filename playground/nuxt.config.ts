@@ -4,8 +4,6 @@ export default defineNuxtConfig(
   defineWcagifyConfig({
     devtools: { enabled: true },
 
-    css: ['~/assets/css/main.css'],
-
     nitro: {
       vercel: {
         functions: {

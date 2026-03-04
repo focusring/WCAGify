@@ -1,40 +1,32 @@
-name: ci
+name: CI
 
-on: push
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [22]
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-      - name: Install node
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: '22'
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install
+      - run: pnpm install --ignore-scripts
 
       - name: Build packages
         run: pnpm --filter wcagify build && pnpm --filter create-wcagify build
 
-      - name: Lint
-        run: pnpm run lint
+      - run: nuxt prepare
+        working-directory: playground
 
-      - name: Format check
-        run: pnpm run fmt:check
-
-      - name: Typecheck
-        run: pnpm run typecheck
+      - run: pnpm lint
+      - run: pnpm fmt:check
+      - run: pnpm typecheck
