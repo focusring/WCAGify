@@ -3,7 +3,10 @@
     "title": "WCAGify",
     "description": "WCAG-toegankelijkheidsrapportagetool",
     "reports": "Rapporten",
-    "noReports": "Geen rapporten gevonden"
+    "noReports": "Geen rapporten gevonden",
+    "gridView": "Rasterweergave",
+    "tableView": "Tabelweergave",
+    "columns": "Kolommen"
   },
   "report": {
     "accessibilityConformanceReportFor": "Toegankelijkheidsrapport voor {title}",
@@ -48,7 +51,8 @@
     "total": "Totaal",
     "conformanceLevel": "Conformiteitsniveau: {level} — {conforming} van {total} criteria voldaan",
     "criteriaMet": "{conforming} van {total} criteria voldaan",
-    "downloadPdf": "Download PDF"
+    "downloadPdf": "Download PDF",
+    "searchReports": "Zoek rapporten..."
   },
   "settings": {
     "title": "Instellingen",

@@ -143,7 +143,7 @@ async function downloadPdf() {
               <li v-for="issue in group.issues" :key="issue.path">
                 <a
                   :href="`#issue-${issue.path.split('/').pop()}`"
-                  class="text-green-600 hover:underline dark:text-green-400"
+                  class="text-primary"
                 >
                   {{ issue.title }}
                 </a>
@@ -154,7 +154,7 @@ async function downloadPdf() {
 
         <div v-for="group in issuesBySc" :key="group.sc" class="mt-8">
           <h3 class="text-lg font-medium text-gray-950 dark:text-white">
-            <a :href="group.uri" target="_blank" class="hover:underline">{{ group.name }}</a>
+            <a :href="group.uri" target="_blank">{{ group.name }}</a>
           </h3>
           <div class="mt-4 space-y-8">
             <ReportIssue

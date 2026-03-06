@@ -3,7 +3,10 @@
     "title": "WCAGify",
     "description": "WCAG accessibility reporting tool",
     "reports": "Reports",
-    "noReports": "No reports found"
+    "noReports": "No reports found",
+    "gridView": "Grid view",
+    "tableView": "Table view",
+    "columns": "Columns"
   },
   "report": {
     "accessibilityConformanceReportFor": "Accessibility Conformance Report for {title}",
@@ -48,7 +51,8 @@
     "total": "Total",
     "conformanceLevel": "Conformance level: {level} — {conforming} of {total} criteria met",
     "criteriaMet": "{conforming} of {total} criteria met",
-    "downloadPdf": "Download PDF"
+    "downloadPdf": "Download PDF",
+    "searchReports": "Search reports..."
   },
   "settings": {
     "title": "Settings",
