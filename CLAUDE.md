@@ -1,6 +1,6 @@
 # WCAGify
 
-WCAG accessibility tool — pnpm monorepo.
+WCAG accessibility audit tool — pnpm monorepo.
 
 ## Stack
 
@@ -8,7 +8,10 @@ WCAG accessibility tool — pnpm monorepo.
 - **Nuxt UI v4** (components, includes Tailwind CSS 4 + color mode)
 - **Nuxt Content v3** (markdown-driven content, SQLite-backed)
 - **Nuxt Studio** (visual content editing)
-- **@nuxtjs/i18n** (Dutch default, English secondary)
+- **@nuxtjs/i18n v10** (Dutch default, English secondary)
+- **@nuxt/a11y** (accessibility checks)
+- **@nuxt/icon** (icon support)
+- **Zod v4** (schema validation)
 - **tsdown** (package builds)
 - **VitePress** (documentation)
 
@@ -16,23 +19,31 @@ WCAG accessibility tool — pnpm monorepo.
 
 - `pnpm dev` — start playground dev server
 - `pnpm build` — production build
+- `pnpm preview` — preview production build
 - `pnpm lint` — run OXlint
+- `pnpm fmt` — format with oxfmt
+- `pnpm fmt:check` — check formatting
 - `pnpm typecheck` — run type checking
 - `pnpm docs:dev` — start docs dev server
 - `pnpm docs:build` — build docs
 - `pnpm --filter @focusring/wcagify build` — build core package
 - `pnpm --filter create-wcagify build` — build CLI package
 
-## Project Structure
+## Project Structure (Nuxt Layer Architecture)
 
-- `packages/wcagify/` — core engine (@focusring/wcagify): WCAG data, types, schemas
+The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends it via `defineWcagifyConfig()`, which sets `extends: ['@focusring/wcagify/layer']`. This means the layer provides the full app, modules, and config — the playground only adds content.
+
+- `packages/wcagify/` — core Nuxt layer + module (@focusring/wcagify)
+  - `packages/wcagify/nuxt.config.ts` — layer config: registers all modules, CSS, i18n, route rules
+  - `packages/wcagify/app/` — layer app: pages, components, composables, assets
+  - `packages/wcagify/server/` — API routes (PDF export)
+  - `packages/wcagify/src/` — build-time code: Nuxt module, schemas, types, WCAG data
+  - `packages/wcagify/locales/` — translation files (nl.json, en.json)
 - `packages/create-wcagify/` — CLI scaffolding tool (create-wcagify)
-- `playground/` — Nuxt app (@wcagify/playground)
-  - `playground/app/` — Vue app (pages, components, assets)
-  - `playground/content/` — markdown content files
-  - `playground/content.config.ts` — content collection definitions
-  - `playground/i18n/locales/` — translation files (nl.json, en.json)
-  - `playground/server/` — API routes and PDF service
+- `playground/` — Nuxt app (@wcagify/playground), extends the wcagify layer
+  - `playground/nuxt.config.ts` — uses `defineWcagifyConfig()` to extend the layer
+  - `playground/reports/` — report content files (markdown)
+  - `playground/content.config.ts` — content collection definitions (uses `defineWcagifyCollections`)
 - `docs/` — VitePress documentation site (@wcagify/docs)
 
 ## i18n
@@ -40,13 +51,14 @@ WCAG accessibility tool — pnpm monorepo.
 - Default locale: `nl` (no URL prefix)
 - English: `/en/` prefix
 - Strategy: `prefix_except_default`
+- Locale files live in `packages/wcagify/locales/`, registered via the wcagify module
 - Use `$t('key')` in templates, `useI18n()` in scripts
-- Use `useLocalePath()` or `<NuxtLinkLocale>` for locale-aware links
+- Use `NuxtLinkLocale` for locale-aware internal links
 
 ## Conventions
 
-- Package manager: pnpm
-- Linter: OXlint (correctness, suspicious, style rules)
+- Node >= 22, pnpm 10
+- Linter: OXlint (plugins: typescript, import, unicorn, vue)
 - Formatter: oxfmt
 - Components use `U` prefix (Nuxt UI)
 - Both packages use tsdown for building (ESM, dts generation)
