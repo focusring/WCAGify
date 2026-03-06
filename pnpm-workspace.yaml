@@ -43,6 +43,7 @@ catalogs:
     nuxt: ^4.3.1
     nuxt-studio: ^1.4.0
     tailwindcss: ^4.0.0
+    shiki: ^3.21.0
     zod: ^4.3.6
   cli:
     '@clack/prompts': ^0.9.1
