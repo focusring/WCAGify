@@ -1,5 +1,6 @@
 {
   "name": "@wcagify/monorepo",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,9 +12,13 @@
     "fmt:check": "oxfmt --check",
     "typecheck": "pnpm --filter @wcagify/playground typecheck",
     "docs:dev": "pnpm --filter @wcagify/docs dev",
-    "docs:build": "pnpm --filter @wcagify/docs build"
+    "docs:build": "pnpm --filter @wcagify/docs build",
+    "release": "bumpp package.json packages/*/package.json docs/package.json --all -x \"npx changelogen --no-output\""
   },
   "devDependencies": {
+    "bumpp": "^10.4.1",
+    "changelogen": "^0.6.2",
+    "changelogithub": "^14.0.0",
     "oxfmt": "^0.34.0",
     "oxlint": "^1.49.0"
   },
