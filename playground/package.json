@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@focusring/wcagify": "workspace:*",
-    "@nuxt/content": "^3.11.2",
-    "nuxt": "^4.3.1"
+    "@nuxt/content": "catalog:core",
+    "nuxt": "catalog:core"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "vue-tsc": "^3.2.4"
+    "typescript": "catalog:dev",
+    "vue-tsc": "catalog:dev"
   }
 }

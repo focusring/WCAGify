@@ -9,8 +9,8 @@
     "preview": "vitepress preview"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.1",
-    "tailwindcss": "^4.2.1",
-    "vitepress": "2.0.0-alpha.16"
+    "@tailwindcss/vite": "catalog:docs",
+    "tailwindcss": "catalog:core",
+    "vitepress": "catalog:docs"
   }
 }

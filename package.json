@@ -16,19 +16,14 @@
     "release": "bumpp package.json packages/*/package.json docs/package.json --all -x \"npx changelogen --no-output\""
   },
   "devDependencies": {
-    "bumpp": "^10.4.1",
-    "changelogen": "^0.6.2",
-    "changelogithub": "^14.0.0",
-    "oxfmt": "^0.34.0",
-    "oxlint": "^1.49.0"
+    "bumpp": "catalog:dev",
+    "changelogen": "catalog:dev",
+    "changelogithub": "catalog:dev",
+    "oxfmt": "catalog:dev",
+    "oxlint": "catalog:dev"
   },
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.29.3",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3"
-    ]
-  }
+  "packageManager": "pnpm@10.29.3"
 }

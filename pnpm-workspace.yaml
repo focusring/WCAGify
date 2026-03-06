@@ -3,9 +3,52 @@ packages:
   - playground
   - docs
 
-ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - '@tailwindcss/oxide'
+catalogMode: prefer
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - chokidar
+  - semver
+  - undici-types
+shellEmulator: true
+linkWorkspacePackages: true
+
+onlyBuiltDependencies:
+  - better-sqlite3
   - esbuild
-  - unrs-resolver
-  - vue-demi
+
+catalogs:
+  dev:
+    bumpp: ^10.4.1
+    changelogen: ^0.6.2
+    changelogithub: ^14.0.0
+    oxfmt: ^0.34.0
+    oxlint: ^1.49.0
+    tsdown: ^0.12.5
+    typescript: ^5.9.3
+    vue-tsc: ^3.2.4
+    '@nuxt/schema': ^4.0.0
+    '@types/ejs': ^3.1.5
+    '@types/node': ^22.0.0
+  core:
+    '@iconify-json/lucide': ^1.2.90
+    '@iconify-json/simple-icons': ^1.2.70
+    '@nuxt/a11y': 1.0.0-alpha.1
+    '@nuxt/content': ^3.0.0
+    '@nuxt/icon': ^1.0.0
+    '@nuxt/kit': ^4.0.0
+    '@nuxt/ui': ^4.0.0
+    '@nuxtjs/i18n': ^10.0.0
+    '@vueuse/core': ^14.2.1
+    better-sqlite3: ^12.6.2
+    nuxt: ^4.3.1
+    nuxt-studio: ^1.4.0
+    tailwindcss: ^4.0.0
+    zod: ^4.3.6
+  cli:
+    '@clack/prompts': ^0.9.1
+    commander: ^13.1.0
+    ejs: ^3.1.10
+    picocolors: ^1.1.1
+  docs:
+    vitepress: 2.0.0-alpha.16
+    '@tailwindcss/vite': ^4.2.1
