@@ -19,8 +19,7 @@ jobs:
           node-version: '22'
           cache: pnpm
 
-      - run: pnpm install --ignore-scripts
-      - run: pnpm rebuild better-sqlite3
+      - run: pnpm install
 
       - name: Build packages
         run: pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
