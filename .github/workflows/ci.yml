@@ -19,7 +19,8 @@ jobs:
           node-version: '22'
           cache: pnpm
 
-      - run: pnpm install
+      - run: pnpm install --ignore-scripts
+      - run: pnpm rebuild
 
       - name: Build packages
         run: pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
