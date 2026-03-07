@@ -20,7 +20,6 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --ignore-scripts
-      - run: pnpm rebuild
 
       - name: Build packages
         run: pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
