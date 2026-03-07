@@ -45,6 +45,7 @@ The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends 
   - `playground/reports/` — report content files (markdown)
   - `playground/content.config.ts` — content collection definitions (uses `defineWcagifyCollections`)
 - `docs/` — VitePress documentation site (@wcagify/docs)
+- `test/` — tests (e2e)
 
 ## i18n
 
