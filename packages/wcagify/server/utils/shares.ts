@@ -68,7 +68,9 @@ export function verifySharePassword(share: Share, password: string): boolean {
 
 export function listSharesByReport(reportSlug: string): Share[] {
   const db = getSharesDb()
-  return db.prepare('SELECT * FROM shares WHERE report_slug = ? ORDER BY created_at DESC').all(reportSlug) as Share[]
+  return db
+    .prepare('SELECT * FROM shares WHERE report_slug = ? ORDER BY created_at DESC')
+    .all(reportSlug) as Share[]
 }
 
 export function deleteShare(token: string): boolean {

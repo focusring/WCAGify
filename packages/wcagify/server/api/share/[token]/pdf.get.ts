@@ -23,7 +23,9 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const report = await queryCollection(event, 'reports').path(`/reports/${share.report_slug}`).first()
+  const report = await queryCollection(event, 'reports')
+    .path(`/reports/${share.report_slug}`)
+    .first()
   if (!report) {
     throw createError({ statusCode: 404, statusMessage: 'Report not found' })
   }

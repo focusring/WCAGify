@@ -82,11 +82,7 @@ function formatDate(dateStr: string): string {
                 class="mt-1"
               />
             </div>
-            <UButton
-              :label="t('share.createLink')"
-              icon="i-lucide-plus"
-              @click="createShareLink"
-            />
+            <UButton :label="t('share.createLink')" icon="i-lucide-plus" @click="createShareLink" />
           </div>
         </div>
 
@@ -135,7 +131,12 @@ function formatDate(dateStr: string): string {
                 <span v-if="share.expires_at">
                   {{ t('share.expiresAt') }}: {{ formatDate(share.expires_at) }}
                 </span>
-                <UIcon v-if="share.password_hash" name="i-lucide-lock" class="size-3" :aria-label="t('share.passwordProtected')" />
+                <UIcon
+                  v-if="share.password_hash"
+                  name="i-lucide-lock"
+                  class="size-3"
+                  :aria-label="t('share.passwordProtected')"
+                />
               </div>
             </li>
           </ul>

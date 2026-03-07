@@ -21,8 +21,8 @@ if (error.value && error.value.statusCode !== 401) {
   throw createError({ statusCode: 404, statusMessage: t('share.notFound') })
 }
 
-const passwordRequired = computed(() =>
-  data.value && 'passwordRequired' in data.value && data.value.passwordRequired === true
+const passwordRequired = computed(
+  () => data.value && 'passwordRequired' in data.value && data.value.passwordRequired === true
 )
 
 const report = computed(() => {
