@@ -10,7 +10,7 @@ evaluation:
   commissioner: Example Organisation
   target: Example Website
   targetLevel: AA
-  targetWcagVersion: "2.1"
+  targetWcagVersion: '2.1'
   date: 2025-01-15
   specialRequirements: None
 language: en
