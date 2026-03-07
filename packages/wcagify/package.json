@@ -80,7 +80,6 @@
     "@nuxt/schema": "catalog:dev",
     "@types/better-sqlite3": "catalog:",
     "@vitest/coverage-v8": "catalog:dev",
-    "nuxt": "catalog:core",
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:dev"
