@@ -20,6 +20,7 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --ignore-scripts
+      - run: pnpm rebuild better-sqlite3
 
       - name: Build packages
         run: pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
