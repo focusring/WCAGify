@@ -9,6 +9,7 @@ const token = route.params.token as string
 
 const password = ref('')
 const passwordError = ref(false)
+const submitError = ref(false)
 const authenticated = ref(false)
 
 const { data, error, refresh } = await useAsyncData(`share-${token}`, () =>
@@ -54,6 +55,7 @@ useSeoMeta({
 
 async function submitPassword() {
   passwordError.value = false
+  submitError.value = false
   try {
     await $fetch(`/api/share/${token}`, {
       method: 'POST',
@@ -63,8 +65,13 @@ async function submitPassword() {
     if (report.value) {
       authenticated.value = true
     }
-  } catch {
-    passwordError.value = true
+  } catch (e: unknown) {
+    const status = (e as { statusCode?: number }).statusCode
+    if (status === 401) {
+      passwordError.value = true
+    } else {
+      submitError.value = true
+    }
   }
 }
 
@@ -107,11 +114,16 @@ async function downloadPdf() {
         v-model="password"
         type="password"
         :placeholder="t('share.password')"
+        :aria-label="t('share.password')"
+        :aria-describedby="passwordError ? 'password-error' : undefined"
         autofocus
         required
       />
-      <p v-if="passwordError" class="text-sm text-error">
+      <p v-if="passwordError" id="password-error" role="alert" class="text-sm text-error">
         {{ t('share.passwordIncorrect') }}
+      </p>
+      <p v-if="submitError" role="alert" class="text-sm text-error">
+        {{ t('share.error') }}
       </p>
       <UButton type="submit" :label="t('share.unlock')" block />
     </form>

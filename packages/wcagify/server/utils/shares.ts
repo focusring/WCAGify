@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3'
-import { pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
+import { createHmac, pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
 import { nanoid } from 'nanoid'
 import { dirname, join } from 'node:path'
 import { mkdirSync } from 'node:fs'
@@ -108,10 +108,11 @@ function verifyPassword(stored: string, password: string): boolean {
 
 function normalizeExpiresAt(expiresAt?: string): string | undefined {
   if (!expiresAt) return undefined
-  if (/^\d{4}-\d{2}-\d{2}$/.test(expiresAt)) {
-    return `${expiresAt}T23:59:59.999Z`
-  }
-  return expiresAt
+  const candidate = /^\d{4}-\d{2}-\d{2}$/.test(expiresAt)
+    ? `${expiresAt}T23:59:59.999Z`
+    : expiresAt
+  if (Number.isNaN(Date.parse(candidate))) return undefined
+  return candidate
 }
 
 function createShare(reportSlug: string, expiresAt?: string, password?: string): Share {
@@ -180,8 +181,25 @@ function isAdminConfigured(): boolean {
   return Boolean(process.env.WCAGIFY_ADMIN_SECRET)
 }
 
+function createSignedToken(payload: string, secret: string): string {
+  const signature = createHmac('sha256', secret).update(payload).digest('hex')
+  return `${payload}.${signature}`
+}
+
+function verifySignedToken(token: string, secret: string): string | null {
+  const dotIndex = token.lastIndexOf('.')
+  if (dotIndex === -1) return null
+  const payload = token.slice(0, dotIndex)
+  const signature = token.slice(dotIndex + 1)
+  const expected = createHmac('sha256', secret).update(payload).digest('hex')
+  if (signature.length !== expected.length) return null
+  if (!timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'))) return null
+  return payload
+}
+
 export {
   createShare,
+  createSignedToken,
   deleteShare,
   getAdminSecret,
   getShareByToken,
@@ -191,6 +209,7 @@ export {
   normalizeExpiresAt,
   resetSharesDb,
   toPublicShare,
-  verifySharePassword
+  verifySharePassword,
+  verifySignedToken
 }
 export type { Share, ShareRow }

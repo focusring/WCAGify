@@ -1,4 +1,5 @@
-import { getAdminSecret } from '../../utils/shares'
+import { randomBytes } from 'node:crypto'
+import { createSignedToken, getAdminSecret } from '../../utils/shares'
 
 export default defineEventHandler(async (event) => {
   const secret = getAdminSecret()
@@ -11,7 +12,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid admin secret' })
   }
 
-  setCookie(event, 'wcagify-admin', secret, {
+  const sessionId = randomBytes(16).toString('hex')
+  const token = createSignedToken(sessionId, secret)
+
+  setCookie(event, 'wcagify-admin', token, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',

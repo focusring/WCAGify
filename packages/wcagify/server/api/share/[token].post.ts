@@ -1,4 +1,4 @@
-import { getShareByToken, verifySharePassword } from '../../utils/shares'
+import { createSignedToken, getShareByToken, verifySharePassword } from '../../utils/shares'
 
 export default defineEventHandler(async (event) => {
   const token = getRouterParam(event, 'token')
@@ -23,7 +23,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid password' })
   }
 
-  setCookie(event, `share-unlock-${token}`, 'true', {
+  const unlockValue = createSignedToken(token, share.password_hash)
+
+  setCookie(event, `share-unlock-${token}`, unlockValue, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',

@@ -15,6 +15,9 @@ export interface ReportPdfOptions {
 export async function generateReportPdf(options: ReportPdfOptions): Promise<Uint8Array> {
   const fetchPath = options.reportPath ?? `/reports/${options.slug}`
   const pageResponse = await options.localFetch(fetchPath)
+  if (!pageResponse.ok) {
+    throw new Error(`Failed to fetch report page ${fetchPath}: ${pageResponse.status}`)
+  }
   const ssrHtml = await pageResponse.text()
   const html = await prepareForPdf(ssrHtml, options.baseUrl)
 

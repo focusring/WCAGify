@@ -1,5 +1,5 @@
 import { queryCollection } from '@nuxt/content/server'
-import { getShareByToken } from '../../utils/shares'
+import { getShareByToken, verifySignedToken } from '../../utils/shares'
 
 export default defineEventHandler(async (event) => {
   const token = getRouterParam(event, 'token')
@@ -14,8 +14,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (share.password_hash) {
-    const unlocked = getCookie(event, `share-unlock-${token}`)
-    if (!unlocked) {
+    const unlockCookie = getCookie(event, `share-unlock-${token}`)
+    const verifiedToken = unlockCookie ? verifySignedToken(unlockCookie, share.password_hash) : null
+    if (verifiedToken !== token) {
       return { passwordRequired: true, token }
     }
   }

@@ -74,8 +74,8 @@ describe('normalizeExpiresAt', () => {
     expect(normalizeExpiresAt(full)).toBe(full)
   })
 
-  it('passes through non-date strings unchanged', () => {
-    expect(normalizeExpiresAt('not-a-date')).toBe('not-a-date')
+  it('returns undefined for non-date strings', () => {
+    expect(normalizeExpiresAt('not-a-date')).toBeUndefined()
   })
 })
 

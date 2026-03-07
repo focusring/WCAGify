@@ -36,7 +36,17 @@
     "tips": "Tips",
     "successCriterion": "Success criterion",
     "severity": "Severity",
+    "severityLevel": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
     "difficulty": "Difficulty",
+    "difficultyLevel": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
     "url": "URL",
     "description": "Description",
     "externalLink": "External link",
@@ -80,7 +90,8 @@
     "adminDescription": "Enter your admin secret to manage share links.",
     "adminSecret": "Admin secret",
     "adminLogin": "Authenticate",
-    "adminError": "Invalid admin secret. Please try again."
+    "adminError": "Invalid admin secret. Please try again.",
+    "error": "Something went wrong. Please try again."
   },
   "settings": {
     "title": "Settings",

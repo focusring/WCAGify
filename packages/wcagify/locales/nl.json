@@ -36,7 +36,17 @@
     "tips": "Tips",
     "successCriterion": "Succescriterium",
     "severity": "Ernst",
+    "severityLevel": {
+      "low": "Laag",
+      "medium": "Gemiddeld",
+      "high": "Hoog"
+    },
     "difficulty": "Moeilijkheid",
+    "difficultyLevel": {
+      "low": "Laag",
+      "medium": "Gemiddeld",
+      "high": "Hoog"
+    },
     "url": "URL",
     "description": "Beschrijving",
     "externalLink": "Externe link",
@@ -80,7 +90,8 @@
     "adminDescription": "Voer je beheerdersgeheim in om deellinks te beheren.",
     "adminSecret": "Beheerdersgeheim",
     "adminLogin": "Authenticeren",
-    "adminError": "Ongeldig beheerdersgeheim. Probeer het opnieuw."
+    "adminError": "Ongeldig beheerdersgeheim. Probeer het opnieuw.",
+    "error": "Er is iets misgegaan. Probeer het opnieuw."
   },
   "settings": {
     "title": "Instellingen",

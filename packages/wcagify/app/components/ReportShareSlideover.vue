@@ -7,7 +7,7 @@ const props = defineProps<{
 
 const open = defineModel<boolean>('open', { default: false })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const adminSecret = ref('')
 const adminError = ref(false)
@@ -43,27 +43,38 @@ async function loginAdmin() {
 const expiresAt = ref('')
 const password = ref('')
 const copiedToken = ref<string | undefined>()
+const shareError = ref(false)
 
 async function createShareLink() {
-  await $fetch('/api/shares', {
-    method: 'POST',
-    body: {
-      reportSlug: props.reportSlug,
-      expiresAt: expiresAt.value || undefined,
-      password: password.value || undefined
-    }
-  })
-  expiresAt.value = ''
-  password.value = ''
-  await refresh()
+  shareError.value = false
+  try {
+    await $fetch('/api/shares', {
+      method: 'POST',
+      body: {
+        reportSlug: props.reportSlug,
+        expiresAt: expiresAt.value || undefined,
+        password: password.value || undefined
+      }
+    })
+    expiresAt.value = ''
+    password.value = ''
+    await refresh()
+  } catch {
+    shareError.value = true
+  }
 }
 
 async function deleteShareLink(token: string, deleteToken: string) {
-  await $fetch(`/api/shares/${token}`, {
-    method: 'DELETE',
-    body: { deleteToken }
-  })
-  await refresh()
+  shareError.value = false
+  try {
+    await $fetch(`/api/shares/${token}`, {
+      method: 'DELETE',
+      body: { deleteToken }
+    })
+    await refresh()
+  } catch {
+    shareError.value = true
+  }
 }
 
 function shareUrl(token: string): string {
@@ -79,8 +90,9 @@ async function copyLink(token: string) {
 }
 
 function formatDate(dateStr: string): string {
-  const parts = dateStr.split('-').map(Number)
-  return new Date(parts[0]!, parts[1]! - 1, parts[2]!).toLocaleDateString()
+  const parsed = Date.parse(dateStr)
+  if (Number.isNaN(parsed)) return dateStr
+  return new Date(parsed).toLocaleDateString(locale.value)
 }
 </script>
 
@@ -117,8 +129,9 @@ function formatDate(dateStr: string): string {
           </h3>
           <div class="mt-3 space-y-3">
             <div>
-              <label class="text-xs text-muted">{{ t('share.expiresAt') }}</label>
+              <label for="share-expires-at" class="text-xs text-muted">{{ t('share.expiresAt') }}</label>
               <UInput
+                id="share-expires-at"
                 v-model="expiresAt"
                 type="date"
                 :placeholder="t('share.noExpiry')"
@@ -126,14 +139,18 @@ function formatDate(dateStr: string): string {
               />
             </div>
             <div>
-              <label class="text-xs text-muted">{{ t('share.password') }}</label>
+              <label for="share-password" class="text-xs text-muted">{{ t('share.password') }}</label>
               <UInput
+                id="share-password"
                 v-model="password"
                 type="password"
                 :placeholder="t('share.passwordOptional')"
                 class="mt-1"
               />
             </div>
+            <p v-if="shareError" class="text-sm text-error">
+              {{ t('share.error') }}
+            </p>
             <UButton :label="t('share.createLink')" icon="i-lucide-plus" @click="createShareLink" />
           </div>
         </div>
