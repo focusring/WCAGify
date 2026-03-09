@@ -32,10 +32,6 @@ const nuxtConfig = {
     ]
   },
 
-  routeRules: {
-    '/': { prerender: true }
-  },
-
   // CJS packages used by nuxt-studio that lack ESM default exports, breaking Vite's @fs serving in the layer architecture
   alias: {
     extend: `${dir}/shims/extend-esm.js`,

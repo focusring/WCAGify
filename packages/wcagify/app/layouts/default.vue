@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const localePath = useLocalePath()
-const kbdEnabled = useKeyboardShortcutsEnabled()
 </script>
 
 <template>
@@ -16,20 +15,10 @@ const kbdEnabled = useKeyboardShortcutsEnabled()
       <UButton
         :to="localePath('/settings')"
         :label="t('settings.title').toLowerCase()"
-        :aria-keyshortcuts="kbdEnabled ? ',' : undefined"
         color="neutral"
         variant="ghost"
         class="no-underline!"
-      >
-        <template #trailing>
-          <kbd
-            data-kbd-hint
-            aria-hidden="true"
-            class="ms-1 inline-flex items-center justify-center size-5 text-xs text-muted bg-elevated border border-default rounded font-mono"
-            >,</kbd
-          >
-        </template>
-      </UButton>
+      />
     </template>
   </UHeader>
 

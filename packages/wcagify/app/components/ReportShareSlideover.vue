@@ -108,10 +108,15 @@ function formatDate(dateStr: string): string {
           {{ t('share.adminDescription') }}
         </p>
         <form class="mt-6 w-full max-w-xs space-y-4" @submit.prevent="loginAdmin">
+          <label for="admin-secret" class="block text-xs text-muted">
+            {{ t('share.adminSecret') }} <small>{{ t('share.required') }}</small>
+          </label>
           <UInput
+            id="admin-secret"
             v-model="adminSecret"
             type="password"
             :placeholder="t('share.adminSecret')"
+            aria-required="true"
             autofocus
             required
           />
@@ -129,9 +134,9 @@ function formatDate(dateStr: string): string {
           </h3>
           <div class="mt-3 space-y-3">
             <div>
-              <label for="share-expires-at" class="text-xs text-muted">{{
-                t('share.expiresAt')
-              }}</label>
+              <label for="share-expires-at" class="block text-xs text-muted">
+                {{ t('share.expiresAt') }}
+              </label>
               <UInput
                 id="share-expires-at"
                 v-model="expiresAt"
@@ -141,16 +146,10 @@ function formatDate(dateStr: string): string {
               />
             </div>
             <div>
-              <label for="share-password" class="text-xs text-muted">{{
-                t('share.password')
-              }}</label>
-              <UInput
-                id="share-password"
-                v-model="password"
-                type="password"
-                :placeholder="t('share.passwordOptional')"
-                class="mt-1"
-              />
+              <label for="share-password" class="block text-xs text-muted">
+                {{ t('share.password') }}
+              </label>
+              <UInput id="share-password" v-model="password" type="password" class="mt-1" />
             </div>
             <p v-if="shareError" class="text-sm text-error">
               {{ t('share.error') }}

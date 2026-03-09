@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     httpOnly: true,
     secure: !import.meta.dev,
     sameSite: 'strict',
-    path: '/api/shares',
+    path: '/',
     maxAge: 60 * 60 * 24 * 365
   })
 

@@ -91,7 +91,17 @@
     "adminSecret": "Beheerdersgeheim",
     "adminLogin": "Authenticeren",
     "adminError": "Ongeldig beheerdersgeheim. Probeer het opnieuw.",
-    "error": "Er is iets misgegaan. Probeer het opnieuw."
+    "error": "Er is iets misgegaan. Probeer het opnieuw.",
+    "required": "verplicht"
+  },
+  "admin": {
+    "loginTitle": "Inloggen",
+    "loginDescription": "Voer het beheerdersgeheim in om WCAGify te openen.",
+    "setupRequired": "Configuratie vereist",
+    "setupDescription": "WCAGify vereist dat de omgevingsvariabele WCAGIFY_ADMIN_SECRET is ingesteld voordat het gebruikt kan worden.",
+    "secret": "Beheerdersgeheim",
+    "signIn": "Inloggen",
+    "invalidSecret": "Ongeldig beheerdersgeheim. Probeer het opnieuw."
   },
   "settings": {
     "title": "Instellingen",
@@ -106,9 +116,6 @@
     "clearColor": "Kleur wissen",
     "languageSection": "Taal",
     "language": "Taal",
-    "keyboardShortcutsSection": "Sneltoetsen",
-    "keyboardShortcuts": "Sneltoetsen inschakelen",
-    "keyboardShortcutsDescription": "Toon sneltoetsindicatoren in de interface",
     "back": "terug"
   }
 }

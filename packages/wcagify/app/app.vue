@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { onKeyStroke } from '@vueuse/core'
-
 const { t } = useI18n()
 const head = useLocaleHead({ seo: true })
-const localePath = useLocalePath()
-const kbdEnabled = useKeyboardShortcutsEnabled()
+const { status: adminStatus, refresh: refreshAdminStatus } = useAdminAuth()
+
+onMounted(async () => {
+  if (!adminStatus.value) await refreshAdminStatus()
+  if (adminStatus.value?.dev && !adminStatus.value.configured) {
+    console.warn(
+      '[wcagify] WCAGIFY_ADMIN_SECRET is not set. In production, the app will be locked until this is configured.'
+    )
+  }
+})
 
 useHead({
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
@@ -21,14 +27,6 @@ useSeoMeta({
   ogDescription: () => t('app.description')
 })
 
-onKeyStroke(',', (e: KeyboardEvent) => {
-  if (!kbdEnabled.value) return
-  const target = e.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-    return
-  e.preventDefault()
-  navigateTo(localePath('/settings'))
-})
 </script>
 
 <template>
@@ -39,8 +37,3 @@ onKeyStroke(',', (e: KeyboardEvent) => {
   </UApp>
 </template>
 
-<style>
-[data-kbd='false'] [data-kbd-hint] {
-  display: none;
-}
-</style>

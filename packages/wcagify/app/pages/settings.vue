@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onKeyStroke } from '@vueuse/core'
 import { ACCENT_COLORS, NEUTRAL_COLORS } from '../composables/useSettings'
 import type { AccentColor, NeutralColor } from '../composables/useSettings'
 
@@ -7,7 +6,6 @@ const { t, locale, locales, setLocale: setNuxtLocale } = useI18n()
 const router = useRouter()
 const { settings } = useSettings()
 const colorMode = useColorMode()
-const kbdEnabled = useKeyboardShortcutsEnabled()
 
 const ACCENT_HEX: Record<string, string> = {
   green: '#22c55e',
@@ -54,14 +52,6 @@ async function onLocaleChange(code: string) {
   await setNuxtLocale(code as 'en' | 'nl')
 }
 
-onKeyStroke(',', (e: KeyboardEvent) => {
-  if (!kbdEnabled.value) return
-  const target = e.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-    return
-  e.preventDefault()
-  router.back()
-})
 
 useSeoMeta({
   title: () => `${t('settings.title')} — WCAGify`
@@ -162,25 +152,7 @@ useSeoMeta({
           </div>
         </section>
 
-        <!-- Keyboard Shortcuts -->
-        <section>
-          <h2 class="text-xs text-muted uppercase tracking-wider mb-4">
-            {{ t('settings.keyboardShortcutsSection') }}
-          </h2>
-          <div class="bg-elevated border border-default rounded-lg p-4 sm:p-6">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <span class="block text-sm font-medium">
-                  {{ t('settings.keyboardShortcuts') }}
-                </span>
-                <p class="text-sm text-muted mt-1">
-                  {{ t('settings.keyboardShortcutsDescription') }}
-                </p>
-              </div>
-              <USwitch v-model="kbdEnabled" />
-            </div>
-          </div>
-        </section>
+
       </div>
     </article>
   </main>

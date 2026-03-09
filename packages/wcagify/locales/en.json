@@ -91,7 +91,17 @@
     "adminSecret": "Admin secret",
     "adminLogin": "Authenticate",
     "adminError": "Invalid admin secret. Please try again.",
-    "error": "Something went wrong. Please try again."
+    "error": "Something went wrong. Please try again.",
+    "required": "required"
+  },
+  "admin": {
+    "loginTitle": "Sign in",
+    "loginDescription": "Enter the admin secret to access WCAGify.",
+    "setupRequired": "Setup required",
+    "setupDescription": "WCAGify requires the WCAGIFY_ADMIN_SECRET environment variable to be configured before it can be used.",
+    "secret": "Admin secret",
+    "signIn": "Sign in",
+    "invalidSecret": "Invalid admin secret. Please try again."
   },
   "settings": {
     "title": "Settings",
@@ -106,9 +116,6 @@
     "clearColor": "Clear color",
     "languageSection": "Language",
     "language": "Language",
-    "keyboardShortcutsSection": "Keyboard shortcuts",
-    "keyboardShortcuts": "Enable keyboard shortcuts",
-    "keyboardShortcutsDescription": "Show keyboard shortcut indicators throughout the interface",
     "back": "back"
   }
 }
