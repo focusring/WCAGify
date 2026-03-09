@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  title: 'Open Source WCAG accessibility audit tool - WCAGify',
   vite: {
     plugins: [tailwindcss()]
   },
