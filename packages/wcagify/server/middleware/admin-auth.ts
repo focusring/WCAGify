@@ -1,6 +1,14 @@
 import { getAdminSecret, verifySignedToken } from '../utils/shares'
 
-const PUBLIC_PREFIXES = ['/api/share/', '/api/admin/', '/share/', '/_nuxt/', '/_ipx/', '/__nuxt']
+const PUBLIC_PREFIXES = [
+  '/api/share/',
+  '/api/admin/',
+  '/share/',
+  '/_nuxt/',
+  '/_ipx/',
+  '/__nuxt',
+  '/_i18n/'
+]
 const PUBLIC_PATHS = ['/login', '/favicon.ico']
 
 function isPublicRoute(pathname: string): boolean {
