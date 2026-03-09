@@ -1,5 +1,6 @@
 import { queryCollection } from '@nuxt/content/server'
 import { generateReportPdf } from '@focusring/wcagify/pdf'
+import { createAuthLocalFetch } from '../../utils/local-fetch'
 
 export default defineEventHandler(async (event) => {
   const raw = getRouterParam(event, 'slug.pdf')
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     filename,
     weasyprintUrl: config.weasyprintUrl,
     baseUrl,
-    localFetch
+    localFetch: createAuthLocalFetch(localFetch)
   })
 
   setHeader(event, 'Content-Type', 'application/pdf')

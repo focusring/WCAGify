@@ -1,5 +1,6 @@
 import { queryCollection } from '@nuxt/content/server'
 import { generateReportPdf } from '@focusring/wcagify/pdf'
+import { createAuthLocalFetch } from '../../../utils/local-fetch'
 import { getShareByToken, verifySignedToken } from '../../../utils/shares'
 
 export default defineEventHandler(async (event) => {
@@ -41,7 +42,7 @@ export default defineEventHandler(async (event) => {
     filename,
     weasyprintUrl: config.weasyprintUrl,
     baseUrl,
-    localFetch,
+    localFetch: createAuthLocalFetch(localFetch),
     reportPath: `/reports/${share.report_slug}`
   })
 
