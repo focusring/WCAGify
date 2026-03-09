@@ -71,12 +71,14 @@
     "@nuxtjs/i18n": "catalog:core",
     "@vueuse/core": "catalog:core",
     "better-sqlite3": "catalog:core",
+    "nanoid": "catalog:",
     "nuxt-studio": "catalog:core",
     "tailwindcss": "catalog:core",
     "zod": "catalog:core"
   },
   "devDependencies": {
     "@nuxt/schema": "catalog:dev",
+    "@types/better-sqlite3": "catalog:",
     "@vitest/coverage-v8": "catalog:dev",
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev",

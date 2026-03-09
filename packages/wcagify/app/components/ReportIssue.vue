@@ -14,7 +14,7 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
 </script>
 
 <template>
-  <article :id="`issue-${issue.path.split('/').pop()}`">
+  <article :id="`issue-${issue.path.split('/').filter(Boolean).pop() || issue.path}`">
     <h4 class="font-medium text-gray-950 dark:text-white">
       {{ issue.title }}
     </h4>
@@ -25,11 +25,11 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
       </div>
       <div class="flex gap-1">
         <dt>{{ t('report.severity') }}:</dt>
-        <dd>{{ issue.severity }}</dd>
+        <dd>{{ t(`report.severityLevel.${issue.severity.toLowerCase()}`) }}</dd>
       </div>
       <div class="flex gap-1">
         <dt>{{ t('report.difficulty') }}:</dt>
-        <dd>{{ issue.difficulty }}</dd>
+        <dd>{{ t(`report.difficultyLevel.${issue.difficulty.toLowerCase()}`) }}</dd>
       </div>
       <div v-if="samplePage" class="flex gap-1">
         <dt>{{ t('report.sample') }}:</dt>

@@ -9,10 +9,15 @@ export interface ReportPdfOptions {
   weasyprintUrl: string
   baseUrl: string
   localFetch: LocalFetch
+  reportPath?: string
 }
 
 export async function generateReportPdf(options: ReportPdfOptions): Promise<Uint8Array> {
-  const pageResponse = await options.localFetch(`/reports/${options.slug}`)
+  const fetchPath = options.reportPath ?? `/reports/${options.slug}`
+  const pageResponse = await options.localFetch(fetchPath)
+  if (!pageResponse.ok) {
+    throw new Error(`Failed to fetch report page ${fetchPath}: ${pageResponse.status}`)
+  }
   const ssrHtml = await pageResponse.text()
   const html = await prepareForPdf(ssrHtml, options.baseUrl)
 

@@ -93,6 +93,10 @@ describe('getOutputFileName', () => {
     expect(getOutputFileName('npmrc.ejs')).toBe('.npmrc')
   })
 
+  it('maps env.example to .env.example', () => {
+    expect(getOutputFileName('env.example.ejs')).toBe('.env.example')
+  })
+
   it('handles regular file names', () => {
     expect(getOutputFileName('nuxt.config.ts.ejs')).toBe('nuxt.config.ts')
   })

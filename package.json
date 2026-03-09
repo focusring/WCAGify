@@ -7,7 +7,7 @@
     "dev": "pnpm --filter @wcagify/playground dev",
     "build": "pnpm --filter @wcagify/playground build",
     "preview": "pnpm --filter @wcagify/playground preview",
-    "lint": "oxlint",
+    "lint": "oxlint -c oxlint.config.ts",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "typecheck": "pnpm --filter @wcagify/playground typecheck",
