@@ -7,5 +7,8 @@ export default defineConfig({
   outDir: 'dist',
   clean: true,
   hash: false,
-  external: ['@nuxt/content', '@nuxt/kit', '@nuxt/schema']
+  deps: {
+    neverBundle: ['@nuxt/content', '@nuxt/kit', '@nuxt/schema']
+  },
+  outExtensions: () => ({ js: '.js', dts: '.d.ts' })
 })
