@@ -204,7 +204,7 @@ function formatDate(dateStr: string): string {
                   {{ t('share.expiresAt') }}: {{ formatDate(share.expires_at) }}
                 </span>
                 <UIcon
-                  v-if="share.password_hash"
+                  v-if="share.passwordProtected"
                   name="i-lucide-lock"
                   class="size-3"
                   :aria-label="t('share.passwordProtected')"

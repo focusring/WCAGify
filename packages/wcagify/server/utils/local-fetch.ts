@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { createSignedToken, getAdminSecret } from './shares'
+import { createSignedToken, getAdminSecret } from './auth'
 
 type LocalFetch = (url: string, init?: RequestInit) => Promise<Response>
 

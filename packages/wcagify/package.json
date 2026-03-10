@@ -78,6 +78,7 @@
     "zod": "catalog:core"
   },
   "devDependencies": {
+    "@libsql/client": "catalog:dev",
     "@nuxt/schema": "catalog:dev",
     "@types/better-sqlite3": "catalog:",
     "@vitest/coverage-v8": "catalog:dev",

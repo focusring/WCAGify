@@ -1,4 +1,4 @@
-import { getAdminSecret, verifySignedToken } from '../utils/shares'
+import { getAdminSecret, verifySignedToken } from '../utils/auth'
 
 const PUBLIC_PREFIXES = [
   '/api/share/',
@@ -28,14 +28,7 @@ export default defineEventHandler((event) => {
 
   const secret = getAdminSecret()
 
-  if (!secret) {
-    if (import.meta.dev) return
-
-    if (isApiRoute(pathname)) {
-      throw createError({ statusCode: 503, statusMessage: 'Admin not configured' })
-    }
-    return sendRedirect(event, '/login')
-  }
+  if (!secret) return
 
   const cookie = getCookie(event, 'wcagify-admin')
   if (cookie && verifySignedToken(cookie, secret)) return

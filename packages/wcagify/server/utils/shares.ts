@@ -1,8 +1,8 @@
-import Database from 'better-sqlite3'
-import { createHmac, pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
+import { pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
+import { join } from 'node:path'
 import { nanoid } from 'nanoid'
-import { dirname, join } from 'node:path'
-import { mkdirSync } from 'node:fs'
+import type { DbAdapter, Migration } from '../lib/db'
+import { createLibsqlAdapter, createSqliteAdapter, runMigrations } from '../lib/db'
 
 interface ShareRow {
   token: string
@@ -18,7 +18,7 @@ interface Share {
   report_slug: string
   created_at: string
   expires_at: string | null
-  password_hash: boolean
+  passwordProtected: boolean
   delete_token: string
 }
 
@@ -28,21 +28,16 @@ function toPublicShare(row: ShareRow): Share {
     report_slug: row.report_slug,
     created_at: row.created_at,
     expires_at: row.expires_at,
-    password_hash: Boolean(row.password_hash),
+    passwordProtected: Boolean(row.password_hash),
     delete_token: row.delete_token
   }
-}
-
-interface Migration {
-  version: number
-  up: (instance: Database.Database) => void
 }
 
 const migrations: Migration[] = [
   {
     version: 1,
-    up: (instance) => {
-      instance.exec(`
+    up: async (db) => {
+      await db.exec(`
         CREATE TABLE IF NOT EXISTS shares (
           token TEXT PRIMARY KEY,
           report_slug TEXT NOT NULL,
@@ -52,39 +47,33 @@ const migrations: Migration[] = [
           delete_token TEXT NOT NULL
         )
       `)
-      instance.exec(`CREATE INDEX IF NOT EXISTS idx_shares_report_slug ON shares(report_slug)`)
+      await db.exec('CREATE INDEX IF NOT EXISTS idx_shares_report_slug ON shares(report_slug)')
     }
   }
 ]
 
-function runMigrations(instance: Database.Database): void {
-  const currentVersion = (instance.pragma('user_version', { simple: true }) as number) ?? 0
+let db: DbAdapter | undefined
+let dbInit: Promise<DbAdapter> | undefined
 
-  const pending = migrations
-    .filter((m) => m.version > currentVersion)
-    .toSorted((a, b) => a.version - b.version)
-
-  for (const migration of pending) {
-    instance.transaction(() => {
-      migration.up(instance)
-      instance.pragma(`user_version = ${migration.version}`)
-    })()
+async function getDb(): Promise<DbAdapter> {
+  if (db) return db
+  if (!dbInit) {
+    dbInit = (async () => {
+      const dbUrl = process.env.DATABASE_URL
+      const adapter = dbUrl
+        ? await createLibsqlAdapter(dbUrl, process.env.DATABASE_AUTH_TOKEN)
+        : await createSqliteAdapter(
+            join(process.env.VERCEL ? '/tmp' : join(process.cwd(), '.data'), 'shares.sqlite')
+          )
+      await runMigrations(adapter, migrations)
+      return adapter
+    })().catch((error) => {
+      dbInit = undefined
+      throw error
+    })
   }
-}
-
-let sharesDb: Database.Database | undefined = undefined
-
-function getSharesDb(): Database.Database {
-  if (sharesDb) return sharesDb
-
-  const dbPath = join(process.cwd(), '.data', 'shares.sqlite')
-  mkdirSync(dirname(dbPath), { recursive: true })
-  sharesDb = new Database(dbPath)
-  sharesDb.pragma('journal_mode = WAL')
-
-  runMigrations(sharesDb)
-
-  return sharesDb
+  db = await dbInit
+  return db
 }
 
 const PBKDF2_ITERATIONS = 100_000
@@ -106,6 +95,12 @@ function verifyPassword(stored: string, password: string): boolean {
   return timingSafeEqual(storedDk, dk)
 }
 
+const SLUG_RE = /^[\da-z][\da-z-]*$/
+
+function isValidSlug(value: string): boolean {
+  return SLUG_RE.test(value)
+}
+
 function normalizeExpiresAt(expiresAt?: string): string | undefined {
   if (!expiresAt) return undefined
   const candidate = /^\d{4}-\d{2}-\d{2}$/.test(expiresAt) ? `${expiresAt}T23:59:59.999Z` : expiresAt
@@ -113,28 +108,35 @@ function normalizeExpiresAt(expiresAt?: string): string | undefined {
   return candidate
 }
 
-function createShare(reportSlug: string, expiresAt?: string, password?: string): Share {
-  const conn = getSharesDb()
+async function createShare(
+  reportSlug: string,
+  expiresAt?: string,
+  password?: string
+): Promise<Share> {
+  const conn = await getDb()
   const token = nanoid(12)
   const deleteToken = nanoid(24)
   const passwordHash = password ? hashPassword(password) : undefined
   const normalizedExpiry = normalizeExpiresAt(expiresAt)
 
-  conn
-    .prepare(
-      'INSERT INTO shares (token, report_slug, expires_at, password_hash, delete_token) VALUES (?, ?, ?, ?, ?)'
-    )
-    .run(token, reportSlug, normalizedExpiry, passwordHash, deleteToken)
+  await conn.run(
+    'INSERT INTO shares (token, report_slug, expires_at, password_hash, delete_token) VALUES (?, ?, ?, ?, ?)',
+    [token, reportSlug, normalizedExpiry, passwordHash, deleteToken]
+  )
 
-  const row = conn.prepare('SELECT * FROM shares WHERE token = ?').get(token) as ShareRow
-  return toPublicShare(row)
+  return toPublicShare({
+    token,
+    report_slug: reportSlug,
+    created_at: new Date().toISOString(),
+    expires_at: normalizedExpiry ?? null,
+    password_hash: passwordHash ?? null,
+    delete_token: deleteToken
+  })
 }
 
-function getShareByToken(token: string): ShareRow | undefined {
-  const conn = getSharesDb()
-  const share = conn.prepare('SELECT * FROM shares WHERE token = ?').get(token) as
-    | ShareRow
-    | undefined
+async function getShareByToken(token: string): Promise<ShareRow | undefined> {
+  const conn = await getDb()
+  const share = await conn.get<ShareRow>('SELECT * FROM shares WHERE token = ?', [token])
 
   if (share?.expires_at && new Date(share.expires_at) < new Date()) {
     return undefined
@@ -148,67 +150,42 @@ function verifySharePassword(share: ShareRow, password: string): boolean {
   return verifyPassword(share.password_hash, password)
 }
 
-function listSharesByReport(reportSlug: string): Share[] {
-  const conn = getSharesDb()
-  const rows = conn
-    .prepare('SELECT * FROM shares WHERE report_slug = ? ORDER BY created_at DESC')
-    .all(reportSlug) as ShareRow[]
+async function listSharesByReport(reportSlug: string): Promise<Share[]> {
+  const conn = await getDb()
+  const rows = await conn.all<ShareRow>(
+    "SELECT * FROM shares WHERE report_slug = ? AND (expires_at IS NULL OR expires_at > datetime('now')) ORDER BY created_at DESC",
+    [reportSlug]
+  )
   return rows.map(toPublicShare)
 }
 
-function deleteShare(token: string, deleteToken: string): boolean {
-  const conn = getSharesDb()
-  const result = conn
-    .prepare('DELETE FROM shares WHERE token = ? AND delete_token = ?')
-    .run(token, deleteToken)
+async function deleteShare(token: string, deleteToken: string): Promise<boolean> {
+  const conn = await getDb()
+  const result = await conn.run('DELETE FROM shares WHERE token = ? AND delete_token = ?', [
+    token,
+    deleteToken
+  ])
   return result.changes > 0
 }
 
 function resetSharesDb(): void {
-  if (sharesDb) {
-    sharesDb.close()
-    sharesDb = undefined
+  if (db) {
+    db.close()
+    db = undefined
+    dbInit = undefined
   }
-}
-
-function getAdminSecret(): string | undefined {
-  return process.env.WCAGIFY_ADMIN_SECRET || undefined
-}
-
-function isAdminConfigured(): boolean {
-  return Boolean(process.env.WCAGIFY_ADMIN_SECRET)
-}
-
-function createSignedToken(payload: string, secret: string): string {
-  const signature = createHmac('sha256', secret).update(payload).digest('hex')
-  return `${payload}.${signature}`
-}
-
-function verifySignedToken(token: string, secret: string): string | undefined {
-  const dotIndex = token.lastIndexOf('.')
-  if (dotIndex === -1) return undefined
-  const payload = token.slice(0, dotIndex)
-  const signature = token.slice(dotIndex + 1)
-  const expected = createHmac('sha256', secret).update(payload).digest('hex')
-  if (signature.length !== expected.length) return undefined
-  if (!timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex')))
-    return undefined
-  return payload
 }
 
 export {
   createShare,
-  createSignedToken,
   deleteShare,
-  getAdminSecret,
   getShareByToken,
   hashPassword,
-  isAdminConfigured,
+  isValidSlug,
   listSharesByReport,
   normalizeExpiresAt,
   resetSharesDb,
   toPublicShare,
-  verifySharePassword,
-  verifySignedToken
+  verifySharePassword
 }
 export type { Share, ShareRow }
