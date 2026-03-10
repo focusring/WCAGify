@@ -67,6 +67,7 @@ function cleanup(): void {
 function getOutputFileName(templateFileName: string): string {
   const name = templateFileName.replace('.ejs', '')
   if (name === 'gitignore') return '.gitignore'
+  if (name === 'dockerignore') return '.dockerignore'
   if (name === 'npmrc') return '.npmrc'
   if (name === 'env.example') return '.env.example'
   return name

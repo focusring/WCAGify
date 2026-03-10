@@ -64,6 +64,7 @@
   "dependencies": {
     "@iconify-json/lucide": "catalog:core",
     "@iconify-json/simple-icons": "catalog:core",
+    "@libsql/client": "catalog:dev",
     "@nuxt/a11y": "catalog:core",
     "@nuxt/content": "catalog:core",
     "@nuxt/icon": "catalog:core",

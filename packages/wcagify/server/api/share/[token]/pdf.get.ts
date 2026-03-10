@@ -1,28 +1,13 @@
 import { queryCollection } from '@nuxt/content/server'
 import { generateReportPdf } from '@focusring/wcagify/pdf'
 import { createAuthLocalFetch } from '../../../utils/local-fetch'
-import { getShareByToken, verifySignedToken } from '../../../utils/shares'
+import { requireShare, verifyShareUnlock } from '../../../utils/share-access'
 
 export default defineEventHandler(async (event) => {
-  const token = getRouterParam(event, 'token')
+  const share = await requireShare(event)
 
-  if (!token) {
-    throw createError({ statusCode: 400, statusMessage: 'Missing token' })
-  }
-
-  const share = getShareByToken(token)
-  if (!share) {
-    throw createError({ statusCode: 404, statusMessage: 'Share link not found or expired' })
-  }
-
-  if (share.password_hash) {
-    const unlockCookie = getCookie(event, `share-unlock-${token}`)
-    const verifiedToken = unlockCookie
-      ? verifySignedToken(unlockCookie, share.password_hash)
-      : undefined
-    if (verifiedToken !== token) {
-      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-    }
+  if (!verifyShareUnlock(event, share)) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
   const report = await queryCollection(event, 'reports')

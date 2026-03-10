@@ -2,6 +2,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { join } from 'node:path'
 import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { EventEmitter } from 'node:events'
+
+const { mockSpawn } = vi.hoisted(() => {
+  const mockSpawn = vi.fn()
+  return { mockSpawn }
+})
+
+vi.mock('node:child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:child_process')>()
+  return { ...actual, spawn: mockSpawn }
+})
 
 vi.mock('@clack/prompts', () => ({
   intro: vi.fn(),
@@ -124,14 +135,15 @@ describe('createSafeSpinner', () => {
     expect(() => s.message('test')).not.toThrow()
   })
 
-  it('creates TTY spinner when TTY is available', () => {
+  it('creates TTY spinner when TTY is available and methods work', () => {
     const origStdout = process.stdout.isTTY
     const origStdin = process.stdin.isTTY
     process.stdout.isTTY = true
     process.stdin.isTTY = true
     const s = createSafeSpinner()
-    expect(typeof s.start).toBe('function')
-    expect(typeof s.stop).toBe('function')
+    expect(() => s.start('loading')).not.toThrow()
+    expect(() => s.message('updating')).not.toThrow()
+    expect(() => s.stop('done')).not.toThrow()
     process.stdout.isTTY = origStdout
     process.stdin.isTTY = origStdin
   })
@@ -212,13 +224,29 @@ describe('renderTemplatesRecursively', () => {
   })
 })
 
+function createMockChildProcess(exitCode: number) {
+  const emitter = new EventEmitter()
+  setImmediate(() => emitter.emit('close', exitCode))
+  return emitter
+}
+
 describe('runCommand', () => {
   it('resolves on successful command', async () => {
+    mockSpawn.mockReturnValue(createMockChildProcess(0))
     await expect(runCommand('echo', ['hello'], process.cwd())).resolves.toBeUndefined()
   })
 
   it('rejects on failed command', async () => {
+    mockSpawn.mockReturnValue(createMockChildProcess(1))
     await expect(runCommand('exit', ['1'], process.cwd())).rejects.toThrow(/exited with code/)
+  })
+
+  it('rejects on spawn error', async () => {
+    const emitter = new EventEmitter()
+    mockSpawn.mockReturnValue(emitter)
+    const promise = runCommand('nonexistent', [], process.cwd())
+    emitter.emit('error', new Error('spawn ENOENT'))
+    await expect(promise).rejects.toThrow('spawn ENOENT')
   })
 })
 
@@ -233,6 +261,7 @@ describe('create', () => {
     tempDir = join(tmpdir(), `wcagify-create-test-${Date.now()}`)
     mkdirSync(tempDir, { recursive: true })
     vi.spyOn(process, 'cwd').mockReturnValue(tempDir)
+    mockSpawn.mockImplementation(() => createMockChildProcess(0))
   })
 
   afterEach(() => {
@@ -276,5 +305,85 @@ describe('create', () => {
     await create({ name: 'no-install-test', git: false, install: false })
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('pnpm install'))
     consoleSpy.mockRestore()
+  })
+
+  it('handles git init failure gracefully', async () => {
+    mockSpawn.mockImplementation((cmd: string) => {
+      return createMockChildProcess(cmd === 'git' ? 1 : 0)
+    })
+
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    await create({ name: 'git-fail-test', git: true, install: false })
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('Git initialization failed'))
+    consoleSpy.mockRestore()
+  })
+
+  it('handles install failure gracefully', async () => {
+    mockSpawn.mockImplementation((cmd: string) => {
+      return createMockChildProcess(cmd === 'pnpm' ? 1 : 0)
+    })
+
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    await create({ name: 'install-fail-test', git: false, install: true })
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('Dependency installation failed'))
+    consoleSpy.mockRestore()
+  })
+
+  it('runs interactive prompts when no name is provided', async () => {
+    const { text, confirm, isCancel } = await import('@clack/prompts')
+    vi.mocked(text).mockResolvedValue('prompted-project')
+    vi.mocked(confirm).mockResolvedValueOnce(false).mockResolvedValueOnce(false)
+    vi.mocked(isCancel).mockReturnValue(false)
+
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    await create({})
+    expect(text).toHaveBeenCalled()
+    expect(confirm).toHaveBeenCalledTimes(2)
+    expect(existsSync(join(tempDir, 'prompted-project'))).toBe(true)
+    consoleSpy.mockRestore()
+  })
+
+  it('exits when user cancels project name prompt', async () => {
+    const { text, isCancel, cancel } = await import('@clack/prompts')
+    vi.mocked(text).mockResolvedValue(Symbol('cancel') as any)
+    vi.mocked(isCancel).mockReturnValue(true)
+
+    await expect(create({})).rejects.toThrow()
+    expect(cancel).toHaveBeenCalledWith('Operation cancelled')
+  })
+
+  it('exits when user cancels git confirm prompt', async () => {
+    const { text, confirm, isCancel, cancel } = await import('@clack/prompts')
+    vi.mocked(text).mockResolvedValue('cancel-git-test')
+    vi.mocked(isCancel).mockReturnValueOnce(false).mockReturnValueOnce(true)
+    vi.mocked(confirm).mockResolvedValueOnce(Symbol('cancel') as any)
+
+    await expect(create({})).rejects.toThrow()
+    expect(cancel).toHaveBeenCalledWith('Operation cancelled')
+  })
+
+  it('exits when user cancels install confirm prompt', async () => {
+    const { text, confirm, isCancel, cancel } = await import('@clack/prompts')
+    vi.mocked(text).mockResolvedValue('cancel-install-test')
+    vi.mocked(isCancel)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true)
+    vi.mocked(confirm)
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(Symbol('cancel') as any)
+
+    await expect(create({})).rejects.toThrow()
+    expect(cancel).toHaveBeenCalledWith('Operation cancelled')
+  })
+
+  it('cleans up created files on unexpected error', async () => {
+    const { fetchLatestWcagifyVersion } = await import('../../src/version.js')
+    vi.mocked(fetchLatestWcagifyVersion).mockRejectedValueOnce(new Error('boom'))
+
+    await expect(create({ name: 'cleanup-test' })).rejects.toThrow()
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('Cleaning up'))
+    expect(log.info).toHaveBeenCalledWith(expect.stringContaining('Cleanup complete'))
+    expect(existsSync(join(tempDir, 'cleanup-test'))).toBe(false)
   })
 })

@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { getAdminSecret, isAdminConfigured } from '../../server/utils/auth'
 import {
   hashPassword,
   verifySharePassword,
   normalizeExpiresAt,
-  toPublicShare,
-  getAdminSecret,
-  isAdminConfigured
+  toPublicShare
 } from '../../server/utils/shares'
 import type { ShareRow } from '../../server/utils/shares'
 
@@ -89,14 +88,14 @@ describe('toPublicShare', () => {
     delete_token: 'del456'
   }
 
-  it('converts password_hash string to true', () => {
+  it('converts password_hash string to passwordProtected true', () => {
     const result = toPublicShare(baseRow)
-    expect(result.password_hash).toBe(true)
+    expect(result.passwordProtected).toBe(true)
   })
 
-  it('converts null password_hash to false', () => {
+  it('converts null password_hash to passwordProtected false', () => {
     const result = toPublicShare({ ...baseRow, password_hash: null })
-    expect(result.password_hash).toBe(false)
+    expect(result.passwordProtected).toBe(false)
   })
 
   it('preserves all other fields', () => {
@@ -109,59 +108,53 @@ describe('toPublicShare', () => {
   })
 })
 
-describe('getAdminSecret', () => {
-  let originalSecret: string | undefined
+function withEnv(key: string, fn: () => void) {
+  let original: string | undefined
 
   beforeEach(() => {
-    originalSecret = process.env.WCAGIFY_ADMIN_SECRET
+    original = process.env[key]
   })
 
   afterEach(() => {
-    if (originalSecret !== undefined) {
-      process.env.WCAGIFY_ADMIN_SECRET = originalSecret
+    if (original !== undefined) {
+      process.env[key] = original
     } else {
-      delete process.env.WCAGIFY_ADMIN_SECRET
+      delete process.env[key]
     }
   })
 
-  it('returns env var when set', () => {
-    process.env.WCAGIFY_ADMIN_SECRET = 'my-secret'
-    expect(getAdminSecret()).toBe('my-secret')
-  })
+  fn()
+}
 
-  it('returns undefined when env var is not set', () => {
-    delete process.env.WCAGIFY_ADMIN_SECRET
-    expect(getAdminSecret()).toBeUndefined()
-  })
+describe('getAdminSecret', () => {
+  withEnv('WCAGIFY_ADMIN_SECRET', () => {
+    it('returns env var when set', () => {
+      process.env.WCAGIFY_ADMIN_SECRET = 'my-secret'
+      expect(getAdminSecret()).toBe('my-secret')
+    })
 
-  it('returns undefined for empty string', () => {
-    process.env.WCAGIFY_ADMIN_SECRET = ''
-    expect(getAdminSecret()).toBeUndefined()
+    it('returns undefined when env var is not set', () => {
+      delete process.env.WCAGIFY_ADMIN_SECRET
+      expect(getAdminSecret()).toBeUndefined()
+    })
+
+    it('returns undefined for empty string', () => {
+      process.env.WCAGIFY_ADMIN_SECRET = ''
+      expect(getAdminSecret()).toBeUndefined()
+    })
   })
 })
 
 describe('isAdminConfigured', () => {
-  let originalSecret: string | undefined
+  withEnv('WCAGIFY_ADMIN_SECRET', () => {
+    it('returns true when env var is set', () => {
+      process.env.WCAGIFY_ADMIN_SECRET = 'configured'
+      expect(isAdminConfigured()).toBe(true)
+    })
 
-  beforeEach(() => {
-    originalSecret = process.env.WCAGIFY_ADMIN_SECRET
-  })
-
-  afterEach(() => {
-    if (originalSecret !== undefined) {
-      process.env.WCAGIFY_ADMIN_SECRET = originalSecret
-    } else {
+    it('returns false when env var is not set', () => {
       delete process.env.WCAGIFY_ADMIN_SECRET
-    }
-  })
-
-  it('returns true when env var is set', () => {
-    process.env.WCAGIFY_ADMIN_SECRET = 'configured'
-    expect(isAdminConfigured()).toBe(true)
-  })
-
-  it('returns false when env var is not set', () => {
-    delete process.env.WCAGIFY_ADMIN_SECRET
-    expect(isAdminConfigured()).toBe(false)
+      expect(isAdminConfigured()).toBe(false)
+    })
   })
 })

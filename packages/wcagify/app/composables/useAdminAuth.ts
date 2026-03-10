@@ -23,7 +23,7 @@ function useAdminAuth() {
   const isAuthenticated = computed(() => {
     const s = status.value
     if (!s) return false
-    if (s.dev && !s.configured) return true
+    if (!s.configured) return true
     return s.authenticated
   })
 

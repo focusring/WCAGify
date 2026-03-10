@@ -1,26 +1,11 @@
 import { queryCollection } from '@nuxt/content/server'
-import { getShareByToken, verifySignedToken } from '../../utils/shares'
+import { requireShare, verifyShareUnlock } from '../../utils/share-access'
 
 export default defineEventHandler(async (event) => {
-  const token = getRouterParam(event, 'token')
+  const share = await requireShare(event)
 
-  if (!token) {
-    throw createError({ statusCode: 400, statusMessage: 'Missing token' })
-  }
-
-  const share = getShareByToken(token)
-  if (!share) {
-    throw createError({ statusCode: 404, statusMessage: 'Share link not found or expired' })
-  }
-
-  if (share.password_hash) {
-    const unlockCookie = getCookie(event, `share-unlock-${token}`)
-    const verifiedToken = unlockCookie
-      ? verifySignedToken(unlockCookie, share.password_hash)
-      : undefined
-    if (verifiedToken !== token) {
-      return { passwordRequired: true, token }
-    }
+  if (!verifyShareUnlock(event, share)) {
+    return { passwordRequired: true, token: share.token }
   }
 
   const reportPath = `/reports/${share.report_slug}`
@@ -34,5 +19,5 @@ export default defineEventHandler(async (event) => {
     .where('path', 'LIKE', `${reportPath}/%`)
     .all()
 
-  return { report, issues, token }
+  return { report, issues, token: share.token }
 })

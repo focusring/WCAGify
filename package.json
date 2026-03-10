@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @wcagify/playground dev",
-    "build": "pnpm --filter @wcagify/playground build",
+    "build": "pnpm --filter @focusring/wcagify build && pnpm --filter @wcagify/playground build",
     "preview": "pnpm --filter @wcagify/playground preview",
+    "start": "node playground/.output/server/index.mjs",
     "lint": "oxlint -c oxlint.config.ts",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",

@@ -1,4 +1,4 @@
-import { getAdminSecret, verifySignedToken } from '../../utils/shares'
+import { getAdminSecret, verifySignedToken } from '../../utils/auth'
 
 export default defineEventHandler((event) => {
   const secret = getAdminSecret()

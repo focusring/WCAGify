@@ -56,4 +56,5 @@ wcagify/
 
 - Learn how to [create reports](/guide/reports)
 - Understand how [issues](/guide/issues) are structured
+- [Deploy to production](/guide/deployment)
 - Explore the [configuration reference](/reference/configuration)

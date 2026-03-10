@@ -1,16 +1,9 @@
-import { createSignedToken, getShareByToken, verifySharePassword } from '../../utils/shares'
+import { createSignedToken } from '../../utils/auth'
+import { requireShare } from '../../utils/share-access'
+import { verifySharePassword } from '../../utils/shares'
 
 export default defineEventHandler(async (event) => {
-  const token = getRouterParam(event, 'token')
-
-  if (!token) {
-    throw createError({ statusCode: 400, statusMessage: 'Missing token' })
-  }
-
-  const share = getShareByToken(token)
-  if (!share) {
-    throw createError({ statusCode: 404, statusMessage: 'Share link not found or expired' })
-  }
+  const share = await requireShare(event)
 
   if (!share.password_hash) {
     return { ok: true }
@@ -23,9 +16,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid password' })
   }
 
-  const unlockValue = createSignedToken(token, share.password_hash)
+  const unlockValue = createSignedToken(share.token, share.password_hash)
 
-  setCookie(event, `share-unlock-${token}`, unlockValue, {
+  setCookie(event, `share-unlock-${share.token}`, unlockValue, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',

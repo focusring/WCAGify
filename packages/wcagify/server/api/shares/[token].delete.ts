@@ -12,11 +12,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Missing deleteToken' })
   }
 
-  const deleted = deleteShare(token, body.deleteToken)
+  const deleted = await deleteShare(token, body.deleteToken)
   if (!deleted) {
     throw createError({ statusCode: 403, statusMessage: 'Invalid delete token or share not found' })
   }
 
   setResponseStatus(event, 204)
-  return ''
 })
