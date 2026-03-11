@@ -7,7 +7,7 @@ interface DbAdapter {
   exec(sql: string): Promise<void>
   getUserVersion(): Promise<number>
   setUserVersion(version: number): Promise<void>
-  transaction(fn: () => Promise<void>): Promise<void>
+  transaction(fn: (tx: DbAdapter) => Promise<void>): Promise<void>
   close(): void
 }
 
@@ -15,47 +15,68 @@ interface DbAdapter {
 const sanitizeParams = (params: unknown[]) =>
   params.map((p) => (p === undefined ? null : p)) as InValue[]
 
-async function createLibsqlAdapter(url: string, authToken?: string): Promise<DbAdapter> {
-  const { createClient } = await import('@libsql/client')
-  const client = createClient({ url, authToken })
+interface Executable {
+  execute(stmt: string | { sql: string; args: InValue[] }): Promise<{
+    rowsAffected: number
+    rows: unknown[]
+  }>
+}
 
+function buildMethods(target: Executable) {
   return {
-    async run(sql, params = []) {
-      const r = await client.execute({ sql, args: sanitizeParams(params) })
+    async run(sql: string, params: unknown[] = []) {
+      const r = await target.execute({ sql, args: sanitizeParams(params) })
       return { changes: r.rowsAffected }
     },
     async get<T>(sql: string, params: unknown[] = []) {
-      const r = await client.execute({ sql, args: sanitizeParams(params) })
+      const r = await target.execute({ sql, args: sanitizeParams(params) })
       return (r.rows[0] as T) ?? undefined
     },
     async all<T>(sql: string, params: unknown[] = []) {
-      const r = await client.execute({ sql, args: sanitizeParams(params) })
+      const r = await target.execute({ sql, args: sanitizeParams(params) })
       return r.rows as unknown as T[]
     },
-    async exec(sql) {
-      await client.execute(sql)
+    async exec(sql: string) {
+      await target.execute(sql)
     },
     async getUserVersion() {
-      await client.execute(
+      await target.execute(
         'CREATE TABLE IF NOT EXISTS _migrations (key TEXT PRIMARY KEY, value INTEGER NOT NULL)'
       )
-      const r = await client.execute({
+      const r = await target.execute({
         sql: 'SELECT value FROM _migrations WHERE key = ?',
         args: ['user_version']
       })
       return ((r.rows[0] as Record<string, unknown>)?.value as number) ?? 0
     },
-    async setUserVersion(version) {
+    async setUserVersion(version: number) {
       if (!Number.isInteger(version)) throw new Error(`Invalid user_version: ${version}`)
-      await client.execute({
+      await target.execute({
         sql: 'INSERT OR REPLACE INTO _migrations (key, value) VALUES (?, ?)',
         args: ['user_version', version]
       })
-    },
+    }
+  }
+}
+
+async function createLibsqlAdapter(url: string, authToken?: string): Promise<DbAdapter> {
+  const { createClient } = await import('@libsql/client')
+  const client = createClient({ url, authToken })
+  const methods = buildMethods(client)
+
+  return {
+    ...methods,
     async transaction(fn) {
       const tx = await client.transaction('write')
+      const txAdapter: DbAdapter = {
+        ...buildMethods(tx),
+        transaction() {
+          throw new Error('Nested transactions are not supported')
+        },
+        close() {}
+      }
       try {
-        await fn()
+        await fn(txAdapter)
         await tx.commit()
       } catch (error) {
         await tx.rollback()
@@ -90,9 +111,9 @@ async function runMigrations(db: DbAdapter, migrations: Migration[]): Promise<vo
     .toSorted((a, b) => a.version - b.version)
 
   for (const migration of pending) {
-    await db.transaction(async () => {
-      await migration.up(db)
-      await db.setUserVersion(migration.version)
+    await db.transaction(async (tx) => {
+      await migration.up(tx)
+      await tx.setUserVersion(migration.version)
     })
   }
 }
