@@ -1,6 +1,6 @@
 {
   "name": "@focusring/wcagify",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "WCAG accessibility audit tool — Nuxt layer with report generation and PDF export",
   "keywords": [
     "a11y",
