@@ -1,7 +1,14 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/pdf/index.ts', 'src/module.ts', 'src/config.ts', 'src/content.ts'],
+  entry: [
+    'src/index.ts',
+    'src/pdf/index.ts',
+    'src/module.ts',
+    'src/config.ts',
+    'src/content.ts',
+    'src/cli/new-report.ts'
+  ],
   format: 'esm',
   dts: true,
   outDir: 'dist',

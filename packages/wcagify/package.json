@@ -16,6 +16,9 @@
     "url": "https://github.com/focusring/WCAGify.git",
     "directory": "packages/wcagify"
   },
+  "bin": {
+    "wcagify-new-report": "./dist/cli/new-report.js"
+  },
   "files": [
     "dist",
     "app",

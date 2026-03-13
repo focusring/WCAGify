@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @wcagify/playground dev",
+    "report:add": "pnpm --filter @wcagify/playground exec wcagify-new-report",
     "build": "pnpm --filter @focusring/wcagify build && pnpm --filter @wcagify/playground build",
     "preview": "pnpm --filter @wcagify/playground preview",
     "start": "node playground/.output/server/index.mjs",
