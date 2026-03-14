@@ -1,4 +1,6 @@
-const dir = new URL('.', import.meta.url).pathname
+import { fileURLToPath } from 'node:url'
+
+const dir = fileURLToPath(new URL('.', import.meta.url))
 
 const hasStudioRepoInfo = Boolean(
   (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG) ||
