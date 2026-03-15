@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.3.0",
-    "@types/chrome": "^0.0.304",
+    "@types/chrome": "^0.1.37",
     "@vitejs/plugin-vue": "^6.0.5",
     "happy-dom": "^18.0.1",
     "tailwindcss": "catalog:core",
