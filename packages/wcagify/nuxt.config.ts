@@ -64,16 +64,20 @@ const nuxtConfig = {
   i18n: {
     defaultLocale: 'en',
     strategy: 'no_prefix',
+    restructureDir: false,
+    langDir: 'locales',
     locales: [
       {
         code: 'en',
         name: 'English',
-        language: 'en-US'
+        language: 'en-US',
+        file: 'en.ts'
       },
       {
         code: 'nl',
         name: 'Nederlands',
-        language: 'nl-NL'
+        language: 'nl-NL',
+        file: 'nl.ts'
       }
     ],
     detectBrowserLanguage: {

@@ -1,0 +1,28 @@
+{
+  "name": "@wcagify/browser-extension",
+  "version": "0.3.4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nuxt/ui": "catalog:",
+    "@tiptap/core": "catalog:",
+    "@tiptap/vue-3": "catalog:",
+    "vue": "^3.5.30"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.3.0",
+    "@types/chrome": "^0.0.304",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "happy-dom": "^18.0.1",
+    "tailwindcss": "catalog:core",
+    "typescript": "catalog:dev",
+    "vite": "^8.0.0",
+    "vitest": "catalog:dev"
+  }
+}

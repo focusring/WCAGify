@@ -1,14 +1,17 @@
 import type { NuxtConfig } from '@nuxt/schema'
 
 export function defineWcagifyConfig(userConfig: NuxtConfig = {}): NuxtConfig {
-  let userExtends: string[] = []
-  if (userConfig.extends) {
-    userExtends = Array.isArray(userConfig.extends) ? userConfig.extends : [userConfig.extends]
-  }
+  const { extends: configExtends, ...rest } = userConfig
+  const userExtends = Array.isArray(configExtends)
+    ? configExtends
+    : configExtends
+      ? [configExtends]
+      : []
 
   return {
-    ...userConfig,
-    extends: ['@focusring/wcagify/layer', ...userExtends],
+    ...rest,
+    // eslint-disable-next-line no-nested-ternary
+    extends: ['@focusring/wcagify/layer', ...userExtends] as NuxtConfig['extends'],
     compatibilityDate: userConfig.compatibilityDate ?? '2025-01-15'
   }
 }

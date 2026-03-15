@@ -67,7 +67,7 @@ export function scaffoldProject(name: string): string {
 
 export function cleanupTmpDir(): void {
   if (existsSync(TMP_DIR)) {
-    rmSync(TMP_DIR, { recursive: true, force: true })
+    rmSync(TMP_DIR, { recursive: true, force: true, maxRetries: 3, retryDelay: 500 })
   }
 }
 

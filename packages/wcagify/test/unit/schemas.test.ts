@@ -102,7 +102,7 @@ describe('reportSchema', () => {
   })
 
   it('works without outOfScope', () => {
-    const { outOfScope: _, ...withoutOutOfScope } = valid
-    expect(reportSchema.parse(withoutOutOfScope)).toBeDefined()
+    // valid already lacks outOfScope — just confirm it parses
+    expect(reportSchema.parse(valid)).toBeDefined()
   })
 })

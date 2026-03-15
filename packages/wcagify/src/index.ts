@@ -3,6 +3,7 @@ export { reportSchema, issueSchema, evaluationSchema, samplePageSchema } from '.
 export { filterIssues, sortIssuesBySc, filterTips, groupIssuesBySc } from './issues'
 export { resolveSamplePage } from './report'
 export { defineWcagifyConfig } from './config'
+export { toSlug, buildIssueFrontmatter, escapeYamlValue } from './content-utils'
 export type {
   WcagVersion,
   Language,

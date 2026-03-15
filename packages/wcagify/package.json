@@ -53,8 +53,8 @@
       "import": "./dist/pdf/index.js",
       "default": "./src/pdf/index.ts"
     },
-    "./locales/en": "./locales/en.json",
-    "./locales/nl": "./locales/nl.json",
+    "./locales/en": "./locales/en.ts",
+    "./locales/nl": "./locales/nl.ts",
     "./print.css": "./print.css",
     "./layer": "./nuxt.config.ts"
   },

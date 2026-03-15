@@ -15,13 +15,16 @@ describe('defineWcagifyCollections', () => {
 
   it('reports collection sources index.md files', () => {
     const { reports } = defineWcagifyCollections()
-    expect(reports.source.include).toBe('reports/**/index.md')
+    // Mock returns raw config object, not resolved type
+    const source = reports.source as unknown as { include: string }
+    expect(source.include).toBe('reports/**/index.md')
   })
 
   it('issues collection excludes index.md files', () => {
     const { issues } = defineWcagifyCollections()
-    expect(issues.source.include).toBe('reports/**/*.md')
-    expect(issues.source.exclude).toContain('reports/**/index.md')
+    const source = issues.source as unknown as { include: string; exclude: string[] }
+    expect(source.include).toBe('reports/**/*.md')
+    expect(source.exclude).toContain('reports/**/index.md')
   })
 
   it('reports collection has page type', () => {

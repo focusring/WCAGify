@@ -1,5 +1,5 @@
 import type { NuxtModule } from '@nuxt/schema'
-import { defineNuxtModule, createResolver } from '@nuxt/kit'
+import { defineNuxtModule } from '@nuxt/kit'
 
 const module: NuxtModule = defineNuxtModule({
   meta: {
@@ -7,8 +7,6 @@ const module: NuxtModule = defineNuxtModule({
     configKey: 'wcagify'
   },
   setup(_options, nuxt) {
-    const { resolve } = createResolver(import.meta.url)
-
     if (nuxt.options.dev) {
       nuxt.hook('listen', () => {
         if (!process.env.WCAGIFY_ADMIN_SECRET) {
@@ -18,16 +16,6 @@ const module: NuxtModule = defineNuxtModule({
         }
       })
     }
-
-    nuxt.hook('i18n:registerModule', (register) => {
-      register({
-        langDir: resolve('../locales'),
-        locales: [
-          { code: 'nl', file: 'nl.json' },
-          { code: 'en', file: 'en.json' }
-        ]
-      })
-    })
   }
 })
 

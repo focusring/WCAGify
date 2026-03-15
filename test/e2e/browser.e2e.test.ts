@@ -118,4 +118,167 @@ describe('Browser E2E', () => {
       expect(bodyContent).toContain('AA')
     })
   })
+
+  describe('browser extension integration', () => {
+    let reportSlug: string
+    let sampleId: string
+
+    it('GET /api/reports returns reports with correct shape', async () => {
+      const response = await fetch(`${baseUrl}/api/reports`)
+      expect(response.ok).toBe(true)
+
+      const reports = await response.json()
+      expect(reports.length).toBeGreaterThan(0)
+
+      const report = reports[0]
+      expect(report).toHaveProperty('slug')
+      expect(report).toHaveProperty('title')
+      expect(report).toHaveProperty('sample')
+      expect(Array.isArray(report.sample)).toBe(true)
+
+      reportSlug = report.slug
+      sampleId = report.sample[0]?.id ?? 'homepage'
+
+      if (report.sample.length > 0) {
+        const samplePage = report.sample[0]
+        expect(samplePage).toHaveProperty('title')
+        expect(samplePage).toHaveProperty('id')
+        expect(samplePage).toHaveProperty('url')
+      }
+    })
+
+    it('POST /api/issues creates an issue with description', async () => {
+      const response = await fetch(`${baseUrl}/api/issues`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          report: reportSlug,
+          title: 'Missing focus indicator on navigation links',
+          sc: '2.4.7',
+          severity: 'High',
+          difficulty: 'Low',
+          sample: sampleId,
+          description:
+            '**Found on:** [https://example.com](https://example.com)\n\n**Element:** `nav > a.menu-item`'
+        })
+      })
+
+      expect(response.ok).toBe(true)
+      const result = await response.json()
+      expect(result.success).toBe(true)
+      expect(result.path).toContain('.md')
+    })
+
+    it('POST /api/issues creates an issue without description', async () => {
+      const response = await fetch(`${baseUrl}/api/issues`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          report: reportSlug,
+          title: 'Insufficient color contrast on buttons',
+          sc: '1.4.3',
+          severity: 'Medium',
+          difficulty: 'Medium',
+          sample: sampleId
+        })
+      })
+
+      expect(response.ok).toBe(true)
+    })
+
+    it('POST /api/issues handles duplicate titles', async () => {
+      const issueData = {
+        report: reportSlug,
+        title: 'Duplicate title test issue',
+        sc: '1.1.1',
+        severity: 'Low' as const,
+        difficulty: 'Low' as const,
+        sample: sampleId
+      }
+
+      const result1 = await (
+        await fetch(`${baseUrl}/api/issues`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(issueData)
+        })
+      ).json()
+
+      const result2 = await (
+        await fetch(`${baseUrl}/api/issues`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(issueData)
+        })
+      ).json()
+
+      expect(result1.path).not.toBe(result2.path)
+      expect(result2.path).toContain('-2.md')
+    })
+
+    it('POST /api/issues rejects invalid input', async () => {
+      const [empty, traversal, missing] = await Promise.all([
+        fetch(`${baseUrl}/api/issues`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ report: reportSlug, title: '' })
+        }),
+        fetch(`${baseUrl}/api/issues`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            report: '../../../etc/passwd',
+            title: 'Path traversal attempt',
+            sc: '1.1.1',
+            severity: 'Low',
+            difficulty: 'Low',
+            sample: sampleId
+          })
+        }),
+        fetch(`${baseUrl}/api/issues`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            report: 'non-existent-report',
+            title: 'Missing report',
+            sc: '1.1.1',
+            severity: 'Low',
+            difficulty: 'Low',
+            sample: sampleId
+          })
+        })
+      ])
+
+      expect(empty.status).toBe(400)
+      expect(traversal.status).toBe(400)
+      expect(missing.status).toBe(404)
+    })
+
+    it('submitted issue appears on the report page', async () => {
+      const issueTitle = 'E2E round-trip keyboard trap test'
+      await fetch(`${baseUrl}/api/issues`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          report: reportSlug,
+          title: issueTitle,
+          sc: '2.1.2',
+          severity: 'High',
+          difficulty: 'Medium',
+          sample: sampleId,
+          description: 'Keyboard focus gets trapped in the email input field.'
+        })
+      })
+
+      await page.goto(baseUrl)
+      await page.waitForSelector('table')
+      const reportLink = await page.waitForSelector('table a')
+      await reportLink.click()
+      await page.waitForSelector('#issues', { timeout: 30_000 })
+
+      const issuesContent = await page.textContent('#issues')
+      expect(issuesContent).toContain('2.1.2')
+      expect(issuesContent).toContain(issueTitle)
+    })
+  })
 })

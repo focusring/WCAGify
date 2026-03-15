@@ -120,8 +120,8 @@ function runCommand(command: string, args: string[], cwd: string): Promise<void>
   })
 }
 
-function validateProjectName(value: string): string | undefined {
-  if (!value.trim()) return 'Project name is required'
+function validateProjectName(value: string | undefined): string | undefined {
+  if (!value?.trim()) return 'Project name is required'
   if (!/^[a-z0-9-]+$/.test(value)) return 'Must be lowercase alphanumeric with hyphens only'
   if (value.startsWith('-') || value.endsWith('-')) return 'Cannot start or end with a hyphen'
   return undefined
