@@ -4,7 +4,7 @@ export default defineManifest({
   manifest_version: 3,
   name: 'WCAGify',
   description: 'WCAG accessibility audit tool',
-  version: '0.3.4',
+  version: '0.4.0',
   icons: {
     '16': 'src/assets/wcagify-16.png',
     '48': 'src/assets/wcagify-48.png',
