@@ -5,7 +5,9 @@ import {
   scorecard,
   conformanceSummary,
   scorecardByLevel,
-  PRINCIPLES
+  PRINCIPLES,
+  guidelineName,
+  allScEntries
 } from '../../src/wcag'
 
 describe('PRINCIPLES', () => {
@@ -178,5 +180,47 @@ describe('scorecardByLevel', () => {
     const expected = scorecard(issues, 'AA', '2.2')
 
     expect(result.total).toEqual(expected)
+  })
+})
+
+describe('guidelineName', () => {
+  it('returns the English name for a known guideline', () => {
+    expect(guidelineName('1.1', '2.2', 'en')).toBe('Text Alternatives')
+  })
+
+  it('returns the Dutch name for a known guideline', () => {
+    expect(guidelineName('1.1', '2.2', 'nl')).toBe('Tekstalternatieven')
+  })
+
+  it('returns the guideline code for an unknown guideline', () => {
+    expect(guidelineName('9.9', '2.2', 'en')).toBe('9.9')
+  })
+
+  it('uses default version and language', () => {
+    expect(guidelineName('2.1')).toBe('Keyboard Accessible')
+  })
+
+  it('handles WCAG 2.0', () => {
+    expect(guidelineName('2.3', '2.0', 'en')).toBe('Seizures')
+  })
+})
+
+describe('allScEntries', () => {
+  it('returns an object with SC entries for the given version and language', () => {
+    const entries = allScEntries('2.2', 'en')
+    expect(entries).toHaveProperty('1.1.1')
+    expect(entries['1.1.1']).toHaveProperty('name')
+    expect(entries['1.1.1']).toHaveProperty('slug')
+    expect(entries['1.1.1']).toHaveProperty('level')
+  })
+
+  it('uses default version and language', () => {
+    const entries = allScEntries()
+    expect(entries).toHaveProperty('1.1.1')
+  })
+
+  it('returns entries for WCAG 2.1', () => {
+    const entries = allScEntries('2.1', 'en')
+    expect(entries).toHaveProperty('1.1.1')
   })
 })

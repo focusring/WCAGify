@@ -270,15 +270,20 @@ describe('Browser E2E', () => {
         })
       })
 
-      await page.goto(baseUrl)
-      await page.waitForSelector('table')
-      const reportLink = await page.waitForSelector('table a')
-      await reportLink.click()
+      // Wait for Nuxt Content to index the new file, then navigate to the report
+      await new Promise((resolve) => setTimeout(resolve, 2_000))
+      await page.goto(`${baseUrl}/reports/${reportSlug}`, { waitUntil: 'networkidle' })
       await page.waitForSelector('#issues', { timeout: 30_000 })
 
       const issuesContent = await page.textContent('#issues')
       expect(issuesContent).toContain('2.1.2')
-      expect(issuesContent).toContain(issueTitle)
+
+      // Issue title is inside a collapsed criterion accordion — click to expand
+      await page.locator('#issues button', { hasText: '2.1.2' }).first().click()
+      await page.waitForSelector(`text=${issueTitle}`)
+
+      const expandedContent = await page.textContent('#issues')
+      expect(expandedContent).toContain(issueTitle)
     })
   })
 })

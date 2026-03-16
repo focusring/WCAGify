@@ -1,16 +1,16 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-brand: #16a34a;
-  --color-brand-light: #22c55e;
-  --color-brand-dark: #15803d;
+  --color-brand: #15803d;
+  --color-brand-light: #16a34a;
+  --color-brand-dark: #166534;
 }
 
 :root {
   --vp-c-brand-1: var(--color-brand);
   --vp-c-brand-2: var(--color-brand-dark);
-  --vp-c-brand-3: #166534;
-  --vp-c-brand-soft: rgba(22, 163, 74, 0.14);
+  --vp-c-brand-3: #14532d;
+  --vp-c-brand-soft: rgba(21, 128, 61, 0.14);
   --vp-button-brand-bg: var(--vp-c-brand-1);
   --vp-button-brand-hover-bg: var(--vp-c-brand-2);
 }
@@ -20,8 +20,10 @@
 }
 
 .dark {
-  --vp-c-brand-1: var(--color-brand-light);
-  --vp-c-brand-2: var(--color-brand);
-  --vp-c-brand-3: var(--color-brand-dark);
-  --vp-c-brand-soft: rgba(34, 197, 94, 0.14);
+  --vp-c-brand-1: #4ade80;
+  --vp-c-brand-2: #22c55e;
+  --vp-c-brand-3: var(--color-brand-light);
+  --vp-c-brand-soft: rgba(74, 222, 128, 0.14);
+  --vp-button-brand-bg: var(--color-brand);
+  --vp-button-brand-hover-bg: var(--color-brand-dark);
 }
