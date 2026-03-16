@@ -19,6 +19,7 @@ export default {
     conformanceTarget: 'Conformance target',
     conformanceResult: 'Conformance result',
     specialRequirements: 'Special requirements',
+    navigationTitle: 'Navigation',
     executiveSummary: 'Executive summary',
     resultsPerPrinciple: 'Results per principle',
     aboutThisReport: 'About this report',

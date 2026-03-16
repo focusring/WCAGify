@@ -18,7 +18,7 @@ const principleIcons: Record<string, string> = {
 </script>
 
 <template>
-  <section class="mt-12">
+  <section :id="group.principle" class="mt-12 scroll-mt-20">
     <div class="flex items-center gap-3">
       <Icon
         :name="principleIcons[group.principle] ?? 'i-lucide-circle'"

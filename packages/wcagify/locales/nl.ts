@@ -19,6 +19,7 @@ export default {
     conformanceTarget: 'Conformiteitsdoel',
     conformanceResult: 'Conformiteitsresultaat',
     specialRequirements: 'Speciale vereisten',
+    navigationTitle: 'Navigatie',
     executiveSummary: 'Samenvatting',
     resultsPerPrinciple: 'Resultaten per principe',
     aboutThisReport: 'Over dit rapport',

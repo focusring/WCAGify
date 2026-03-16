@@ -23,6 +23,18 @@ const issuesByPrinciple = computed(() => {
 })
 
 const reportTips = computed(() => filterTips(props.issues))
+
+const statusCounts = computed(() => {
+  const counts = { passed: 0, failed: 0, 'not-present': 0, 'not-tested': 0 }
+  for (const group of issuesByPrinciple.value) {
+    for (const guideline of group.guidelines) {
+      for (const sc of guideline.criteria) {
+        counts[sc.status as keyof typeof counts]++
+      }
+    }
+  }
+  return counts
+})
 </script>
 
 <template>
@@ -34,7 +46,7 @@ const reportTips = computed(() => filterTips(props.issues))
       <slot name="actions" />
     </div>
 
-    <section id="executive-summary" class="mt-12">
+    <section id="executive-summary" class="mt-12 scroll-mt-20">
       <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
         {{ t('report.executiveSummary') }}
       </h2>
@@ -45,7 +57,7 @@ const reportTips = computed(() => filterTips(props.issues))
 
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
-    <section id="scorecard">
+    <section id="scorecard" class="scroll-mt-20">
       <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
         {{ t('report.resultsPerPrinciple') }}
       </h2>
@@ -60,7 +72,7 @@ const reportTips = computed(() => filterTips(props.issues))
 
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
-    <section id="about">
+    <section id="about" class="scroll-mt-20">
       <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
         {{ t('report.aboutThisReport') }}
       </h2>
@@ -73,7 +85,7 @@ const reportTips = computed(() => filterTips(props.issues))
 
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
-    <section id="scope">
+    <section id="scope" class="scroll-mt-20">
       <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
         {{ t('report.scope') }}
       </h2>
@@ -84,7 +96,7 @@ const reportTips = computed(() => filterTips(props.issues))
 
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
-    <section id="sample">
+    <section id="sample" class="scroll-mt-20">
       <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
         {{ t('report.representativeSample') }}
       </h2>
@@ -100,6 +112,13 @@ const reportTips = computed(() => filterTips(props.issues))
         <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
           {{ t('report.results') }}
         </h2>
+
+        <div class="md:flex grid grid-cols-2 grid-rows-2 gap-4 mt-4 max-w-lg md:max-w-none">
+          <ResultsIndicator status="passed" :count="statusCounts.passed" />
+          <ResultsIndicator status="failed" :count="statusCounts.failed" />
+          <ResultsIndicator status="not-present" :count="statusCounts['not-present']" />
+          <ResultsIndicator status="not-tested" :count="statusCounts['not-tested']" />
+        </div>
 
         <ReportPrinciple
           v-for="group in issuesByPrinciple"

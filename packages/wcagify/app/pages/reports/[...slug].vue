@@ -46,26 +46,41 @@ const shareOpen = ref(false)
 </script>
 
 <template>
-  <ReportContent v-if="report" :report="report" :issues="issues ?? []">
-    <template #actions>
-      <UButton
-        :label="t('share.share')"
-        icon="i-lucide-share-2"
-        variant="outline"
-        @click="shareOpen = true"
+  <UPage
+    v-if="report"
+    :ui="{
+      right: 'lg:col-span-3 order-first lg:order-last mt-11.5 !pr-0 !pt-8.5',
+      center: 'lg:col-span-7'
+    }"
+  >
+    <UPageBody>
+      <ReportContent :report="report" :issues="issues ?? []">
+        <template #actions>
+          <UButton
+            :label="t('share.share')"
+            icon="i-lucide-share-2"
+            variant="outline"
+            @click="shareOpen = true"
+          />
+          <UButton
+            :label="t('report.downloadPdf')"
+            icon="i-lucide-download"
+            :loading="isGeneratingPdf"
+            @click="downloadPdf"
+          />
+        </template>
+      </ReportContent>
+      <ReportShareSlideover
+        v-if="shareOpen"
+        v-model:open="shareOpen"
+        :report-slug="(route.params.slug as string[]).join('/')"
       />
-      <UButton
-        :label="t('report.downloadPdf')"
-        icon="i-lucide-download"
-        :loading="isGeneratingPdf"
-        @click="downloadPdf"
-      />
-    </template>
-  </ReportContent>
+    </UPageBody>
 
-  <ReportShareSlideover
-    v-if="shareOpen"
-    v-model:open="shareOpen"
-    :report-slug="(route.params.slug as string[]).join('/')"
-  />
+    <template #right>
+      <UPageAside>
+        <ReportAside :report="report" />
+      </UPageAside>
+    </template>
+  </UPage>
 </template>
