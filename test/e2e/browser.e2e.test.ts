@@ -277,13 +277,7 @@ describe('Browser E2E', () => {
 
       const issuesContent = await page.textContent('#issues')
       expect(issuesContent).toContain('2.1.2')
-
-      // Issue title is inside a collapsed criterion accordion — click to expand
-      await page.locator('#issues button', { hasText: '2.1.2' }).first().click()
-      await page.waitForSelector(`text=${issueTitle}`)
-
-      const expandedContent = await page.textContent('#issues')
-      expect(expandedContent).toContain(issueTitle)
+      expect(issuesContent).toContain(issueTitle)
     })
   })
 })
