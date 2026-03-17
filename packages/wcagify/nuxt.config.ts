@@ -13,6 +13,7 @@ const nuxtConfig = {
     '@nuxt/ui',
     '@nuxt/content',
     '@nuxtjs/i18n',
+    '@nuxt/fonts',
     ...(hasStudioRepoInfo ? ['nuxt-studio' as const] : []),
     '@nuxt/a11y',
     '@focusring/wcagify/nuxt'

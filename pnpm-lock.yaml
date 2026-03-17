@@ -62,6 +62,9 @@ catalogs:
       specifier: ^4.3.6
       version: 4.3.6
   default:
+    '@nuxt/fonts':
+      specifier: ^0.14.0
+      version: 0.14.0
     '@nuxt/ui':
       specifier: ^4.5.1
       version: 4.5.1
@@ -269,6 +272,9 @@ importers:
       '@nuxt/content':
         specifier: catalog:core
         version: 3.12.0(@libsql/client@0.17.0)(better-sqlite3@12.6.2)(magicast@0.5.2)
+      '@nuxt/fonts':
+        specifier: 'catalog:'
+        version: 0.14.0(db0@0.3.4(@libsql/client@0.17.0)(better-sqlite3@12.6.2))(ioredis@5.9.3)(magicast@0.5.2)(vite@8.0.0(@types/node@24.12.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.0)(yaml@2.8.2))
       '@nuxt/icon':
         specifier: catalog:core
         version: 2.2.1(magicast@0.5.2)(vite@8.0.0(@types/node@24.12.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.0)(yaml@2.8.2))(vue@3.5.30(typescript@5.9.3))
@@ -12095,7 +12101,7 @@ snapshots:
       esbuild: 0.27.3
       fontaine: 0.8.0
       jiti: 2.6.1
-      lightningcss: 1.31.1
+      lightningcss: 1.32.0
       magic-string: 0.30.21
       ohash: 2.0.11
       pathe: 2.0.3

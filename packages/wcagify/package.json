@@ -71,6 +71,7 @@
     "@libsql/client": "catalog:core",
     "@nuxt/a11y": "catalog:core",
     "@nuxt/content": "catalog:core",
+    "@nuxt/fonts": "catalog:",
     "@nuxt/icon": "catalog:core",
     "@nuxt/kit": "catalog:core",
     "@nuxt/ui": "catalog:core",

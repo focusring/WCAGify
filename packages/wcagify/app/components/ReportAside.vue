@@ -1,58 +1,57 @@
 <script setup lang="ts">
-import type { ContentNavigationLink } from '@nuxt/ui'
+interface NavItem {
+  title: string
+  icon?: string
+  hash: string
+  children?: NavItem[]
+}
 
 const { t } = useI18n()
 
-const navigation = computed<ContentNavigationLink[]>(() => [
+const navigation = computed<NavItem[]>(() => [
   {
     title: t('report.executiveSummary'),
-    icon: 'i-lucide:notebook',
-    path: '#executive-summary'
+    hash: 'executive-summary'
   },
   {
     title: t('report.resultsPerPrinciple'),
-    icon: 'i-lucide:book-open-text',
-    path: '#scorecard'
+    hash: 'scorecard'
   },
   {
     title: t('report.aboutThisReport'),
-    icon: 'i-lucide:book-search',
-    path: '#about'
+    hash: 'about'
   },
   {
     title: t('report.scope'),
-    icon: 'i-lucide:map',
-    path: '#scope'
+    hash: 'scope'
   },
   {
     title: t('report.representativeSample'),
-    icon: 'i-lucide:test-tube',
-    path: '#sample'
+    hash: 'sample'
   },
   {
-    title: t('report.issues'),
-    icon: 'i-lucide:clipboard-x',
-    path: '#issues',
+    title: t('report.results'),
+    hash: 'issues',
     children: [
       {
         title: t('report.principles.perceivable'),
         icon: 'i-lucide-eye',
-        path: '#perceivable'
+        hash: 'perceivable'
       },
       {
         title: t('report.principles.operable'),
         icon: 'i-lucide-pointer',
-        path: '#operable'
+        hash: 'operable'
       },
       {
         title: t('report.principles.understandable'),
         icon: 'i-lucide-brain',
-        path: '#understandable'
+        hash: 'understandable'
       },
       {
         title: t('report.principles.robust'),
         icon: 'i-lucide-shield-check',
-        path: '#robust'
+        hash: 'robust'
       }
     ]
   }
@@ -60,16 +59,34 @@ const navigation = computed<ContentNavigationLink[]>(() => [
 </script>
 
 <template>
-  <div class="p-3 rounded-lg border border-accented max-w-58">
+  <nav
+    class="p-3 rounded-lg border border-accented max-w-58"
+    :aria-label="$t('report.navigationTitle')"
+  >
     <h2 class="mb-4 text-2xl font-semibold text-gray-950 dark:text-white">
       {{ $t('report.navigationTitle') }}
     </h2>
-    <UContentNavigation
-      :navigation="navigation"
-      highlight
-      highlight-color="primary"
-      color="primary"
-      variant="pill"
-    />
-  </div>
+    <ul class="space-y-1">
+      <li v-for="item in navigation" :key="item.hash">
+        <a
+          :href="`#${item.hash}`"
+          class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+        >
+          <Icon v-if="item.icon" :name="item.icon" class="size-4 shrink-0" />
+          {{ item.title }}
+        </a>
+        <ul v-if="item.children" class="ml-4 mt-1 space-y-1">
+          <li v-for="child in item.children" :key="child.hash">
+            <a
+              :href="`#${child.hash}`"
+              class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            >
+              <Icon v-if="child.icon" :name="child.icon" class="size-4 shrink-0" />
+              {{ child.title }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
 </template>
