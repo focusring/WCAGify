@@ -2092,13 +2092,26 @@ onUnmounted(() => cancelAnimationFrame(rafId))
 
 @media (max-width: 768px) {
   .showcase-tablist-wrapper {
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
+    justify-content: center;
   }
 
-  .showcase-tablist-wrapper::-webkit-scrollbar {
+  .showcase-tablist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+  }
+
+  .showcase-divider {
     display: none;
+  }
+
+  .showcase-tab {
+    min-width: 0;
+    border: 1px solid var(--vp-c-divider);
+  }
+
+  .showcase-tab-content {
+    justify-content: center;
   }
 
   .mockup-body {
