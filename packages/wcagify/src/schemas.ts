@@ -33,6 +33,7 @@ const reportSchema = z.object({
 const issueSchema = z.object({
   sc: z.string(),
   severity: z.enum(['Low', 'Medium', 'High']),
+  type: z.enum(['Content', 'Technical', 'Design', 'Unknown']).optional(),
   difficulty: z.enum(['Low', 'Medium', 'High']),
   sample: z.string()
 })

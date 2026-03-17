@@ -40,6 +40,13 @@ export default {
     results: 'Resultaten',
     tips: 'Tips',
     successCriterion: 'Succescriterium',
+    type: 'Type',
+    typesort: {
+      content: 'Content',
+      technical: 'Technisch',
+      design: 'Ontwerp',
+      unknown: 'Onbekend'
+    },
     severity: 'Ernst',
     severityLevel: {
       low: 'Laag',

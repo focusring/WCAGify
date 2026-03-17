@@ -27,15 +27,14 @@ const principleIcons: Record<string, string> = {
 
 <template>
   <section v-show="hasVisibleGuidelines" :id="group.principle" class="mt-12 scroll-mt-20">
-    <div class="flex items-center gap-3">
+    <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
       <Icon
         :name="principleIcons[group.principle] ?? 'i-lucide-circle'"
-        class="size-6 text-primary"
+        class="shrink-0 size-6 text-primary"
       />
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
-        {{ t(`report.principles.${group.principle}`) }}
-      </h2>
-    </div>
+      {{ t(`report.principles.${group.principle}`) }}
+    </h2>
+
     <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
       {{ t(`report.principleDescriptions.${group.principle}`) }}
     </p>

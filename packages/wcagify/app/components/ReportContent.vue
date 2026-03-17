@@ -52,7 +52,7 @@ provide('statusFilters', activeFilters)
 </script>
 
 <template>
-  <div class="mx-auto max-w-prose">
+  <div>
     <ReportCoverPage :report="report" :issues="issues" />
     <ReportHeader :report="report" :issues="issues" />
 
@@ -61,7 +61,8 @@ provide('statusFilters', activeFilters)
     </div>
 
     <section id="executive-summary" class="mt-12 scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <Icon name="i-lucide-file-text" class="size-6 shrink-0" />
         {{ t('report.executiveSummary') }}
       </h2>
       <div class="mt-4 prose dark:prose-invert">
@@ -72,7 +73,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="scorecard" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <Icon name="i-lucide-list-checks" class="size-6 shrink-0" />
         {{ t('report.resultsPerPrinciple') }}
       </h2>
       <div class="mt-4">
@@ -87,7 +89,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="about" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <Icon name="i-lucide-info" class="size-6 shrink-0" />
         {{ t('report.aboutThisReport') }}
       </h2>
       <div class="mt-4 prose dark:prose-invert">
@@ -100,7 +103,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="scope" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <Icon name="i-lucide-target" class="size-6 shrink-0" />
         {{ t('report.scope') }}
       </h2>
       <div class="mt-4">
@@ -111,7 +115,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="sample" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <Icon name="i-lucide-layers" class="size-6 shrink-0" />
         {{ t('report.representativeSample') }}
       </h2>
       <div class="mt-4">
@@ -122,8 +127,9 @@ provide('statusFilters', activeFilters)
     <template v-if="issuesByPrinciple.length">
       <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
-      <section id="issues" class="min-h-screen">
-        <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <section id="issues" class="min-h-screen scroll-mt-20">
+        <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+          <Icon name="i-lucide-bar-chart-2" class="size-6 shrink-0" />
           {{ t('report.results') }}
         </h2>
 

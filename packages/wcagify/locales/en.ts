@@ -39,6 +39,13 @@ export default {
     results: 'Results',
     tips: 'Tips',
     successCriterion: 'Success criterion',
+    type: 'Type',
+    typesort: {
+      content: 'Content',
+      technical: 'Technical',
+      design: 'Design',
+      unknown: 'Unknown'
+    },
     severity: 'Severity',
     severityLevel: {
       low: 'Low',
