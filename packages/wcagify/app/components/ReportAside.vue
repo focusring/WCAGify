@@ -78,7 +78,7 @@ const navigation = computed<NavItem[]>(() => [
           :href="`#${item.hash}`"
           class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100 hover:text-black dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 dark:hover:text-white no-underline!"
         >
-          <Icon v-if="item.icon" :name="item.icon" class="size-4 shrink-0" />
+          <UIcon v-if="item.icon" :name="item.icon" class="size-4 shrink-0" />
           {{ item.title }}
         </a>
         <ul v-if="item.children" class="ml-3 mt-1 space-y-1">
@@ -87,7 +87,7 @@ const navigation = computed<NavItem[]>(() => [
               :href="`#${child.hash}`"
               class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100 hover:text-black dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 dark:hover:text-white no-underline!"
             >
-              <Icon v-if="child.icon" :name="child.icon" class="size-4 shrink-0" />
+              <UIcon v-if="child.icon" :name="child.icon" class="size-4 shrink-0" />
               {{ child.title }}
             </a>
           </li>

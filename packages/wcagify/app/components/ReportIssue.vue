@@ -17,6 +17,10 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
 
 const open = ref(false)
 
+const panelId = computed(
+  () => `issue-panel-${props.issue.path.split('/').filter(Boolean).pop() || props.issue.path}`
+)
+
 const severityColor = {
   low: 'success',
   medium: 'warning',
@@ -33,7 +37,12 @@ function getSeverityColor(severity: string): BadgeColor {
 
 <template>
   <article :id="`issue-${issue.path.split('/').filter(Boolean).pop() || issue.path}`">
-    <button class="p-4 flex w-full items-start gap-3 text-left" @click="open = !open">
+    <button
+      class="p-4 flex w-full items-start gap-3 text-left border-t border-muted"
+      :aria-expanded="open"
+      :aria-controls="panelId"
+      @click="open = !open"
+    >
       <span class="font-medium text-gray-950 dark:text-white">
         <span v-if="index">{{ index }}. </span>{{ issue.title }}
       </span>
@@ -59,52 +68,11 @@ function getSeverityColor(severity: string): BadgeColor {
       </div>
     </button>
 
-    <div v-show="open" class="mt-3">
+    <div :id="panelId" v-show="open" :aria-hidden="!open" class="mt-3">
       <div class="mt-3 pl-7 pr-4 prose dark:prose-invert">
         <ContentRenderer :value="issue" />
       </div>
-      <dl
-        class="flex flex-col md:grid md:grid-cols-2 md:grid-rows-2 gap-x-4 gap-y-4 md:gap-y-1 px-7 py-4 text-sm font-medium bg-default text-gray-950 dark:text-white"
-      >
-        <div class="flex gap-1">
-          <p>{{ t('report.type') }}:</p>
-          <UBadge
-            :label="t(`report.typesort.${(issue.type ?? 'Unknown').toLowerCase()}`)"
-            variant="subtle"
-            color="primary"
-          />
-        </div>
-        <div class="flex gap-1">
-          <p>{{ t('report.difficulty') }}:</p>
-          <UBadge
-            :label="t(`report.difficultyLevel.${issue.difficulty.toLowerCase()}`)"
-            variant="subtle"
-            color="secondary"
-          />
-        </div>
-        <div v-if="criterion" class="flex gap-1 items-center">
-          <p>{{ t('report.successCriterion') }}:</p>
-          <UButton
-            :to="criterion.uri"
-            :label="criterion.name"
-            target="_blank"
-            variant="link"
-            trailing-icon="i-lucide-external-link"
-            class="p-0"
-          />
-        </div>
-        <div v-if="samplePage" class="flex gap-1 items-center">
-          <dt>{{ t('report.sample') }}:</dt>
-          <UButton
-            :to="samplePage.url"
-            :label="samplePage.title"
-            target="_blank"
-            variant="link"
-            trailing-icon="i-lucide-external-link"
-            class="p-0"
-          />
-        </div>
-      </dl>
+      <ReportIssueFooter :issue="issue" :report="report" :criterion="criterion" />
     </div>
   </article>
 </template>

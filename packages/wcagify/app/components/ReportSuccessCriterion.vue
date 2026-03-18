@@ -32,10 +32,7 @@ const levelColors: Record<string, BadgeColor> = {
     v-show="!statusFilters || statusFilters.has(criterion.status)"
     class="rounded-lg border border-gray-200 dark:border-muted bg-muted overflow-hidden"
   >
-    <div
-      class="flex items-center gap-3 px-4 py-3"
-      :class="{ 'border-b border-muted': criterion.issues.length > 0 }"
-    >
+    <div class="flex items-center gap-3 px-4 py-3">
       <UBadge
         :label="criterion.level"
         variant="subtle"

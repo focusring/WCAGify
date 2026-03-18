@@ -28,7 +28,7 @@ const principleIcons: Record<string, string> = {
 <template>
   <section v-show="hasVisibleGuidelines" :id="group.principle" class="mt-12 scroll-mt-20">
     <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
-      <Icon
+      <UIcon
         :name="principleIcons[group.principle] ?? 'i-lucide-circle'"
         class="shrink-0 size-6 text-primary"
       />
