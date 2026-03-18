@@ -51,7 +51,7 @@ const columns = computed<TableColumn<ReportsCollectionItem>[]>(() => [
         variant: 'ghost',
         label: t('report.title'),
         icon: sortIcon(isSorted),
-        class: '-mx-2.5',
+        class: '-mx-2.5 cursor-pointer',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     }
@@ -73,7 +73,7 @@ const columns = computed<TableColumn<ReportsCollectionItem>[]>(() => [
         variant: 'ghost',
         label: t('report.date'),
         icon: sortIcon(isSorted),
-        class: '-mx-2.5',
+        class: '-mx-2.5 cursor-pointer',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     },
@@ -140,6 +140,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
                 color="neutral"
                 variant="outline"
                 trailing-icon="i-lucide-chevron-down"
+                class="cursor-pointer"
               />
             </UDropdownMenu>
 
@@ -151,6 +152,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
               :aria-label="t('app.tableView')"
               :aria-pressed="view === 'table'"
               @click="view = 'table'"
+              class="cursor-pointer"
             />
             <UButton
               :color="view === 'grid' ? 'primary' : 'neutral'"
@@ -160,6 +162,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
               :aria-label="t('app.gridView')"
               :aria-pressed="view === 'grid'"
               @click="view = 'grid'"
+              class="cursor-pointer"
             />
           </div>
         </div>

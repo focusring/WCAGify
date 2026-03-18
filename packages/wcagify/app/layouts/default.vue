@@ -4,7 +4,7 @@ const localePath = useLocalePath()
 </script>
 
 <template>
-  <UHeader>
+  <UHeader :toggle="false">
     <template #left>
       <NuxtLinkLocale to="/">
         <AppLogo />
@@ -16,6 +16,7 @@ const localePath = useLocalePath()
         :to="localePath('/settings')"
         :label="t('settings.title').toLowerCase()"
         color="neutral"
+        icon="i-lucide-settings"
         variant="ghost"
         class="no-underline!"
       />

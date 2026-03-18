@@ -98,7 +98,8 @@
   }
 
   header,
-  footer {
+  footer,
+  nuxt-studio {
     display: none !important;
   }
 

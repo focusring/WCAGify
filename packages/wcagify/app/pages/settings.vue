@@ -62,17 +62,18 @@ useSeoMeta({
     <article class="max-w-2xl mx-auto">
       <header class="mb-12">
         <div class="flex items-baseline justify-between gap-4 mb-4">
-          <h1 class="font-mono text-3xl sm:text-4xl font-medium">
+          <h1 class="text-3xl sm:text-4xl font-medium">
             {{ t('settings.title') }}
           </h1>
-          <button
-            type="button"
-            class="cursor-pointer inline-flex items-center gap-2 p-1.5 -mx-1.5 font-mono text-sm text-muted hover:text-default transition-colors duration-200 rounded shrink-0"
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-arrow-left"
+            class="-mx-1.5 shrink-0 cursor-pointer"
             @click="router.back()"
           >
-            <UIcon name="i-lucide-arrow-left" class="size-4" aria-hidden="true" />
             <span class="sr-only sm:not-sr-only">{{ t('settings.back') }}</span>
-          </button>
+          </UButton>
         </div>
         <p class="text-muted text-lg">
           {{ t('settings.tagline') }}
@@ -95,7 +96,7 @@ useSeoMeta({
                 v-model="colorMode.preference"
                 :items="themeOptions"
                 value-key="value"
-                class="max-w-48"
+                class="max-w-48 cursor-pointer"
               />
             </div>
 
@@ -143,7 +144,7 @@ useSeoMeta({
                   :model-value="locale"
                   :items="localeOptions"
                   value-key="value"
-                  class="max-w-48"
+                  class="min-w-32 cursor-pointer"
                   @update:model-value="onLocaleChange($event)"
                 />
               </ClientOnly>
