@@ -15,7 +15,7 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
 </script>
 
 <template>
-  <div
+  <dl
     class="flex flex-col md:grid md:grid-cols-2 md:grid-rows-2 gap-x-4 gap-y-4 md:gap-y-1 px-7 py-4 text-sm font-medium bg-default text-gray-950 dark:text-white"
   >
     <div class="flex gap-1">
@@ -56,5 +56,5 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
         class="p-0"
       />
     </div>
-  </div>
+  </dl>
 </template>
