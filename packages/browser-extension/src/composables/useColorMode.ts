@@ -19,7 +19,7 @@ export function useColorMode() {
     initialized = true
 
     chrome.storage.local.get(['colorMode']).then((result) => {
-      if (result.colorMode) preference.value = result.colorMode
+      if (result.colorMode) preference.value = result.colorMode as ColorMode
       apply(preference.value)
     })
 

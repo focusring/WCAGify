@@ -8,7 +8,7 @@ let loadPromise: Promise<void> | null = null
 
 async function doLoad() {
   const result = await chrome.storage.local.get(['locale'])
-  if (result.locale && result.locale in messages) locale.value = result.locale
+  if (result.locale && (result.locale as string) in messages) locale.value = result.locale as Locale
   ready = true
 }
 

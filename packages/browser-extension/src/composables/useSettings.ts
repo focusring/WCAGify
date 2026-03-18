@@ -8,8 +8,8 @@ let loadPromise: Promise<void> | null = null
 
 async function doLoad() {
   const result = await chrome.storage.local.get(['wcagifyUrl', 'reportSlug'])
-  if (result.wcagifyUrl) wcagifyUrl.value = result.wcagifyUrl
-  if (result.reportSlug) reportSlug.value = result.reportSlug
+  if (result.wcagifyUrl) wcagifyUrl.value = result.wcagifyUrl as string
+  if (result.reportSlug) reportSlug.value = result.reportSlug as string
   ready = true
 }
 
