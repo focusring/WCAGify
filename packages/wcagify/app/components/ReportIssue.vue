@@ -17,9 +17,9 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
 
 const open = ref(false)
 
-const panelId = computed(
-  () => `issue-panel-${props.issue.path.split('/').filter(Boolean).pop() || props.issue.path}`
-)
+const sanitizedPath = props.issue.path.split('/').filter(Boolean).join('-')
+const issueId = `issue-${sanitizedPath}`
+const panelId = `issue-panel-${sanitizedPath}`
 
 const severityColor = {
   low: 'success',
@@ -36,7 +36,7 @@ function getSeverityColor(severity: string): BadgeColor {
 </script>
 
 <template>
-  <article :id="`issue-${issue.path.split('/').filter(Boolean).pop() || issue.path}`">
+  <article :id="issueId">
     <button
       class="p-4 flex w-full items-start gap-3 text-left border-t border-muted"
       :aria-expanded="open"
@@ -44,7 +44,7 @@ function getSeverityColor(severity: string): BadgeColor {
       @click="open = !open"
     >
       <span class="font-medium text-gray-950 dark:text-white">
-        <span v-if="index">{{ index }}. </span>{{ issue.title }}
+        <span v-if="index !== undefined && index !== null">{{ index }}. </span>{{ issue.title }}
       </span>
 
       <div class="ml-auto flex items-center gap-2 shrink-0">

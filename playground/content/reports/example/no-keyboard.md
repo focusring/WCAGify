@@ -2,7 +2,7 @@
 title: Not all functionality is reachable with the keyboard
 sc: 2.1.1
 severity:
-type:
+type: content
 sample: page-2
 ---
 

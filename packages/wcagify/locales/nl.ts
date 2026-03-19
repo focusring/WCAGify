@@ -98,7 +98,7 @@ export default {
           'Geen van de beoordeelde criteria is als goedgekeurd aangemerkt in dit rapport.'
       },
       failed: {
-        title: 'Geen afgekeurde criteria gevonden',
+        title: 'Geen criteria gemarkeerd als niet aanwezig gevonden',
         description: 'Geen van de beoordeelde criteria is als afgekeurd aangemerkt. Goed werk!'
       },
       'not-present': {

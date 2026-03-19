@@ -29,21 +29,20 @@ function getSeverityColor(severity: string): BadgeColor {
 
 <template>
   <dl
-    class="flex flex-col md:grid md:grid-cols-2 md:grid-rows-2 gap-x-4 gap-y-4 md:gap-y-1 px-7 py-4 text-sm font-medium bg-default text-gray-950 dark:text-white"
+    class="flex flex-col gap-x-4 gap-y-4 md:gap-y-1 px-7 py-4 text-sm font-medium bg-default text-gray-950 dark:text-white md:grid md:grid-cols-2"
+    :class="criterion || samplePage ? 'md:grid-rows-2' : 'md:grid-rows-1'"
   >
-    <div class="flex gap-1">
+    <div v-if="issue.type" class="flex gap-1">
       <p>{{ t('report.type') }}:</p>
       <UBadge
-        v-if="issue.type"
         :label="t(`report.typesort.${issue.type.toLowerCase()}`)"
         variant="subtle"
         color="primary"
       />
     </div>
-    <div class="flex gap-1">
+    <div v-if="issue.severity" class="flex gap-1">
       <p>{{ t('report.severity') }}:</p>
       <UBadge
-        v-if="issue.severity"
         :label="t(`report.severityLevel.${issue.severity.toLowerCase()}`)"
         :color="getSeverityColor(issue.severity)"
         variant="subtle"

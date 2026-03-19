@@ -99,7 +99,7 @@ export default {
         description: 'None of the evaluated criteria have been marked as failed. Great work!'
       },
       'not-present': {
-        title: 'No not-present criteria found',
+        title: 'No criteria marked as not present found',
         description: 'All criteria are present in the evaluated content.'
       },
       'not-tested': {
