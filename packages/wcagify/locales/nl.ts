@@ -49,6 +49,7 @@ export default {
     },
     severity: 'Ernst',
     severityLevel: {
+      none: 'Geen',
       low: 'Laag',
       medium: 'Gemiddeld',
       high: 'Hoog'
@@ -90,6 +91,25 @@ export default {
     conformanceLevel: 'Conformiteitsniveau: {level} — {conforming} van {total} criteria voldaan',
     criteriaMet: '{conforming} van {total} criteria voldaan',
     scoreFormat: '{conforming} / {total}',
+    emptyFilter: {
+      passed: {
+        title: 'Geen goedgekeurde criteria gevonden',
+        description:
+          'Geen van de beoordeelde criteria is als goedgekeurd aangemerkt in dit rapport.'
+      },
+      failed: {
+        title: 'Geen afgekeurde criteria gevonden',
+        description: 'Geen van de beoordeelde criteria is als afgekeurd aangemerkt. Goed werk!'
+      },
+      'not-present': {
+        title: 'Geen niet-aanwezige criteria gevonden',
+        description: 'Alle criteria zijn aanwezig in de beoordeelde content.'
+      },
+      'not-tested': {
+        title: 'Geen ongeteste criteria gevonden',
+        description: 'Alle criteria zijn getest en hebben een resultaat gekregen.'
+      }
+    },
     downloadPdf: 'Download PDF',
     searchReports: 'Zoek rapporten...'
   },

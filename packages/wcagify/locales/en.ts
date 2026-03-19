@@ -48,6 +48,7 @@ export default {
     },
     severity: 'Severity',
     severityLevel: {
+      none: 'None',
       low: 'Low',
       medium: 'Medium',
       high: 'High'
@@ -88,6 +89,24 @@ export default {
     conformanceLevel: 'Conformance level: {level} — {conforming} of {total} criteria met',
     criteriaMet: '{conforming} of {total} criteria met',
     scoreFormat: '{conforming} / {total}',
+    emptyFilter: {
+      passed: {
+        title: 'No passed criteria found',
+        description: 'None of the evaluated criteria have been marked as passed for this report.'
+      },
+      failed: {
+        title: 'No failed criteria found',
+        description: 'None of the evaluated criteria have been marked as failed. Great work!'
+      },
+      'not-present': {
+        title: 'No not-present criteria found',
+        description: 'All criteria are present in the evaluated content.'
+      },
+      'not-tested': {
+        title: 'No untested criteria found',
+        description: 'All criteria have been tested and assigned a result.'
+      }
+    },
     downloadPdf: 'Download PDF',
     searchReports: 'Search reports...'
   },

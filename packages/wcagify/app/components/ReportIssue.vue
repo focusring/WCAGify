@@ -50,6 +50,7 @@ function getSeverityColor(severity: string): BadgeColor {
       <div class="ml-auto flex items-center gap-2 shrink-0">
         <UBadge v-if="samplePage" :label="samplePage.title" variant="outline" color="neutral" />
         <UBadge
+          v-if="issue.severity"
           :label="t(`report.severityLevel.${issue.severity.toLowerCase()}`)"
           variant="subtle"
           :color="getSeverityColor(issue.severity)"

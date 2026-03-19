@@ -1,9 +1,8 @@
 ---
 title: Not all functionality is reachable with the keyboard
-sc: '2.1.1'
-severity: High
-type: Content
-difficulty: Medium
+sc: 2.1.1
+severity:
+type:
 sample: page-2
 ---
 

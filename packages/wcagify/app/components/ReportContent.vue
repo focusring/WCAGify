@@ -48,6 +48,13 @@ function toggleFilter(status: Status) {
 
 const isFiltering = computed(() => activeFilters.value.size < allStatuses.length)
 
+const emptyFilterStatus = computed<Status | null>(() => {
+  if (!isFiltering.value) return null
+  const [status] = [...activeFilters.value] as Status[]
+  if (status === undefined) return null
+  return statusCounts.value[status] === 0 ? status : null
+})
+
 provide('statusFilters', activeFilters)
 </script>
 
@@ -164,12 +171,26 @@ provide('statusFilters', activeFilters)
           />
         </div>
 
-        <ReportPrinciple
-          v-for="group in issuesByPrinciple"
-          :key="group.principle"
-          :group="group"
-          :report="report"
-        />
+        <div
+          v-if="emptyFilterStatus"
+          class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-muted py-16 text-center bg-muted"
+        >
+          <h3 class="text-lg font-semibold text-gray-950 dark:text-white">
+            {{ t(`report.emptyFilter.${emptyFilterStatus}.title`) }}
+          </h3>
+          <p class="max-w-sm text-sm text-gray-600 dark:text-gray-400">
+            {{ t(`report.emptyFilter.${emptyFilterStatus}.description`) }}
+          </p>
+        </div>
+
+        <template v-else>
+          <ReportPrinciple
+            v-for="group in issuesByPrinciple"
+            :key="group.principle"
+            :group="group"
+            :report="report"
+          />
+        </template>
       </section>
     </template>
 

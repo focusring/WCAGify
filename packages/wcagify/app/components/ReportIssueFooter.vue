@@ -12,6 +12,19 @@ const { t } = useI18n()
 const { resolveSamplePage } = useWcagData()
 
 const samplePage = computed(() => resolveSamplePage(props.report.sample, props.issue.sample))
+
+const severityColor = {
+  low: 'success',
+  medium: 'warning',
+  high: 'error'
+} as const
+
+type BadgeColor = 'error' | 'neutral' | 'success' | 'warning' | 'primary' | 'secondary' | 'info'
+
+function getSeverityColor(severity: string): BadgeColor {
+  return (severityColor[severity.toLowerCase() as keyof typeof severityColor] ??
+    'neutral') as BadgeColor
+}
 </script>
 
 <template>
@@ -21,17 +34,19 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
     <div class="flex gap-1">
       <p>{{ t('report.type') }}:</p>
       <UBadge
-        :label="t(`report.typesort.${(issue.type ?? 'Unknown').toLowerCase()}`)"
+        v-if="issue.type"
+        :label="t(`report.typesort.${issue.type.toLowerCase()}`)"
         variant="subtle"
         color="primary"
       />
     </div>
     <div class="flex gap-1">
-      <p>{{ t('report.difficulty') }}:</p>
+      <p>{{ t('report.severity') }}:</p>
       <UBadge
-        :label="t(`report.difficultyLevel.${issue.difficulty.toLowerCase()}`)"
+        v-if="issue.severity"
+        :label="t(`report.severityLevel.${issue.severity.toLowerCase()}`)"
+        :color="getSeverityColor(issue.severity)"
         variant="subtle"
-        color="secondary"
       />
     </div>
     <div v-if="criterion" class="flex gap-1 items-center">
