@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { ScGroup } from '@focusring/wcagify'
 import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 
 const props = defineProps<{
   issue: IssuesCollectionItem
   report: ReportsCollectionItem
+  criterion: ScGroup<IssuesCollectionItem>
   scName: string
   index?: number
 }>()
@@ -14,6 +16,10 @@ const { resolveSamplePage } = useWcagData()
 const samplePage = computed(() => resolveSamplePage(props.report.sample, props.issue.sample))
 
 const open = ref(false)
+
+const sanitizedPath = props.issue.path.split('/').filter(Boolean).join('-')
+const issueId = `issue-${sanitizedPath}`
+const panelId = `issue-panel-${sanitizedPath}`
 
 const severityColor = {
   low: 'success',
@@ -30,15 +36,21 @@ function getSeverityColor(severity: string): BadgeColor {
 </script>
 
 <template>
-  <article :id="`issue-${issue.path.split('/').filter(Boolean).pop() || issue.path}`">
-    <button class="flex w-full items-center gap-3 text-left" @click="open = !open">
+  <article :id="issueId">
+    <button
+      class="p-4 flex w-full items-start gap-3 text-left border-t border-muted"
+      :aria-expanded="open"
+      :aria-controls="panelId"
+      @click="open = !open"
+    >
       <span class="font-medium text-gray-950 dark:text-white">
-        <span v-if="index">{{ index }}. </span>{{ issue.title }}
+        <span v-if="index !== undefined && index !== null">{{ index }}. </span>{{ issue.title }}
       </span>
 
       <div class="ml-auto flex items-center gap-2 shrink-0">
         <UBadge v-if="samplePage" :label="samplePage.title" variant="outline" color="neutral" />
         <UBadge
+          v-if="issue.severity"
           :label="t(`report.severityLevel.${issue.severity.toLowerCase()}`)"
           variant="subtle"
           :color="getSeverityColor(issue.severity)"
@@ -49,7 +61,7 @@ function getSeverityColor(severity: string): BadgeColor {
           color="error"
           icon="i-lucide-x"
         />
-        <Icon
+        <UIcon
           name="i-lucide-chevron-down"
           class="size-5 text-gray-400 transition-transform"
           :class="{ 'rotate-180': open }"
@@ -57,24 +69,11 @@ function getSeverityColor(severity: string): BadgeColor {
       </div>
     </button>
 
-    <div v-show="open" class="mt-3 pl-4">
-      <dl class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
-        <div class="flex gap-1">
-          <dt>{{ t('report.successCriterion') }}:</dt>
-          <dd>{{ scName }}</dd>
-        </div>
-        <div class="flex gap-1">
-          <dt>{{ t('report.difficulty') }}:</dt>
-          <dd>{{ t(`report.difficultyLevel.${issue.difficulty.toLowerCase()}`) }}</dd>
-        </div>
-        <div v-if="samplePage" class="flex gap-1">
-          <dt>{{ t('report.sample') }}:</dt>
-          <dd>{{ samplePage.title }}</dd>
-        </div>
-      </dl>
-      <div class="mt-3 prose dark:prose-invert">
+    <div :id="panelId" v-show="open" :aria-hidden="!open" class="mt-3">
+      <div class="mt-3 pl-7 pr-4 prose dark:prose-invert">
         <ContentRenderer :value="issue" />
       </div>
+      <ReportIssueFooter :issue="issue" :report="report" :criterion="criterion" />
     </div>
   </article>
 </template>

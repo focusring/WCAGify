@@ -48,11 +48,18 @@ function toggleFilter(status: Status) {
 
 const isFiltering = computed(() => activeFilters.value.size < allStatuses.length)
 
+const emptyFilterStatus = computed<Status | null>(() => {
+  if (!isFiltering.value) return null
+  const [status] = [...activeFilters.value] as Status[]
+  if (status === undefined) return null
+  return statusCounts.value[status] === 0 ? status : null
+})
+
 provide('statusFilters', activeFilters)
 </script>
 
 <template>
-  <div class="mx-auto max-w-prose">
+  <div>
     <ReportCoverPage :report="report" :issues="issues" />
     <ReportHeader :report="report" :issues="issues" />
 
@@ -61,7 +68,8 @@ provide('statusFilters', activeFilters)
     </div>
 
     <section id="executive-summary" class="mt-12 scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <UIcon name="i-lucide-file-text" class="size-6 shrink-0" />
         {{ t('report.executiveSummary') }}
       </h2>
       <div class="mt-4 prose dark:prose-invert">
@@ -72,7 +80,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="scorecard" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <UIcon name="i-lucide-list-checks" class="size-6 shrink-0" />
         {{ t('report.resultsPerPrinciple') }}
       </h2>
       <div class="mt-4">
@@ -87,7 +96,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="about" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <UIcon name="i-lucide-info" class="size-6 shrink-0" />
         {{ t('report.aboutThisReport') }}
       </h2>
       <div class="mt-4 prose dark:prose-invert">
@@ -100,7 +110,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="scope" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <UIcon name="i-lucide-target" class="size-6 shrink-0" />
         {{ t('report.scope') }}
       </h2>
       <div class="mt-4">
@@ -111,7 +122,8 @@ provide('statusFilters', activeFilters)
     <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
     <section id="sample" class="scroll-mt-20">
-      <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <UIcon name="i-lucide-layers" class="size-6 shrink-0" />
         {{ t('report.representativeSample') }}
       </h2>
       <div class="mt-4">
@@ -122,8 +134,9 @@ provide('statusFilters', activeFilters)
     <template v-if="issuesByPrinciple.length">
       <hr class="my-12 border-gray-200 dark:border-gray-800" />
 
-      <section id="issues" class="min-h-screen">
-        <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+      <section id="issues" class="min-h-screen scroll-mt-20">
+        <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+          <UIcon name="i-lucide-bar-chart-2" class="size-6 shrink-0" />
           {{ t('report.results') }}
         </h2>
 
@@ -158,12 +171,26 @@ provide('statusFilters', activeFilters)
           />
         </div>
 
-        <ReportPrinciple
-          v-for="group in issuesByPrinciple"
-          :key="group.principle"
-          :group="group"
-          :report="report"
-        />
+        <div
+          v-if="emptyFilterStatus"
+          class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-muted py-16 text-center bg-muted"
+        >
+          <h3 class="text-lg font-semibold text-gray-950 dark:text-white">
+            {{ t(`report.emptyFilter.${emptyFilterStatus}.title`) }}
+          </h3>
+          <p class="max-w-sm text-sm text-gray-600 dark:text-gray-400">
+            {{ t(`report.emptyFilter.${emptyFilterStatus}.description`) }}
+          </p>
+        </div>
+
+        <template v-else>
+          <ReportPrinciple
+            v-for="group in issuesByPrinciple"
+            :key="group.principle"
+            :group="group"
+            :report="report"
+          />
+        </template>
       </section>
     </template>
 

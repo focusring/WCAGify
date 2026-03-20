@@ -45,14 +45,8 @@ const shareOpen = ref(false)
 </script>
 
 <template>
-  <UPage
-    v-if="report"
-    :ui="{
-      right: 'lg:col-span-3 order-first lg:order-last mt-11.5 !pr-0 !pt-8.5',
-      center: 'lg:col-span-7'
-    }"
-  >
-    <UPageBody>
+  <div class="mx-6 flex gap-20 mb-8">
+    <div v-if="report" class="mx-auto w-full max-w-prose lg:max-w-none">
       <ReportContent :report="report" :issues="issues ?? []">
         <template #actions>
           <UButton
@@ -74,12 +68,8 @@ const shareOpen = ref(false)
         v-model:open="shareOpen"
         :report-slug="(route.params.slug as string[]).join('/')"
       />
-    </UPageBody>
+    </div>
 
-    <template #right>
-      <UPageAside>
-        <ReportAside />
-      </UPageAside>
-    </template>
-  </UPage>
+    <ReportAside class="mt-12 hidden lg:block h-fit min-w-60.5 sticky top-20 print:hidden" />
+  </div>
 </template>

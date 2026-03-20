@@ -26,17 +26,14 @@ export function escapeYamlValue(value: string): string {
 export function buildIssueFrontmatter(data: {
   title: string
   sc: string
-  severity: string
+  severity?: string
   difficulty: string
   sample: string
 }): string {
-  return [
-    '---',
-    `title: ${escapeYamlValue(data.title)}`,
-    `sc: ${escapeYamlValue(data.sc)}`,
-    `severity: ${data.severity}`,
-    `difficulty: ${data.difficulty}`,
-    `sample: ${escapeYamlValue(data.sample)}`,
-    '---'
-  ].join('\n')
+  const lines = ['---', `title: ${escapeYamlValue(data.title)}`, `sc: ${escapeYamlValue(data.sc)}`]
+  if (data.severity !== undefined) {
+    lines.push(`severity: ${data.severity}`)
+  }
+  lines.push(`difficulty: ${data.difficulty}`, `sample: ${escapeYamlValue(data.sample)}`, '---')
+  return lines.join('\n')
 }

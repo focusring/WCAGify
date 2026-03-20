@@ -30,7 +30,7 @@ const levelColors: Record<string, BadgeColor> = {
 <template>
   <div
     v-show="!statusFilters || statusFilters.has(criterion.status)"
-    class="rounded-lg border border-gray-200 dark:border-gray-800"
+    class="rounded-lg border border-gray-200 dark:border-muted bg-muted overflow-hidden"
   >
     <div class="flex items-center gap-3 px-4 py-3">
       <UBadge
@@ -59,13 +59,14 @@ const levelColors: Record<string, BadgeColor> = {
 
     <div
       v-if="criterion.issues.length > 0"
-      class="border-t border-gray-200 dark:border-gray-800 px-4 py-4 space-y-6"
+      class="border-t border-gray-200 dark:border-gray-800 space-y-2"
     >
       <ReportIssue
         v-for="(issue, index) in criterion.issues"
         :key="issue.path"
         :issue="issue"
         :report="report"
+        :criterion="criterion"
         :sc-name="criterion.name"
         :index="index + 1"
       />
