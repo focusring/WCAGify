@@ -26,8 +26,7 @@ export default defineConfig({
     siteTitle: false,
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
-      { text: 'Reference', link: '/reference/configuration' },
-      { text: 'Legal', link: '/legal/terms-and-conditions' }
+      { text: 'Reference', link: '/reference/configuration' }
     ],
 
     sidebar: {
@@ -63,9 +62,10 @@ export default defineConfig({
     socialLinks: [{ icon: 'github', link: 'https://github.com/focusring/wcagify' }],
 
     footer: {
-      message: 'Released under the MIT License.',
+      message:
+        'Released under the MIT License. <a href="/legal/terms-and-conditions">Terms</a> · <a href="/legal/privacy-policy">Privacy</a> · <a href="/legal/security-policy">Security</a>',
       copyright:
-        'Created with 🫶🏼 by <a href="https://focusring.io" target="_blank" rel="noopener">focusring.io</a>'
+        'Created with ❤️ by <a href="https://focusring.io" target="_blank" rel="noopener">focusring.io</a>'
     },
 
     search: {
