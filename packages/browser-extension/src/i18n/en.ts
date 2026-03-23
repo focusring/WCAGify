@@ -10,6 +10,17 @@ export default {
     connecting: 'Connecting...',
     connected: 'Connected',
     connectionFailed: 'Connection failed',
+    connectionRefused:
+      'Could not connect. Make sure the WCAGify server is running at this URL. Example: http://localhost:3000',
+    connectionHttpError:
+      'Something went wrong while connecting. Make sure the entered URL is a WCAGify instance and is correct. Example: http://localhost:3000',
+    required: 'required',
+    scanning: 'Scanning for WCAGify instances...',
+    selectInstance: 'WCAGify Instance',
+    enterManually: 'Enter URL manually',
+    change: 'Change',
+    rescan: 'Scan again',
+    autoConnected: 'Automatically connected to a detected running WCAGify instance.',
     report: 'Report',
     selectReport: 'Select a report'
   },
@@ -27,7 +38,6 @@ export default {
     issueTitlePlaceholder: 'e.g. Dropdown not keyboard accessible',
     sc: 'SC',
     severity: 'Severity',
-    difficulty: 'Difficulty',
     samplePage: 'Sample Page',
     selectPage: 'Select a page',
     description: 'Description',
@@ -36,6 +46,8 @@ export default {
     submitting: 'Submitting...',
     issueCreated: 'Issue created',
     failedToCreate: 'Failed to create issue',
+    required: 'required',
+    noResults: 'No matching criteria',
     low: 'Low',
     medium: 'Medium',
     high: 'High'

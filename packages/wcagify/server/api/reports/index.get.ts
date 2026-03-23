@@ -6,6 +6,8 @@ export default defineEventHandler(async (event) => {
   return reports.map((report) => ({
     slug: report.path?.replace('/reports/', '') ?? '',
     title: report.title ?? '',
-    sample: report.sample ?? []
+    sample: report.sample ?? [],
+    wcagVersion: report.evaluation?.targetWcagVersion ?? '2.2',
+    targetLevel: report.evaluation?.targetLevel ?? 'AA'
   }))
 })

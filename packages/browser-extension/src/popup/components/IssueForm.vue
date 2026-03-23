@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Report } from '../../types'
 import { useSettings } from '../../composables/useSettings'
 import { useI18n } from '../../composables/useI18n'
 import RichTextEditor from './RichTextEditor.vue'
+import ScCombobox from './ScCombobox.vue'
 
 const props = defineProps<{
   reports: Report[]
@@ -19,7 +20,6 @@ const title = ref('')
 const description = ref('')
 const sc = ref('')
 const severity = ref<'Low' | 'Medium' | 'High'>('Medium')
-const difficulty = ref<'Low' | 'Medium' | 'High'>('Medium')
 const sample = ref('')
 
 const submitting = ref(false)
@@ -29,6 +29,18 @@ const submitMessage = ref('')
 const selectedReport = computed(() => props.reports.find((r) => r.slug === reportSlug.value))
 
 const samplePages = computed(() => selectedReport.value?.sample ?? [])
+const wcagVersion = computed(() => selectedReport.value?.wcagVersion ?? '2.2')
+const targetLevel = computed(() => selectedReport.value?.targetLevel ?? 'AA')
+
+watch(
+  () => props.pageUrl,
+  (url) => {
+    if (!url) return
+    const match = samplePages.value.find((page) => url.startsWith(page.url))
+    if (match) sample.value = match.id
+  },
+  { immediate: true }
+)
 
 const canSubmit = computed(
   () =>
@@ -36,12 +48,6 @@ const canSubmit = computed(
 )
 
 const severityOptions = computed(() => [
-  { value: 'Low' as const, label: t('form.low') },
-  { value: 'Medium' as const, label: t('form.medium') },
-  { value: 'High' as const, label: t('form.high') }
-])
-
-const difficultyOptions = computed(() => [
   { value: 'Low' as const, label: t('form.low') },
   { value: 'Medium' as const, label: t('form.medium') },
   { value: 'High' as const, label: t('form.high') }
@@ -74,7 +80,6 @@ async function submit() {
         title: title.value.trim(),
         sc: sc.value.trim(),
         severity: severity.value,
-        difficulty: difficulty.value,
         sample: sample.value,
         description: bodyParts.join('\n')
       })
@@ -90,9 +95,9 @@ async function submit() {
     title.value = ''
     description.value = ''
     sc.value = ''
-  } catch (e) {
+  } catch (error) {
     submitStatus.value = 'error'
-    submitMessage.value = e instanceof Error ? e.message : t('form.failedToCreate')
+    submitMessage.value = error instanceof Error ? error.message : t('form.failedToCreate')
   } finally {
     submitting.value = false
   }
@@ -103,34 +108,56 @@ async function submit() {
   <form @submit.prevent="submit" class="space-y-3">
     <div>
       <label
+        for="issue-sample"
+        class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
+        >{{ t('form.samplePage') }} <small>({{ t('form.required') }})</small></label
+      >
+      <select
+        id="issue-sample"
+        v-model="sample"
+        required
+        aria-required="true"
+        class="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-base text-gray-900 dark:text-gray-100 focus:border-green-600 dark:focus:border-green-400 focus:outline-none"
+      >
+        <option value="" disabled>{{ t('form.selectPage') }}</option>
+        <option v-for="page in samplePages" :key="page.id" :value="page.id">
+          {{ page.title }} — {{ page.url }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label
         for="issue-title"
         class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-        >{{ t('form.issueTitle') }}</label
+        >{{ t('form.issueTitle') }} <small>({{ t('form.required') }})</small></label
       >
       <input
         id="issue-title"
         v-model="title"
         type="text"
         maxlength="200"
+        required
+        aria-required="true"
         :placeholder="t('form.issueTitlePlaceholder')"
         class="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-base text-gray-900 dark:text-gray-100 focus:border-green-600 dark:focus:border-green-400 focus:outline-none"
       />
     </div>
 
-    <div class="grid grid-cols-3 gap-2">
+    <div class="grid grid-cols-2 gap-2">
       <div>
         <label
           for="issue-sc"
           class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-          >{{ t('form.sc') }}</label
+          >{{ t('form.sc') }} <small>({{ t('form.required') }})</small></label
         >
-        <input
+        <ScCombobox
           id="issue-sc"
           v-model="sc"
-          type="text"
-          maxlength="10"
+          :wcag-version="wcagVersion"
+          :target-level="targetLevel"
+          required
           placeholder="2.1.1"
-          class="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-base text-gray-900 dark:text-gray-100 focus:border-green-600 dark:focus:border-green-400 focus:outline-none"
         />
       </div>
       <div>
@@ -149,40 +176,6 @@ async function submit() {
           </option>
         </select>
       </div>
-      <div>
-        <label
-          for="issue-difficulty"
-          class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-          >{{ t('form.difficulty') }}</label
-        >
-        <select
-          id="issue-difficulty"
-          v-model="difficulty"
-          class="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-base text-gray-900 dark:text-gray-100 focus:border-green-600 dark:focus:border-green-400 focus:outline-none"
-        >
-          <option v-for="opt in difficultyOptions" :key="opt.value" :value="opt.value">
-            {{ opt.label }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <div>
-      <label
-        for="issue-sample"
-        class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-        >{{ t('form.samplePage') }}</label
-      >
-      <select
-        id="issue-sample"
-        v-model="sample"
-        class="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-base text-gray-900 dark:text-gray-100 focus:border-green-600 dark:focus:border-green-400 focus:outline-none"
-      >
-        <option value="" disabled>{{ t('form.selectPage') }}</option>
-        <option v-for="page in samplePages" :key="page.id" :value="page.id">
-          {{ page.title }}
-        </option>
-      </select>
     </div>
 
     <div>
