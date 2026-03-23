@@ -2,6 +2,7 @@
   "installCommand": "pnpm install --ignore-scripts",
   "buildCommand": "pnpm docs:build",
   "outputDirectory": "docs/.vitepress/dist",
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/assets/(.*)",
