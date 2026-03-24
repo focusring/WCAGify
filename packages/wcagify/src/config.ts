@@ -1,6 +1,13 @@
+type DateString =
+  | ''
+  | 'latest'
+  | `${number}${number}${number}${number}-${'0' | '1'}${number}-${'0' | '1' | '2' | '3'}${number}`
+
+const DEFAULT_COMPAT_DATE: DateString = '2025-01-15'
+
 export function defineWcagifyConfig<T extends Record<string, unknown>>(
   userConfig: T = {} as T
-): T & { extends: string[]; compatibilityDate: string } {
+): T & { extends: string[]; compatibilityDate: DateString } {
   const configExtends = (userConfig as Record<string, unknown>).extends
   let userExtends: unknown[] = []
   if (Array.isArray(configExtends)) {
@@ -12,7 +19,6 @@ export function defineWcagifyConfig<T extends Record<string, unknown>>(
   return {
     ...userConfig,
     extends: ['@focusring/wcagify/layer', ...userExtends],
-    compatibilityDate:
-      ((userConfig as Record<string, unknown>).compatibilityDate as string) ?? '2025-01-15'
-  } as T & { extends: string[]; compatibilityDate: string }
+    compatibilityDate: (userConfig.compatibilityDate as DateString) ?? DEFAULT_COMPAT_DATE
+  } as T & { extends: string[]; compatibilityDate: DateString }
 }
