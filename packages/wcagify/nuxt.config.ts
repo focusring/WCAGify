@@ -9,6 +9,10 @@ const hasStudioRepoInfo = Boolean(
 )
 
 const nuxtConfig = {
+  features: {
+    inlineStyles: false
+  },
+
   modules: [
     '@nuxt/ui',
     '@nuxt/content',
