@@ -7,10 +7,10 @@
 export {}
 declare global {
   const avatarGroupInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useAvatarGroup.js').avatarGroupInjectionKey
-  const defineLocale: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/defineLocale.js').defineLocale
-  const defineShortcuts: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts.js').defineShortcuts
-  const extendLocale: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/defineLocale.js').extendLocale
-  const extractShortcuts: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts.js').extractShortcuts
+  const defineLocale: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/defineLocale').defineLocale
+  const defineShortcuts: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts').defineShortcuts
+  const extendLocale: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/defineLocale').extendLocale
+  const extractShortcuts: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts').extractShortcuts
   const fieldGroupInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFieldGroup.js').fieldGroupInjectionKey
   const formBusInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js').formBusInjectionKey
   const formErrorsInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js').formErrorsInjectionKey
@@ -25,66 +25,21 @@ declare global {
   const portalTargetInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/usePortal.js').portalTargetInjectionKey
   const provideThemeContext: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentUI.js').provideThemeContext
   const toastMaxInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useToast.js').toastMaxInjectionKey
-  const useAppConfig: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/vue/composables/useAppConfig.js').useAppConfig
+  const useAppConfig: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/vue/composables/useAppConfig.js').useAppConfig
   const useAvatarGroup: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useAvatarGroup.js').useAvatarGroup
   const useComponentIcons: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentIcons.js').useComponentIcons
   const useComponentUI: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentUI.js').useComponentUI
-  const useContentSearch: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useContentSearch.js').useContentSearch
+  const useContentSearch: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useContentSearch').useContentSearch
   const useEditorMenu: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useEditorMenu.js').useEditorMenu
   const useFieldGroup: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFieldGroup.js').useFieldGroup
-  const useFileUpload: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFileUpload.js').useFileUpload
-  const useFormField: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js').useFormField
-  const useKbd: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useKbd.js').useKbd
+  const useFileUpload: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useFileUpload').useFileUpload
+  const useFormField: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useFormField').useFormField
+  const useKbd: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useKbd').useKbd
   const useLocale: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useLocale.js').useLocale
-  const useOverlay: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useOverlay.js').useOverlay
+  const useOverlay: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useOverlay').useOverlay
   const usePortal: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/usePortal.js').usePortal
-  const useResizable: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useResizable.js').useResizable
-  const useScrollspy: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useScrollspy.js').useScrollspy
-  const useToast: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useToast.js').useToast
-}
-// for type re-export
-declare global {
-  // @ts-ignore
-  export type {
-    ShortcutConfig,
-    ShortcutsConfig,
-    ShortcutsOptions
-  } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts.d')
-  // @ts-ignore
-  export type { UseComponentIconsProps } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentIcons.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentIcons.d')
-  // @ts-ignore
-  export type {
-    ThemeUI,
-    ThemeRootContext
-  } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentUI.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useComponentUI.d')
-  // @ts-ignore
-  export type { EditorMenuOptions } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useEditorMenu.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useEditorMenu.d')
-  // @ts-ignore
-  export type { UseFileUploadOptions } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFileUpload.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useFileUpload.d')
-  // @ts-ignore
-  export type {
-    KbdKey,
-    KbdKeySpecific
-  } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useKbd.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useKbd.d')
-  // @ts-ignore
-  export type {
-    OverlayOptions,
-    Overlay
-  } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useOverlay.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useOverlay.d')
-  // @ts-ignore
-  export type {
-    UseResizableProps,
-    UseResizableReturn
-  } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useResizable.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useResizable.d')
-  // @ts-ignore
-  export type { Toast } from '../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useToast.d'
-  import('../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/composables/useToast.d')
+  const useResizable: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useResizable').useResizable
+  const useScrollShadow: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useScrollShadow').useScrollShadow
+  const useScrollspy: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useScrollspy').useScrollspy
+  const useToast: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/composables/useToast').useToast
 }

@@ -83,26 +83,38 @@ const fixedToolbarItems = computed<EditorToolbarItem<typeof customHandlers>[][]>
   ]
 ])
 
-const suggestionItems = computed<EditorSuggestionMenuItem<typeof customHandlers>[][]>(() => [
-  [
-    { type: 'label', label: t('editor.style') },
-    { kind: 'paragraph', label: t('editor.paragraph'), icon: 'i-lucide-type' },
-    { kind: 'heading', level: 6, label: t('editor.heading6'), icon: 'i-lucide-heading-6' },
-    { kind: 'bulletList', label: t('editor.bulletList'), icon: 'i-lucide-list' },
-    { kind: 'orderedList', label: t('editor.numberedList'), icon: 'i-lucide-list-ordered' },
-    { kind: 'blockquote', label: t('editor.blockquote'), icon: 'i-lucide-text-quote' },
-    { kind: 'codeBlock', label: t('editor.codeBlock'), icon: 'i-lucide-square-code' }
-  ],
-  [
-    { type: 'label', label: t('editor.insert') },
-    { kind: 'imageUpload', label: t('editor.image'), icon: 'i-lucide-image' },
-    {
-      kind: 'horizontalRule',
-      label: t('editor.horizontalRule'),
-      icon: 'i-lucide-separator-horizontal'
-    }
-  ]
-])
+const suggestionItems = computed(
+  () =>
+    [
+      [
+        { type: 'label' as const, label: t('editor.style') },
+        { kind: 'paragraph' as const, label: t('editor.paragraph'), icon: 'i-lucide-type' },
+        {
+          kind: 'heading' as const,
+          level: 6 as const,
+          label: t('editor.heading6'),
+          icon: 'i-lucide-heading-6'
+        },
+        { kind: 'bulletList' as const, label: t('editor.bulletList'), icon: 'i-lucide-list' },
+        {
+          kind: 'orderedList' as const,
+          label: t('editor.numberedList'),
+          icon: 'i-lucide-list-ordered'
+        },
+        { kind: 'blockquote' as const, label: t('editor.blockquote'), icon: 'i-lucide-text-quote' },
+        { kind: 'codeBlock' as const, label: t('editor.codeBlock'), icon: 'i-lucide-square-code' }
+      ],
+      [
+        { type: 'label' as const, label: t('editor.insert') },
+        { kind: 'imageUpload' as const, label: t('editor.image'), icon: 'i-lucide-image' },
+        {
+          kind: 'horizontalRule' as const,
+          label: t('editor.horizontalRule'),
+          icon: 'i-lucide-separator-horizontal'
+        }
+      ]
+    ] as EditorSuggestionMenuItem<typeof customHandlers>[][]
+)
 </script>
 
 <template>

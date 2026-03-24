@@ -11,13 +11,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    UApp: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/App.vue')['default']
-    UAvatar: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/Avatar.vue')['default']
-    UEditor: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/Editor.vue')['default']
-    UEditorDragHandle: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/EditorDragHandle.vue')['default']
-    UEditorSuggestionMenu: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/EditorSuggestionMenu.vue')['default']
-    UEditorToolbar: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/EditorToolbar.vue')['default']
-    UFileUpload: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/components/FileUpload.vue')['default']
-    UIcon: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.5.1_@nuxt+content@3.12.0_@libsql+client@0.17.0_better-sqlite3@12.6.2_magicas_843f4d454ed7fe60aca58aa0870fc3ee/node_modules/@nuxt/ui/dist/runtime/vue/components/Icon.vue')['default']
+    UApp: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/App.vue')['default']
+    UAvatar: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/Avatar.vue')['default']
+    UEditor: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/Editor.vue')['default']
+    UEditorDragHandle: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/EditorDragHandle.vue')['default']
+    UEditorSuggestionMenu: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/EditorSuggestionMenu.vue')['default']
+    UEditorToolbar: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/EditorToolbar.vue')['default']
+    UFileUpload: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/components/FileUpload.vue')['default']
+    UIcon: typeof import('./../../node_modules/.pnpm/@nuxt+ui@4.6.0_@nuxt+conten_ba96c3765dccf6167e4b176fc9e3cbfc/node_modules/@nuxt/ui/dist/runtime/vue/components/Icon.vue')['default']
   }
 }
