@@ -49,6 +49,7 @@ const nuxtConfig = {
 
   vite: {
     optimizeDeps: {
+      include: ['debug'],
       exclude: [
         'axe-core',
         'remark-gfm',
