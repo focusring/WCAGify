@@ -17,7 +17,7 @@ function detectPackageManager(): 'pnpm' | 'npm' | 'yarn' | 'bun' {
 }
 
 function runCmd(pm: string): string {
-  return pm === 'npm' ? 'npx' : pm
+  return pm === 'npm' ? 'npm run' : pm
 }
 
 interface SafeSpinner {
