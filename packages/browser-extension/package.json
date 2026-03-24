@@ -19,10 +19,10 @@
     "@crxjs/vite-plugin": "^2.4.0",
     "@types/chrome": "^0.1.38",
     "@vitejs/plugin-vue": "^6.0.5",
-    "happy-dom": "^20.8.4",
+    "happy-dom": "^20.8.7",
     "tailwindcss": "catalog:core",
     "typescript": "catalog:dev",
-    "vite": "^8.0.1",
+    "vite": "^8.0.2",
     "vitest": "catalog:dev"
   }
 }
