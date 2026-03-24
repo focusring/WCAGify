@@ -33,8 +33,8 @@ catalogs:
     picocolors: ^1.1.1
   core:
     '@iconify-json/lucide': ^1.2.98
-    '@iconify-json/simple-icons': ^1.2.74
-    '@libsql/client': ^0.17.0
+    '@iconify-json/simple-icons': ^1.2.75
+    '@libsql/client': ^0.17.2
     '@nuxt/a11y': 1.0.0-alpha.1
     '@nuxt/content': ^3.12.0
     '@nuxt/icon': ^2.2.1
@@ -43,7 +43,7 @@ catalogs:
     '@nuxtjs/i18n': ^10.2.3
     '@vueuse/core': ^14.2.1
     nuxt: ^4.4.2
-    nuxt-studio: ^1.5.0
+    nuxt-studio: ^1.5.1
     tailwindcss: ^4.2.2
     zod: ^4.3.6
   dev:
@@ -65,7 +65,7 @@ catalogs:
     vue-tsc: ^3.2.6
   docs:
     '@tailwindcss/vite': ^4.2.2
-    vitepress: 2.0.0-alpha.16
+    vitepress: 2.0.0-alpha.17
 
 linkWorkspacePackages: true
 
