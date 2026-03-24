@@ -22,11 +22,14 @@ export default defineNitroPlugin((nitroApp) => {
       )
     )
 
-    // Prevent FOUC: hide the page until all render-blocking CSS is loaded.
-    // In Vite dev mode, external CSS (Tailwind utilities) is processed on-demand
-    // while inline styles (Nuxt UI theme) load instantly, causing a brief flash
-    // of partially-styled content.
+    // Prevent FOUC: hide the page until all external CSS stylesheets have loaded.
+    // In Vite dev mode, Tailwind utilities are served as external stylesheets that
+    // load asynchronously, causing a flash of unstyled content. We hide the page
+    // with an inline style, then unhide once every <link rel="stylesheet"> fires
+    // its load event (with a safety timeout fallback).
     html.head.unshift('<style>html:not(.css-ready){visibility:hidden}</style>')
-    html.bodyAppend.push(`<script>document.documentElement.classList.add('css-ready')</script>`)
+    html.head.push(
+      `<script>(function(){var d=document.documentElement,l=document.querySelectorAll('link[rel="stylesheet"]'),n=0;function r(){if(--n<=0)d.classList.add('css-ready')}for(var i=0;i<l.length;i++){if(l[i].sheet)continue;n++;l[i].addEventListener('load',r);l[i].addEventListener('error',r)}if(n===0)d.classList.add('css-ready');setTimeout(function(){d.classList.add('css-ready')},1500)})();</script>`
+    )
   })
 })
