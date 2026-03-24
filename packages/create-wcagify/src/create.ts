@@ -105,8 +105,7 @@ function runCommand(command: string, args: string[], cwd: string): Promise<void>
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
-      stdio: 'inherit',
-      shell: true
+      stdio: 'inherit'
     })
 
     child.on('error', reject)

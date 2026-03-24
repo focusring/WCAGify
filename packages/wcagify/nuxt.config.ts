@@ -49,7 +49,7 @@ const nuxtConfig = {
 
   vite: {
     optimizeDeps: {
-      include: ['debug'],
+      include: ['debug', '@vue/devtools-core', '@vue/devtools-kit'],
       exclude: [
         'axe-core',
         'remark-gfm',
@@ -65,6 +65,7 @@ const nuxtConfig = {
   },
 
   i18n: {
+    baseUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
     defaultLocale: 'en',
     strategy: 'no_prefix',
     restructureDir: false,
