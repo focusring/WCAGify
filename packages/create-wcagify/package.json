@@ -1,6 +1,6 @@
 {
   "name": "create-wcagify",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Scaffold a new WCAGify accessibility audit project",
   "keywords": [
     "a11y",
