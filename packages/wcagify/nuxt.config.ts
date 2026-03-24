@@ -10,6 +10,8 @@ const hasStudioRepoInfo = Boolean(
 )
 
 const nuxtConfig = {
+  devtools: { enabled: false },
+
   modules: [
     '@nuxt/ui',
     '@nuxt/content',
@@ -49,7 +51,7 @@ const nuxtConfig = {
 
   vite: {
     optimizeDeps: {
-      include: ['debug', '@vue/devtools-core', '@vue/devtools-kit'],
+      include: ['debug'],
       exclude: [
         'axe-core',
         'remark-gfm',

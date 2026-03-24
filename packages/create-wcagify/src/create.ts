@@ -8,6 +8,18 @@ import pc from 'picocolors'
 
 import { fetchLatestWcagifyVersion } from './version.js'
 
+function detectPackageManager(): 'pnpm' | 'npm' | 'yarn' | 'bun' {
+  const ua = process.env.npm_config_user_agent || ''
+  if (ua.startsWith('yarn')) return 'yarn'
+  if (ua.startsWith('bun')) return 'bun'
+  if (ua.startsWith('pnpm')) return 'pnpm'
+  return 'npm'
+}
+
+function runCmd(pm: string): string {
+  return pm === 'npm' ? 'npx' : pm
+}
+
 interface SafeSpinner {
   start: (msg?: string) => void
   stop: (msg?: string) => void
@@ -127,6 +139,7 @@ function validateProjectName(value: string | undefined): string | undefined {
 }
 
 async function create(options: CreateOptions = {}): Promise<void> {
+  const pm = detectPackageManager()
   const s = createSafeSpinner()
 
   try {
@@ -173,7 +186,7 @@ async function create(options: CreateOptions = {}): Promise<void> {
       initGit = initGitResult
 
       const runInstallResult = await confirm({
-        message: 'Run pnpm install after scaffolding?',
+        message: `Run ${pm} install after scaffolding?`,
         initialValue: true
       })
 
@@ -229,11 +242,11 @@ async function create(options: CreateOptions = {}): Promise<void> {
     if (runInstall) {
       s.start('Installing dependencies (this may take a while)...')
       try {
-        await runCommand('pnpm', ['install'], targetDir)
+        await runCommand(pm, ['install'], targetDir)
         s.stop('Dependencies installed')
       } catch {
         s.stop('Failed to install dependencies')
-        log.warn('Dependency installation failed. You can run "pnpm install" manually.')
+        log.warn(`Dependency installation failed. You can run "${pm} install" manually.`)
       }
     }
 
@@ -245,9 +258,9 @@ async function create(options: CreateOptions = {}): Promise<void> {
     console.log(pc.cyan('Next steps:'))
     console.log(`  ${pc.dim('$')} cd ${projectName}`)
     if (!runInstall) {
-      console.log(`  ${pc.dim('$')} pnpm install`)
+      console.log(`  ${pc.dim('$')} ${pm} install`)
     }
-    console.log(`  ${pc.dim('$')} pnpm dev`)
+    console.log(`  ${pc.dim('$')} ${runCmd(pm)} dev`)
     console.log('')
   } catch (error) {
     s.stop('Failed')
