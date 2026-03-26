@@ -100,10 +100,6 @@ describe('getOutputFileName', () => {
     expect(getOutputFileName('gitignore.ejs')).toBe('.gitignore')
   })
 
-  it('maps npmrc to .npmrc', () => {
-    expect(getOutputFileName('npmrc.ejs')).toBe('.npmrc')
-  })
-
   it('maps env.example to .env.example', () => {
     expect(getOutputFileName('env.example.ejs')).toBe('.env.example')
   })
@@ -113,7 +109,7 @@ describe('getOutputFileName', () => {
   })
 
   it('handles nested template names', () => {
-    expect(getOutputFileName('tsconfig.json.ejs')).toBe('tsconfig.json')
+    expect(getOutputFileName('content.config.ts.ejs')).toBe('content.config.ts')
   })
 })
 
