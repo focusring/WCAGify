@@ -32,7 +32,7 @@ catalogs:
     ejs: ^5.0.1
     picocolors: ^1.1.1
   core:
-    '@iconify-json/lucide': ^1.2.98
+    '@iconify-json/lucide': ^1.2.99
     '@iconify-json/simple-icons': ^1.2.75
     '@libsql/client': ^0.17.2
     '@nuxt/a11y': 1.0.0-alpha.1
