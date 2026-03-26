@@ -15,26 +15,21 @@
   --color-green-800: #016538;
   --color-green-900: #0a5331;
   --color-green-950: #052e16;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bedbff;
+  --color-blue-300: #8ec5ff;
+  --color-blue-400: #51a2ff;
+  --color-blue-500: #2b7fff;
+  --color-blue-600: #155dfc;
+  --color-blue-700: #1447e6;
+  --color-blue-800: #193cb8;
+  --color-blue-900: #1c398e;
+  --color-blue-950: #162456;
 }
 
-/*
- * Nuxt UI references --ui-color-neutral-* and --ui-color-primary-* via @layer theme.
- * In a non-Nuxt setup #build/ui.css is not generated, so we define them here.
- * Using Tailwind's slate scale.
- */
 :root {
-  --ui-color-neutral-50: #f8fafc;
-  --ui-color-neutral-100: #f1f5f9;
-  --ui-color-neutral-200: #e2e8f0;
-  --ui-color-neutral-300: #cbd5e1;
-  --ui-color-neutral-400: #94a3b8;
-  --ui-color-neutral-500: #64748b;
-  --ui-color-neutral-600: #475569;
-  --ui-color-neutral-700: #334155;
-  --ui-color-neutral-800: #1e293b;
-  --ui-color-neutral-900: #0f172a;
-  --ui-color-neutral-950: #020617;
-
   --ui-color-primary-50: var(--color-green-50);
   --ui-color-primary-100: var(--color-green-100);
   --ui-color-primary-200: var(--color-green-200);
@@ -46,6 +41,18 @@
   --ui-color-primary-800: var(--color-green-800);
   --ui-color-primary-900: var(--color-green-900);
   --ui-color-primary-950: var(--color-green-950);
+
+  --ui-color-secondary-50: var(--color-blue-50);
+  --ui-color-secondary-100: var(--color-blue-100);
+  --ui-color-secondary-200: var(--color-blue-200);
+  --ui-color-secondary-300: var(--color-blue-300);
+  --ui-color-secondary-400: var(--color-blue-400);
+  --ui-color-secondary-500: var(--color-blue-500);
+  --ui-color-secondary-600: var(--color-blue-600);
+  --ui-color-secondary-700: var(--color-blue-700);
+  --ui-color-secondary-800: var(--color-blue-800);
+  --ui-color-secondary-900: var(--color-blue-900);
+  --ui-color-secondary-950: var(--color-blue-950);
 
   --ui-radius: 0.125rem;
 }
@@ -68,14 +75,14 @@ textarea:not([class*='u-']) {
   color: #f3f4f6;
 } */
 
-select:not([class*='u-']) {
+/* select:not([class*='u-']) {
   appearance: auto;
-}
+} */
 
 /*
  * TipTap editor: ensure placeholder and list markers have proper contrast.
  */
-.tiptap .is-editor-empty::before,
+/* .tiptap .is-editor-empty::before,
 .tiptap .is-empty::before {
   color: #9ca3af;
 }
@@ -93,4 +100,4 @@ select:not([class*='u-']) {
 .dark .tiptap ul li::marker,
 .dark .tiptap ol li::marker {
   color: #d1d5db;
-}
+} */

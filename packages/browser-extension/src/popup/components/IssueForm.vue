@@ -133,10 +133,11 @@ async function submit() {
         v-model="sampleModel"
         :items="samplePages.map((p) => ({ label: `${p.title} — ${p.url}`, value: p.id }))"
         :placeholder="t('form.selectPage')"
+        :ui="{ placeholder: 'text-muted', trailingIcon: 'text-muted' }"
         required
         aria-required="true"
-        color="success"
-        class="w-full"
+        variant="subtle"
+        class="w-full cursor-pointer"
       />
     </div>
 
@@ -154,7 +155,7 @@ async function submit() {
         required
         aria-required="true"
         :placeholder="t('form.issueTitlePlaceholder')"
-        color="success"
+        variant="subtle"
         class="w-full"
       />
     </div>
@@ -185,8 +186,8 @@ async function submit() {
           id="issue-severity"
           v-model="severity"
           :items="severityOptions"
-          color="success"
-          class="w-full"
+          variant="subtle"
+          class="w-full cursor-pointer"
         />
       </div>
     </div>
@@ -207,7 +208,7 @@ async function submit() {
       size="xl"
       icon="i-lucide-file-input"
       class="w-full justify-center"
-      :ui="{ leadingIcon: 'size-5' }"
+      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer' }"
     />
 
     <div

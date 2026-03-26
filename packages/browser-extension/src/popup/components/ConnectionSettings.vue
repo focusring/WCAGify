@@ -14,6 +14,11 @@ const status = ref<'idle' | 'loading' | 'connected' | 'error'>('idle')
 const errorMessage = ref('')
 const mode = ref<'scanning' | 'select' | 'manual'>('scanning')
 const autoConnected = ref(false)
+const isOpen = ref(status.value !== 'connected')
+
+watch(status, (val) => {
+  isOpen.value = val !== 'connected'
+})
 
 const emit = defineEmits<{
   reportsLoaded: [reports: Report[]]
@@ -114,18 +119,22 @@ async function fetchReports() {
 
 <template>
   <div class="space-y-3">
-    <details :open="status !== 'connected' || undefined" class="group">
-      <summary
-        class="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 list-none [&::-webkit-details-marker]:hidden"
+    <UCollapsible :open="isOpen" @update:open="isOpen = $event">
+      <UButton
+        class="group"
+        variant="ghost"
+        color="neutral"
+        trailing-icon="i-lucide-chevron-down"
+        block
+        :ui="{
+          trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+          base: 'cursor-pointer px-3'
+        }"
       >
-        <UIcon
-          name="i-lucide-chevron-right"
-          class="size-4 transition-transform group-open:rotate-90"
-        />
         <template v-if="status === 'connected'">
-          <span class="inline-block h-2 w-2 rounded-full bg-green-500"></span>
+          <UChip standalone inset />
           <span class="text-green-700 dark:text-green-400">{{ t('connection.connected') }}</span>
-          <span class="text-gray-600 dark:text-gray-400">&mdash; {{ wcagifyUrl }}</span>
+          <span class="text-gray-600 dark:text-gray-300">&mdash; {{ wcagifyUrl }}</span>
         </template>
         <template v-else-if="mode === 'scanning'">
           {{ t('connection.scanning') }}
@@ -133,104 +142,112 @@ async function fetchReports() {
         <template v-else>
           {{ t('connection.url') }}
         </template>
-      </summary>
+      </UButton>
 
-      <div class="mt-3 space-y-3">
-        <!-- Scanning state -->
-        <div v-if="mode === 'scanning'" class="text-sm text-gray-500 dark:text-gray-400">
-          {{ t('connection.scanning') }}
-        </div>
-
-        <!-- Multiple instances found: dropdown -->
-        <div v-else-if="mode === 'select'">
-          <label
-            for="wcagify-instance"
-            class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-            >{{ t('connection.selectInstance') }}
-            <small>({{ t('connection.required') }})</small></label
-          >
-          <select
-            id="wcagify-instance"
-            :value="wcagifyUrl"
-            @change="connectInstance(($event.target as HTMLSelectElement).value)"
-            required
-            aria-required="true"
-            class="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-base text-gray-900 dark:text-gray-100 focus:border-green-600 dark:focus:border-green-400 focus:outline-none"
-          >
-            <option v-for="instance in instances" :key="instance.url" :value="instance.url">
-              {{ instance.label }}
-            </option>
-          </select>
-          <button
-            type="button"
-            @click="switchToManual"
-            class="mt-1 text-sm text-green-700 cursor-pointer dark:text-green-400 hover:underline"
-          >
-            {{ t('connection.enterManually') }}
-          </button>
-        </div>
-
-        <!-- Manual input -->
-        <div v-else>
-          <form @submit.prevent="fetchReports">
-            <label
-              for="wcagify-url"
-              class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-              >{{ t('connection.url') }} <small>({{ t('connection.required') }})</small></label
-            >
-            <div class="flex gap-2">
-              <UInput
-                id="wcagify-url"
-                v-model="wcagifyUrl"
-                type="url"
-                placeholder="http://localhost:3000"
-                required
-                aria-required="true"
-                :aria-invalid="status === 'error' ? true : undefined"
-                :aria-describedby="status === 'error' ? 'wcagify-url-error' : undefined"
-                :color="status === 'error' ? 'error' : 'success'"
-                :highlight="status === 'error'"
-                class="flex-1"
-              />
-
-              <UButton type="submit" color="success" :label="t('connection.connect')" />
-
-              <UButton
-                @click="rescan"
-                color="neutral"
-                variant="outline"
-                icon="i-lucide-refresh-cw"
-                :aria-label="t('connection.rescan')"
-              />
-            </div>
-          </form>
-          <div
-            v-if="autoConnected && status === 'connected'"
-            class="mt-1.5 flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400"
-          >
-            <UIcon name="i-lucide-info" class="size-4 shrink-0" />
-            {{ t('connection.autoConnected') }}
+      <template #content>
+        <div class="mt-3 space-y-3">
+          <!-- Scanning state -->
+          <div v-if="mode === 'scanning'" class="text-sm text-gray-500 dark:text-gray-400 px-2.5">
+            {{ t('connection.scanning') }}
           </div>
+
+          <!-- Multiple instances found: dropdown -->
+          <div v-else-if="mode === 'select'">
+            <label
+              for="wcagify-instance"
+              class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >{{ t('connection.selectInstance') }}
+              <small>({{ t('connection.required') }})</small></label
+            >
+            <USelect
+              id="wcagify-instance"
+              :model-value="wcagifyUrl"
+              :items="instances.map((i) => ({ label: i.label, value: i.url }))"
+              @update:model-value="connectInstance"
+              required
+              aria-required="true"
+              class="w-full cursor-pointer"
+            />
+            <UButton
+              variant="link"
+              color="success"
+              size="sm"
+              class="mt-1"
+              @click="switchToManual"
+              :ui="{ base: 'cursor-pointer px-0' }"
+            >
+              {{ t('connection.enterManually') }}
+            </UButton>
+          </div>
+
+          <!-- Manual input -->
+          <div v-else>
+            <form @submit.prevent="fetchReports">
+              <label
+                for="wcagify-url"
+                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
+                >{{ t('connection.url') }} <small>({{ t('connection.required') }})</small></label
+              >
+              <div class="flex gap-2">
+                <UInput
+                  id="wcagify-url"
+                  v-model="wcagifyUrl"
+                  type="url"
+                  placeholder="http://localhost:3000"
+                  required
+                  aria-required="true"
+                  :aria-invalid="status === 'error' ? true : undefined"
+                  :aria-describedby="status === 'error' ? 'wcagify-url-error' : undefined"
+                  :color="status === 'error' ? 'error' : 'success'"
+                  :highlight="status === 'error'"
+                  class="flex-1"
+                />
+
+                <UButton
+                  type="submit"
+                  color="success"
+                  :label="t('connection.connect')"
+                  :ui="{ base: 'cursor-pointer' }"
+                />
+
+                <UButton
+                  @click="rescan"
+                  color="neutral"
+                  variant="outline"
+                  icon="i-lucide-refresh-cw"
+                  :aria-label="t('connection.rescan')"
+                  :ui="{ base: 'cursor-pointer' }"
+                />
+              </div>
+            </form>
+            <div
+              v-if="autoConnected && status === 'connected'"
+              class="mt-1.5 flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400"
+            >
+              <UIcon name="i-lucide-info" class="size-4 shrink-0" />
+              {{ t('connection.autoConnected') }}
+            </div>
+          </div>
+
+          <div
+            v-if="mode !== 'scanning' && status === 'loading'"
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
+            {{ t('connection.connecting') }}
+          </div>
+
+          <UAlert
+            v-if="status === 'error'"
+            id="wcagify-url-error"
+            color="error"
+            variant="subtle"
+            :description="errorMessage"
+          />
         </div>
+      </template>
+    </UCollapsible>
 
-        <div
-          v-if="mode !== 'scanning' && status === 'loading'"
-          class="text-sm text-gray-500 dark:text-gray-400"
-        >
-          {{ t('connection.connecting') }}
-        </div>
-
-        <UAlert
-          v-if="status === 'error'"
-          id="wcagify-url-error"
-          color="error"
-          variant="subtle"
-          :description="errorMessage"
-        />
-      </div>
-    </details>
-
-    <div v-if="status === 'connected' && reports.length > 0">
+    <div v-if="status === 'connected' && reports.length > 0" class="">
       <label
         for="wcagify-report"
         class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
@@ -241,11 +258,12 @@ async function fetchReports() {
         v-model="reportSlug"
         :items="reports.map((r) => ({ label: r.title, value: r.slug }))"
         :placeholder="t('connection.selectReport')"
+        :ui="{ placeholder: 'text-muted', trailingIcon: 'text-muted' }"
         required
         aria-required="true"
-        color="success"
-        class="w-full"
+        class="w-full cursor-pointer"
         size="lg"
+        variant="subtle"
       />
     </div>
   </div>

@@ -36,36 +36,39 @@ function onReportsLoaded(data: Report[]) {
 <template>
   <UApp>
     <div class="min-h-screen p-4 bg-white dark:bg-gray-900 font-sans">
-      <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-2">
         <img src="../assets/wcagify-48.png" alt="WCAGify logo" class="size-6" />
-        <h1 class="text-lg font-bold text-black dark:text-white">WCAGify</h1>
-        <div class="ml-auto flex items-center gap-1">
+        <h1 class="text-lg font-bold text-black dark:text-white select-none">WCAGify</h1>
+        <div class="ml-auto flex items-center gap-2">
           <USelect
             v-model="locale"
             :items="localeItems"
             :aria-label="t('language')"
+            variant="subtle"
             size="sm"
-            class="w-auto min-w-24"
+            class="w-auto min-w-24 cursor-pointer"
           />
           <UButton
             @click="cycle"
             :title="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
             :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
+            :ui="{ base: 'cursor-pointer' }"
             :icon="colorModeIcon"
             size="sm"
             color="neutral"
-            variant="ghost"
+            variant="subtle"
           />
         </div>
       </div>
 
+      <USeparator class="my-4" />
+
       <div class="space-y-4">
         <ConnectionSettings @reports-loaded="onReportsLoaded" />
 
-        <div
-          v-if="reports.length > 0"
-          class="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4"
-        >
+        <USeparator />
+
+        <div v-if="reports.length > 0" class="space-y-4">
           <ElementPicker ref="picker" />
 
           <IssueForm

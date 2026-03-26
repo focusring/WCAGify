@@ -52,10 +52,10 @@ async function pickElement() {
       :disabled="picking"
       color="success"
       variant="outline"
-      class="w-full justify-center"
+      class="w-full justify-center cursor-pointer"
       icon="i-lucide-square-mouse-pointer"
       size="xl"
-      :ui="{ leadingIcon: 'size-5' }"
+      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer' }"
       :label="picking ? t('picker.picking') : t('picker.pickElement')"
     />
 
