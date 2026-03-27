@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 type Status = 'passed' | 'failed' | 'not-present' | 'not-tested'
 
 const props = defineProps<{
@@ -30,7 +32,7 @@ const config: Record<Status, { icon: string; class: string }> = {
   <button
     role="switch"
     :aria-checked="active"
-    :aria-label="$t(`report.scStatus.${status}`) + ': ' + count"
+    :aria-label="t(`report.scStatus.${status}`) + ': ' + count"
     class="flex flex-col items-center p-2.5 md:max-w-34 w-full rounded-lg text-gray-950 font-semibold cursor-pointer transition-all"
     :class="[
       config[status].class,
@@ -45,7 +47,7 @@ const config: Record<Status, { icon: string; class: string }> = {
       <span class="text-lg">{{ count }}</span>
     </span>
     <span>
-      {{ $t(`report.scStatus.${status}`) }}
+      {{ t(`report.scStatus.${status}`) }}
     </span>
   </button>
 </template>

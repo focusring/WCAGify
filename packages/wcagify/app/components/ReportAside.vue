@@ -71,10 +71,10 @@ const navigation = computed<NavItem[]>(() => [
 <template>
   <nav
     class="px-2 py-3 rounded-lg border border-accented"
-    :aria-label="$t('report.navigationTitle')"
+    :aria-label="t('report.navigationTitle')"
   >
     <h2 class="mb-3 px-2 text-2xl font-semibold text-gray-950 dark:text-white">
-      {{ $t('report.navigationTitle') }}
+      {{ t('report.navigationTitle') }}
     </h2>
     <ul class="space-y-1">
       <li v-for="item in navigation" :key="item.hash">
