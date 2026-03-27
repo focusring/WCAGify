@@ -19,7 +19,8 @@ const { t } = useI18n()
 const title = ref('')
 const description = ref('')
 const sc = ref('')
-const severity = ref<'Low' | 'Medium' | 'High'>('Medium')
+const severity = ref<'Low' | 'Medium' | 'High' | undefined>(undefined)
+const type = ref<'Content' | 'Design' | 'Technical' | undefined>(undefined)
 const sample = ref('')
 
 const submitting = ref(false)
@@ -69,6 +70,12 @@ const severityOptions = computed(() => [
   { value: 'High' as const, label: t('form.high') }
 ])
 
+const typeOptions = computed(() => [
+  { value: 'Content' as const, label: t('form.content') },
+  { value: 'Design' as const, label: t('form.design') },
+  { value: 'Technical' as const, label: t('form.technical') }
+])
+
 async function submit() {
   if (!canSubmit.value) return
 
@@ -96,6 +103,7 @@ async function submit() {
         title: title.value.trim(),
         sc: sc.value.trim(),
         severity: severity.value,
+        type: type.value,
         sample: sample.value,
         description: bodyParts.join('\n')
       })
@@ -160,32 +168,65 @@ async function submit() {
       />
     </div>
 
+    <div>
+      <label for="issue-sc" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
+        >{{ t('form.sc') }} <small>({{ t('form.required') }})</small></label
+      >
+      <ScCombobox
+        id="issue-sc"
+        v-model="sc"
+        :wcag-version="wcagVersion"
+        :target-level="targetLevel"
+        required
+        placeholder="2.1.1"
+      />
+    </div>
+
     <div class="grid grid-cols-2 gap-2">
-      <div>
-        <label
-          for="issue-sc"
-          class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-          >{{ t('form.sc') }} <small>({{ t('form.required') }})</small></label
-        >
-        <ScCombobox
-          id="issue-sc"
-          v-model="sc"
-          :wcag-version="wcagVersion"
-          :target-level="targetLevel"
-          required
-          placeholder="2.1.1"
-        />
-      </div>
       <div>
         <label
           for="issue-severity"
           class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
           >{{ t('form.severity') }}</label
         >
-        <USelect
+        <USelectMenu
           id="issue-severity"
           v-model="severity"
           :items="severityOptions"
+          value-key="value"
+          :placeholder="t('form.none')"
+          :ui="{
+            placeholder: 'text-muted',
+            trailingIcon: 'text-muted',
+            item: 'cursor-pointer dark:hover:bg-muted rounded-sm'
+          }"
+          :search-input="false"
+          :clear="{ size: 'xs' }"
+          clear-icon="i-lucide-circle-x"
+          variant="subtle"
+          class="w-full cursor-pointer"
+        />
+      </div>
+      <div>
+        <label
+          for="issue-type"
+          class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
+          >{{ t('form.type') }}</label
+        >
+        <USelectMenu
+          id="issue-type"
+          v-model="type"
+          :items="typeOptions"
+          value-key="value"
+          :placeholder="t('form.unknown')"
+          :ui="{
+            placeholder: 'text-muted',
+            trailingIcon: 'text-muted',
+            item: 'cursor-pointer dark:hover:bg-muted rounded-sm'
+          }"
+          :search-input="false"
+          :clear="{ size: 'xs' }"
+          clear-icon="i-lucide-circle-x"
           variant="subtle"
           class="w-full cursor-pointer"
         />

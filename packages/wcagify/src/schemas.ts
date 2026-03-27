@@ -34,7 +34,7 @@ const issueSchema = z.object({
   sc: z.string(),
   severity: z.enum(['Low', 'Medium', 'High']).optional(),
   type: z.enum(['Content', 'Technical', 'Design', 'Unknown']).optional(),
-  difficulty: z.enum(['Low', 'Medium', 'High']),
+  difficulty: z.enum(['Low', 'Medium', 'High']).optional(),
   sample: z.string()
 })
 

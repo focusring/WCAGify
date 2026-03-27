@@ -43,8 +43,8 @@ export default {
     type: 'Type',
     typesort: {
       content: 'Content',
-      technical: 'Technisch',
       design: 'Ontwerp',
+      technical: 'Technisch',
       unknown: 'Onbekend'
     },
     severity: 'Ernst',

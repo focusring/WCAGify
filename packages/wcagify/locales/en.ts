@@ -42,8 +42,8 @@ export default {
     type: 'Type',
     typesort: {
       content: 'Content',
-      technical: 'Technical',
       design: 'Design',
+      technical: 'Technical',
       unknown: 'Unknown'
     },
     severity: 'Severity',

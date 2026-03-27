@@ -223,7 +223,9 @@ defineExpose({ visiblePrinciples })
             </h3>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
               {{ t('report.difficulty') }}:
-              {{ t(`report.difficultyLevel.${tip.difficulty.toLowerCase()}`) }}
+              {{
+                tip.difficulty ? t(`report.difficultyLevel.${tip.difficulty.toLowerCase()}`) : ''
+              }}
             </p>
             <div class="mt-3 prose dark:prose-invert">
               <ContentRenderer :value="tip" />

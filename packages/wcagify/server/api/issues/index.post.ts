@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { report, title, sc, severity, difficulty, sample, description } = result.data
+  const { report, title, sc, severity, type, difficulty, sample, description } = result.data
 
   const { filepath: reportDir } = resolveSecurePath(['content', 'reports'], report)
 
@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const frontmatter = buildIssueFrontmatter({ title, sc, severity, difficulty, sample })
+  const frontmatter = buildIssueFrontmatter({ title, sc, severity, type, difficulty, sample })
 
   const content = finalDescription ? `${frontmatter}\n\n${finalDescription}\n` : `${frontmatter}\n`
 

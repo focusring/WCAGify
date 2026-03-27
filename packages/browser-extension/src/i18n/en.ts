@@ -47,10 +47,17 @@ export default {
     issueCreated: 'Issue created',
     failedToCreate: 'Failed to create issue',
     required: 'required',
+    scSearch: 'Search criteria...',
     noResults: 'No matching criteria',
+    none: 'None',
     low: 'Low',
     medium: 'Medium',
-    high: 'High'
+    high: 'High',
+    type: 'Type',
+    content: 'Content',
+    design: 'Design',
+    technical: 'Technical',
+    unknown: 'Unknown'
   },
   editor: {
     undo: 'Undo',

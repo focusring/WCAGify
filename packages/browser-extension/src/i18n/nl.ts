@@ -47,10 +47,17 @@ export default {
     issueCreated: 'Probleem aangemaakt',
     failedToCreate: 'Probleem aanmaken mislukt',
     required: 'verplicht',
+    scSearch: 'Criteria zoeken...',
     noResults: 'Geen overeenkomende criteria',
+    none: 'Geen',
     low: 'Laag',
     medium: 'Gemiddeld',
-    high: 'Hoog'
+    high: 'Hoog',
+    type: 'Type',
+    content: 'Content',
+    design: 'Ontwerp',
+    technical: 'Technisch',
+    unknown: 'Onbekend'
   },
   editor: {
     undo: 'Ongedaan maken',
