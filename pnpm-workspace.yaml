@@ -6,22 +6,22 @@ packages:
 catalog:
   '@nuxt/fonts': ^0.14.0
   '@nuxt/ui': ^4.6.0
-  '@tiptap/core': ^3.20.5
-  '@tiptap/extension-code-block-lowlight': ^3.20.5
-  '@tiptap/extension-emoji': ^3.20.5
-  '@tiptap/extension-image': ^3.20.5
-  '@tiptap/extension-link': ^3.20.5
-  '@tiptap/extension-placeholder': ^3.20.5
-  '@tiptap/extension-underline': ^3.20.5
-  '@tiptap/starter-kit': ^3.20.5
-  '@tiptap/vue-3': ^3.20.5
+  '@tiptap/core': ^3.21.0
+  '@tiptap/extension-code-block-lowlight': ^3.21.0
+  '@tiptap/extension-emoji': ^3.21.0
+  '@tiptap/extension-image': ^3.21.0
+  '@tiptap/extension-link': ^3.21.0
+  '@tiptap/extension-placeholder': ^3.21.0
+  '@tiptap/extension-underline': ^3.21.0
+  '@tiptap/starter-kit': ^3.21.0
+  '@tiptap/vue-3': ^3.21.0
   '@types/turndown': ^5.0.6
-  happy-dom: ^20.8.8
+  happy-dom: ^20.8.9
   lowlight: ^3.3.0
   nanoid: ^5.1.7
   sharp: ^0.34.5
   turndown: ^7.2.2
-  vitest: ^4.1.1
+  vitest: ^4.1.2
 
 catalogMode: prefer
 
@@ -32,7 +32,7 @@ catalogs:
     ejs: ^5.0.1
     picocolors: ^1.1.1
   core:
-    '@iconify-json/lucide': ^1.2.99
+    '@iconify-json/lucide': ^1.2.100
     '@iconify-json/simple-icons': ^1.2.75
     '@libsql/client': ^0.17.2
     '@nuxt/a11y': 1.0.0-alpha.1
@@ -50,7 +50,7 @@ catalogs:
     '@nuxt/schema': ^4.4.2
     '@types/ejs': ^3.1.5
     '@types/node': ^24.12.0
-    '@vitest/coverage-v8': ^4.1.1
+    '@vitest/coverage-v8': ^4.1.2
     bumpp: ^11.0.1
     changelogen: ^0.6.2
     changelogithub: ^14.0.0
@@ -59,9 +59,9 @@ catalogs:
     oxfmt: ^0.42.0
     oxlint: ^1.57.0
     playwright: ^1.58.2
-    tsdown: ^0.21.5
+    tsdown: ^0.21.7
     typescript: ^6.0.2
-    vitest: ^4.1.1
+    vitest: ^4.1.2
     vue-tsc: ^3.2.6
   docs:
     '@tailwindcss/vite': ^4.2.2
