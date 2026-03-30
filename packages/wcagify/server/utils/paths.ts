@@ -1,4 +1,4 @@
-import { resolve, join } from 'node:path'
+import { resolve, join, sep } from 'node:path'
 
 /**
  * Resolves a file path within a base directory and guards against path traversal.
@@ -7,7 +7,7 @@ import { resolve, join } from 'node:path'
 export function resolveSecurePath(base: string[], filename: string) {
   const dir = resolve(process.cwd(), ...base)
   const filepath = join(dir, filename)
-  if (!filepath.startsWith(dir + '/')) {
+  if (!filepath.startsWith(dir + sep)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid path' })
   }
   return { dir, filepath }
