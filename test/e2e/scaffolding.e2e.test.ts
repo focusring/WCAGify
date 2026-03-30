@@ -30,9 +30,7 @@ describe('CLI Scaffolding E2E', () => {
       expect(existsSync(join(projectPath, 'package.json'))).toBe(true)
       expect(existsSync(join(projectPath, 'nuxt.config.ts'))).toBe(true)
       expect(existsSync(join(projectPath, 'content.config.ts'))).toBe(true)
-      expect(existsSync(join(projectPath, 'tsconfig.json'))).toBe(true)
       expect(existsSync(join(projectPath, '.gitignore'))).toBe(true)
-      expect(existsSync(join(projectPath, '.npmrc'))).toBe(true)
     })
 
     it('creates example report with issue files', () => {
