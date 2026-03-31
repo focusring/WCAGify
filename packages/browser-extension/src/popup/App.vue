@@ -44,6 +44,10 @@ function onReportsLoaded(data: Report[]) {
             v-model="locale"
             :items="localeItems"
             :aria-label="t('language')"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+              item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
+            }"
             variant="subtle"
             size="sm"
             class="w-auto min-w-24 cursor-pointer"
@@ -52,7 +56,9 @@ function onReportsLoaded(data: Report[]) {
             @click="cycle"
             :title="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
             :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
-            :ui="{ base: 'cursor-pointer' }"
+            :ui="{
+              base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+            }"
             :icon="colorModeIcon"
             size="sm"
             color="neutral"

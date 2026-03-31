@@ -13,6 +13,10 @@ defineProps<{
 
 const { t } = useI18n()
 
+const focusRingUi = {
+  base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+}
+
 const customHandlers = {
   imageUpload: {
     canExecute: (editor: Editor) => editor.can().insertContent({ type: 'imageUpload' }),
@@ -22,66 +26,74 @@ const customHandlers = {
   }
 } satisfies EditorCustomHandlers
 
-const fixedToolbarItems = computed<EditorToolbarItem<typeof customHandlers>[][]>(() => [
+const fixedToolbarItems = computed<EditorToolbarItem<typeof customHandlers>[][]>(() =>
   [
-    { kind: 'undo', icon: 'i-lucide-undo', tooltip: { text: t('editor.undo') } },
-    { kind: 'redo', icon: 'i-lucide-redo', tooltip: { text: t('editor.redo') } }
-  ],
-  [
-    {
-      icon: 'i-lucide-heading',
-      tooltip: { text: t('editor.headings') },
-      content: { align: 'start' },
-      items: [
-        { kind: 'heading', level: 6, icon: 'i-lucide-heading-6', label: t('editor.heading6') }
-      ]
-    },
-    {
-      icon: 'i-lucide-list',
-      tooltip: { text: t('editor.lists') },
-      content: { align: 'start' },
-      items: [
-        { kind: 'bulletList', icon: 'i-lucide-list', label: t('editor.bulletList') },
-        { kind: 'orderedList', icon: 'i-lucide-list-ordered', label: t('editor.orderedList') }
-      ]
-    },
-    { kind: 'blockquote', icon: 'i-lucide-text-quote', tooltip: { text: t('editor.blockquote') } },
-    { kind: 'codeBlock', icon: 'i-lucide-square-code', tooltip: { text: t('editor.codeBlock') } }
-  ],
-  [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: t('editor.bold') } },
-    {
-      kind: 'mark',
-      mark: 'italic',
-      icon: 'i-lucide-italic',
-      tooltip: { text: t('editor.italic') }
-    },
-    {
-      kind: 'mark',
-      mark: 'underline',
-      icon: 'i-lucide-underline',
-      tooltip: { text: t('editor.underline') }
-    },
-    {
-      kind: 'mark',
-      mark: 'strike',
-      icon: 'i-lucide-strikethrough',
-      tooltip: { text: t('editor.strikethrough') }
-    },
-    { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: t('editor.code') } }
-  ],
-  [
-    { kind: 'link', icon: 'i-lucide-link', tooltip: { text: t('editor.link') } },
-    { kind: 'imageUpload', icon: 'i-lucide-image', tooltip: { text: t('editor.image') } }
-  ],
-  [
-    {
-      kind: 'horizontalRule',
-      icon: 'i-lucide-separator-horizontal',
-      tooltip: { text: t('editor.horizontalRule') }
-    }
-  ]
-])
+    [
+      { kind: 'undo', icon: 'i-lucide-undo', tooltip: { text: t('editor.undo') } },
+      { kind: 'redo', icon: 'i-lucide-redo', tooltip: { text: t('editor.redo') } }
+    ],
+    [
+      {
+        icon: 'i-lucide-heading',
+        tooltip: { text: t('editor.headings') },
+        content: { align: 'start' },
+        items: [
+          { kind: 'heading', level: 6, icon: 'i-lucide-heading-6', label: t('editor.heading6') }
+        ]
+      },
+      {
+        icon: 'i-lucide-list',
+        tooltip: { text: t('editor.lists') },
+        content: { align: 'start' },
+        items: [
+          { kind: 'bulletList', icon: 'i-lucide-list', label: t('editor.bulletList') },
+          { kind: 'orderedList', icon: 'i-lucide-list-ordered', label: t('editor.orderedList') }
+        ]
+      },
+      {
+        kind: 'blockquote',
+        icon: 'i-lucide-text-quote',
+        tooltip: { text: t('editor.blockquote') }
+      },
+      { kind: 'codeBlock', icon: 'i-lucide-square-code', tooltip: { text: t('editor.codeBlock') } }
+    ],
+    [
+      { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: t('editor.bold') } },
+      {
+        kind: 'mark',
+        mark: 'italic',
+        icon: 'i-lucide-italic',
+        tooltip: { text: t('editor.italic') }
+      },
+      {
+        kind: 'mark',
+        mark: 'underline',
+        icon: 'i-lucide-underline',
+        tooltip: { text: t('editor.underline') }
+      },
+      {
+        kind: 'mark',
+        mark: 'strike',
+        icon: 'i-lucide-strikethrough',
+        tooltip: { text: t('editor.strikethrough') }
+      },
+      { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: t('editor.code') } }
+    ],
+    [
+      { kind: 'link', icon: 'i-lucide-link', tooltip: { text: t('editor.link') } },
+      { kind: 'imageUpload', icon: 'i-lucide-image', tooltip: { text: t('editor.image') } }
+    ],
+    [
+      {
+        kind: 'horizontalRule',
+        icon: 'i-lucide-separator-horizontal',
+        tooltip: { text: t('editor.horizontalRule') }
+      }
+    ]
+  ].map((group) =>
+    group.map((item: EditorToolbarItem<typeof customHandlers>) => ({ ...item, ui: focusRingUi }))
+  )
+)
 
 const suggestionItems = computed(
   () =>

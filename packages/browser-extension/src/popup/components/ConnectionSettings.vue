@@ -128,7 +128,7 @@ async function fetchReports() {
         block
         :ui="{
           trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
-          base: 'cursor-pointer px-3'
+          base: 'cursor-pointer px-3 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
         }"
       >
         <template v-if="status === 'connected'">
@@ -165,19 +165,22 @@ async function fetchReports() {
               :items="instances.map((i) => ({ label: i.label, value: i.url }))"
               @update:model-value="connectInstance"
               required
+              :ui="{
+                placeholder: 'text-muted',
+                item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
+              }"
               aria-required="true"
               class="w-full cursor-pointer"
             />
             <UButton
               variant="link"
+              :label="t('connection.enterManually')"
               color="success"
               size="sm"
               class="mt-1"
               @click="switchToManual"
               :ui="{ base: 'cursor-pointer px-0' }"
-            >
-              {{ t('connection.enterManually') }}
-            </UButton>
+            />
           </div>
 
           <!-- Manual input -->
@@ -216,7 +219,9 @@ async function fetchReports() {
                   variant="outline"
                   icon="i-lucide-refresh-cw"
                   :aria-label="t('connection.rescan')"
-                  :ui="{ base: 'cursor-pointer' }"
+                  :ui="{
+                    base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+                  }"
                 />
               </div>
             </form>
@@ -258,7 +263,11 @@ async function fetchReports() {
         v-model="reportSlug"
         :items="reports.map((r) => ({ label: r.title, value: r.slug }))"
         :placeholder="t('connection.selectReport')"
-        :ui="{ placeholder: 'text-muted', trailingIcon: 'text-muted' }"
+        :ui="{
+          placeholder: 'text-muted',
+          trailingIcon: 'text-muted',
+          item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
+        }"
         required
         aria-required="true"
         class="w-full cursor-pointer"

@@ -1,5 +1,5 @@
 import { execSync, spawn, type ChildProcess } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -80,6 +80,13 @@ export function cleanupProject(name: string): void {
 
 export function packWcagify(): string {
   const wcagifyDir = join(ROOT_DIR, 'packages/wcagify')
+
+  // Reuse existing tarball if already packed (avoids races when files run in parallel)
+  const existing = existsSync(wcagifyDir)
+    ? readdirSync(wcagifyDir).find((f) => f.endsWith('.tgz'))
+    : undefined
+  if (existing) return join(wcagifyDir, existing)
+
   const output = execSync('pnpm pack --pack-destination .', {
     cwd: wcagifyDir,
     encoding: 'utf-8',
@@ -127,12 +134,15 @@ async function waitForServer(url: string, timeoutMs: number): Promise<void> {
   throw new Error(`Server at ${url} did not respond within ${timeoutMs}ms`)
 }
 
-export async function startDevServer(projectPath: string): Promise<{
+export async function startDevServer(
+  projectPath: string,
+  port = 3099
+): Promise<{
   process: ChildProcess
   url: string
 }> {
-  const url = 'http://localhost:3099'
-  const child = spawn('npx', ['nuxt', 'dev', '--port', '3099'], {
+  const url = `http://localhost:${port}`
+  const child = spawn('npx', ['nuxt', 'dev', '--port', String(port)], {
     cwd: projectPath,
     stdio: 'ignore',
     shell: true,

@@ -135,7 +135,7 @@ describe('Package Manager Smoke Tests', () => {
       patchPackageJsonForLocalWcagify(projectPath, tarballPath)
       installDependencies(projectPath)
 
-      const { process: serverProcess, url } = await startDevServer(projectPath)
+      const { process: serverProcess, url } = await startDevServer(projectPath, 3104)
 
       try {
         const response = await fetch(url)

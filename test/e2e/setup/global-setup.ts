@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { cleanupTmpDir, getTmpDir, scaffoldProject } from './test-utils.js'
+import { cleanupTmpDir, getTmpDir, packWcagify, scaffoldProject } from './test-utils.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = join(__dirname, '../../..')
@@ -34,6 +34,9 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   mkdirSync(getTmpDir(), { recursive: true })
 
   buildPackages()
+
+  console.log('Packing @focusring/wcagify tarball...')
+  packWcagify()
 
   console.log('Scaffolding base project for e2e tests...')
   scaffoldProject('base-project')

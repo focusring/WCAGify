@@ -34,7 +34,7 @@ describe('Share E2E', () => {
     patchPackageJsonForLocalWcagify(projectPath, tarball)
     installDependencies(projectPath)
 
-    const server = await startDevServer(projectPath)
+    const server = await startDevServer(projectPath, 3102)
     devServerProcess = server.process
     baseUrl = server.url
 

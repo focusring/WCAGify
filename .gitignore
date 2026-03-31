@@ -29,6 +29,7 @@ docs/.vitepress/dist
 
 # Auto-generated
 auto-imports.d.ts
+components.d.ts
 
 # Local env files
 .env

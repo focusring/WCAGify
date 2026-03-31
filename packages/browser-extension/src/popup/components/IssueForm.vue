@@ -5,6 +5,7 @@ import { useSettings } from '../../composables/useSettings'
 import { useI18n } from '../../composables/useI18n'
 import RichTextEditor from './RichTextEditor.vue'
 import ScCombobox from './ScCombobox.vue'
+import ClearableSelect from './ClearableSelect.vue'
 
 const props = defineProps<{
   reports: Report[]
@@ -136,16 +137,13 @@ async function submit() {
         class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
         >{{ t('form.samplePage') }} <small>({{ t('form.required') }})</small></label
       >
-      <USelect
+      <ClearableSelect
         id="issue-sample"
         v-model="sampleModel"
         :items="samplePages.map((p) => ({ label: `${p.title} — ${p.url}`, value: p.id }))"
         :placeholder="t('form.selectPage')"
-        :ui="{ placeholder: 'text-muted', trailingIcon: 'text-muted' }"
+        :clear-label="t('form.clearPage')"
         required
-        aria-required="true"
-        variant="subtle"
-        class="w-full cursor-pointer"
       />
     </div>
 
@@ -163,9 +161,25 @@ async function submit() {
         required
         aria-required="true"
         :placeholder="t('form.issueTitlePlaceholder')"
+        :ui="{ trailing: 'pe-1.5', base: '[&::placeholder]:text-muted hover:bg-accented/75' }"
         variant="subtle"
-        class="w-full"
-      />
+        class="issue-title-input w-full"
+      >
+        <template v-if="title?.length" #trailing>
+          <UButton
+            color="primary"
+            variant="ghost"
+            size="xs"
+            icon="i-lucide-x"
+            :aria-label="t('form.clearTitle')"
+            :ui="{
+              base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+            }"
+            @click="title = ''"
+            class="cursor-pointer"
+          />
+        </template>
+      </UInput>
     </div>
 
     <div>
@@ -189,22 +203,12 @@ async function submit() {
           class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
           >{{ t('form.severity') }}</label
         >
-        <USelectMenu
+        <ClearableSelect
           id="issue-severity"
           v-model="severity"
           :items="severityOptions"
-          value-key="value"
           :placeholder="t('form.none')"
-          :ui="{
-            placeholder: 'text-muted',
-            trailingIcon: 'text-muted',
-            item: 'cursor-pointer dark:hover:bg-muted rounded-sm'
-          }"
-          :search-input="false"
-          :clear="{ size: 'xs' }"
-          clear-icon="i-lucide-circle-x"
-          variant="subtle"
-          class="w-full cursor-pointer"
+          :clear-label="t('form.clearSeverity')"
         />
       </div>
       <div>
@@ -213,22 +217,12 @@ async function submit() {
           class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
           >{{ t('form.type') }}</label
         >
-        <USelectMenu
+        <ClearableSelect
           id="issue-type"
           v-model="type"
           :items="typeOptions"
-          value-key="value"
           :placeholder="t('form.unknown')"
-          :ui="{
-            placeholder: 'text-muted',
-            trailingIcon: 'text-muted',
-            item: 'cursor-pointer dark:hover:bg-muted rounded-sm'
-          }"
-          :search-input="false"
-          :clear="{ size: 'xs' }"
-          clear-icon="i-lucide-circle-x"
-          variant="subtle"
-          class="w-full cursor-pointer"
+          :clear-label="t('form.clearType')"
         />
       </div>
     </div>
