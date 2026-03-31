@@ -85,14 +85,14 @@ async function submit() {
   submitMessage.value = ''
 
   const bodyParts: string[] = []
-  if (props.pageUrl) bodyParts.push(`**Found on:** [${props.pageUrl}](${props.pageUrl})`)
-  if (props.selector) bodyParts.push(`**Element:** \`${props.selector}\``)
   if (description.value.trim()) {
     // Convert absolute server URLs to relative paths for portability
     const baseUrl = wcagifyUrl.value.replace(/\/$/, '')
     const relativeDescription = description.value.trim().replaceAll(baseUrl, '')
-    bodyParts.push('', relativeDescription)
+    bodyParts.push(relativeDescription)
   }
+  if (props.pageUrl) bodyParts.push(`#### Found on:\n[${props.pageUrl}](${props.pageUrl})\n`)
+  if (props.selector) bodyParts.push(`#### Element:\n\`${props.selector}\``)
 
   try {
     const url = wcagifyUrl.value.replace(/\/$/, '')

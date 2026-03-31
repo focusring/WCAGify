@@ -40,24 +40,20 @@ const levelColors: Record<string, BadgeColor> = {
         class="shrink-0"
       />
 
-      <h4 class="font-medium text-gray-950 dark:text-white text-base">
+      <h4 class="font-medium text-gray-950 dark:text-white text-base w-full">
         {{ criterion.name }}
       </h4>
 
-      <div class="ml-auto flex items-center gap-2 shrink-0">
-        <UBadge
-          :label="t(`report.scStatus.${criterion.status}`)"
-          variant="subtle"
-          :color="statusConfig[criterion.status].color"
-          :icon="statusConfig[criterion.status].icon"
-        />
-      </div>
+      <UBadge
+        :label="t(`report.scStatus.${criterion.status}`)"
+        variant="subtle"
+        :color="statusConfig[criterion.status].color"
+        :icon="statusConfig[criterion.status].icon"
+        class="shrink-0"
+      />
     </div>
 
-    <div
-      v-if="criterion.issues.length > 0"
-      class="border-t border-gray-200 dark:border-gray-800 space-y-2"
-    >
+    <div v-if="criterion.issues.length > 0">
       <ReportIssue
         v-for="(issue, index) in criterion.issues"
         :key="issue.path"

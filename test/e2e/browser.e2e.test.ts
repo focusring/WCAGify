@@ -160,7 +160,7 @@ describe('Browser E2E', () => {
           difficulty: 'Low',
           sample: sampleId,
           description:
-            '**Found on:** [https://example.com](https://example.com)\n\n**Element:** `nav > a.menu-item`'
+            '#### Found on:\n[https://example.com](https://example.com)\n\n#### Element:\n`nav > a.menu-item`'
         })
       })
 
