@@ -89,5 +89,16 @@ export default {
     paragraph: 'Paragraph',
     insert: 'Insert'
   },
+  contrast: {
+    title: 'Contrast Checker',
+    preview: 'Sample preview',
+    foreground: 'Element color',
+    background: 'Background color',
+    normalText: 'Normal text',
+    largeText: 'Large text',
+    contrastRatio: 'Contrast ratio',
+    copy: 'Copy color',
+    eyedropper: 'Pick color from screen'
+  },
   language: 'Language'
 } as const

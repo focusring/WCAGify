@@ -4,6 +4,22 @@ import { useI18n } from '../../composables/useI18n'
 
 const { t } = useI18n()
 
+function toHex(color: string): string {
+  if (!color) return color
+  const hex = color.match(/^#[0-9a-fA-F]{3,8}$/)
+  if (hex) return color.toLowerCase()
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  if (a === 255) {
+    return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')
+  }
+  return '#' + [r, g, b, a].map((v) => v.toString(16).padStart(2, '0')).join('')
+}
+
 const selector = ref('')
 const pageUrl = ref('')
 const pageTitle = ref('')
@@ -25,8 +41,8 @@ function onMessage(message: {
     selector.value = message.selector ?? ''
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
-    foregroundColor.value = message.foregroundColor ?? ''
-    backgroundColor.value = message.backgroundColor ?? ''
+    foregroundColor.value = toHex(message.foregroundColor ?? '')
+    backgroundColor.value = toHex(message.backgroundColor ?? '')
     picking.value = false
   }
   if (message.type === 'picker-cancelled') {

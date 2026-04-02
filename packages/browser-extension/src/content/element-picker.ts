@@ -1,5 +1,48 @@
 import { getUniqueSelector } from './unique-selector'
 
+function parseRgba(color: string): { r: number; g: number; b: number; a: number } | null {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.clearRect(0, 0, 1, 1)
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  return { r, g, b, a }
+}
+
+function getEffectiveBackgroundColor(el: Element): string {
+  const layers: { r: number; g: number; b: number; a: number }[] = []
+
+  let current: Element | null = el
+  while (current) {
+    const bg = getComputedStyle(current).backgroundColor
+    const parsed = parseRgba(bg)
+    if (parsed && parsed.a > 0) {
+      layers.unshift(parsed)
+      if (parsed.a === 255) break // fully opaque — ancestors can't show through
+    }
+    if (current === document.documentElement) break
+    current = current.parentElement
+  }
+
+  // Browser default canvas is white
+  let r = 255,
+    g = 255,
+    b = 255
+
+  // Alpha-composite from farthest ancestor down to the target element
+  for (const layer of layers) {
+    const a = layer.a / 255
+    r = Math.round(layer.r * a + r * (1 - a))
+    g = Math.round(layer.g * a + g * (1 - a))
+    b = Math.round(layer.b * a + b * (1 - a))
+  }
+
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 const OVERLAY_ID = 'wcagify-picker-overlay'
 const PANEL_ID = 'wcagify-picker-panel'
 const BRAND_COLOR = '#15803d'
@@ -179,7 +222,7 @@ function handleClick(e: MouseEvent) {
     url: document.URL,
     pageTitle: document.title,
     foregroundColor: style.color,
-    backgroundColor: style.backgroundColor
+    backgroundColor: getEffectiveBackgroundColor(currentTarget)
   })
   cleanup()
 }

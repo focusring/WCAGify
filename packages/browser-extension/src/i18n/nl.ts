@@ -89,5 +89,16 @@ export default {
     paragraph: 'Paragraaf',
     insert: 'Invoegen'
   },
+  contrast: {
+    title: 'Contrastcontrole',
+    preview: 'Voorbeeldweergave',
+    foreground: 'Element kleur',
+    background: 'Achtergrond kleur',
+    normalText: 'Normale tekst',
+    largeText: 'Grote tekst',
+    contrastRatio: 'Contrastverhouding',
+    copy: 'Kleur kopiëren',
+    eyedropper: 'Kleur van scherm kiezen'
+  },
   language: 'Taal'
 } as const
