@@ -100,7 +100,6 @@ export default {
     copy: 'Kleur kopiëren',
     eyedropper: 'Kleur van scherm kiezen',
     testOptions: 'Testopties',
-    contrastChecker: 'Contrastcontrole',
     sampleSentence: 'De snelle bruine vos'
   },
   language: 'Taal'

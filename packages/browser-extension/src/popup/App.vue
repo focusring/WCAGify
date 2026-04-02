@@ -88,7 +88,7 @@ function copyToClipboard(value: string | undefined) {
             </label>
             <UCollapsible class="flex flex-col gap-2">
               <UButton
-                :label="t('contrast.contrastChecker')"
+                :label="t('contrast.title')"
                 color="primary"
                 variant="subtle"
                 icon="i-lucide-test-tube"

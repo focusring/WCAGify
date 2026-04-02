@@ -100,7 +100,6 @@ export default {
     copy: 'Copy color',
     eyedropper: 'Pick color from screen',
     testOptions: 'Test Options',
-    contrastChecker: 'Contrast Checker',
     sampleSentence: 'The quick brown fox'
   },
   language: 'Language'
