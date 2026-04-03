@@ -283,8 +283,7 @@ export {
   createSafeSpinner,
   trackPath,
   cleanup,
-  renderTemplate,
   renderTemplatesRecursively,
   runCommand
 }
-export type { CreateOptions, TemplateData, SafeSpinner }
+export type { CreateOptions }

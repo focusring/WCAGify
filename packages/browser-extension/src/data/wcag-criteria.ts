@@ -545,4 +545,4 @@ const WCAG_CRITERIA: WcagCriterion[] = [
 ]
 
 export { WCAG_CRITERIA }
-export type { WcagCriterion, WcagVersion, WcagLevel }
+export type { WcagVersion, WcagLevel }

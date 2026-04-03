@@ -1,0 +1,55 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "ignoreDependencies": ["changelogen"]
+    },
+    "packages/wcagify": {
+      "entry": [
+        "locales/*.ts",
+        "app/app.config.ts",
+        "app/app.vue",
+        "app/pages/**/*.vue",
+        "app/layouts/**/*.vue",
+        "app/components/**/*.vue",
+        "app/composables/**/*.ts",
+        "app/middleware/**/*.ts",
+        "app/plugins/**/*.ts",
+        "server/**/*.ts"
+      ],
+      "project": ["src/**/*.ts", "app/**/*.{ts,vue}", "server/**/*.ts", "locales/**/*.ts"],
+      "ignoreDependencies": [
+        "@iconify-json/lucide",
+        "@iconify-json/simple-icons",
+        "@nuxt/a11y",
+        "@nuxt/fonts",
+        "@nuxt/icon",
+        "@nuxtjs/i18n",
+        "@vueuse/core",
+        "nuxt-studio",
+        "vue",
+        "nitropack",
+        "h3"
+      ]
+    },
+    "packages/create-wcagify": {},
+    "packages/browser-extension": {
+      "entry": [
+        "src/background/service-worker.ts",
+        "src/content/element-picker.ts",
+        "src/popup/main.ts",
+        "manifest.config.ts"
+      ],
+      "project": ["src/**/*.{ts,vue}"],
+      "vite": false,
+      "ignoreDependencies": ["@vitejs/plugin-vue"]
+    },
+    "playground": {
+      "entry": ["content.config.ts"],
+      "ignoreDependencies": ["vue-tsc"]
+    },
+    "docs": {
+      "ignoreDependencies": ["vue"]
+    }
+  }
+}

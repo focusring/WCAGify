@@ -7,21 +7,9 @@ catalog:
   '@nuxt/fonts': ^0.14.0
   '@nuxt/ui': ^4.6.0
   '@tiptap/core': ^3.22.1
-  '@tiptap/extension-code-block-lowlight': ^3.22.1
-  '@tiptap/extension-emoji': ^3.22.1
-  '@tiptap/extension-image': ^3.22.1
-  '@tiptap/extension-link': ^3.22.1
-  '@tiptap/extension-placeholder': ^3.22.1
-  '@tiptap/extension-underline': ^3.22.1
-  '@tiptap/starter-kit': ^3.22.1
   '@tiptap/vue-3': ^3.22.1
-  '@types/turndown': ^5.0.6
-  happy-dom: ^20.8.9
-  lowlight: ^3.3.0
   nanoid: ^5.1.7
   sharp: ^0.34.5
-  turndown: ^7.2.2
-  vitest: ^4.1.2
 
 catalogMode: prefer
 
@@ -55,6 +43,7 @@ catalogs:
     changelogen: ^0.6.2
     changelogithub: ^14.0.0
     husky: ^9.1.7
+    knip: ^6.3.0
     lint-staged: ^16.4.0
     oxfmt: ^0.43.0
     oxlint: ^1.58.0

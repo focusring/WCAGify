@@ -13,4 +13,4 @@ interface Report {
   targetLevel: 'A' | 'AA' | 'AAA'
 }
 
-export type { SamplePage, Report }
+export type { Report }

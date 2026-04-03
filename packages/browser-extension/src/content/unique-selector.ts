@@ -92,7 +92,7 @@ function countSort(a: Feature, b: Feature): number {
  * Walk the DOM tree and gather frequency statistics for tags, classes, and attributes.
  * This enables selecting the rarest features for building selectors.
  */
-export function getSelectorData(root: Element): SelectorData {
+function getSelectorData(root: Element): SelectorData {
   const data: SelectorData = { classes: {}, tags: {}, attributes: {} }
 
   const stack: Element[] = [root]
