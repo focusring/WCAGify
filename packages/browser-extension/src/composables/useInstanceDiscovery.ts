@@ -63,5 +63,3 @@ export function useInstanceDiscovery() {
 
   return { instances, scanStatus, scan, abort }
 }
-
-export type { DiscoveredInstance }
