@@ -39,8 +39,7 @@
   "lint-staged": {
     "*.{ts,vue,js,mjs}": [
       "oxlint",
-      "oxfmt",
-      "knip --no-progress"
+      "oxfmt"
     ],
     "*.{json,yaml,yml,md,css}": [
       "oxfmt"

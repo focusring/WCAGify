@@ -1,2 +1,3 @@
-pnpm exec lint-staged
-pnpm typecheck
+lint-staged
+pnpm knip --no-progress
+pnpm run typecheck
