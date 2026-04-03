@@ -40,9 +40,7 @@
         "src/popup/main.ts",
         "manifest.config.ts"
       ],
-      "project": ["src/**/*.{ts,vue}"],
-      "vite": false,
-      "ignoreDependencies": ["@vitejs/plugin-vue"]
+      "project": ["src/**/*.{ts,vue}"]
     },
     "playground": {
       "entry": ["content.config.ts"],
