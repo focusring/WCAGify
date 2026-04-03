@@ -145,8 +145,12 @@ const bgInputStyle = computed(() => ({
   color: getTextColor(localBg.value)
 }))
 
-function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text)
+async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch (err) {
+    console.error('Failed to copy to clipboard', err)
+  }
 }
 
 async function pickColor(target: 'fg' | 'bg') {
@@ -195,14 +199,16 @@ async function pickColor(target: 'fg' | 'bg') {
 
       <!-- Color inputs -->
       <div class="space-y-3 md:space-y-2 my-3 md:my-0 w-full">
-        <label class="block text-sm font-medium text-muted mb-1">
+        <label for="fg-color-input" class="block text-sm font-medium text-muted mb-1">
           {{ t('contrast.foreground') }}
         </label>
         <div class="flex items-center gap-1">
           <input
+            id="fg-color-input"
             type="color"
             v-model="localFg"
             :title="t('contrast.foreground')"
+            :aria-label="t('contrast.foreground')"
             class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
           />
           <UFieldGroup class="w-full">
@@ -210,6 +216,7 @@ async function pickColor(target: 'fg' | 'bg') {
               :model-value="fgText"
               @update:model-value="handleFgInput"
               :style="fgInputStyle"
+              :aria-label="t('contrast.foreground')"
               spellcheck="false"
               class="w-full tracking-widest"
             />
@@ -224,14 +231,16 @@ async function pickColor(target: 'fg' | 'bg') {
           </UFieldGroup>
         </div>
 
-        <label class="block text-sm font-medium text-muted mb-1">
+        <label for="bg-color-input" class="block text-sm font-medium text-muted mb-1">
           {{ t('contrast.background') }}
         </label>
         <div class="flex items-center gap-1">
           <input
+            id="bg-color-input"
             type="color"
             v-model="localBg"
             :title="t('contrast.background')"
+            :aria-label="t('contrast.background')"
             class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
           />
           <UFieldGroup class="w-full">
@@ -239,6 +248,7 @@ async function pickColor(target: 'fg' | 'bg') {
               :model-value="bgText"
               @update:model-value="handleBgInput"
               :style="bgInputStyle"
+              :aria-label="t('contrast.background')"
               spellcheck="false"
               class="w-full tracking-widest"
             />
