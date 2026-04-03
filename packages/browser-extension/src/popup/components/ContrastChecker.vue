@@ -20,7 +20,8 @@ watch(
   (val) => {
     if (val) {
       pickerSelected.value = true
-      const hex = normalizeHex(val, localBg.value) ?? val
+      const bgHex = (props.bgColor && normalizeHex(props.bgColor)) || localBg.value
+      const hex = normalizeHex(val, bgHex) ?? val
       localFg.value = hex
       fgText.value = hex
     }
@@ -44,7 +45,11 @@ watch(localBg, (val) => {
   bgText.value = val
 })
 
-function compositeOnBg(r: number, g: number, b: number, a: number, bgHex: string): string {
+function compositeOnBg(
+  rgba: { r: number; g: number; b: number; a: number },
+  bgHex: string
+): string {
+  const { r, g, b, a } = rgba
   const bm = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bgHex)
   const bgR = bm ? parseInt(bm[1], 16) : 255
   const bgG = bm ? parseInt(bm[2], 16) : 255
@@ -53,7 +58,7 @@ function compositeOnBg(r: number, g: number, b: number, a: number, bgHex: string
   return `#${blend(r, bgR).toString(16).padStart(2, '0')}${blend(g, bgG).toString(16).padStart(2, '0')}${blend(b, bgB).toString(16).padStart(2, '0')}`
 }
 
-function normalizeHex(input: string, bgHex = '#ffffff'): string | null {
+function normalizeHex(input: string, bgHex = '#ffffff'): string | undefined {
   const s = input.trim().replace(/^#+/, '')
   if (/^[0-9a-fA-F]{3}$/.test(s)) return `#${s[0]}${s[0]}${s[1]}${s[1]}${s[2]}${s[2]}`.toLowerCase()
   if (/^[0-9a-fA-F]{4}$/.test(s)) {
@@ -63,7 +68,7 @@ function normalizeHex(input: string, bgHex = '#ffffff'): string | null {
       parseInt(s[2] + s[2], 16),
       parseInt(s[3] + s[3], 16) / 255
     ]
-    return compositeOnBg(r, g, b, a, bgHex)
+    return compositeOnBg({ r, g, b, a }, bgHex)
   }
   if (/^[0-9a-fA-F]{6}$/.test(s)) return `#${s}`.toLowerCase()
   if (/^[0-9a-fA-F]{8}$/.test(s)) {
@@ -73,9 +78,9 @@ function normalizeHex(input: string, bgHex = '#ffffff'): string | null {
       parseInt(s.slice(4, 6), 16),
       parseInt(s.slice(6, 8), 16) / 255
     ]
-    return compositeOnBg(r, g, b, a, bgHex)
+    return compositeOnBg({ r, g, b, a }, bgHex)
   }
-  return null
+  return undefined
 }
 
 function handleFgInput(val: string) {
@@ -98,12 +103,12 @@ function swapColors() {
 
 function toLinear(c: number): number {
   const s = c / 255
-  return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  return s <= 0.040_45 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
 }
 
-function luminance(hex: string): number | null {
+function luminance(hex: string): number | undefined {
   const m = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  if (!m) return null
+  if (!m) return undefined
   const [r, g, b] = [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)]
   return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b)
 }
@@ -111,13 +116,16 @@ function luminance(hex: string): number | null {
 const ratio = computed(() => {
   const l1 = luminance(localFg.value)
   const l2 = luminance(localBg.value)
-  if (l1 === null || l2 === null) return null
+  if (l1 === undefined || l2 === undefined) return undefined
   const lighter = Math.max(l1, l2)
   const darker = Math.min(l1, l2)
   return (lighter + 0.05) / (darker + 0.05)
 })
 
-const ratioLabel = computed(() => (ratio.value !== null ? ratio.value.toFixed(2) + ':1' : '—'))
+const ratioLabel = computed(() => {
+  const r = ratio.value
+  return r !== undefined ? `${r.toFixed(2)}:1` : '—'
+})
 
 const passAA = computed(() => (ratio.value ?? 0) >= 4.5)
 const passAAA = computed(() => (ratio.value ?? 0) >= 7)
@@ -126,7 +134,7 @@ const passAAALarge = computed(() => (ratio.value ?? 0) >= 4.5)
 
 function getTextColor(hex: string): string {
   const l = luminance(hex)
-  return l !== null && l > 0.179 ? '#000000' : '#ffffff'
+  return l !== undefined && l > 0.179 ? '#000000' : '#ffffff'
 }
 
 const fgInputStyle = computed(() =>
@@ -142,10 +150,17 @@ function copyToClipboard(text: string) {
 }
 
 async function pickColor(target: 'fg' | 'bg') {
-  if (!('EyeDropper' in window)) return
+  const EyeDropperConstructor =
+    typeof (globalThis as unknown as { EyeDropper?: unknown }).EyeDropper === 'function'
+      ? (
+          globalThis as unknown as {
+            EyeDropper: new () => { open(): Promise<{ sRGBHex: string }> }
+          }
+        ).EyeDropper
+      : undefined
+  if (!EyeDropperConstructor) return
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await new (window as any).EyeDropper().open()
+    const result: { sRGBHex: string } = await new EyeDropperConstructor().open()
     const hex: string = result.sRGBHex
     if (target === 'fg') {
       localFg.value = hex
@@ -156,7 +171,7 @@ async function pickColor(target: 'fg' | 'bg') {
       bgText.value = hex
     }
   } catch {
-    // user cancelled
+    // User cancelled
   }
 }
 </script>
