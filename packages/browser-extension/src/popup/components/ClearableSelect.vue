@@ -38,13 +38,13 @@ function onSelectKeydown(e: KeyboardEvent) {
     :placeholder="placeholder"
     :ui="{
       placeholder: 'text-muted',
-      item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
+      item: 'cursor-pointer data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
     }"
     :content="{ onKeydown: onSelectKeydown }"
     :required="required"
     :aria-required="required ? 'true' : undefined"
     variant="subtle"
-    class="w-full cursor-pointer"
+    class="w-full cursor-pointer py-2"
   >
     <template #trailing="{ modelValue }">
       <UButton
