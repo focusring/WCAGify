@@ -217,6 +217,7 @@ async function submit() {
       <UFormField
         :label="t('form.severity')"
         :hint="`(${t('form.required')})`"
+        :description="t('form.severityDescription')"
         name="issue-severity"
         :ui="{
           label: 'label-title',
@@ -235,6 +236,7 @@ async function submit() {
       <UFormField
         :label="t('form.type')"
         :hint="`(${t('form.required')})`"
+        :description="t('form.typeDescription')"
         name="issue-type"
         :ui="{
           label: 'label-title',
@@ -255,6 +257,7 @@ async function submit() {
     <UFormField
       :label="t('form.description')"
       :hint="`(${t('form.required')})`"
+      :description="t('form.descriptionDescription')"
       name="issue-description"
       :ui="{
         label: 'label-title',

@@ -63,6 +63,7 @@ function syncSelectedReport() {
 }
 
 function connectInstance(url: string) {
+  autoConnected.value = false
   wcagifyUrl.value = url
   const instance = instances.value.find((i) => i.url === url)
   if (instance) {
@@ -78,6 +79,7 @@ function switchToManual() {
 }
 
 function rescan() {
+  autoConnected.value = false
   mode.value = 'scanning'
   status.value = 'idle'
   errorMessage.value = ''
@@ -110,10 +112,11 @@ const statusAlert = computed(() => {
       description: errorMessage.value
     }
   }
-  return null
+  return undefined
 })
 
 async function fetchReports() {
+  autoConnected.value = false
   status.value = 'loading'
   errorMessage.value = ''
 
