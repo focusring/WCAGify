@@ -62,7 +62,14 @@ watch(
 
 const canSubmit = computed(
   () =>
-    reportSlug.value && title.value.trim() && sc.value.trim() && sample.value && !submitting.value
+    reportSlug.value &&
+    title.value.trim() &&
+    sc.value.trim() &&
+    sample.value &&
+    severity.value &&
+    type.value &&
+    description.value.trim() &&
+    !submitting.value
 )
 
 const severityOptions = computed(() => [
@@ -217,8 +224,8 @@ async function submit() {
       <UFormField
         :label="t('form.severity')"
         :hint="`(${t('form.required')})`"
-        :description="t('form.severityDescription')"
         name="issue-severity"
+        required
         :ui="{
           label: 'label-title',
           labelWrapper: 'flex items-center justify-start gap-1',
@@ -236,8 +243,8 @@ async function submit() {
       <UFormField
         :label="t('form.type')"
         :hint="`(${t('form.required')})`"
-        :description="t('form.typeDescription')"
         name="issue-type"
+        required
         :ui="{
           label: 'label-title',
           labelWrapper: 'flex items-center justify-start gap-1',
@@ -257,8 +264,8 @@ async function submit() {
     <UFormField
       :label="t('form.description')"
       :hint="`(${t('form.required')})`"
-      :description="t('form.descriptionDescription')"
       name="issue-description"
+      required
       :ui="{
         label: 'label-title',
         labelWrapper: 'flex items-center justify-start gap-1',
