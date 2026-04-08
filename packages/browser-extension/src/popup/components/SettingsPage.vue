@@ -78,15 +78,15 @@ function setNeutralColor(val: string | undefined) {
     <!-- Header -->
     <div class="flex items-center gap-2">
       <UIcon name="i-lucide-settings" class="shrink-0 size-6 text-black dark:text-white" />
-      <h1 class="text-lg font-bold text-black dark:text-white">{{ $t('settings.title') }}</h1>
+      <h1 class="text-lg font-bold text-black dark:text-white">{{ t('settings.title') }}</h1>
       <UButton
         @click="emit('back')"
-        :label="$t('settings.back')"
+        :label="t('settings.back')"
         icon="i-lucide-arrow-left"
         size="lg"
         color="neutral"
         variant="subtle"
-        :aria-label="$t('settings.back')"
+        :aria-label="t('settings.back')"
         :ui="{
           base: 'cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm',
           leadingIcon: 'size-4'
@@ -99,21 +99,21 @@ function setNeutralColor(val: string | undefined) {
 
     <!-- General -->
     <h2 class="text-sm font-semibold text-muted tracking-wide mb-3">
-      {{ $t('settings.general') }}
+      {{ t('settings.general') }}
     </h2>
     <section class="bg-elevated rounded-sm p-4 space-y-3 mb-4">
       <ConnectionSettings />
 
       <!-- Language -->
       <UFormField
-        :label="$t('settings.languageLabel')"
+        :label="t('settings.languageLabel')"
         :ui="{ label: 'text-sm font-semibold tracking-wide text-gray-700 dark:text-gray-300' }"
         class="flex flex-row items-center justify-between gap-4"
       >
         <USelect
           v-model="locale"
           :items="localeItems"
-          :aria-label="$t('language')"
+          :aria-label="t('language')"
           :ui="{
             trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
             item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
@@ -126,12 +126,12 @@ function setNeutralColor(val: string | undefined) {
 
       <div class="space-y-3">
         <span class="block text-sm font-medium">
-          {{ $t('settings.accentColor') }}
+          {{ t('settings.accentColor') }}
         </span>
         <SettingsColorPicker
           :colors="accentColorSwatches"
           :model-value="accentColor"
-          :label="$t('settings.accentColor')"
+          :label="t('settings.accentColor')"
           name="accent-color"
           @update:model-value="setAccentColor($event)"
         />
@@ -139,12 +139,12 @@ function setNeutralColor(val: string | undefined) {
 
       <div class="space-y-3">
         <span class="block text-sm font-medium">
-          {{ $t('settings.backgroundShade') }}
+          {{ t('settings.backgroundShade') }}
         </span>
         <SettingsColorPicker
           :colors="neutralColorSwatches"
           :model-value="neutralColor"
-          :label="$t('settings.backgroundShade')"
+          :label="t('settings.backgroundShade')"
           name="background-shade"
           @update:model-value="setNeutralColor($event)"
         />
@@ -153,18 +153,18 @@ function setNeutralColor(val: string | undefined) {
 
     <!-- Appearance -->
     <h2 class="text-sm font-semibold text-muted tracking-wide mb-3">
-      {{ $t('settings.appearance') }}
+      {{ t('settings.appearance') }}
     </h2>
     <section class="bg-elevated rounded-sm space-y-3 p-4">
       <!-- Theme -->
       <UFormField
-        :label="$t('settings.colorMode')"
+        :label="t('settings.colorMode')"
         :ui="{ label: 'text-sm font-semibold tracking-wide text-gray-700 dark:text-gray-300' }"
         class="flex flex-row items-center justify-between gap-4"
       >
         <UButton
           @click="cycle"
-          :aria-label="`${$t('colorMode.dark')}/${$t('colorMode.light')}/${$t('colorMode.system')}: ${colorModeLabel}`"
+          :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
           :ui="{
             base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm',
             leadingIcon: 'size-4'

@@ -7,7 +7,6 @@ import './style.css'
 const app = createApp(App)
 app.use(ui)
 
-const { t } = useI18n()
-app.config.globalProperties.$t = t
+const { ready } = useI18n()
 
-app.mount('#app')
+ready.then(() => app.mount('#app'))

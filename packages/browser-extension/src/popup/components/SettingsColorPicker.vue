@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from '../../composables/useI18n'
+
+const { t } = useI18n()
+
 defineProps<{
   colors: readonly { name: string; value: string }[]
   modelValue: string | undefined
@@ -42,7 +46,7 @@ const emit = defineEmits<{
         :name="name"
         class="sr-only"
         :checked="modelValue === undefined"
-        :aria-label="$t('settings.clearColor')"
+        :aria-label="t('settings.clearColor')"
         value=""
         @change="emit('update:modelValue', undefined)"
       />

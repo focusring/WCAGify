@@ -9,7 +9,7 @@ export type AccentColor = (typeof ACCENT_COLORS)[number]
 export type NeutralColor = (typeof NEUTRAL_COLORS)[number]
 
 const settingsSchema = z.object({
-  wcagifyUrl: z.string().optional(),
+  wcagifyUrl: z.string().url('wcagifyUrl must be a valid URL').optional(),
   reportSlug: z.string().optional(),
   accentColor: z.enum(ACCENT_COLORS).optional(),
   neutralColor: z.enum(NEUTRAL_COLORS).optional()
