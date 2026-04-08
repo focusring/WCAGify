@@ -50,7 +50,6 @@ async function pickElement() {
     <UButton
       @click="pickElement"
       :disabled="picking"
-      color="success"
       variant="outline"
       class="w-full justify-center cursor-pointer"
       icon="i-lucide-square-mouse-pointer"

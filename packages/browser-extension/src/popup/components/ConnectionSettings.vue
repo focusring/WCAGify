@@ -5,11 +5,9 @@ import { useSettings } from '../../composables/useSettings'
 import { useI18n } from '../../composables/useI18n'
 import { useInstanceDiscovery } from '../../composables/useInstanceDiscovery'
 
-const { wcagifyUrl, reportSlug } = useSettings()
+const { wcagifyUrl, reportSlug, reports } = useSettings()
 const { t } = useI18n()
 const { instances, scanStatus, scan, abort } = useInstanceDiscovery()
-
-const reports = ref<Report[]>([])
 const status = ref<'idle' | 'loading' | 'connected' | 'error'>('idle')
 const errorMessage = ref('')
 const mode = ref<'scanning' | 'select' | 'manual'>('scanning')
@@ -19,10 +17,6 @@ const isOpen = ref(status.value !== 'connected')
 watch(status, (val) => {
   isOpen.value = val !== 'connected'
 })
-
-const emit = defineEmits<{
-  reportsLoaded: [reports: Report[]]
-}>()
 
 onMounted(() => {
   scan()
@@ -45,7 +39,6 @@ watch(scanStatus, (val) => {
     reports.value = instance.reports
     syncSelectedReport()
     status.value = 'connected'
-    emit('reportsLoaded', instance.reports)
   } else {
     mode.value = 'select'
     // Pre-select saved URL if it matches a discovered instance
@@ -69,7 +62,6 @@ function connectInstance(url: string) {
     reports.value = instance.reports
     syncSelectedReport()
     status.value = 'connected'
-    emit('reportsLoaded', instance.reports)
   }
 }
 
@@ -101,7 +93,6 @@ async function fetchReports() {
     reports.value = data
     syncSelectedReport()
     status.value = 'connected'
-    emit('reportsLoaded', data)
   } catch (error) {
     status.value = 'error'
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
@@ -132,7 +123,7 @@ async function fetchReports() {
         }"
       >
         <template v-if="status === 'connected'">
-          <UChip standalone inset />
+          <UChip color="success" standalone inset />
           <span class="text-green-700 dark:text-green-400">{{ t('connection.connected') }}</span>
           <span class="text-gray-600 dark:text-gray-300">&mdash; {{ wcagifyUrl }}</span>
         </template>

@@ -239,7 +239,6 @@ async function submit() {
       :disabled="!canSubmit"
       :loading="submitting"
       :label="submitting ? t('form.submitting') : t('form.submit')"
-      color="success"
       size="xl"
       icon="i-lucide-file-input"
       class="w-full justify-center"

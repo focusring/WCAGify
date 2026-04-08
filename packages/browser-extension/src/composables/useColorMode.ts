@@ -28,7 +28,6 @@ export function useColorMode() {
     })
 
     watch(preference, (val) => {
-      apply(val)
       chrome.storage.local.set({ colorMode: val })
     })
   }
@@ -38,7 +37,8 @@ export function useColorMode() {
   function cycle() {
     const modes: ColorMode[] = ['system', 'light', 'dark']
     const idx = modes.indexOf(preference.value)
-    preference.value = modes[(idx + 1) % modes.length]
+    preference.value = modes[(idx + 1) % modes.length]!
+    apply(preference.value)
   }
 
   return { preference, cycle }

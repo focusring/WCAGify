@@ -87,5 +87,18 @@ export default {
     paragraph: 'Paragraph',
     insert: 'Insert'
   },
-  language: 'Language'
+  language: 'Language',
+  settings: {
+    title: 'Settings',
+    back: 'Back',
+    appearance: 'Appearance',
+    colorMode: 'Theme',
+    languageLabel: 'Language',
+    general: 'General',
+    wcagifyUrl: 'WCAGify URL',
+    save: 'Save',
+    saved: 'Saved',
+    accentColor: 'Accent Color',
+    backgroundShade: 'Background Shade'
+  }
 } as const

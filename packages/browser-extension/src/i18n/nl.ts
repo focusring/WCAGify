@@ -87,5 +87,18 @@ export default {
     paragraph: 'Paragraaf',
     insert: 'Invoegen'
   },
-  language: 'Taal'
+  language: 'Taal',
+  settings: {
+    title: 'Instellingen',
+    back: 'Terug',
+    appearance: 'Uiterlijk',
+    colorMode: 'Kleurmodus',
+    languageLabel: 'Taal',
+    general: 'Algemeen',
+    wcagifyUrl: 'WCAGify URL',
+    save: 'Opslaan',
+    saved: 'Opgeslagen',
+    accentColor: 'Accentkleur',
+    backgroundShade: 'Achtergrondtint'
+  }
 } as const
