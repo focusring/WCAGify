@@ -138,12 +138,13 @@ const suggestionItems = computed(
     :handlers="customHandlers"
     :placeholder="placeholder"
     :ui="{ base: 'px-3 py-2 min-h-32' }"
-    class="w-full rounded-md border border-gray-300 dark:border-gray-600 focus-within:border-green-600 dark:focus-within:border-green-400"
+    class="bg-elevated hover:bg-accented/75 transition-colors duration-200 w-full rounded-md border input-border focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary focus-within:rounded-sm"
   >
     <UEditorToolbar
       :editor="editor"
       :items="fixedToolbarItems"
-      class="border-b border-gray-200 dark:border-gray-700 px-2 py-1 overflow-x-auto"
+      :ui="{ separator: 'bg-slate-300 dark:bg-slate-700' }"
+      class="border-b input-border px-2 py-1 overflow-x-auto"
     />
 
     <UEditorDragHandle :editor="editor" />

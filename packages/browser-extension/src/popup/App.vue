@@ -35,7 +35,7 @@ function onReportsLoaded(data: Report[]) {
 
 <template>
   <UApp>
-    <div class="min-h-screen p-4 bg-white dark:bg-gray-900 font-sans">
+    <div class="min-h-screen p-4 bg-white dark:bg-slate-900 font-sans">
       <div class="flex items-center gap-2">
         <img src="../assets/wcagify-48.png" alt="WCAGify logo" class="size-6" />
         <h1 class="text-lg font-bold text-black dark:text-white">WCAGify</h1>
@@ -49,7 +49,6 @@ function onReportsLoaded(data: Report[]) {
               item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
             }"
             variant="subtle"
-            size="sm"
             class="w-auto min-w-24 cursor-pointer"
           />
           <UButton
@@ -60,16 +59,15 @@ function onReportsLoaded(data: Report[]) {
               base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
             }"
             :icon="colorModeIcon"
-            size="sm"
             color="neutral"
             variant="subtle"
           />
         </div>
       </div>
 
-      <USeparator class="my-4" />
+      <USeparator class="my-3" />
 
-      <div class="space-y-4">
+      <div class="space-y-3">
         <ConnectionSettings @reports-loaded="onReportsLoaded" />
 
         <USeparator />

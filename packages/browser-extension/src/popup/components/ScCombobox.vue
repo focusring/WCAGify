@@ -56,11 +56,11 @@ const selectedItem = computed(() => items.value.find((item) => item.value === mo
     }"
     :placeholder="placeholder"
     :ui="{
-      base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1 h-8 pr-7.5',
+      base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 pr-7.5',
       placeholder: 'text-muted',
       trailingIcon:
         'text-muted group-data-[state=open]:rotate-180 transition-transform duration-200',
-      item: 'grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] cursor-pointer data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-primary data-[highlighted]:rounded-sm'
+      item: 'grid grid-cols-[minmax(2.5rem,auto)_auto_1fr_auto] items-center cursor-pointer data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-primary data-[highlighted]:rounded-sm'
     }"
     :required="required"
     variant="subtle"
@@ -70,12 +70,10 @@ const selectedItem = computed(() => items.value.find((item) => item.value === mo
       <!-- Select bar -->
       <template v-if="selectedItem">
         <UBadge
-          class="shrink-0 w-fit text-xs font-semibold py-0.5"
+          class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
           :color="
-            selectedItem.level === 'A' ? 'error' : selectedItem.level === 'AA' ? 'warning' : 'info'
+            selectedItem.level === 'A' ? 'info' : selectedItem.level === 'AA' ? 'warning' : 'info'
           "
-          variant="outline"
-          size="sm"
           >{{ selectedItem.level }}</UBadge
         >
         <span class="font-medium shrink-0">{{ selectedItem.sc }}</span>
@@ -104,10 +102,8 @@ const selectedItem = computed(() => items.value.find((item) => item.value === mo
     <!-- Select bar items -->
     <template #item="{ item }">
       <UBadge
-        class="shrink-0 w-fit text-xs font-semibold py-0.5"
-        :color="item.level === 'A' ? 'error' : item.level === 'AA' ? 'warning' : 'info'"
-        variant="subtle"
-        size="sm"
+        class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
+        :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'info'"
         >{{ item.level }}</UBadge
       >
       <span class="font-medium shrink-0">{{ item.sc }}</span>
