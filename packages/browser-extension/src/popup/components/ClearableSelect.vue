@@ -20,13 +20,6 @@ withDefaults(
 )
 
 const { t } = useI18n()
-
-function onSelectKeydown(e: KeyboardEvent) {
-  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
-  e.target?.dispatchEvent(
-    new KeyboardEvent('keydown', { key: e.key, bubbles: true, cancelable: true })
-  )
-}
 </script>
 
 <template>
@@ -40,7 +33,6 @@ function onSelectKeydown(e: KeyboardEvent) {
       placeholder: 'text-muted',
       item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
     }"
-    :content="{ onKeydown: onSelectKeydown }"
     :required="required"
     :aria-required="required ? 'true' : undefined"
     variant="subtle"
