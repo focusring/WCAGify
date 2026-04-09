@@ -37,27 +37,27 @@ const localeItems = computed(() => locales.map(([value, label]) => ({ value, lab
 
     <div v-show="currentView === 'main'" class="min-h-screen p-4 font-sans">
       <div class="space-y-4">
-        <div v-if="reports.length > 0" class="space-y-4">
-          <div class="flex gap-3">
-            <ElementPicker ref="picker" class="flex-1" />
+        <div class="flex gap-3">
+          <ElementPicker v-if="reports.length > 0" ref="picker" class="flex-1" />
 
-            <UButton
-              @click="currentView = 'settings'"
-              :aria-label="t('settings.title')"
-              :title="t('settings.title')"
-              :label="t('settings.title')"
-              icon="i-lucide-settings"
-              size="xl"
-              color="primary"
-              variant="subtle"
-              :ui="{
-                base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm',
-                leadingIcon: 'size-5'
-              }"
-              class="ml-auto"
-            />
-          </div>
+          <UButton
+            @click="currentView = 'settings'"
+            :aria-label="t('settings.title')"
+            :title="t('settings.title')"
+            :label="t('settings.title')"
+            icon="i-lucide-settings"
+            size="xl"
+            color="primary"
+            variant="subtle"
+            :ui="{
+              base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm',
+              leadingIcon: 'size-5'
+            }"
+            class="ml-auto"
+          />
+        </div>
 
+        <template v-if="reports.length > 0">
           <USeparator class="my-4" />
 
           <IssueForm
@@ -66,7 +66,7 @@ const localeItems = computed(() => locales.map(([value, label]) => ({ value, lab
             :page-url="picker?.pageUrl ?? ''"
             :page-title="picker?.pageTitle ?? ''"
           />
-        </div>
+        </template>
       </div>
     </div>
   </UApp>
