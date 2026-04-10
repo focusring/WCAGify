@@ -23,6 +23,7 @@ const { t } = useI18n()
 
 function onSelectKeydown(e: KeyboardEvent) {
   if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+  if (!e.isTrusted) return
   e.target?.dispatchEvent(
     new KeyboardEvent('keydown', { key: e.key, bubbles: true, cancelable: true })
   )

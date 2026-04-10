@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Report } from '../../types'
 import { useSettings } from '../../composables/useSettings'
 import { useI18n } from '../../composables/useI18n'
@@ -7,41 +7,36 @@ import { useInstanceDiscovery } from '../../composables/useInstanceDiscovery'
 
 const { wcagifyUrl, reportSlug, reports } = useSettings()
 const { t } = useI18n()
-const { instances, scanStatus, scan, abort } = useInstanceDiscovery()
+const { instances, scanStatus, scan } = useInstanceDiscovery()
 const status = ref<'idle' | 'loading' | 'connected' | 'error'>('idle')
 const errorMessage = ref('')
 const mode = ref<'scanning' | 'select' | 'manual'>('scanning')
 const autoConnected = ref(false)
-onMounted(() => {
-  scan()
-})
 
-onUnmounted(() => {
-  abort()
-})
+watch(
+  scanStatus,
+  (val) => {
+    if (val !== 'done') return
 
-watch(scanStatus, (val) => {
-  if (val !== 'done') return
-
-  if (instances.value.length === 0) {
-    mode.value = 'manual'
-  } else if (instances.value.length === 1) {
-    mode.value = 'manual'
-    autoConnected.value = true
-    const instance = instances.value[0]!
-    wcagifyUrl.value = instance.url
-    reports.value = instance.reports
-    syncSelectedReport()
-    status.value = 'connected'
-  } else {
-    mode.value = 'select'
-    // Pre-select saved URL if it matches a discovered instance
-    const match = instances.value.find((i) => i.url === wcagifyUrl.value)
-    if (match) {
-      connectInstance(match.url)
+    if (instances.value.length === 0) {
+      mode.value = 'manual'
+    } else if (instances.value.length === 1) {
+      mode.value = 'manual'
+      autoConnected.value = true
+      // wcagifyUrl and reports are already set by useSettings auto-connect;
+      // update status so the connected UI shows correctly
+      status.value = 'connected'
+    } else {
+      mode.value = 'select'
+      // Pre-select saved URL if it matches a discovered instance
+      const match = instances.value.find((i) => i.url === wcagifyUrl.value)
+      if (match) {
+        connectInstance(match.url)
+      }
     }
-  }
-})
+  },
+  { immediate: true }
+)
 
 function syncSelectedReport() {
   if (reportSlug.value && !reports.value.some((r) => r.slug === reportSlug.value)) {
@@ -263,7 +258,8 @@ async function fetchReports() {
         :placeholder="t('connection.selectReport')"
         :ui="{
           placeholder: 'text-muted',
-          trailingIcon: 'text-muted group-data-[state=open]:rotate-180 transition-transform duration-200',
+          trailingIcon:
+            'text-muted group-data-[state=open]:rotate-180 transition-transform duration-200',
           item: 'cursor-pointer selectable-focus',
           content: 'overflow-visible'
         }"
