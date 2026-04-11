@@ -13,7 +13,7 @@ export default {
     connectionRefused:
       'Could not connect. Make sure the WCAGify server is running at this URL. Example: http://localhost:3000',
     connectionHttpError:
-      'Something went wrong while connecting. Make sure the entered URL is a WCAGify instance and is correct. Example: http://localhost:3000',
+      'Something went wrong while connecting. Make sure the entered URL is a WCAGify instance and is correctly formatted. For example: http://localhost:3000.',
     required: 'required',
     scanning: 'Scanning for WCAGify instances...',
     selectInstance: 'WCAGify Instance',

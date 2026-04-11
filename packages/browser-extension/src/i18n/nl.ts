@@ -13,7 +13,7 @@ export default {
     connectionRefused:
       'Kan geen verbinding maken. Controleer of de WCAGify-server draait op deze URL. Voorbeeld: http://localhost:3000',
     connectionHttpError:
-      'Er ging iets mis bij het verbinden. Controleer of de ingevoerde URL een WCAGify-instantie is en correct is. Voorbeeld: http://localhost:3000',
+      'Er ging iets mis bij het verbinden. Controleer of de ingevoerde URL een WCAGify-instantie is en correct is opgemaakt. Bijvoorbeeld: http://localhost:3000.',
     required: 'verplicht',
     scanning: 'Zoeken naar WCAGify-instanties...',
     selectInstance: 'WCAGify-instantie',
