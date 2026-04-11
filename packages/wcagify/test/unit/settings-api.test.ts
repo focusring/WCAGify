@@ -2,9 +2,13 @@ import { describe, it, expect } from 'vitest'
 
 /**
  * Tests for the settings parsing logic used by GET /api/settings.
- * Extracts and tests the cookie-parsing behavior as a pure function
+ * Mirrors the validation in settings.get.ts as a pure function
  * since the actual handler relies on Nitro auto-imports.
  */
+const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet']
+const NEUTRAL_COLORS = ['slate', 'gray', 'zinc', 'neutral', 'stone']
+const LOCALES = ['en', 'nl']
+
 function parseSettings(settingsCookie: string | undefined, localeCookie: string | undefined) {
   let accentColor = 'green'
   let neutralColor = 'slate'
@@ -12,18 +16,21 @@ function parseSettings(settingsCookie: string | undefined, localeCookie: string 
   if (settingsCookie) {
     try {
       const parsed = JSON.parse(settingsCookie)
-      if (parsed.accentColor) accentColor = parsed.accentColor
-      if (parsed.neutralColor) neutralColor = parsed.neutralColor
+      if (typeof parsed.accentColor === 'string' && ACCENT_COLORS.includes(parsed.accentColor)) {
+        accentColor = parsed.accentColor
+      }
+      if (typeof parsed.neutralColor === 'string' && NEUTRAL_COLORS.includes(parsed.neutralColor)) {
+        neutralColor = parsed.neutralColor
+      }
     } catch {
-      // ignore malformed cookie
+      // Ignore malformed cookie
     }
   }
 
-  return {
-    accentColor,
-    neutralColor,
-    locale: localeCookie || 'en'
-  }
+  const locale =
+    typeof localeCookie === 'string' && LOCALES.includes(localeCookie) ? localeCookie : 'en'
+
+  return { accentColor, neutralColor, locale }
 }
 
 describe('GET /api/settings parsing', () => {
@@ -79,5 +86,29 @@ describe('GET /api/settings parsing', () => {
   it('defaults locale to en when i18n cookie is empty string', () => {
     const result = parseSettings(undefined, '')
     expect(result.locale).toBe('en')
+  })
+
+  it('rejects invalid accent color and falls back to default', () => {
+    const cookie = JSON.stringify({ accentColor: 'pink', neutralColor: 'slate' })
+    const result = parseSettings(cookie, undefined)
+    expect(result.accentColor).toBe('green')
+  })
+
+  it('rejects invalid neutral color and falls back to default', () => {
+    const cookie = JSON.stringify({ accentColor: 'green', neutralColor: 'magenta' })
+    const result = parseSettings(cookie, undefined)
+    expect(result.neutralColor).toBe('slate')
+  })
+
+  it('rejects invalid locale and falls back to en', () => {
+    const result = parseSettings(undefined, 'fr')
+    expect(result.locale).toBe('en')
+  })
+
+  it('rejects non-string color values', () => {
+    const cookie = JSON.stringify({ accentColor: 42, neutralColor: true })
+    const result = parseSettings(cookie, undefined)
+    expect(result.accentColor).toBe('green')
+    expect(result.neutralColor).toBe('slate')
   })
 })

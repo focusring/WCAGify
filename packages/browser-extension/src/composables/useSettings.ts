@@ -1,7 +1,10 @@
 import { ref, watch } from 'vue'
 import { z } from 'zod'
 import type { Report } from '../types'
-import { useInstanceDiscovery, type InstanceSettings } from './useInstanceDiscovery'
+import { supportedLocales } from '../i18n'
+import type { Locale } from '../i18n'
+import { useInstanceDiscovery } from './useInstanceDiscovery'
+import type { InstanceSettings } from './useInstanceDiscovery'
 import { useI18n } from './useI18n'
 
 export const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet'] as const
@@ -53,8 +56,8 @@ function applyInstanceSettings(settings: InstanceSettings | undefined) {
   ) {
     neutralColor.value = settings.neutralColor as NeutralColor
   }
-  if (settings.locale && ['en', 'nl'].includes(settings.locale)) {
-    locale.value = settings.locale as 'en' | 'nl'
+  if (settings.locale && (supportedLocales as readonly string[]).includes(settings.locale)) {
+    locale.value = settings.locale as Locale
   }
 }
 

@@ -1,3 +1,7 @@
+const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet']
+const NEUTRAL_COLORS = ['slate', 'gray', 'zinc', 'neutral', 'stone']
+const LOCALES = ['en', 'nl']
+
 export default defineEventHandler((event) => {
   const settingsCookie = getCookie(event, 'wcagify-settings')
   const localeCookie = getCookie(event, 'i18n_redirected')
@@ -8,16 +12,19 @@ export default defineEventHandler((event) => {
   if (settingsCookie) {
     try {
       const parsed = JSON.parse(settingsCookie)
-      if (parsed.accentColor) accentColor = parsed.accentColor
-      if (parsed.neutralColor) neutralColor = parsed.neutralColor
+      if (typeof parsed.accentColor === 'string' && ACCENT_COLORS.includes(parsed.accentColor)) {
+        accentColor = parsed.accentColor
+      }
+      if (typeof parsed.neutralColor === 'string' && NEUTRAL_COLORS.includes(parsed.neutralColor)) {
+        neutralColor = parsed.neutralColor
+      }
     } catch {
-      // ignore malformed cookie
+      // Ignore malformed cookie
     }
   }
 
-  return {
-    accentColor,
-    neutralColor,
-    locale: localeCookie || 'en'
-  }
+  const locale =
+    typeof localeCookie === 'string' && LOCALES.includes(localeCookie) ? localeCookie : 'en'
+
+  return { accentColor, neutralColor, locale }
 })

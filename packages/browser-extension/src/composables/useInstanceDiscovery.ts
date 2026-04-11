@@ -1,11 +1,14 @@
 import { ref } from 'vue'
+import { z } from 'zod'
 import type { Report } from '../types'
 
-export interface InstanceSettings {
-  accentColor: string
-  neutralColor: string
-  locale: string
-}
+const instanceSettingsSchema = z.object({
+  accentColor: z.string(),
+  neutralColor: z.string(),
+  locale: z.string()
+})
+
+export type InstanceSettings = z.infer<typeof instanceSettingsSchema>
 
 interface DiscoveredInstance {
   url: string
@@ -36,9 +39,12 @@ async function probePort(
     let settings: InstanceSettings | undefined
     try {
       const settingsRes = await fetch(`${url}/api/settings`, { signal })
-      if (settingsRes.ok) settings = await settingsRes.json()
+      if (settingsRes.ok) {
+        const parsed = instanceSettingsSchema.safeParse(await settingsRes.json())
+        if (parsed.success) settings = parsed.data
+      }
     } catch {
-      // settings endpoint may not exist on older instances
+      // Settings endpoint may not exist on older instances
     }
 
     return { url, reports, settings, label }

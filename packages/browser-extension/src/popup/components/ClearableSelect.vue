@@ -10,9 +10,13 @@ function onTabKeydown(e: KeyboardEvent) {
   if (e.key === 'Tab') isOpen.value = false
 }
 
-watch(isOpen, (open) => {
-  if (open) document.addEventListener('keydown', onTabKeydown)
-  else document.removeEventListener('keydown', onTabKeydown)
+watch(isOpen, (open, _, onCleanup) => {
+  if (open) {
+    document.addEventListener('keydown', onTabKeydown)
+    onCleanup(() => document.removeEventListener('keydown', onTabKeydown))
+  } else {
+    document.removeEventListener('keydown', onTabKeydown)
+  }
 })
 
 withDefaults(

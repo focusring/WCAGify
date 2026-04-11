@@ -9,6 +9,7 @@ export type Messages = DeepStringify<typeof en>
 export type Locale = 'en' | 'nl'
 
 export const messages: Record<Locale, Messages> = { en, nl }
+export const supportedLocales = Object.keys(messages) as Locale[]
 
 export const localeLabels: Record<Locale, string> = {
   en: 'English',

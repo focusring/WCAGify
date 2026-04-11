@@ -22,7 +22,7 @@ export default defineManifest({
     type: 'module'
   },
   permissions: ['activeTab', 'tabs', 'storage', 'sidePanel'],
-  host_permissions: ['http://localhost/*'],
+  host_permissions: ['http://localhost/*', 'https://*/*'],
   content_security_policy: {
     extension_pages: "script-src 'self'; object-src 'self'; img-src 'self' data: https://*;"
   },
