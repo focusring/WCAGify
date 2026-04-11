@@ -1,7 +1,8 @@
 import { ref, watch } from 'vue'
 import { z } from 'zod'
 import type { Report } from '../types'
-import { useInstanceDiscovery } from './useInstanceDiscovery'
+import { useInstanceDiscovery, type InstanceSettings } from './useInstanceDiscovery'
+import { useI18n } from './useI18n'
 
 export const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet'] as const
 export const NEUTRAL_COLORS = ['slate', 'gray', 'zinc', 'neutral', 'stone'] as const
@@ -40,6 +41,23 @@ const neutralColor = ref<NeutralColor>('slate')
 
 const { scan, scanStatus, instances } = useInstanceDiscovery()
 
+function applyInstanceSettings(settings: InstanceSettings | undefined) {
+  if (!settings) return
+  const { locale } = useI18n()
+  if (settings.accentColor && (ACCENT_COLORS as readonly string[]).includes(settings.accentColor)) {
+    accentColor.value = settings.accentColor as AccentColor
+  }
+  if (
+    settings.neutralColor &&
+    (NEUTRAL_COLORS as readonly string[]).includes(settings.neutralColor)
+  ) {
+    neutralColor.value = settings.neutralColor as NeutralColor
+  }
+  if (settings.locale && ['en', 'nl'].includes(settings.locale)) {
+    locale.value = settings.locale as 'en' | 'nl'
+  }
+}
+
 // Auto-connect when scan finds exactly one instance
 watch(scanStatus, (val) => {
   if (val !== 'done') return
@@ -47,6 +65,7 @@ watch(scanStatus, (val) => {
     const instance = instances.value[0]!
     wcagifyUrl.value = instance.url
     reports.value = instance.reports
+    applyInstanceSettings(instance.settings)
     if (reportSlug.value && !reports.value.some((r) => r.slug === reportSlug.value)) {
       reportSlug.value = ''
     }
@@ -104,5 +123,13 @@ watch(neutralColor, (val) => {
 
 export function useSettings() {
   load()
-  return { wcagifyUrl, reportSlug, reports, accentColor, neutralColor, scanStatus }
+  return {
+    wcagifyUrl,
+    reportSlug,
+    reports,
+    accentColor,
+    neutralColor,
+    scanStatus,
+    applyInstanceSettings
+  }
 }

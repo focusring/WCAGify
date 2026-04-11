@@ -6,7 +6,7 @@ const dir = fileURLToPath(new URL('.', import.meta.url))
 const hasStudioRepoInfo = Boolean(
   (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG) ||
   process.env.NETLIFY ||
-  process.env.NODE_ENV !== 'production'
+  process.env.NUXT_STUDIO
 )
 
 const nuxtConfig = {

@@ -1,9 +1,16 @@
 import { ref } from 'vue'
 import type { Report } from '../types'
 
+export interface InstanceSettings {
+  accentColor: string
+  neutralColor: string
+  locale: string
+}
+
 interface DiscoveredInstance {
   url: string
   reports: Report[]
+  settings?: InstanceSettings
   label: string
 }
 
@@ -25,7 +32,16 @@ async function probePort(
     const reports = data as Report[]
     const count = reports.length
     const label = count === 1 ? `${url} (1 report)` : `${url} (${count} reports)`
-    return { url, reports, label }
+
+    let settings: InstanceSettings | undefined
+    try {
+      const settingsRes = await fetch(`${url}/api/settings`, { signal })
+      if (settingsRes.ok) settings = await settingsRes.json()
+    } catch {
+      // settings endpoint may not exist on older instances
+    }
+
+    return { url, reports, settings, label }
   } catch {
     return undefined
   }

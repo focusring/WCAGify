@@ -6,7 +6,7 @@ import { useI18n } from '../../composables/useI18n'
 import { useInstanceDiscovery } from '../../composables/useInstanceDiscovery'
 import ClearableSelect from './ClearableSelect.vue'
 
-const { wcagifyUrl, reportSlug, reports } = useSettings()
+const { wcagifyUrl, reportSlug, reports, applyInstanceSettings } = useSettings()
 const { t } = useI18n()
 const { instances, scanStatus, scan } = useInstanceDiscovery()
 const status = ref<'idle' | 'loading' | 'connected' | 'error'>('idle')
@@ -51,6 +51,7 @@ function connectInstance(url: string) {
   const instance = instances.value.find((i) => i.url === url)
   if (instance) {
     reports.value = instance.reports
+    applyInstanceSettings(instance.settings)
     syncSelectedReport()
     status.value = 'connected'
   }
@@ -114,6 +115,14 @@ async function fetchReports() {
     reports.value = data
     syncSelectedReport()
     status.value = 'connected'
+
+    // Inherit settings from the connected instance
+    try {
+      const settingsRes = await fetch(`${url}/api/settings`)
+      if (settingsRes.ok) applyInstanceSettings(await settingsRes.json())
+    } catch {
+      // settings endpoint may not exist on older instances
+    }
   } catch (error) {
     status.value = 'error'
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
