@@ -62,7 +62,14 @@ watch(
 
 const canSubmit = computed(
   () =>
-    reportSlug.value && title.value.trim() && sc.value.trim() && sample.value && !submitting.value
+    reportSlug.value &&
+    title.value.trim() &&
+    sc.value.trim() &&
+    sample.value &&
+    severity.value &&
+    type.value &&
+    description.value.trim() &&
+    !submitting.value
 )
 
 const severityOptions = computed(() => [
@@ -130,13 +137,17 @@ async function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="space-y-3">
-    <div>
-      <label
-        for="issue-sample"
-        class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-        >{{ t('form.samplePage') }} <small>({{ t('form.required') }})</small></label
-      >
+  <UForm :state="{}" class="space-y-3" @submit="submit">
+    <UFormField
+      :label="t('form.samplePage')"
+      :hint="`(${t('form.required')})`"
+      name="issue-sample"
+      :ui="{
+        label: 'label-title',
+        labelWrapper: 'flex items-center justify-start gap-1',
+        hint: 'label-hint'
+      }"
+    >
       <ClearableSelect
         id="issue-sample"
         v-model="sampleModel"
@@ -145,14 +156,18 @@ async function submit() {
         :clear-label="t('form.clearPage')"
         required
       />
-    </div>
+    </UFormField>
 
-    <div>
-      <label
-        for="issue-title"
-        class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-        >{{ t('form.issueTitle') }} <small>({{ t('form.required') }})</small></label
-      >
+    <UFormField
+      :label="t('form.issueTitle')"
+      :hint="`(${t('form.required')})`"
+      name="issue-title"
+      :ui="{
+        label: 'label-title',
+        labelWrapper: 'flex items-center justify-start gap-1',
+        hint: 'label-hint'
+      }"
+    >
       <UInput
         id="issue-title"
         v-model="title"
@@ -161,9 +176,12 @@ async function submit() {
         required
         aria-required="true"
         :placeholder="t('form.issueTitlePlaceholder')"
-        :ui="{ trailing: 'pe-1.5', base: '[&::placeholder]:text-muted hover:bg-accented/75' }"
+        :ui="{
+          trailing: 'pe-1.5',
+          base: '[&::placeholder]:text-muted py-2 text-sm hover:bg-accented/75 selectable-focus'
+        }"
         variant="subtle"
-        class="issue-title-input w-full"
+        class="w-full"
       >
         <template v-if="title?.length" #trailing>
           <UButton
@@ -173,19 +191,24 @@ async function submit() {
             icon="i-lucide-x"
             :aria-label="t('form.clearTitle')"
             :ui="{
-              base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+              base: 'selectable-focus cursor-pointer'
             }"
             @click="title = ''"
-            class="cursor-pointer"
           />
         </template>
       </UInput>
-    </div>
+    </UFormField>
 
-    <div>
-      <label for="issue-sc" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-        >{{ t('form.sc') }} <small>({{ t('form.required') }})</small></label
-      >
+    <UFormField
+      :label="t('form.sc')"
+      :hint="`(${t('form.required')})`"
+      name="issue-sc"
+      :ui="{
+        label: 'label-title',
+        labelWrapper: 'flex items-center justify-start gap-1',
+        hint: 'label-hint'
+      }"
+    >
       <ScCombobox
         id="issue-sc"
         v-model="sc"
@@ -194,15 +217,21 @@ async function submit() {
         required
         placeholder="2.1.1"
       />
-    </div>
+    </UFormField>
 
-    <div class="grid grid-cols-2 gap-2">
-      <div>
-        <label
-          for="issue-severity"
-          class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-          >{{ t('form.severity') }}</label
-        >
+    <div class="flex gap-3">
+      <UFormField
+        :label="t('form.severity')"
+        :hint="`(${t('form.required')})`"
+        name="issue-severity"
+        required
+        :ui="{
+          label: 'label-title after:content-none',
+          labelWrapper: 'flex items-center justify-start gap-1',
+          hint: 'label-hint'
+        }"
+        class="w-full"
+      >
         <ClearableSelect
           id="issue-severity"
           v-model="severity"
@@ -210,13 +239,19 @@ async function submit() {
           :placeholder="t('form.none')"
           :clear-label="t('form.clearSeverity')"
         />
-      </div>
-      <div>
-        <label
-          for="issue-type"
-          class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1"
-          >{{ t('form.type') }}</label
-        >
+      </UFormField>
+      <UFormField
+        :label="t('form.type')"
+        :hint="`(${t('form.required')})`"
+        name="issue-type"
+        required
+        :ui="{
+          label: 'label-title after:content-none',
+          labelWrapper: 'flex items-center justify-start gap-1',
+          hint: 'label-hint'
+        }"
+        class="w-full"
+      >
         <ClearableSelect
           id="issue-type"
           v-model="type"
@@ -224,15 +259,22 @@ async function submit() {
           :placeholder="t('form.unknown')"
           :clear-label="t('form.clearType')"
         />
-      </div>
+      </UFormField>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{
-        t('form.description')
-      }}</label>
+    <UFormField
+      :label="t('form.description')"
+      :hint="`(${t('form.required')})`"
+      name="issue-description"
+      required
+      :ui="{
+        label: 'label-title after:content-none',
+        labelWrapper: 'flex items-center justify-start gap-1',
+        hint: 'label-hint'
+      }"
+    >
       <RichTextEditor v-model="description" :placeholder="t('form.descriptionPlaceholder')" />
-    </div>
+    </UFormField>
 
     <UButton
       type="submit"
@@ -257,5 +299,5 @@ async function submit() {
     >
       {{ submitMessage }}
     </div>
-  </form>
+  </UForm>
 </template>

@@ -31,35 +31,35 @@ async function probePort(
   }
 }
 
+// Singleton state — shared across all callers
+const instances = ref<DiscoveredInstance[]>([])
+const scanStatus = ref<'idle' | 'scanning' | 'done'>('idle')
+let abortController: AbortController | undefined
+
+async function scan() {
+  abort()
+  abortController = new AbortController()
+  const { signal } = abortController
+
+  scanStatus.value = 'scanning'
+  instances.value = []
+
+  const results = await Promise.allSettled(PORTS.map((port) => probePort(port, signal)))
+
+  if (signal.aborted) return
+
+  instances.value = results
+    .map((r) => (r.status === 'fulfilled' ? r.value : undefined))
+    .filter((r): r is DiscoveredInstance => r !== undefined)
+
+  scanStatus.value = 'done'
+}
+
+function abort() {
+  abortController?.abort()
+  abortController = undefined
+}
+
 export function useInstanceDiscovery() {
-  const instances = ref<DiscoveredInstance[]>([])
-  const scanStatus = ref<'idle' | 'scanning' | 'done'>('idle')
-
-  let abortController: AbortController | undefined
-
-  async function scan() {
-    abort()
-    abortController = new AbortController()
-    const { signal } = abortController
-
-    scanStatus.value = 'scanning'
-    instances.value = []
-
-    const results = await Promise.allSettled(PORTS.map((port) => probePort(port, signal)))
-
-    if (signal.aborted) return
-
-    instances.value = results
-      .map((r) => (r.status === 'fulfilled' ? r.value : undefined))
-      .filter((r): r is DiscoveredInstance => r !== undefined)
-
-    scanStatus.value = 'done'
-  }
-
-  function abort() {
-    abortController?.abort()
-    abortController = undefined
-  }
-
   return { instances, scanStatus, scan, abort }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { WcagVersion, WcagLevel } from '../../data/wcag-criteria'
 import { WCAG_CRITERIA } from '../../data/wcag-criteria'
 import { useI18n } from '../../composables/useI18n'
@@ -40,27 +40,42 @@ const items = computed(() =>
 )
 
 const selectedItem = computed(() => items.value.find((item) => item.value === model.value) ?? null)
+
+const isOpen = ref(false)
+
+function onTabKeydown(e: KeyboardEvent) {
+  if (e.key === 'Tab') isOpen.value = false
+}
+
+watch(isOpen, (open) => {
+  if (open) document.addEventListener('keydown', onTabKeydown)
+  else document.removeEventListener('keydown', onTabKeydown)
+})
 </script>
 
 <template>
   <USelectMenu
     :id="id"
     v-model="model"
+    :open="isOpen"
+    @update:open="isOpen = $event"
     :items="items"
     value-key="value"
     searchable
     :search-input="{
       placeholder: t('form.scSearch'),
       leadingIcon: 'i-lucide-search',
-      ui: { base: 'ps-12' }
+      ui: { base: 'ps-13 mx-1.5 py-2 [&::placeholder]:text-muted selectable-focus' }
     }"
     :placeholder="placeholder"
     :ui="{
-      base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1 h-8 pr-7.5',
+      base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5 selectable-focus',
       placeholder: 'text-muted',
-      trailingIcon:
-        'text-muted group-data-[state=open]:rotate-180 transition-transform duration-200',
-      item: 'grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] cursor-pointer data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-primary data-[highlighted]:rounded-sm'
+      trailingIcon: 'text-muted icon-animation',
+      item: 'grid grid-cols-[minmax(2.5rem,auto)_auto_1fr_auto] items-center cursor-pointer selectable-focus',
+      content: 'py-1',
+      viewport: 'mt-2',
+      group: 'space-y-1.5'
     }"
     :required="required"
     variant="subtle"
@@ -70,12 +85,10 @@ const selectedItem = computed(() => items.value.find((item) => item.value === mo
       <!-- Select bar -->
       <template v-if="selectedItem">
         <UBadge
-          class="shrink-0 w-fit text-xs font-semibold py-0.5"
+          class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
           :color="
-            selectedItem.level === 'A' ? 'error' : selectedItem.level === 'AA' ? 'warning' : 'info'
+            selectedItem.level === 'A' ? 'info' : selectedItem.level === 'AA' ? 'warning' : 'info'
           "
-          variant="outline"
-          size="sm"
           >{{ selectedItem.level }}</UBadge
         >
         <span class="font-medium shrink-0">{{ selectedItem.sc }}</span>
@@ -92,9 +105,8 @@ const selectedItem = computed(() => items.value.find((item) => item.value === mo
         icon="i-lucide-x"
         :aria-label="t('form.clear')"
         :ui="{
-          base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+          base: 'selectable-focus cursor-pointer'
         }"
-        class="cursor-pointer"
         @pointerdown.stop
         @click.stop="model = ''"
         @keydown.enter.stop="model = ''"
@@ -104,10 +116,8 @@ const selectedItem = computed(() => items.value.find((item) => item.value === mo
     <!-- Select bar items -->
     <template #item="{ item }">
       <UBadge
-        class="shrink-0 w-fit text-xs font-semibold py-0.5"
-        :color="item.level === 'A' ? 'error' : item.level === 'AA' ? 'warning' : 'info'"
-        variant="subtle"
-        size="sm"
+        class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
+        :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'info'"
         >{{ item.level }}</UBadge
       >
       <span class="font-medium shrink-0">{{ item.sc }}</span>

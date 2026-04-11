@@ -1,6 +1,7 @@
 import { ref, watch } from 'vue'
 import { z } from 'zod'
 import type { Report } from '../types'
+import { useInstanceDiscovery } from './useInstanceDiscovery'
 
 export const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet'] as const
 export const NEUTRAL_COLORS = ['slate', 'gray', 'zinc', 'neutral', 'stone'] as const
@@ -37,6 +38,21 @@ const reports = ref<Report[]>([])
 const accentColor = ref<AccentColor>('green')
 const neutralColor = ref<NeutralColor>('slate')
 
+const { scan, scanStatus, instances } = useInstanceDiscovery()
+
+// Auto-connect when scan finds exactly one instance
+watch(scanStatus, (val) => {
+  if (val !== 'done') return
+  if (instances.value.length === 1) {
+    const instance = instances.value[0]!
+    wcagifyUrl.value = instance.url
+    reports.value = instance.reports
+    if (reportSlug.value && !reports.value.some((r) => r.slug === reportSlug.value)) {
+      reportSlug.value = ''
+    }
+  }
+})
+
 let ready = false
 let loadPromise: Promise<void> | null = null
 
@@ -59,6 +75,7 @@ async function doLoad() {
   applyAccentColor(accentColor.value)
   applyNeutralColor(neutralColor.value)
   ready = true
+  scan()
 }
 
 function load() {
@@ -87,5 +104,5 @@ watch(neutralColor, (val) => {
 
 export function useSettings() {
   load()
-  return { wcagifyUrl, reportSlug, reports, accentColor, neutralColor }
+  return { wcagifyUrl, reportSlug, reports, accentColor, neutralColor, scanStatus }
 }

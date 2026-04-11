@@ -176,10 +176,13 @@
   --ui-color-secondary-950: var(--color-blue-950);
 
   --ui-radius: 0.125rem;
+
+  --ui-text-muted: var(--color-slate-600);
 }
 
 .dark {
   --focus-gap-color: white;
+  --ui-text-muted: var(--color-slate-300);
 }
 
 :focus {
@@ -188,8 +191,23 @@
   border-radius: 0.125rem;
 }
 
+/* remove focus outline on USelectMenu background */
+[data-slot='focusScope']:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* remove focus ring on USelect dropdown, restore Tailwind ring+shadow */
+[role='listbox']:focus {
+  outline: none;
+  box-shadow:
+    var(--tw-inset-ring-shadow, 0 0 0 #0000), var(--tw-ring-offset-shadow, 0 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 0 #0000), var(--tw-shadow, 0 0 0 #0000) !important;
+}
+
 .selectable-focus:focus,
 .selectable-focus:focus-visible,
+.selectable-focus[data-highlighted],
 .selectable-focus:has(input:focus),
 .selectable-focus:has(input:focus-visible) {
   outline: 0.375rem double var(--ui-color-primary-500);
@@ -199,47 +217,26 @@
   transition: none;
 }
 
-/*
- * Nuxt UI's preflight strips default form element styling.
- * Restore appearance for plain HTML inputs/selects/buttons used in the extension.
- */
-/* input:not([class*='u-']),
-select:not([class*='u-']),
-textarea:not([class*='u-']) {
-  background-color: white;
-  color: #111827;
-} */
+.label-title {
+  @apply font-medium tracking-wide text-muted;
+}
 
-/* .dark input:not([class*='u-']),
-.dark select:not([class*='u-']),
-.dark textarea:not([class*='u-']) {
-  background-color: #1f2937;
-  color: #f3f4f6;
-} */
+.label-hint {
+  @apply text-slate-600 dark:text-slate-400;
+}
 
-/* select:not([class*='u-']) {
-  appearance: auto;
-} */
+.icon-animation {
+  @apply group-data-[state=open]:rotate-180 transition-transform duration-200;
+}
 
 /*
  * TipTap editor: ensure placeholder and list markers have proper contrast.
  */
-/* .tiptap .is-editor-empty::before,
-.tiptap .is-empty::before {
-  color: #9ca3af;
+
+.input-border {
+  @apply border-slate-300 dark:border-slate-700;
 }
 
-.dark .tiptap .is-editor-empty::before,
-.dark .tiptap .is-empty::before {
-  color: #6b7280;
+.tiptap.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--ui-text-muted);
 }
-
-.tiptap ul li::marker,
-.tiptap ol li::marker {
-  color: #374151;
-}
-
-.dark .tiptap ul li::marker,
-.dark .tiptap ol li::marker {
-  color: #d1d5db;
-} */

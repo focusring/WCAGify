@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 
+const emit = defineEmits<{ openSettings: [] }>()
 const { t } = useI18n()
 
 const selector = ref('')
@@ -47,16 +48,33 @@ async function pickElement() {
 
 <template>
   <div class="space-y-2">
-    <UButton
-      @click="pickElement"
-      :disabled="picking"
-      variant="outline"
-      class="w-full justify-center cursor-pointer"
-      icon="i-lucide-square-mouse-pointer"
-      size="xl"
-      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer' }"
-      :label="picking ? t('picker.picking') : t('picker.pickElement')"
-    />
+    <div class="flex gap-3">
+      <UButton
+        @click="pickElement"
+        :disabled="picking"
+        variant="outline"
+        class="w-full justify-center cursor-pointer"
+        icon="i-lucide-square-mouse-pointer"
+        size="xl"
+        :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer selectable-focus' }"
+        :label="picking ? t('picker.picking') : t('picker.pickElement')"
+      />
+
+      <UButton
+        @click="emit('openSettings')"
+        :aria-label="t('settings.title')"
+        :title="t('settings.title')"
+        :label="t('settings.title')"
+        icon="i-lucide-settings"
+        size="xl"
+        color="primary"
+        variant="subtle"
+        :ui="{
+          base: 'cursor-pointer selectable-focus',
+          leadingIcon: 'size-5'
+        }"
+      />
+    </div>
 
     <div v-if="selector" class="space-y-1 rounded bg-gray-50 dark:bg-gray-800 p-2 text-sm">
       <div>

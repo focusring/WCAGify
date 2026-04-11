@@ -1,7 +1,19 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 
 const model = defineModel<string | undefined>()
+
+const isOpen = ref(false)
+
+function onTabKeydown(e: KeyboardEvent) {
+  if (e.key === 'Tab') isOpen.value = false
+}
+
+watch(isOpen, (open) => {
+  if (open) document.addEventListener('keydown', onTabKeydown)
+  else document.removeEventListener('keydown', onTabKeydown)
+})
 
 withDefaults(
   defineProps<{
@@ -26,17 +38,19 @@ const { t } = useI18n()
   <USelect
     :id="id"
     v-model="model"
+    :open="isOpen"
+    @update:open="isOpen = $event"
     :items="items"
     :value-key="valueKey"
     :placeholder="placeholder"
     :ui="{
       placeholder: 'text-muted',
-      item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
+      item: 'cursor-pointer selectable-focus'
     }"
     :required="required"
     :aria-required="required ? 'true' : undefined"
     variant="subtle"
-    class="w-full cursor-pointer"
+    class="w-full cursor-pointer selectable-focus py-2"
   >
     <template #trailing="{ modelValue }">
       <UButton
@@ -49,7 +63,7 @@ const { t } = useI18n()
         icon="i-lucide-x"
         :aria-label="clearLabel || t('form.clear')"
         :ui="{
-          base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+          base: 'selectable-focus'
         }"
         class="cursor-pointer mr-1"
         @pointerdown.stop
@@ -57,10 +71,7 @@ const { t } = useI18n()
         @keydown.enter.stop="model = undefined"
         @keydown.space.prevent.stop="model = undefined"
       />
-      <UIcon
-        name="i-lucide-chevron-down"
-        class="text-muted size-5 group-data-[state=open]:rotate-180 transition-transform duration-200"
-      />
+      <UIcon name="i-lucide-chevron-down" class="text-muted size-5 icon-animation" />
     </template>
   </USelect>
 </template>
