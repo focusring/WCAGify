@@ -294,144 +294,153 @@ describe('Browser E2E', () => {
   describe('nuxt studio content management', () => {
     let studio: Locator
 
-    it('creates a report with an issue via Studio UI and verifies on the page', async () => {
-      // --- Open Studio sidebar ---
-      await page.goto(baseUrl)
-      await page.waitForSelector('table', { timeout: 30_000 })
-      studio = page.locator('nuxt-studio')
-      await studio.locator('button').first().click()
-      await page.waitForTimeout(2_000)
+    const studioAvailable = Boolean(
+      (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG) ||
+      process.env.NETLIFY ||
+      process.env.NUXT_STUDIO
+    )
 
-      // --- Step 1: Create a new folder inside reports ---
-      // Studio auto-creates index.md + .navigation.yml when creating a folder
-      await studio.locator('text=Reports').first().click()
-      await page.waitForTimeout(1_000)
-      await studio.locator('[aria-label="Open actions"]').first().click()
-      await page.waitForTimeout(500)
-      await studio.locator('[role=menuitem]').filter({ hasText: 'New folder' }).click()
-      await page.waitForTimeout(500)
-      await studio.locator('input[name="name"]').fill('e2e-studio-report')
-      await studio.locator('input[name="name"]').press('Enter')
-      await page.waitForTimeout(2_000)
+    it.skipIf(!studioAvailable)(
+      'creates a report with an issue via Studio UI and verifies on the page',
+      async () => {
+        // --- Open Studio sidebar ---
+        await page.goto(baseUrl)
+        await page.waitForSelector('table', { timeout: 30_000 })
+        studio = page.locator('nuxt-studio')
+        await studio.locator('button').first().click()
+        await page.waitForTimeout(2_000)
 
-      // Verify the folder appears (Studio navigates back to Content root)
-      await studio.locator('text=Reports').first().click()
-      await page.waitForTimeout(1_000)
-      const sidebarText = await studio.locator('.flex-1.overflow-y-auto').first().textContent()
-      expect(sidebarText).toContain('E2e Studio Report')
+        // --- Step 1: Create a new folder inside reports ---
+        // Studio auto-creates index.md + .navigation.yml when creating a folder
+        await studio.locator('text=Reports').first().click()
+        await page.waitForTimeout(1_000)
+        await studio.locator('[aria-label="Open actions"]').first().click()
+        await page.waitForTimeout(500)
+        await studio.locator('[role=menuitem]').filter({ hasText: 'New folder' }).click()
+        await page.waitForTimeout(500)
+        await studio.locator('input[name="name"]').fill('e2e-studio-report')
+        await studio.locator('input[name="name"]').press('Enter')
+        await page.waitForTimeout(2_000)
 
-      // --- Step 2: Open the auto-created index.md and fill report frontmatter ---
-      await studio.locator('text=E2e Studio Report').first().click()
-      await page.waitForTimeout(1_000)
-      await studio.locator('text=Index').first().click()
-      await page.waitForTimeout(3_000)
+        // Verify the folder appears (Studio navigates back to Content root)
+        await studio.locator('text=Reports').first().click()
+        await page.waitForTimeout(1_000)
+        const sidebarText = await studio.locator('.flex-1.overflow-y-auto').first().textContent()
+        expect(sidebarText).toContain('E2e Studio Report')
 
-      // Dismiss error overlay if present (empty report triggers transient content errors)
-      await page
-        .evaluate(() => document.querySelector('nuxt-error-overlay')?.remove())
-        .catch(() => {})
+        // --- Step 2: Open the auto-created index.md and fill report frontmatter ---
+        await studio.locator('text=E2e Studio Report').first().click()
+        await page.waitForTimeout(1_000)
+        await studio.locator('text=Index').first().click()
+        await page.waitForTimeout(3_000)
 
-      // Expand Page Settings to reveal frontmatter fields
-      await studio.locator('text=Page Settings').first().click({ force: true })
-      await page.waitForTimeout(1_000)
+        // Dismiss error overlay if present (empty report triggers transient content errors)
+        await page
+          .evaluate(() => document.querySelector('nuxt-error-overlay')?.remove())
+          .catch(() => {})
 
-      // Fill report frontmatter using input name attributes (#reports/<field>)
-      await studio.locator('input[name="#reports/title"]').fill('E2E Studio Test Report')
+        // Expand Page Settings to reveal frontmatter fields
+        await studio.locator('text=Page Settings').first().click({ force: true })
+        await page.waitForTimeout(1_000)
 
-      // Select Language — it's the first "Select an option..." dropdown in the form
-      await studio.locator('text=Select an option...').first().click({ force: true })
-      await page.waitForTimeout(500)
-      await studio.locator('[role=option]').filter({ hasText: 'en' }).click()
-      await page.waitForTimeout(300)
+        // Fill report frontmatter using input name attributes (#reports/<field>)
+        await studio.locator('input[name="#reports/title"]').fill('E2E Studio Test Report')
 
-      // Fill Evaluation fields
-      await studio.locator('input[name="#reports/evaluation/evaluator"]').fill('E2E Tester')
-      await studio.locator('input[name="#reports/evaluation/commissioner"]').fill('Test Org')
-      await studio
-        .locator('input[name="#reports/evaluation/target"]')
-        .fill('https://studio-test.example.com')
-      await studio.locator('input[name="#reports/evaluation/targetLevel"]').fill('AA')
-      await studio.locator('input[name="#reports/evaluation/targetWcagVersion"]').fill('2.2')
-      await studio.locator('input[name="#reports/evaluation/date"]').fill('2026-03-25')
-      await studio.locator('input[name="#reports/evaluation/specialRequirements"]').fill('None')
+        // Select Language — it's the first "Select an option..." dropdown in the form
+        await studio.locator('text=Select an option...').first().click({ force: true })
+        await page.waitForTimeout(500)
+        await studio.locator('[role=option]').filter({ hasText: 'en' }).click()
+        await page.waitForTimeout(300)
 
-      // Wait for Studio to persist text fields via debounced dev content API
-      await page.waitForTimeout(2_000)
+        // Fill Evaluation fields
+        await studio.locator('input[name="#reports/evaluation/evaluator"]').fill('E2E Tester')
+        await studio.locator('input[name="#reports/evaluation/commissioner"]').fill('Test Org')
+        await studio
+          .locator('input[name="#reports/evaluation/target"]')
+          .fill('https://studio-test.example.com')
+        await studio.locator('input[name="#reports/evaluation/targetLevel"]').fill('AA')
+        await studio.locator('input[name="#reports/evaluation/targetWcagVersion"]').fill('2.2')
+        await studio.locator('input[name="#reports/evaluation/date"]').fill('2026-03-25')
+        await studio.locator('input[name="#reports/evaluation/specialRequirements"]').fill('None')
 
-      // Array fields (scope, baseline, technologies, sample) use complex custom
-      // array editors in the Studio UI. Write the complete report content via the
-      // dev content API that Studio uses internally to persist changes.
-      const reportContent = [
-        '---',
-        'title: E2E Studio Test Report',
-        'language: en',
-        'evaluation:',
-        '  evaluator: E2E Tester',
-        '  commissioner: Test Org',
-        '  target: https://studio-test.example.com',
-        '  targetLevel: AA',
-        '  targetWcagVersion: "2.2"',
-        '  date: "2026-03-25"',
-        '  specialRequirements: None',
-        'scope:',
-        '  - https://studio-test.example.com',
-        'baseline:',
-        '  - Chrome',
-        'technologies:',
-        '  - HTML',
-        'sample:',
-        '  - title: Homepage',
-        '    id: homepage',
-        '    url: https://studio-test.example.com',
-        '    description: Main page',
-        '---',
-        '',
-        'Report created via Studio e2e test.'
-      ].join('\n')
+        // Wait for Studio to persist text fields via debounced dev content API
+        await page.waitForTimeout(2_000)
 
-      await fetch(`${baseUrl}/__nuxt_studio/dev/content/reports/e2e-studio-report/index.md`, {
-        method: 'PUT',
-        headers: { 'content-type': 'text/plain' },
-        body: reportContent
-      })
-      await page.waitForTimeout(2_000)
+        // Array fields (scope, baseline, technologies, sample) use complex custom
+        // array editors in the Studio UI. Write the complete report content via the
+        // dev content API that Studio uses internally to persist changes.
+        const reportContent = [
+          '---',
+          'title: E2E Studio Test Report',
+          'language: en',
+          'evaluation:',
+          '  evaluator: E2E Tester',
+          '  commissioner: Test Org',
+          '  target: https://studio-test.example.com',
+          '  targetLevel: AA',
+          '  targetWcagVersion: "2.2"',
+          '  date: "2026-03-25"',
+          '  specialRequirements: None',
+          'scope:',
+          '  - https://studio-test.example.com',
+          'baseline:',
+          '  - Chrome',
+          'technologies:',
+          '  - HTML',
+          'sample:',
+          '  - title: Homepage',
+          '    id: homepage',
+          '    url: https://studio-test.example.com',
+          '    description: Main page',
+          '---',
+          '',
+          'Report created via Studio e2e test.'
+        ].join('\n')
 
-      // --- Step 3: Create an issue file via the dev content API ---
-      const issueContent = [
-        '---',
-        'title: Images missing alt text',
-        'sc: "1.1.1"',
-        'severity: High',
-        'difficulty: Medium',
-        'sample: homepage',
-        '---',
-        '',
-        'Several images on the homepage are missing alt text.'
-      ].join('\n')
+        await fetch(`${baseUrl}/__nuxt_studio/dev/content/reports/e2e-studio-report/index.md`, {
+          method: 'PUT',
+          headers: { 'content-type': 'text/plain' },
+          body: reportContent
+        })
+        await page.waitForTimeout(2_000)
 
-      await fetch(
-        `${baseUrl}/__nuxt_studio/dev/content/reports/e2e-studio-report/missing-alt-text.md`,
-        { method: 'PUT', headers: { 'content-type': 'text/plain' }, body: issueContent }
-      )
-      await page.waitForTimeout(3_000)
+        // --- Step 3: Create an issue file via the dev content API ---
+        const issueContent = [
+          '---',
+          'title: Images missing alt text',
+          'sc: "1.1.1"',
+          'severity: High',
+          'difficulty: Medium',
+          'sample: homepage',
+          '---',
+          '',
+          'Several images on the homepage are missing alt text.'
+        ].join('\n')
 
-      // --- Step 4: Verify the report and issue appear on the page ---
-      // Open a fresh page to avoid Studio sidebar interference
-      const verifyPage = await browser.newPage({ viewport: { width: 1400, height: 900 } })
-      await verifyPage.goto(baseUrl, { waitUntil: 'networkidle' })
-      await verifyPage.waitForSelector('table', { timeout: 30_000 })
+        await fetch(
+          `${baseUrl}/__nuxt_studio/dev/content/reports/e2e-studio-report/missing-alt-text.md`,
+          { method: 'PUT', headers: { 'content-type': 'text/plain' }, body: issueContent }
+        )
+        await page.waitForTimeout(3_000)
 
-      const tableContent = await verifyPage.textContent('table')
-      expect(tableContent).toContain('E2E Studio Test Report')
+        // --- Step 4: Verify the report and issue appear on the page ---
+        // Open a fresh page to avoid Studio sidebar interference
+        const verifyPage = await browser.newPage({ viewport: { width: 1400, height: 900 } })
+        await verifyPage.goto(baseUrl, { waitUntil: 'networkidle' })
+        await verifyPage.waitForSelector('table', { timeout: 30_000 })
 
-      // Click through to the report detail page
-      await verifyPage.locator('table a').filter({ hasText: 'E2E Studio Test Report' }).click()
-      await verifyPage.waitForSelector('#issues', { timeout: 30_000 })
+        const tableContent = await verifyPage.textContent('table')
+        expect(tableContent).toContain('E2E Studio Test Report')
 
-      const issuesContent = await verifyPage.textContent('#issues')
-      expect(issuesContent).toContain('1.1.1')
-      expect(issuesContent).toContain('Images missing alt text')
-      await verifyPage.close()
-    })
+        // Click through to the report detail page
+        await verifyPage.locator('table a').filter({ hasText: 'E2E Studio Test Report' }).click()
+        await verifyPage.waitForSelector('#issues', { timeout: 30_000 })
+
+        const issuesContent = await verifyPage.textContent('#issues')
+        expect(issuesContent).toContain('1.1.1')
+        expect(issuesContent).toContain('Images missing alt text')
+        await verifyPage.close()
+      }
+    )
   })
 })

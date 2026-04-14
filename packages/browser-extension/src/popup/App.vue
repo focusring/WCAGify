@@ -1,79 +1,119 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { Report } from '../types'
-import { useColorMode } from '../composables/useColorMode'
+import { ref } from 'vue'
 import { useI18n } from '../composables/useI18n'
-import { localeLabels, type Locale } from '../i18n'
+import { useSettings } from '../composables/useSettings'
+import logoSvg from '../assets/wcagify-icon.svg'
+import ClearableSelect from './components/ClearableSelect.vue'
 import ConnectionSettings from './components/ConnectionSettings.vue'
 import ElementPicker from './components/ElementPicker.vue'
 import IssueForm from './components/IssueForm.vue'
+import SettingsPage from './components/SettingsPage.vue'
 
-const reports = ref<Report[]>([])
 const picker = ref<InstanceType<typeof ElementPicker>>()
-const { preference, cycle } = useColorMode()
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const { reports, reportSlug, scanStatus } = useSettings()
 
-const colorModeIcon = computed(() => {
-  if (preference.value === 'dark') return 'i-lucide-moon'
-  if (preference.value === 'light') return 'i-lucide-sun'
-  return 'i-lucide-monitor'
-})
-
-const colorModeLabel = computed(() => {
-  if (preference.value === 'dark') return t('colorMode.dark')
-  if (preference.value === 'light') return t('colorMode.light')
-  return t('colorMode.system')
-})
-
-const locales = Object.entries(localeLabels) as [Locale, string][]
-const localeItems = computed(() => locales.map(([value, label]) => ({ value, label })))
-
-function onReportsLoaded(data: Report[]) {
-  reports.value = data
-}
+const currentView = ref<'main' | 'settings'>('main')
 </script>
 
 <template>
   <UApp>
-    <div class="min-h-screen p-4 bg-white dark:bg-slate-900 font-sans">
+    <SettingsPage v-if="currentView === 'settings'" @back="currentView = 'main'" />
+
+    <div v-show="currentView === 'main'" class="min-h-screen p-4 font-sans">
+      <!-- Header -->
       <div class="flex items-center gap-2">
-        <img src="../assets/wcagify-48.png" alt="WCAGify logo" class="size-6" />
+        <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
         <h1 class="text-lg font-bold text-black dark:text-white">WCAGify</h1>
-        <div class="ml-auto flex items-center gap-2">
-          <USelect
-            v-model="locale"
-            :items="localeItems"
-            :aria-label="t('language')"
-            :ui="{
-              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
-              item: 'data-highlighted:not-data-disabled:before:bg-elevated data-highlighted:not-data-disabled:before:ring-2 data-highlighted:not-data-disabled:before:ring-inset data-highlighted:not-data-disabled:before:ring-primary'
-            }"
-            variant="subtle"
-            class="w-auto min-w-24 cursor-pointer"
-          />
-          <UButton
-            @click="cycle"
-            :title="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
-            :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
-            :ui="{
-              base: 'cursor-pointer focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
-            }"
-            :icon="colorModeIcon"
-            color="neutral"
-            variant="subtle"
-          />
-        </div>
+
+        <UButton
+          @click="currentView = 'settings'"
+          :aria-label="t('settings.title')"
+          :title="t('settings.title')"
+          icon="i-lucide-settings"
+          size="xl"
+          color="neutral"
+          variant="ghost"
+          :ui="{
+            base: 'cursor-pointer selectable-focus ml-auto',
+            leadingIcon: 'size-5'
+          }"
+        />
       </div>
 
-      <USeparator class="my-3" />
+      <USeparator class="mt-3 mb-4" />
 
-      <div class="space-y-3">
-        <ConnectionSettings @reports-loaded="onReportsLoaded" />
+      <div class="space-y-4">
+        <ElementPicker v-if="reports.length > 0" ref="picker" class="flex-1" />
 
-        <USeparator />
+        <div v-else-if="scanStatus !== 'done'" class="w-full">
+          <USkeleton class="h-10 w-full rounded-md mb-4" />
+          <div class="w-full space-y-2.5">
+            <USkeleton class="h-3.5 w-24 rounded-md" />
+            <USkeleton class="h-9 w-full rounded-md" />
+          </div>
+        </div>
 
-        <div v-if="reports.length > 0" class="space-y-4">
-          <ElementPicker ref="picker" />
+        <!-- Setup screen when no instance is connected -->
+        <div v-else class="space-y-5 max-w-2xl mx-auto">
+          <div class="flex flex-col items-center text-center pt-2">
+            <img :src="logoSvg" alt="" aria-hidden="true" class="size-16 mb-3" />
+            <h1 class="text-lg font-bold text-black dark:text-white mb-1">
+              {{ t('setup.title') }}
+            </h1>
+            <p class="text-sm text-muted">
+              {{ t('setup.description') }}
+            </p>
+          </div>
+
+          <section class="bg-elevated rounded-sm p-4">
+            <ConnectionSettings />
+          </section>
+
+          <div
+            class="rounded-sm border border-dashed border-gray-300 dark:border-gray-700 p-4 space-y-2"
+          >
+            <h2 class="text-sm font-semibold text-black dark:text-white flex items-center gap-1.5">
+              <UIcon name="i-lucide-info" class="size-4 text-muted" />
+              {{ t('setup.helpTitle') }}
+            </h2>
+            <ol class="text-sm text-muted list-decimal list-inside space-y-1">
+              <li>{{ t('setup.step1') }}</li>
+              <li>{{ t('setup.step2') }}</li>
+              <li>{{ t('setup.step3') }}</li>
+            </ol>
+            <a
+              href="https://wcagify.com/guide/getting-started"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline selectable-focus mt-1"
+            >
+              {{ t('setup.docsLink') }}
+              <UIcon name="i-lucide-external-link" class="size-3.5" />
+            </a>
+          </div>
+        </div>
+
+        <template v-if="reports.length > 0">
+          <!-- Report Selection remove for now, need to implement when their are more reports -->
+          <!-- <UFormField
+            :label="t('connection.report')"
+            :hint="`(${t('connection.required')})`"
+            name="wcagify-report"
+            :ui="{
+              label: 'label-title',
+              labelWrapper: 'flex items-center justify-start gap-1',
+              hint: 'label-hint'
+            }"
+          >
+            <ClearableSelect
+              id="wcagify-report"
+              v-model="reportSlug"
+              :items="reports.map((r) => ({ label: r.title, value: r.slug }))"
+              :placeholder="t('connection.selectReport')"
+              required
+            />
+          </UFormField> -->
 
           <IssueForm
             :reports="reports"
@@ -81,7 +121,27 @@ function onReportsLoaded(data: Report[]) {
             :page-url="picker?.pageUrl ?? ''"
             :page-title="picker?.pageTitle ?? ''"
           />
-        </div>
+        </template>
+
+        <template v-else-if="scanStatus !== 'done'">
+          <div class="space-y-3">
+            <div v-for="n in 2" :key="n" class="w-full space-y-2.5">
+              <USkeleton class="h-3.5 w-24 rounded-md" />
+              <USkeleton class="h-9 w-full rounded-md" />
+            </div>
+            <div class="flex gap-3 w-full">
+              <div v-for="n in 2" :key="n" class="w-full space-y-2.5">
+                <USkeleton class="h-3.5 w-24 rounded-md" />
+                <USkeleton class="h-9 w-full rounded-md" />
+              </div>
+            </div>
+            <div class="w-full space-y-2.5">
+              <USkeleton class="h-3.5 w-24 rounded-md" />
+              <USkeleton class="h-41.75 w-full rounded-md" />
+            </div>
+            <USkeleton class="h-10 w-full rounded-md" />
+          </div>
+        </template>
       </div>
     </div>
   </UApp>

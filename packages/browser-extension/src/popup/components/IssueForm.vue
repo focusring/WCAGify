@@ -178,10 +178,10 @@ async function submit() {
         :placeholder="t('form.issueTitlePlaceholder')"
         :ui="{
           trailing: 'pe-1.5',
-          base: '[&::placeholder]:text-muted py-2 text-sm hover:bg-accented/75'
+          base: '[&::placeholder]:text-muted py-2 text-sm hover:bg-accented/75 selectable-focus'
         }"
         variant="subtle"
-        class="issue-title-input w-full"
+        class="w-full"
       >
         <template v-if="title?.length" #trailing>
           <UButton
@@ -191,10 +191,9 @@ async function submit() {
             icon="i-lucide-x"
             :aria-label="t('form.clearTitle')"
             :ui="{
-              base: 'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary focus-visible:rounded-sm'
+              base: 'selectable-focus cursor-pointer'
             }"
             @click="title = ''"
-            class="cursor-pointer"
           />
         </template>
       </UInput>
@@ -220,7 +219,7 @@ async function submit() {
       />
     </UFormField>
 
-    <div class="grid grid-cols-2 gap-2">
+    <div class="flex gap-3">
       <UFormField
         :label="t('form.severity')"
         :hint="`(${t('form.required')})`"
@@ -231,6 +230,7 @@ async function submit() {
           labelWrapper: 'flex items-center justify-start gap-1',
           hint: 'label-hint'
         }"
+        class="w-full"
       >
         <ClearableSelect
           id="issue-severity"
@@ -250,6 +250,7 @@ async function submit() {
           labelWrapper: 'flex items-center justify-start gap-1',
           hint: 'label-hint'
         }"
+        class="w-full"
       >
         <ClearableSelect
           id="issue-type"
@@ -280,11 +281,9 @@ async function submit() {
       :disabled="!canSubmit"
       :loading="submitting"
       :label="submitting ? t('form.submitting') : t('form.submit')"
-      color="success"
       size="xl"
       icon="i-lucide-file-input"
-      class="w-full justify-center"
-      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer' }"
+      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer selectable-focus w-full justify-center' }"
     />
 
     <div

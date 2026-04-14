@@ -10,6 +10,7 @@ catalog:
   '@tiptap/vue-3': ^3.22.1
   nanoid: ^5.1.7
   sharp: ^0.34.5
+  zod: ^4.3.6
 
 catalogMode: prefer
 

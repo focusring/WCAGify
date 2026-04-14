@@ -80,6 +80,9 @@ catalogs:
     sharp:
       specifier: ^0.34.5
       version: 0.34.5
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
   dev:
     '@nuxt/schema':
       specifier: ^4.4.2
@@ -201,6 +204,9 @@ importers:
       vue:
         specifier: ^3.5.32
         version: 3.5.32(typescript@6.0.2)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@crxjs/vite-plugin':
         specifier: ^2.4.0

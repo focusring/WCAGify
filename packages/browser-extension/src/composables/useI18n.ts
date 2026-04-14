@@ -43,7 +43,7 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string {
 }
 
 export function useI18n() {
-  load()
+  const ready = load()
 
   const t = (key: TranslationKey): string => {
     return getNestedValue(messages[locale.value] as unknown as Record<string, unknown>, key)
@@ -51,5 +51,5 @@ export function useI18n() {
 
   const currentMessages = computed(() => messages[locale.value])
 
-  return { locale, t, messages: currentMessages }
+  return { locale, t, messages: currentMessages, ready }
 }

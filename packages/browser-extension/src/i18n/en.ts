@@ -9,11 +9,12 @@ export default {
     connect: 'Connect',
     connecting: 'Connecting...',
     connected: 'Connected',
+    disconnected: 'Disconnected',
     connectionFailed: 'Connection failed',
     connectionRefused:
       'Could not connect. Make sure the WCAGify server is running at this URL. Example: http://localhost:3000',
     connectionHttpError:
-      'Something went wrong while connecting. Make sure the entered URL is a WCAGify instance and is correct. Example: http://localhost:3000',
+      'Something went wrong while connecting. Make sure the entered URL is a WCAGify instance and is correctly formatted. For example: http://localhost:3000.',
     required: 'required',
     scanning: 'Scanning for WCAGify instances...',
     selectInstance: 'WCAGify Instance',
@@ -21,6 +22,9 @@ export default {
     change: 'Change',
     rescan: 'Scan again',
     autoConnected: 'Automatically connected to a detected running WCAGify instance.',
+    connectionSuccess: 'Successfully connected to WCAGify.',
+    urlClearedWarning:
+      'Enter a URL to connect to a WCAGify report. For example: http://localhost:3000.',
     report: 'Report',
     selectReport: 'Select a report'
   },
@@ -90,5 +94,36 @@ export default {
     paragraph: 'Paragraph',
     insert: 'Insert'
   },
-  language: 'Language'
+  setup: {
+    title: 'Welcome to WCAGify',
+    description:
+      'Connect to a running WCAGify instance to start reporting accessibility issues directly from your browser.',
+    helpTitle: 'Getting started',
+    step1: 'Start your WCAGify project locally (e.g. pnpm dev)',
+    step2: 'Enter the URL or let the extension auto-detect it',
+    step3: 'Select a report and start auditing',
+    docsLink: 'Read the full WCAGify guide'
+  },
+  language: 'Language',
+  settings: {
+    title: 'Settings',
+    back: 'Back',
+    appearance: 'Appearance',
+    colorMode: 'Theme',
+    languageLabel: 'Language',
+    general: 'General',
+    wcagifyUrl: 'WCAGify URL',
+    save: 'Save',
+    saved: 'Saved',
+    accentColor: 'Accent Color',
+    backgroundShade: 'Background Shade',
+    clearColor: 'Clear color',
+    license: 'is released under the MIT License.',
+    terms: 'Terms',
+    privacy: 'Privacy',
+    security: 'Security',
+    madeBy: 'Made with ❤️ by',
+    inRegion: 'in Europe 🇪🇺',
+    version: 'Version'
+  }
 } as const

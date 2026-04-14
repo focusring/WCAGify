@@ -66,8 +66,29 @@ export function scaffoldProject(name: string): string {
 }
 
 export function cleanupTmpDir(): void {
-  if (existsSync(TMP_DIR)) {
-    rmSync(TMP_DIR, { recursive: true, force: true, maxRetries: 3, retryDelay: 500 })
+  if (!existsSync(TMP_DIR)) return
+
+  // On Windows, lingering dev-server (node/nuxt) processes can hold file locks
+  // on .tmp, causing EPERM. Kill any node processes still rooted in .tmp first.
+  if (process.platform === 'win32') {
+    try {
+      execSync(`taskkill /f /fi "IMAGENAME eq node.exe" /fi "STATUS eq RUNNING" >nul 2>&1`, {
+        stdio: 'ignore',
+        shell: true
+      })
+    } catch {
+      // ignore — taskkill exits non-zero when no matching processes are found
+    }
+    // Give Windows a moment to release file handles after killing processes
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500)
+  }
+
+  try {
+    rmSync(TMP_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 1000 })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.warn(`Warning: could not fully clean up ${TMP_DIR}: ${message}`)
+    console.warn('You may need to delete it manually or restart the terminal.')
   }
 }
 
@@ -107,12 +128,18 @@ export function patchPackageJsonForLocalWcagify(projectPath: string, tarballPath
 }
 
 export function installDependencies(projectPath: string): void {
+  // Disable pnpm trust-downgrade checks for test projects.
+  // Several transitive deps (chokidar, semver, …) lost provenance attestation
+  // in a patch release, triggering ERR_PNPM_TRUST_DOWNGRADE.
+  // --trust-policy-ignore-after 1 ignores downgrades for packages published
+  // more than 1 minute ago, which covers all currently known problem packages.
+  // This is safe because these are throwaway projects created just for tests.
   try {
-    execSync('pnpm install --no-frozen-lockfile --ignore-workspace', {
+    execSync('pnpm install --no-frozen-lockfile --ignore-workspace --trust-policy-ignore-after 1', {
       cwd: projectPath,
       stdio: 'pipe',
       timeout: 120_000,
-      env: { ...process.env, NO_COLOR: '1', CI: '1', npm_config_trust_policy: 'permissive' }
+      env: { ...process.env, NO_COLOR: '1', CI: '1' }
     })
   } catch (error) {
     const execError = error as { stdout?: string; stderr?: string; message?: string }
@@ -161,7 +188,14 @@ export async function startDevServer(
 export function stopDevServer(child: ChildProcess): void {
   if (child.pid) {
     try {
-      process.kill(-child.pid, 'SIGTERM')
+      if (process.platform === 'win32') {
+        // On Windows, negative-PID group kill doesn't work and SIGTERM leaves
+        // child processes running (holding file locks). Use taskkill /t to
+        // forcefully terminate the entire process tree.
+        execSync(`taskkill /pid ${child.pid} /f /t`, { stdio: 'ignore' })
+      } else {
+        process.kill(-child.pid, 'SIGTERM')
+      }
     } catch {
       child.kill('SIGTERM')
     }
