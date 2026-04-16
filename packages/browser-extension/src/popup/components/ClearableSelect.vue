@@ -51,8 +51,10 @@ const { t } = useI18n()
       :ui="{
         placeholder: 'text-muted',
         item: 'cursor-pointer selectable-focus',
-        base: 'pe-14'
+        base: 'pe-14',
+        content: 'z-50'
       }"
+      :portal="false"
       :required="required"
       :aria-required="required ? 'true' : undefined"
       variant="subtle"

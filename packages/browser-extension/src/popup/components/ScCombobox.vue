@@ -84,10 +84,11 @@ watch(isOpen, (open, _, onCleanup) => {
       placeholder: 'text-muted',
       trailingIcon: 'text-muted icon-animation',
       item: 'grid grid-cols-[minmax(2.5rem,auto)_auto_1fr_auto] items-center cursor-pointer selectable-focus',
-      content: 'py-1',
+      content: 'py-1 z-50',
       viewport: 'mt-2',
       group: 'space-y-1.5'
     }"
+    :portal="false"
     :required="required"
     variant="subtle"
     class="w-full cursor-pointer"

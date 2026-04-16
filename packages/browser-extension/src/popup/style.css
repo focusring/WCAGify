@@ -191,18 +191,12 @@
   border-radius: 0.125rem;
 }
 
-/* remove focus on USelectMenu menu background */
+/* Suppress focus ring on dropdown containers — focus is managed internally by Reka UI.
+   Restore the component border using --ui-border instead of the global focus gap. */
+[role='listbox']:focus,
 [data-slot='focusScope']:focus {
   outline: none;
-  box-shadow: none;
-}
-
-/* remove focus on USelect dropdown menu, restore Tailwind ring+shadow */
-[role='listbox']:focus {
-  outline: none;
-  box-shadow:
-    var(--tw-inset-ring-shadow, 0 0 0 #0000), var(--tw-ring-offset-shadow, 0 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 0 #0000), var(--tw-shadow, 0 0 0 #0000) !important;
+  box-shadow: 0 0 0 1px var(--ui-border);
 }
 
 .editor-toolbar button:focus,
