@@ -69,7 +69,7 @@ watch(isOpen, (open, _, onCleanup) => {
     :search-input="{
       placeholder: t('form.scSearch'),
       leadingIcon: 'i-lucide-search',
-      ui: { base: 'ps-13 mx-1.5 py-2 [&::placeholder]:text-muted selectable-focus' }
+      ui: { base: 'ps-13 mx-1.5 py-2 selectable-focus' }
     }"
     :placeholder="placeholder"
     :aria-label="
@@ -88,8 +88,8 @@ watch(isOpen, (open, _, onCleanup) => {
       viewport: 'mt-2',
       group: 'space-y-1.5'
     }"
-    :portal="false"
     :required="required"
+    :portal="false"
     variant="subtle"
     class="w-full cursor-pointer"
   >
@@ -117,9 +117,7 @@ watch(isOpen, (open, _, onCleanup) => {
         size="xs"
         icon="i-lucide-x"
         :aria-label="t('form.clearSc')"
-        :ui="{
-          base: 'selectable-focus cursor-pointer'
-        }"
+        :ui="{ base: 'selectable-focus cursor-pointer' }"
         @pointerdown.stop
         @click.stop="model = ''"
         @keydown.enter.stop="model = ''"
