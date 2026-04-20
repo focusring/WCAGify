@@ -24,7 +24,8 @@ export default defineManifest({
   permissions: ['activeTab', 'tabs', 'storage', 'sidePanel'],
   host_permissions: ['http://localhost/*', 'https://*/*'],
   content_security_policy: {
-    extension_pages: "script-src 'self'; object-src 'self'; img-src 'self' data: https://*;"
+    extension_pages:
+      "script-src 'self'; object-src 'self'; img-src 'self' data: http://localhost:* https://*;"
   },
   side_panel: {
     default_path: 'src/popup/index.html'
