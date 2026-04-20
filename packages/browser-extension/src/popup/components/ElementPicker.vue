@@ -8,6 +8,7 @@ const selector = ref('')
 const pageUrl = ref('')
 const pageTitle = ref('')
 const picking = ref(false)
+const pickerTabId = ref<number | null>(null)
 
 defineExpose({ selector, pageUrl, pageTitle })
 
@@ -17,14 +18,36 @@ function onMessage(message: { type: string; selector?: string; url?: string; pag
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
     picking.value = false
+    pickerTabId.value = null
   }
   if (message.type === 'picker-cancelled') {
     picking.value = false
+    pickerTabId.value = null
   }
 }
 
-onMounted(() => chrome.runtime.onMessage.addListener(onMessage))
-onUnmounted(() => chrome.runtime.onMessage.removeListener(onMessage))
+function cancelPicker() {
+  if (!picking.value) return
+  picking.value = false
+  if (pickerTabId.value != null) {
+    chrome.tabs.sendMessage(pickerTabId.value, { type: 'cancel-picker' }).catch(() => {})
+    pickerTabId.value = null
+  }
+}
+
+function onKeyDown(e: KeyboardEvent) {
+  if (e.key === 'Escape') cancelPicker()
+}
+
+onMounted(() => {
+  chrome.runtime.onMessage.addListener(onMessage)
+  window.addEventListener('keydown', onKeyDown)
+})
+onUnmounted(() => {
+  cancelPicker()
+  chrome.runtime.onMessage.removeListener(onMessage)
+  window.removeEventListener('keydown', onKeyDown)
+})
 
 async function pickElement() {
   // Side panel lives in the same window — find the active page tab directly
@@ -34,6 +57,7 @@ async function pickElement() {
   )
   if (!tab?.id) return
 
+  pickerTabId.value = tab.id
   picking.value = true
   selector.value = ''
   pageUrl.value = ''

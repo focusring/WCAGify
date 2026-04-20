@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 
 const model = defineModel<string | undefined>()
@@ -31,9 +31,10 @@ watch(isOpen, async (open, _, onCleanup) => {
   }
 })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     id?: string
+    label?: string
     items: { label: string; value: string }[]
     valueKey?: keyof { label: string; value: string }
     placeholder?: string
@@ -43,11 +44,23 @@ withDefaults(
   {
     valueKey: 'value',
     required: false,
-    clearLabel: undefined
+    clearLabel: undefined,
+    label: undefined
   }
 )
 
 const { t } = useI18n()
+
+const selectedLabel = computed(
+  () => props.items.find((item) => (item[props.valueKey] ?? item.value) === model.value)?.label
+)
+
+const triggerAriaLabel = computed(() => {
+  if (!props.label) return undefined
+  if (selectedLabel.value) return `${props.label}: ${selectedLabel.value}`
+  if (props.placeholder) return `${props.label}, ${props.placeholder}`
+  return props.label
+})
 </script>
 
 <template>
@@ -69,6 +82,7 @@ const { t } = useI18n()
       }"
       :portal="false"
       :required="required"
+      :aria-label="triggerAriaLabel"
       :aria-required="required ? 'true' : undefined"
       variant="subtle"
       class="w-full cursor-pointer selectable-focus py-2"

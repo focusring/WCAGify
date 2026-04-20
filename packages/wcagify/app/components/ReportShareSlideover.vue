@@ -158,7 +158,7 @@ function formatDate(dateStr: string): string {
           </div>
         </div>
 
-        <USeparator />
+        <USeparator aria-hidden="true" />
 
         <div>
           <h3 class="text-sm font-medium text-gray-950 dark:text-white">

@@ -151,6 +151,7 @@ async function submit() {
       <ClearableSelect
         id="issue-sample"
         v-model="sampleModel"
+        :label="t('form.samplePage')"
         :items="samplePages.map((p) => ({ label: `${p.title} — ${p.url}`, value: p.id }))"
         :placeholder="t('form.selectPage')"
         :clear-label="t('form.clearPage')"
@@ -238,6 +239,7 @@ async function submit() {
         <ClearableSelect
           id="issue-severity"
           v-model="severity"
+          :label="t('form.severity')"
           :items="severityOptions"
           :placeholder="t('form.none')"
           :clear-label="t('form.clearSeverity')"
@@ -256,6 +258,7 @@ async function submit() {
         <ClearableSelect
           id="issue-type"
           v-model="type"
+          :label="t('form.type')"
           :items="typeOptions"
           :placeholder="t('form.unknown')"
           :clear-label="t('form.clearType')"

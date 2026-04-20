@@ -216,4 +216,7 @@ chrome.runtime.onMessage.addListener((message: { type: string }) => {
   if (message.type === 'start-picker') {
     startPicker()
   }
+  if (message.type === 'cancel-picker') {
+    cleanup()
+  }
 })

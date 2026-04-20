@@ -199,6 +199,15 @@
   box-shadow: 0 0 0 1px var(--ui-border);
 }
 
+/* box-shadow is ignored in forced-colors mode; restore a visible outline so
+   Windows High Contrast users still get a clear focus indicator. */
+@media (forced-colors: active) {
+  [role='listbox']:focus,
+  [data-slot='focusScope']:focus {
+    outline: 1px solid CanvasText;
+  }
+}
+
 .editor-toolbar button:focus,
 .UEditorDragHandle button:focus,
 .editor-toolbar button:focus-visible,

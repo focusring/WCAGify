@@ -30,8 +30,8 @@ watch(
     } else if (instances.value.length === 1) {
       mode.value = 'manual'
       autoConnected.value = true
-      // wcagifyUrl and reports are already set by useSettings auto-connect;
-      // update status so the connected UI shows correctly
+      // WcagifyUrl and reports are already set by useSettings auto-connect;
+      // Update status so the connected UI shows correctly
       status.value = 'connected'
     } else {
       mode.value = 'select'
@@ -61,6 +61,17 @@ function connectInstance(url: string) {
     syncSelectedReport()
     status.value = 'connected'
   }
+}
+
+function clearUrl() {
+  wcagifyUrl.value = ''
+  urlCleared.value = true
+  status.value = 'idle'
+  errorMessage.value = ''
+  reports.value = []
+  reportSlug.value = ''
+  autoConnected.value = false
+  manuallyConnected.value = false
 }
 
 function switchToManual() {
@@ -128,7 +139,7 @@ async function fetchReports() {
       const settingsRes = await fetch(`${url}/api/settings`)
       if (settingsRes.ok) applyInstanceSettings(await settingsRes.json())
     } catch {
-      // settings endpoint may not exist on older instances
+      // Settings endpoint may not exist on older instances
     }
   } catch (error) {
     status.value = 'error'
@@ -239,10 +250,7 @@ async function fetchReports() {
                   :ui="{
                     base: 'selectable-focus cursor-pointer'
                   }"
-                  @click="
-                    wcagifyUrl = ''
-                    urlCleared = true
-                  "
+                  @click="clearUrl"
                 />
               </template>
             </UInput>

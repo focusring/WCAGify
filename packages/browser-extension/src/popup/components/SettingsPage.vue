@@ -107,7 +107,7 @@ function setNeutralColor(val: string | undefined) {
       />
     </div>
 
-    <USeparator class="my-3" />
+    <USeparator class="my-3" aria-hidden="true" />
 
     <div class="max-w-2xl mx-auto">
       <!-- General -->
@@ -194,7 +194,7 @@ function setNeutralColor(val: string | undefined) {
     </div>
 
     <!-- About -->
-    <USeparator class="my-4" />
+    <USeparator class="my-4" aria-hidden="true" />
 
     <footer
       class="flex flex-col items-center gap-2 text-center text-xs text-muted pb-2 max-w-md mx-auto whitespace-nowrap"

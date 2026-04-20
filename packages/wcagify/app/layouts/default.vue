@@ -29,7 +29,7 @@ const localePath = useLocalePath()
     </UContainer>
   </UMain>
 
-  <USeparator />
+  <USeparator aria-hidden="true" />
 
   <UFooter>
     <template #left>
