@@ -18,12 +18,12 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.4.0",
-    "@types/chrome": "^0.1.39",
-    "@vitejs/plugin-vue": "^6.0.5",
-    "happy-dom": "^20.8.9",
+    "@types/chrome": "^0.1.40",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "happy-dom": "^20.9.0",
     "tailwindcss": "catalog:core",
     "typescript": "catalog:dev",
-    "vite": "^8.0.3",
+    "vite": "^8.0.9",
     "vitest": "catalog:dev"
   }
 }
