@@ -51,7 +51,9 @@ const props = withDefaults(
 
 const { t } = useI18n()
 
-const selectedLabel = computed(() => props.items.find((item) => item.value === model.value)?.label)
+const selectedLabel = computed(
+  () => props.items.find((item) => (item[props.valueKey] ?? item.value) === model.value)?.label
+)
 
 const triggerAriaLabel = computed(() => {
   if (!props.label) return undefined

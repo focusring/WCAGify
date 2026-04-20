@@ -8,6 +8,7 @@ const selector = ref('')
 const pageUrl = ref('')
 const pageTitle = ref('')
 const picking = ref(false)
+const pickerTabId = ref<number | null>(null)
 
 defineExpose({ selector, pageUrl, pageTitle })
 
@@ -17,20 +18,21 @@ function onMessage(message: { type: string; selector?: string; url?: string; pag
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
     picking.value = false
+    pickerTabId.value = null
   }
   if (message.type === 'picker-cancelled') {
     picking.value = false
+    pickerTabId.value = null
   }
 }
 
-async function cancelPicker() {
+function cancelPicker() {
   if (!picking.value) return
   picking.value = false
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
-  const tab = tabs.find(
-    (t) => t.url && !t.url.startsWith('chrome') && !t.url.startsWith('extension')
-  )
-  if (tab?.id) chrome.tabs.sendMessage(tab.id, { type: 'cancel-picker' }).catch(() => {})
+  if (pickerTabId.value != null) {
+    chrome.tabs.sendMessage(pickerTabId.value, { type: 'cancel-picker' }).catch(() => {})
+    pickerTabId.value = null
+  }
 }
 
 function onKeyDown(e: KeyboardEvent) {
@@ -42,6 +44,7 @@ onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
 })
 onUnmounted(() => {
+  cancelPicker()
   chrome.runtime.onMessage.removeListener(onMessage)
   window.removeEventListener('keydown', onKeyDown)
 })
@@ -54,6 +57,7 @@ async function pickElement() {
   )
   if (!tab?.id) return
 
+  pickerTabId.value = tab.id
   picking.value = true
   selector.value = ''
   pageUrl.value = ''
