@@ -6,8 +6,70 @@ import { h, resolveComponent } from 'vue'
 const UButton = resolveComponent('UButton')
 
 const { t, locale } = useI18n()
+const localePath = useLocalePath()
+const toast = useToast()
+const router = useRouter()
 
 const { data: reports } = await useAsyncData('reports', () => queryCollection('reports').all())
+
+const importInput = useTemplateRef<HTMLInputElement>('importInput')
+const importing = ref(false)
+
+interface ImportWarning {
+  code: string
+  message: string
+}
+
+async function onImportFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  importing.value = true
+  try {
+    const text = await file.text()
+    const response = await $fetch<{
+      success: boolean
+      slug: string
+      reportPath: string
+      issueCount: number
+      warnings: ImportWarning[]
+    }>('/api/reports/import', {
+      method: 'POST',
+      body: text,
+      headers: { 'Content-Type': 'application/json' }
+    })
+    toast.add({
+      title: t('app.importSuccess'),
+      description:
+        response.warnings.length > 0
+          ? t('app.importWithWarnings', {
+              count: response.warnings.length,
+              issues: response.issueCount
+            })
+          : t('app.importSuccessDetail', { issues: response.issueCount }),
+      color: response.warnings.length > 0 ? 'warning' : 'success'
+    })
+    await router.push(localePath(response.reportPath))
+  } catch (error: unknown) {
+    const message =
+      (error as { data?: { statusMessage?: string }; statusMessage?: string }).data
+        ?.statusMessage ??
+      (error as { statusMessage?: string }).statusMessage ??
+      (error as Error).message
+    toast.add({
+      title: t('app.importFailed'),
+      description: message,
+      color: 'error'
+    })
+  } finally {
+    importing.value = false
+    input.value = ''
+  }
+}
+
+function triggerImport() {
+  importInput.value?.click()
+}
 
 const search = ref('')
 const view = useCookie<'grid' | 'table'>('wcagify-reports-view', { default: () => 'table' })
@@ -72,12 +134,15 @@ function toggleFieldVisibility(id: string, visible: boolean) {
 
 function getAccessor(report: ReportsCollectionItem, field: string): string {
   switch (field) {
-    case 'title':
+    case 'title': {
       return report.title
-    case 'evaluation_date':
+    }
+    case 'evaluation_date': {
       return report.evaluation.date
-    default:
+    }
+    default: {
       return ''
+    }
   }
 }
 
@@ -97,7 +162,7 @@ const filteredAndSortedReports = computed(() => {
 
   const field = sortField.value
   const desc = sortDesc.value
-  return [...result].sort((a, b) => {
+  return [...result].toSorted((a, b) => {
     const aVal = getAccessor(a, field)
     const bVal = getAccessor(b, field)
     const cmp = aVal.localeCompare(bVal)
@@ -176,12 +241,31 @@ const columnLabels = computed<Record<string, string>>(() => ({
 
 <template>
   <div class="py-8">
-    <h1 class="text-3xl font-bold">
-      {{ t('app.reports') }}
-    </h1>
-    <p class="mt-1 text-muted">
-      {{ t('app.description') }}
-    </p>
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h1 class="text-3xl font-bold">
+          {{ t('app.reports') }}
+        </h1>
+        <p class="mt-1 text-muted">
+          {{ t('app.description') }}
+        </p>
+      </div>
+      <UButton
+        :label="t('app.importEvaluation')"
+        icon="i-lucide-upload"
+        variant="outline"
+        :loading="importing"
+        :disabled="importing"
+        @click="triggerImport"
+      />
+      <input
+        ref="importInput"
+        type="file"
+        accept=".json,.jsonld,application/json,application/ld+json"
+        class="sr-only"
+        @change="onImportFileChange"
+      />
+    </div>
 
     <template v-if="reports?.length">
       <div class="mt-6 rounded-lg border border-accented divide-y divide-accented">

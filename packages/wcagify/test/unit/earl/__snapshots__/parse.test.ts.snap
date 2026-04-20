@@ -1,0 +1,55 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseEarl > matches a canonical snapshot 1`] = `
+{
+  "issues": [
+    {
+      "difficulty": "Low",
+      "sample": "page-1",
+      "sc": "1.1.1",
+      "severity": "Medium",
+      "title": "Missing alt",
+      "type": "Design",
+    },
+  ],
+  "report": {
+    "baseline": [
+      "Windows 11 with Chrome and NVDA",
+    ],
+    "evaluation": {
+      "commissioner": "Example Org",
+      "date": "2026-04-20",
+      "evaluator": "WCAGify",
+      "specialRequirements": "None",
+      "target": "Example Website",
+      "targetLevel": "AA",
+      "targetWcagVersion": "2.2",
+    },
+    "language": "en",
+    "sample": [
+      {
+        "description": "The homepage",
+        "id": "page-1",
+        "title": "Homepage",
+        "url": "https://example.com",
+      },
+      {
+        "description": "Contact page",
+        "id": "page-2",
+        "title": "Contact",
+        "url": "https://example.com/contact",
+      },
+    ],
+    "scStatuses": {},
+    "scope": [
+      "https://example.com",
+    ],
+    "technologies": [
+      "HTML",
+      "CSS",
+    ],
+    "title": "WCAG audit Example Website",
+  },
+  "warnings": [],
+}
+`;

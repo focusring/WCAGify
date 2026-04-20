@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { toSlug, escapeYamlValue, buildIssueFrontmatter } from '../../src/content-utils'
+import {
+  toSlug,
+  escapeYamlValue,
+  buildIssueFrontmatter,
+  buildReportFrontmatter
+} from '../../src/content-utils'
 
 describe('toSlug', () => {
   it('converts a simple title to lowercase kebab-case', () => {
@@ -115,5 +120,80 @@ describe('buildIssueFrontmatter', () => {
   it('escapes sample with special characters', () => {
     const result = buildIssueFrontmatter({ ...base, sample: 'page #1' })
     expect(result).toContain("sample: 'page #1'")
+  })
+})
+
+describe('buildReportFrontmatter', () => {
+  const base = {
+    title: 'Example audit',
+    language: 'en' as const,
+    evaluation: {
+      evaluator: 'WCAGify',
+      commissioner: 'Acme',
+      target: 'example.com',
+      targetLevel: 'AA',
+      targetWcagVersion: '2.2',
+      date: '2026-04-20',
+      specialRequirements: 'None'
+    },
+    scope: ['https://example.com', 'https://example.com/contact'],
+    baseline: ['Windows 11 + NVDA'],
+    technologies: ['HTML', 'CSS'],
+    sample: [{ id: 'page-1', title: 'Homepage', url: 'https://example.com', description: 'Home' }]
+  }
+
+  it('produces valid YAML delimiters and title', () => {
+    const yaml = buildReportFrontmatter(base)
+    expect(yaml.startsWith('---\n')).toBe(true)
+    expect(yaml.endsWith('\n---')).toBe(true)
+    expect(yaml).toContain('title: Example audit')
+  })
+
+  it('emits evaluation block with all required fields', () => {
+    const yaml = buildReportFrontmatter(base)
+    expect(yaml).toContain('evaluation:')
+    expect(yaml).toContain('evaluator: WCAGify')
+    expect(yaml).toContain('targetLevel: AA')
+    expect(yaml).toContain("targetWcagVersion: '2.2'")
+  })
+
+  it('always quotes targetWcagVersion so YAML cannot parse it as a float', () => {
+    const yaml = buildReportFrontmatter(base)
+    expect(yaml).not.toContain('targetWcagVersion: 2.2')
+    expect(yaml).toMatch(/targetWcagVersion: '2\.2'/)
+  })
+
+  it('emits scope list as indented YAML items', () => {
+    const yaml = buildReportFrontmatter(base)
+    expect(yaml).toContain('scope:')
+    expect(yaml).toContain("- 'https://example.com'")
+  })
+
+  it('emits sample entries as nested maps', () => {
+    const yaml = buildReportFrontmatter(base)
+    expect(yaml).toContain('- id: page-1')
+    expect(yaml).toContain('title: Homepage')
+    expect(yaml).toContain("url: 'https://example.com'")
+  })
+
+  it('omits scStatuses when empty', () => {
+    const yaml = buildReportFrontmatter(base)
+    expect(yaml).not.toContain('scStatuses:')
+  })
+
+  it('emits scStatuses when provided', () => {
+    const yaml = buildReportFrontmatter({
+      ...base,
+      scStatuses: { '1.2.1': 'passed', '1.2.2': 'not-present' }
+    })
+    expect(yaml).toContain('scStatuses:')
+    expect(yaml).toContain('1.2.1: passed')
+    expect(yaml).toContain('1.2.2: not-present')
+  })
+
+  it('produces empty-list placeholder for empty arrays', () => {
+    const yaml = buildReportFrontmatter({ ...base, scope: [], technologies: [] })
+    expect(yaml).toContain('scope:\n  []')
+    expect(yaml).toContain('technologies:\n  []')
   })
 })

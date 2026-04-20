@@ -6,7 +6,12 @@ export default {
     noReports: 'Geen rapporten gevonden',
     gridView: 'Rasterweergave',
     tableView: 'Tabelweergave',
-    columns: 'Kolommen'
+    columns: 'Kolommen',
+    importEvaluation: 'Onderzoek importeren',
+    importSuccess: 'Onderzoek geïmporteerd',
+    importSuccessDetail: '{issues} issue(s) aangemaakt.',
+    importWithWarnings: '{issues} issue(s) aangemaakt met {count} waarschuwing(en).',
+    importFailed: 'Importeren mislukt'
   },
   report: {
     accessibilityConformanceReportFor: 'Toegankelijkheidsrapport voor {title}',
@@ -111,6 +116,8 @@ export default {
       }
     },
     downloadPdf: 'Download PDF',
+    exportEarl: 'Exporteer EARL',
+    importIssues: 'Issues importeren',
     searchReports: 'Zoek rapporten...'
   },
   share: {

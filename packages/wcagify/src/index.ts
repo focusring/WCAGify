@@ -17,7 +17,12 @@ export {
 } from './issues'
 export { resolveSamplePage } from './report'
 export { defineWcagifyConfig } from './config'
-export { toSlug, buildIssueFrontmatter, escapeYamlValue } from './content-utils'
+export {
+  toSlug,
+  buildIssueFrontmatter,
+  buildReportFrontmatter,
+  escapeYamlValue
+} from './content-utils'
 export type {
   WcagVersion,
   Language,

@@ -1,0 +1,75 @@
+const EARL_CONTEXT_URL = 'https://www.w3.org/WAI/content-assets/wcag-act-rules/earl-context.json'
+
+const HYBRID_CONTEXT = {
+  dcterms: 'http://purl.org/dc/terms/',
+  earl: 'http://www.w3.org/ns/earl#',
+  wcagem: 'http://www.w3.org/TR/WCAG-EM/#',
+  WCAG: 'http://www.w3.org/TR/WCAG/#',
+  WCAG2: 'https://www.w3.org/TR/WCAG22/#',
+  WAI: 'http://www.w3.org/WAI/',
+  wcagify: 'https://wcagify.dev/ns#',
+
+  title: 'dcterms:title',
+  description: 'dcterms:description',
+  summary: 'dcterms:summary',
+  hasPart: 'dcterms:hasPart',
+  isPartOf: 'dcterms:isPartOf',
+  date: { '@id': 'dcterms:date', '@type': 'http://www.w3.org/TR/NOTE-datetime' },
+
+  language: '@language',
+  id: '@id',
+  type: '@type',
+
+  Evaluation: 'wcagem:procedure',
+  defineScope: 'wcagem:step1',
+  scope: 'wcagem:step1a',
+  conformanceTarget: { '@id': 'wcagem:step1b', '@type': '@id' },
+  accessibilitySupportBaseline: 'wcagem:step1c',
+  additionalEvaluationRequirements: 'wcagem:step1d',
+  exploreTarget: 'wcagem:step2',
+  essentialFunctionality: 'wcagem:step2b',
+  pageTypeVariety: 'wcagem:step2c',
+  technologiesReliedUpon: 'wcagem:step2d',
+  selectSample: 'wcagem:step3',
+  structuredSample: 'wcagem:step3a',
+  randomSample: 'wcagem:step3b',
+  auditSample: 'wcagem:step4',
+  reportFindings: 'wcagem:step5',
+  documentSteps: 'wcagem:step5a',
+  commissioner: 'wcagem:commissioner',
+  evaluator: 'wcagem:evaluator',
+  evaluationSpecifics: 'wcagem:step5b',
+  wcagVersion: 'WAI:standards-guidelines/wcag/#versions',
+  reportToolVersion: 'wcagem:reportToolVersion',
+
+  A: 'WAI:WCAG2A-Conformance',
+  AA: 'WAI:WCAG2AA-Conformance',
+  AAA: 'WAI:WCAG2AAA-Conformance',
+
+  Website: 'wcagem:website',
+  Webpage: 'wcagem:webpage',
+
+  Assertion: 'earl:Assertion',
+  Assertor: 'earl:Assertor',
+  TestSubject: 'earl:TestSubject',
+  TestCriterion: 'earl:TestCriterion',
+  TestCase: 'earl:TestCase',
+  TestRequirement: 'earl:TestRequirement',
+  TestResult: 'earl:TestResult',
+  TestMode: 'earl:TestMode',
+  OutcomeValue: 'earl:OutcomeValue',
+  Pass: 'earl:Pass',
+  Fail: 'earl:Fail',
+  CannotTell: 'earl:CannotTell',
+  NotApplicable: 'earl:NotApplicable',
+  NotTested: 'earl:NotTested',
+
+  assertedBy: 'earl:assertedBy',
+  mode: 'earl:mode',
+  result: 'earl:result',
+  subject: 'earl:subject',
+  test: 'earl:test',
+  outcome: 'earl:outcome'
+}
+
+export { EARL_CONTEXT_URL, HYBRID_CONTEXT }

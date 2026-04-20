@@ -21,6 +21,7 @@ export default defineConfig({
     'max-lines-per-function': 'off',
     'unicorn/filename-case': 'off',
     'no-duplicate-imports': 'off',
+    'import/no-anonymous-default-export': 'off',
     'import/no-named-export': 'off',
     'import/no-nodejs-modules': 'off',
     'import/prefer-default-export': 'off',

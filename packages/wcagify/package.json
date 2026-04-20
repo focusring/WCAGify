@@ -53,6 +53,11 @@
       "import": "./dist/pdf/index.js",
       "default": "./src/pdf/index.ts"
     },
+    "./earl": {
+      "types": "./dist/earl/index.d.ts",
+      "import": "./dist/earl/index.js",
+      "default": "./src/earl/index.ts"
+    },
     "./locales/en": "./locales/en.ts",
     "./locales/nl": "./locales/nl.ts",
     "./print.css": "./print.css",

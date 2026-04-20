@@ -95,6 +95,15 @@ async function downloadPdf() {
     isGeneratingPdf.value = false
   }
 }
+
+function downloadEarl() {
+  const link = document.createElement('a')
+  link.href = `/api/exports/share/${token}`
+  link.download = `${report.value?.title ?? 'report'}-evaluation.json`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 </script>
 
 <template>
@@ -131,6 +140,12 @@ async function downloadPdf() {
 
   <ReportContent v-else-if="report" :report="report" :issues="issues">
     <template #actions>
+      <UButton
+        :label="t('report.exportEarl')"
+        icon="i-lucide-file-json"
+        variant="outline"
+        @click="downloadEarl"
+      />
       <UButton
         :label="t('report.downloadPdf')"
         icon="i-lucide-download"

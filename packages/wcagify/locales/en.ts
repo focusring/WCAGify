@@ -6,7 +6,12 @@ export default {
     noReports: 'No reports found',
     gridView: 'Grid view',
     tableView: 'Table view',
-    columns: 'Columns'
+    columns: 'Columns',
+    importEvaluation: 'Import evaluation',
+    importSuccess: 'Evaluation imported',
+    importSuccessDetail: 'Created {issues} issue(s).',
+    importWithWarnings: 'Created {issues} issue(s) with {count} warning(s).',
+    importFailed: 'Import failed'
   },
   report: {
     accessibilityConformanceReportFor: 'Accessibility Conformance Report for {title}',
@@ -108,6 +113,8 @@ export default {
       }
     },
     downloadPdf: 'Download PDF',
+    exportEarl: 'Export EARL',
+    importIssues: 'Import issues',
     searchReports: 'Search reports...'
   },
   share: {

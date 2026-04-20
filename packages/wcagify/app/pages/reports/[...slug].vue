@@ -41,7 +41,73 @@ async function downloadPdf() {
   }
 }
 
+function downloadEarl() {
+  const link = document.createElement('a')
+  link.href = `/api/exports${reportPath.value}`
+  link.download = `${report.value?.title ?? 'report'}-evaluation.json`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 const shareOpen = ref(false)
+
+const importIssuesInput = useTemplateRef<HTMLInputElement>('importIssuesInput')
+const importingIssues = ref(false)
+const toast = useToast()
+const { t } = useI18n()
+
+interface ImportResponse {
+  success: boolean
+  mode: 'create' | 'merge'
+  issueCount: number
+  warnings: { code: string; message: string }[]
+}
+
+async function onImportIssuesFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  const slug = (route.params.slug as string[]).join('/')
+  importingIssues.value = true
+  try {
+    const text = await file.text()
+    const response = await $fetch<ImportResponse>(
+      `/api/reports/import?target=${encodeURIComponent(slug)}`,
+      {
+        method: 'POST',
+        body: text,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    toast.add({
+      title: t('app.importSuccess'),
+      description:
+        response.warnings.length > 0
+          ? t('app.importWithWarnings', {
+              count: response.warnings.length,
+              issues: response.issueCount
+            })
+          : t('app.importSuccessDetail', { issues: response.issueCount }),
+      color: response.warnings.length > 0 ? 'warning' : 'success'
+    })
+    await reloadNuxtApp({ path: reportPath.value })
+  } catch (error: unknown) {
+    const message =
+      (error as { data?: { statusMessage?: string }; statusMessage?: string }).data
+        ?.statusMessage ??
+      (error as { statusMessage?: string }).statusMessage ??
+      (error as Error).message
+    toast.add({ title: t('app.importFailed'), description: message, color: 'error' })
+  } finally {
+    importingIssues.value = false
+    input.value = ''
+  }
+}
+
+function triggerIssuesImport() {
+  importIssuesInput.value?.click()
+}
 
 const reportContentRef = ref<{ visiblePrinciples: Set<string> }>()
 const visiblePrinciples = computed(
@@ -59,6 +125,27 @@ const visiblePrinciples = computed(
             icon="i-lucide-share-2"
             variant="outline"
             @click="shareOpen = true"
+          />
+          <UButton
+            :label="$t('report.importIssues')"
+            icon="i-lucide-upload"
+            variant="outline"
+            :loading="importingIssues"
+            :disabled="importingIssues"
+            @click="triggerIssuesImport"
+          />
+          <input
+            ref="importIssuesInput"
+            type="file"
+            accept=".json,.jsonld,application/json,application/ld+json"
+            class="sr-only"
+            @change="onImportIssuesFileChange"
+          />
+          <UButton
+            :label="$t('report.exportEarl')"
+            icon="i-lucide-file-json"
+            variant="outline"
+            @click="downloadEarl"
           />
           <UButton
             :label="$t('report.downloadPdf')"
