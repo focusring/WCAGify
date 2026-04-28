@@ -230,6 +230,26 @@
   @apply text-slate-600 dark:text-slate-400;
 }
 
+.collapsible-enter-active {
+  display: grid !important;
+  transition: grid-template-rows 0.2s ease-out;
+}
+
+.collapsible-leave-active {
+  display: grid !important;
+  transition: grid-template-rows 0.2s ease-in;
+}
+
+.collapsible-enter-from,
+.collapsible-leave-to {
+  grid-template-rows: 0fr;
+}
+
+.collapsible-enter-to,
+.collapsible-leave-from {
+  grid-template-rows: 1fr;
+}
+
 .icon-animation {
   @apply group-data-[state=open]:rotate-180 transition-transform duration-200;
 }

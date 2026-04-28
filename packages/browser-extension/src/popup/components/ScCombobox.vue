@@ -39,10 +39,12 @@ const items = computed(() =>
   }))
 )
 
-const selectedItem = computed(() => items.value.find((item) => item.value === model.value) ?? null)
+const selectedItem = computed(
+  () => items.value.find((item) => item.value === model.value) ?? undefined
+)
 
 function levelLabel(level: WcagLevel) {
-  return `${t('form.wcagLevel')} ${level}`
+  return `${t('form.sc.level')} ${level}`
 }
 
 const isOpen = ref(false)
@@ -64,6 +66,7 @@ watch(isOpen, async (open, _, onCleanup) => {
     }
   } else {
     document.removeEventListener('keydown', onTabKeydown)
+    await nextTick()
     const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
     if (focusScope) {
       focusScope.removeAttribute('role')
@@ -84,17 +87,17 @@ watch(isOpen, async (open, _, onCleanup) => {
       value-key="value"
       searchable
       :search-input="{
-        placeholder: t('form.scSearch'),
+        placeholder: t('form.sc.search'),
         leadingIcon: 'i-lucide-search',
         ui: { base: 'ps-13 mx-1.5 py-2 selectable-focus' }
       }"
       :placeholder="placeholder"
       :aria-label="
         selectedItem
-          ? `${t('form.scLabel')}: ${levelLabel(selectedItem.level)} ${selectedItem.sc}, ${selectedItem.name}`
+          ? `${t('form.sc.ariaLabel')}: ${levelLabel(selectedItem.level)} ${selectedItem.sc}, ${selectedItem.name}`
           : placeholder
-            ? `${t('form.scLabel')}, ${placeholder}`
-            : t('form.scLabel')
+            ? `${t('form.sc.ariaLabel')}, ${placeholder}`
+            : t('form.sc.ariaLabel')
       "
       :ui="{
         base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5 selectable-focus',
@@ -143,7 +146,7 @@ watch(isOpen, async (open, _, onCleanup) => {
         />
       </template>
       <template #empty>
-        {{ t('form.noResults') }}
+        {{ t('form.sc.noResults') }}
       </template>
     </USelectMenu>
     <UButton
@@ -155,7 +158,7 @@ watch(isOpen, async (open, _, onCleanup) => {
       variant="ghost"
       size="xs"
       icon="i-lucide-x"
-      :aria-label="t('form.clearSc')"
+      :aria-label="t('form.sc.clear')"
       :ui="{ base: 'selectable-focus cursor-pointer absolute end-8 top-1/2 -translate-y-1/2' }"
       @pointerdown.stop
       @click.stop="model = ''"

@@ -23,6 +23,7 @@ watch(isOpen, async (open, _, onCleanup) => {
     }
   } else {
     document.removeEventListener('keydown', onTabKeydown)
+    await nextTick()
     const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
     if (focusScope) {
       focusScope.removeAttribute('role')
@@ -35,6 +36,7 @@ const props = withDefaults(
   defineProps<{
     id?: string
     label?: string
+    ariaDescribedby?: string
     items: { label: string; value: string }[]
     valueKey?: keyof { label: string; value: string }
     placeholder?: string
@@ -45,7 +47,8 @@ const props = withDefaults(
     valueKey: 'value',
     required: false,
     clearLabel: undefined,
-    label: undefined
+    label: undefined,
+    ariaDescribedby: undefined
   }
 )
 
@@ -77,15 +80,15 @@ const triggerAriaLabel = computed(() => {
       :ui="{
         placeholder: 'text-muted',
         item: 'cursor-pointer selectable-focus',
-        base: 'pe-14',
+        base: 'pe-14 cursor-pointer w-full selectable-focus py-2',
         content: 'z-50'
       }"
       :portal="false"
       :required="required"
       :aria-label="triggerAriaLabel"
+      :aria-describedby="ariaDescribedby"
       :aria-required="required ? 'true' : undefined"
       variant="subtle"
-      class="w-full cursor-pointer selectable-focus py-2"
     >
       <template #trailing>
         <UIcon name="i-lucide-chevron-down" class="text-muted size-5 icon-animation" />
