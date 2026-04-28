@@ -5,13 +5,16 @@ type DeepStringify<T> = {
   [K in keyof T]: T[K] extends Record<string, unknown> ? DeepStringify<T[K]> : string
 }
 
-export type Messages = DeepStringify<typeof en>
-export type Locale = 'en' | 'nl'
+type Messages = DeepStringify<typeof en>
+type Locale = 'en' | 'nl'
 
-export const messages: Record<Locale, Messages> = { en, nl }
-export const supportedLocales = Object.keys(messages) as Locale[]
+const messages: Record<Locale, Messages> = { en, nl }
+const supportedLocales = Object.keys(messages) as Locale[]
 
-export const localeLabels: Record<Locale, string> = {
+const localeLabels: Record<Locale, string> = {
   en: 'English',
   nl: 'Nederlands'
 }
+
+export { messages, supportedLocales, localeLabels }
+export type { Messages, Locale }

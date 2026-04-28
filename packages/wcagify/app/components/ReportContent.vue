@@ -48,11 +48,11 @@ function toggleFilter(status: Status) {
 
 const isFiltering = computed(() => activeFilters.value.size < allStatuses.length)
 
-const emptyFilterStatus = computed<Status | null>(() => {
-  if (!isFiltering.value) return null
+const emptyFilterStatus = computed<Status | undefined>(() => {
+  if (!isFiltering.value) return
   const [status] = [...activeFilters.value] as Status[]
-  if (status === undefined) return null
-  return statusCounts.value[status] === 0 ? status : null
+  if (status === undefined) return
+  return statusCounts.value[status] === 0 ? status : undefined
 })
 
 provide('statusFilters', activeFilters)

@@ -4,12 +4,14 @@ import sharp from 'sharp'
 
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp'])
 
+/* eslint-disable unicorn/number-literal-case -- oxfmt enforces lowercase hex; keep consistent with formatter */
 const MAGIC_BYTES: Record<string, number[][]> = {
   'image/png': [[0x89, 0x50, 0x4e, 0x47]],
   'image/jpeg': [[0xff, 0xd8, 0xff]],
   'image/gif': [[0x47, 0x49, 0x46, 0x38]],
   'image/webp': [[0x52, 0x49, 0x46, 0x46]] // RIFF header
 }
+/* eslint-enable unicorn/number-literal-case */
 
 function validateMagicBytes(data: Buffer, mime: string): boolean {
   const signatures = MAGIC_BYTES[mime]

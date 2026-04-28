@@ -2,14 +2,10 @@
 import { computed, ref, onMounted, nextTick, useTemplateRef } from 'vue'
 import { useColorMode } from '../../composables/useColorMode'
 import { useI18n } from '../../composables/useI18n'
-import {
-  ACCENT_COLORS,
-  NEUTRAL_COLORS,
-  useSettings,
-  type AccentColor,
-  type NeutralColor
-} from '../../composables/useSettings'
-import { localeLabels, type Locale } from '../../i18n'
+import { ACCENT_COLORS, NEUTRAL_COLORS, useSettings } from '../../composables/useSettings'
+import type { AccentColor, NeutralColor } from '../../composables/useSettings'
+import { localeLabels } from '../../i18n'
+import type { Locale } from '../../i18n'
 import logoSvg from '../../assets/wcagify-icon.svg'
 import ConnectionSettings from './ConnectionSettings.vue'
 import SettingsColorPicker from './SettingsColorPicker.vue'
@@ -74,14 +70,12 @@ const neutralColorSwatches = NEUTRAL_COLORS.map((name) => ({
 }))
 
 function setAccentColor(val: string | undefined) {
-  if (val && (ACCENT_COLORS as readonly string[]).includes(val))
-    accentColor.value = val as AccentColor
-  else accentColor.value = 'green'
+  accentColor.value =
+    val && (ACCENT_COLORS as readonly string[]).includes(val) ? (val as AccentColor) : 'green'
 }
 function setNeutralColor(val: string | undefined) {
-  if (val && (NEUTRAL_COLORS as readonly string[]).includes(val))
-    neutralColor.value = val as NeutralColor
-  else neutralColor.value = 'slate'
+  neutralColor.value =
+    val && (NEUTRAL_COLORS as readonly string[]).includes(val) ? (val as NeutralColor) : 'slate'
 }
 </script>
 

@@ -214,7 +214,7 @@ const tabs: Tab[] = [
   { id: 'markdown', labelKey: 'tabMarkdown' }
 ]
 
-const DURATIONS = [8000, 8000, 8000, 10000]
+const DURATIONS = [8000, 8000, 8000, 10_000]
 const activeIndex = ref(0)
 const progress = ref(0)
 const paused = ref(false)
@@ -286,7 +286,7 @@ function onTabKeydown(event: KeyboardEvent) {
   tab?.focus()
 }
 
-const panelsEl = ref<HTMLElement | null>(null)
+const panelsEl = ref<HTMLElement>()
 
 watch(activeIndex, () => {
   const el = panelsEl.value

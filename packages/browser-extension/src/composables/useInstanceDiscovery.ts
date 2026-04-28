@@ -8,7 +8,7 @@ const instanceSettingsSchema = z.object({
   locale: z.string()
 })
 
-export type InstanceSettings = z.infer<typeof instanceSettingsSchema>
+type InstanceSettings = z.infer<typeof instanceSettingsSchema>
 
 interface DiscoveredInstance {
   url: string
@@ -36,7 +36,7 @@ async function probePort(
     const count = reports.length
     const label = count === 1 ? `${url} (1 report)` : `${url} (${count} reports)`
 
-    let settings: InstanceSettings | undefined
+    let settings: InstanceSettings | undefined = undefined
     try {
       const settingsRes = await fetch(`${url}/api/settings`, { signal })
       if (settingsRes.ok) {
@@ -56,8 +56,8 @@ async function probePort(
 // Singleton state — shared across all callers
 const instances = ref<DiscoveredInstance[]>([])
 const scanStatus = ref<'idle' | 'scanning' | 'done'>('idle')
-let abortController: AbortController | undefined
-let scanningPromise: Promise<void> | undefined
+let abortController: AbortController | undefined = undefined
+let scanningPromise: Promise<void> | undefined = undefined
 
 function scan(): Promise<void> {
   // Reuse the in-flight scan so concurrent callers don't cancel each other.
@@ -90,6 +90,9 @@ function abort() {
   scanningPromise = undefined
 }
 
-export function useInstanceDiscovery() {
+function useInstanceDiscovery() {
   return { instances, scanStatus, scan, abort }
 }
+
+export { useInstanceDiscovery }
+export type { InstanceSettings }

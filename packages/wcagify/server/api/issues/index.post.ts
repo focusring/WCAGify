@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
     await mkdir(reportUploadsDir, { recursive: true })
 
-    const moves: Array<{ oldUrl: string; newUrl: string; oldPath: string; newPath: string }> = []
+    const moves: { oldUrl: string; newUrl: string; oldPath: string; newPath: string }[] = []
 
     for (const match of finalDescription.matchAll(UPLOAD_URL_RE)) {
       const oldFilename = match[1]!
@@ -92,11 +92,11 @@ export default defineEventHandler(async (event) => {
     try {
       await writeFile(filepath, content, { encoding: 'utf8', flag: 'wx' })
       break
-    } catch (err: unknown) {
+    } catch (error: unknown) {
       if (
-        err instanceof Error &&
-        'code' in err &&
-        (err as NodeJS.ErrnoException).code === 'EEXIST'
+        error instanceof Error &&
+        'code' in error &&
+        (error as NodeJS.ErrnoException).code === 'EEXIST'
       ) {
         counter++
         if (counter > MAX_COLLISIONS) {
@@ -108,7 +108,7 @@ export default defineEventHandler(async (event) => {
         filename = `${slug}-${counter}.md`
         filepath = join(reportDir, filename)
       } else {
-        throw err
+        throw error
       }
     }
   }

@@ -6,7 +6,7 @@ const preference = ref<ColorMode>('system')
 let initialized = false
 
 function getSystemDark(): boolean {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
+  return globalThis.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
 function apply(pref: ColorMode) {
@@ -23,7 +23,7 @@ export function useColorMode() {
       apply(preference.value)
     })
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (preference.value === 'system') apply('system')
     })
 

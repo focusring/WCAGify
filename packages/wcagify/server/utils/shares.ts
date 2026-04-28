@@ -53,8 +53,8 @@ const migrations: Migration[] = [
   }
 ]
 
-let db: DbAdapter | undefined
-let dbInit: Promise<DbAdapter> | undefined
+let db: DbAdapter | undefined = undefined
+let dbInit: Promise<DbAdapter> | undefined = undefined
 
 async function getDb(): Promise<DbAdapter> {
   if (db) return db
@@ -130,7 +130,9 @@ async function createShare(
     token,
     report_slug: reportSlug,
     created_at: new Date().toISOString(),
+    // eslint-disable-next-line unicorn/no-null -- ShareRow columns mirror SQL NULL values
     expires_at: normalizedExpiry ?? null,
+    // eslint-disable-next-line unicorn/no-null -- ShareRow columns mirror SQL NULL values
     password_hash: passwordHash ?? null,
     delete_token: deleteToken
   })

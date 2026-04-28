@@ -5,7 +5,7 @@ import { useSettings } from '../composables/useSettings'
 import logoSvg from '../assets/wcagify-icon.svg'
 import ClearableSelect from './components/ClearableSelect.vue'
 import ConnectionSettings from './components/ConnectionSettings.vue'
-import ElementPicker from './components/ElementPicker.vue'
+import type ElementPicker from './components/ElementPicker.vue'
 import IssueForm from './components/IssueForm.vue'
 import SettingsPage from './components/SettingsPage.vue'
 

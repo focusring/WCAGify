@@ -1,5 +1,3 @@
-export {}
-
 // Set toolbar icon based on browser color scheme
 function updateIcon(isDark: boolean) {
   const prefix = isDark ? 'light' : 'dark'
@@ -12,8 +10,8 @@ function updateIcon(isDark: boolean) {
 }
 
 // Listen for color scheme changes
-if (self.matchMedia) {
-  const mq = self.matchMedia('(prefers-color-scheme: dark)')
+if (globalThis.matchMedia) {
+  const mq = globalThis.matchMedia('(prefers-color-scheme: dark)')
   updateIcon(mq.matches)
   mq.addEventListener('change', (e) => updateIcon(e.matches))
 }

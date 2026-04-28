@@ -72,12 +72,15 @@ function toggleFieldVisibility(id: string, visible: boolean) {
 
 function getAccessor(report: ReportsCollectionItem, field: string): string {
   switch (field) {
-    case 'title':
+    case 'title': {
       return report.title
-    case 'evaluation_date':
+    }
+    case 'evaluation_date': {
       return report.evaluation.date
-    default:
+    }
+    default: {
       return ''
+    }
   }
 }
 
@@ -97,7 +100,7 @@ const filteredAndSortedReports = computed(() => {
 
   const field = sortField.value
   const desc = sortDesc.value
-  return [...result].sort((a, b) => {
+  return [...result].toSorted((a, b) => {
     const aVal = getAccessor(a, field)
     const bVal = getAccessor(b, field)
     const cmp = aVal.localeCompare(bVal)

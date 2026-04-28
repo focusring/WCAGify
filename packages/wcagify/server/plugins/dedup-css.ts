@@ -21,8 +21,8 @@ function normalizeCssHref(href: string): string {
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('render:html', (html) => {
     // Deduplicate CSS <link> tags — Nuxt's Vite dev renderer can produce
-    // duplicate stylesheet links when a Nuxt layer resolves via both a
-    // bare node_modules path and the fully-resolved absolute path.
+    // Duplicate stylesheet links when a Nuxt layer resolves via both a
+    // Bare node_modules path and the fully-resolved absolute path.
     const seen = new Set<string>()
     html.head = html.head.map((chunk: string) =>
       chunk.replace(
@@ -39,8 +39,8 @@ export default defineNitroPlugin((nitroApp) => {
     // Prevent FOUC: hide the page until CSS is actually applied.
     // In Vite dev mode, <link rel="stylesheet"> tags load JS modules that call
     // __vite__updateStyle() to inject <style> tags — the link's `load` event fires
-    // when the JS is received, BEFORE styles are in the DOM. In production, CSS is
-    // inlined or loaded as real stylesheets, so the `load` event works.
+    // When the JS is received, BEFORE styles are in the DOM. In production, CSS is
+    // Inlined or loaded as real stylesheets, so the `load` event works.
     // We use a two-pronged approach:
     //   1. Watch for Tailwind's marker (--font-sans) via getComputedStyle
     //   2. Safety timeout so the page is never hidden indefinitely

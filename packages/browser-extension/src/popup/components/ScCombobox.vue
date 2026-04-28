@@ -39,7 +39,7 @@ const items = computed(() =>
   }))
 )
 
-const selectedItem = computed(() => items.value.find((item) => item.value === model.value) ?? null)
+const selectedItem = computed(() => items.value.find((item) => item.value === model.value))
 
 function levelLabel(level: WcagLevel) {
   return `${t('form.wcagLevel')} ${level}`

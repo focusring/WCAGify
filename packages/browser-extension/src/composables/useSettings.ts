@@ -7,11 +7,11 @@ import { useInstanceDiscovery } from './useInstanceDiscovery'
 import type { InstanceSettings } from './useInstanceDiscovery'
 import { useI18n } from './useI18n'
 
-export const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet'] as const
-export const NEUTRAL_COLORS = ['slate', 'gray', 'zinc', 'neutral', 'stone'] as const
+const ACCENT_COLORS = ['green', 'blue', 'red', 'orange', 'teal', 'indigo', 'violet'] as const
+const NEUTRAL_COLORS = ['slate', 'gray', 'zinc', 'neutral', 'stone'] as const
 
-export type AccentColor = (typeof ACCENT_COLORS)[number]
-export type NeutralColor = (typeof NEUTRAL_COLORS)[number]
+type AccentColor = (typeof ACCENT_COLORS)[number]
+type NeutralColor = (typeof NEUTRAL_COLORS)[number]
 
 const settingsSchema = z.object({
   wcagifyUrl: z.string().url('wcagifyUrl must be a valid URL').optional(),
@@ -76,7 +76,7 @@ watch(scanStatus, (val) => {
 })
 
 let ready = false
-let loadPromise: Promise<void> | null = null
+let loadPromise: Promise<void> | undefined = undefined
 
 async function doLoad() {
   const parsed = settingsSchema.safeParse(
@@ -124,7 +124,7 @@ watch(neutralColor, (val) => {
   }
 })
 
-export function useSettings() {
+function useSettings() {
   load()
   return {
     wcagifyUrl,
@@ -136,3 +136,6 @@ export function useSettings() {
     applyInstanceSettings
   }
 }
+
+export { ACCENT_COLORS, NEUTRAL_COLORS, useSettings }
+export type { AccentColor, NeutralColor }

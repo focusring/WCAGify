@@ -30,15 +30,15 @@ const ImageUpload = Node.create({
     return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'image-upload' })]
   },
   addNodeView(): NodeViewRenderer {
+    // eslint-disable-next-line new-cap -- VueNodeViewRenderer is a factory from @tiptap/vue-3
     return VueNodeViewRenderer(ImageUploadNodeComponent)
   },
   addCommands() {
     return {
       insertImageUpload:
         () =>
-        ({ commands }: CommandProps) => {
-          return commands.insertContent({ type: this.name })
-        }
+        ({ commands }: CommandProps) =>
+          commands.insertContent({ type: this.name })
     }
   }
 })

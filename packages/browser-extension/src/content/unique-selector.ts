@@ -43,7 +43,7 @@ interface SelectorData {
 }
 
 function escapeAttribute(str: string): string {
-  return str.replace(/([\\"])/g, '\\$1').replace(/(\r\n|\r|\n)/g, '\\a ')
+  return str.replace(/([\\"])/g, String.raw`\$1`).replace(/(\r\n|\r|\n)/g, String.raw`\a `)
 }
 
 function filterAttribute(attr: Attr): boolean {
@@ -55,7 +55,7 @@ function filterAttribute(attr: Attr): boolean {
 }
 
 function getAttributeNameValue(node: Element, attr: Attr): string | null {
-  const name = attr.name
+  const { name } = attr
 
   if (name.includes('href') || name.includes('src')) {
     const value = node.getAttribute(name) ?? ''
@@ -73,19 +73,21 @@ function getAttributeNameValue(node: Element, attr: Attr): string | null {
  * Extract the last meaningful segment of a URI for use in selectors.
  * Returns the filename or last path segment, trimming query strings and fragments.
  */
-function getFriendlyUriEnd(uri: string): string | null {
-  if (!uri) return null
+function getFriendlyUriEnd(uri: string): string | undefined {
+  if (!uri) return
 
   const index = uri.indexOf('?')
   const noQuery = index !== -1 ? uri.substring(0, index) : uri
   const path = noQuery.split('/').pop() ?? ''
 
-  if (!path || path.length > MAX_ATTRIBUTE_LENGTH) return null
+  if (!path || path.length > MAX_ATTRIBUTE_LENGTH) return
   return path
 }
 
 function countSort(a: Feature, b: Feature): number {
-  return a.count < b.count ? -1 : a.count === b.count ? 0 : 1
+  if (a.count < b.count) return -1
+  if (a.count > b.count) return 1
+  return 0
 }
 
 /**
@@ -141,7 +143,7 @@ function uncommonClasses(node: Element, selectorData: SelectorData): Feature[] {
     }
   }
 
-  return result.sort(countSort)
+  return result.toSorted(countSort)
 }
 
 function uncommonAttributes(node: Element, selectorData: SelectorData): Feature[] {
@@ -161,7 +163,7 @@ function uncommonAttributes(node: Element, selectorData: SelectorData): Feature[
     }
   }
 
-  return result.sort(countSort)
+  return result.toSorted(countSort)
 }
 
 function getBaseSelector(elm: Element): string {
@@ -182,7 +184,7 @@ function getElmId(elm: Element): string | undefined {
 }
 
 function getNthChildString(elm: Element, selector: string): string {
-  const siblings = elm.parentNode ? Array.from(elm.parentNode.children) : []
+  const siblings = elm.parentNode ? [...elm.parentNode.children] : []
 
   const hasMatchingSibling = siblings.some(
     (sibling) => sibling !== elm && sibling.matches(selector)
@@ -199,11 +201,11 @@ function getNthChildString(elm: Element, selector: string): string {
  * Follows axe-core's strategy: unique class > unique attribute > three least common.
  */
 function getThreeLeastCommonFeatures(elm: Element, selectorData: SelectorData): string {
-  let selector = ''
-  let features: Feature[]
-
   const clss = uncommonClasses(elm, selectorData)
   const atts = uncommonAttributes(elm, selectorData)
+
+  let selector = ''
+  let features: Feature[] = []
 
   if (clss.length && clss[0]!.count === 1) {
     features = [clss[0]!]
@@ -211,15 +213,16 @@ function getThreeLeastCommonFeatures(elm: Element, selectorData: SelectorData): 
     features = [atts[0]!]
     selector = getBaseSelector(elm)
   } else {
-    features = clss.concat(atts).sort(countSort).slice(0, 3)
+    features = [...clss, ...atts].toSorted(countSort).slice(0, 3)
 
-    if (!features.some((f) => f.species === 'class')) {
-      selector = getBaseSelector(elm)
-    } else {
+    if (features.some((f) => f.species === 'class')) {
       // Classes before attributes
-      features.sort((a, b) =>
-        a.species !== b.species && a.species === 'class' ? -1 : a.species === b.species ? 0 : 1
-      )
+      features.sort((a, b) => {
+        if (a.species === b.species) return 0
+        return a.species === 'class' ? -1 : 1
+      })
+    } else {
+      selector = getBaseSelector(elm)
     }
   }
 
@@ -241,7 +244,7 @@ function generateSelector(
   selectorData: SelectorData
 ): string {
   let selector = ''
-  let similar: Element[] | null = null
+  let similar: Element[] | undefined = undefined
   let current: Element | null = elm
 
   do {
@@ -253,11 +256,10 @@ function generateSelector(
 
     selector = selector ? `${features} > ${selector}` : features
 
-    if (!similar || similar.length > SIMILAR_FILTER_LIMIT) {
-      similar = Array.from(doc.querySelectorAll(selector))
-    } else {
-      similar = similar.filter((item) => item.matches(selector))
-    }
+    similar =
+      !similar || similar.length > SIMILAR_FILTER_LIMIT
+        ? [...doc.querySelectorAll(selector)]
+        : similar.filter((item) => item.matches(selector))
 
     current = current.parentElement
   } while (similar.length > 1 && current && current.nodeType !== 11)
@@ -297,7 +299,7 @@ export function getUniqueSelector(el: Element): string | string[] {
   }
 
   // Shadow DOM — collect selectors per shadow boundary
-  const stack: Array<{ elm: Element; doc: Document | ShadowRoot }> = []
+  const stack: { elm: Element; doc: Document | ShadowRoot }[] = []
   let current: Element = el
 
   while (doc.nodeType === 11) {

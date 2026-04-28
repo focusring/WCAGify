@@ -14,9 +14,9 @@ const pickerStrings = {
 }
 
 let pickerLocale: 'en' | 'nl' = 'en'
-let activeOverlay: HTMLElement | null = null
-let infoPanel: HTMLElement | null = null
-let currentTarget: Element | null = null
+let activeOverlay: HTMLElement | undefined = undefined
+let infoPanel: HTMLElement | undefined = undefined
+let currentTarget: Element | undefined = undefined
 
 function injectStyles() {
   if (document.getElementById('wcagify-picker-styles')) return
@@ -138,10 +138,10 @@ function cleanup() {
   activeOverlay?.removeEventListener('mousemove', handleMouseMove)
   activeOverlay?.removeEventListener('click', handleClick)
   activeOverlay?.remove()
-  activeOverlay = null
+  activeOverlay = undefined
   infoPanel?.remove()
-  infoPanel = null
-  currentTarget = null
+  infoPanel = undefined
+  currentTarget = undefined
   document.removeEventListener('keydown', handleKeyDown)
 }
 
@@ -194,10 +194,9 @@ async function startPicker() {
 
   try {
     const result = await chrome.storage.local.get(['locale'])
-    if (result.locale === 'nl') pickerLocale = 'nl'
-    else pickerLocale = 'en'
+    pickerLocale = result.locale === 'nl' ? 'nl' : 'en'
   } catch {
-    /* default to en */
+    /* Default to en */
   }
 
   infoPanel = createInfoPanel()

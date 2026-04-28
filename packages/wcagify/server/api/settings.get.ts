@@ -13,10 +13,10 @@ export default defineEventHandler((event) => {
     try {
       const parsed = JSON.parse(settingsCookie)
       if (typeof parsed.accentColor === 'string' && ACCENT_COLORS.includes(parsed.accentColor)) {
-        accentColor = parsed.accentColor
+        ;({ accentColor } = parsed)
       }
       if (typeof parsed.neutralColor === 'string' && NEUTRAL_COLORS.includes(parsed.neutralColor)) {
-        neutralColor = parsed.neutralColor
+        ;({ neutralColor } = parsed)
       }
     } catch {
       // Ignore malformed cookie

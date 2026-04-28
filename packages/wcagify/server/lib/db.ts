@@ -11,8 +11,8 @@ interface DbAdapter {
   close(): void
 }
 
-// eslint-disable-next-line unicorn/no-null -- libsql requires null, not undefined
 const sanitizeParams = (params: unknown[]) =>
+  // eslint-disable-next-line unicorn/no-null -- libsql requires null, not undefined
   params.map((p) => (p === undefined ? null : p)) as InValue[]
 
 interface Executable {
