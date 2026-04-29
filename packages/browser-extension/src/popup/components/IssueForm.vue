@@ -69,10 +69,6 @@ const sampleModel = computed({
 const wcagVersion = computed(() => selectedReport.value?.wcagVersion ?? '2.2')
 const targetLevel = computed(() => selectedReport.value?.targetLevel ?? 'AA')
 
-watch(sc, () => {
-  scTouched.value = true
-})
-
 watch(
   samplePages,
   (pages) => {
@@ -161,6 +157,8 @@ async function submit() {
     title.value = ''
     description.value = ''
     sc.value = ''
+    titleTouched.value = false
+    scTouched.value = false
   } catch (error) {
     submitStatus.value = 'error'
     submitMessage.value = error instanceof Error ? error.message : t('form.submitIssue.issueFailed')
@@ -205,7 +203,7 @@ async function submit() {
 
         <ClearableSelect
           id="issue-sample"
-          aria-describedby="issue-sample-desc"
+          :aria-describedby="'issue-sample-desc'"
           v-model="sampleModel"
           :label="t('form.samplePage.label')"
           :items="samplePages.map((p) => ({ label: `${p.title} — ${p.url}`, value: p.id }))"
@@ -267,6 +265,7 @@ async function submit() {
             maxlength="200"
             required
             aria-required="true"
+            :aria-describedby="'issue-title-desc'"
             :placeholder="title ? undefined : t('form.issueTitle.placeholder')"
             :ui="{
               base: '[&::placeholder]:text-muted py-2 pe-8 text-sm hover:bg-accented/75 selectable-focus'
@@ -344,6 +343,8 @@ async function submit() {
           :target-level="targetLevel"
           required
           :placeholder="t('form.sc.placeholder')"
+          :aria-describedby="'issue-sc-desc'"
+          @update:model-value="scTouched = true"
         />
 
         <UButton
@@ -499,6 +500,7 @@ async function submit() {
           v-model="description"
           :placeholder="t('form.description.placeholder')"
           :label="t('form.description.label')"
+          :aria-describedby="'issue-description-desc'"
         />
 
         <UButton

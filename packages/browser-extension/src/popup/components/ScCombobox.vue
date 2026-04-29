@@ -10,6 +10,7 @@ const props = defineProps<{
   targetLevel: WcagLevel
   required?: boolean
   placeholder?: string
+  ariaDescribedby?: string
 }>()
 
 const model = defineModel<string>({ default: '' })
@@ -108,6 +109,7 @@ watch(isOpen, async (open, _, onCleanup) => {
       }"
       :portal="false"
       :required="required"
+      :aria-describedby="ariaDescribedby"
       variant="subtle"
       class="w-full cursor-pointer"
     >

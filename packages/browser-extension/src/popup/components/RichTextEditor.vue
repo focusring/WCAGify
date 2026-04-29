@@ -11,6 +11,7 @@ const model = defineModel<string>({ default: '' })
 defineProps<{
   placeholder?: string
   label?: string
+  ariaDescribedby?: string
 }>()
 
 const { t } = useI18n()
@@ -140,6 +141,7 @@ const suggestionItems = computed(
     :handlers="customHandlers"
     :placeholder="placeholder"
     :aria-label="label"
+    :aria-describedby="ariaDescribedby"
     :ui="{ base: 'px-3 py-2 min-h-32' }"
     class="bg-elevated hover:bg-accented/75 transition-colors duration-200 w-full rounded-md border input-border"
   >

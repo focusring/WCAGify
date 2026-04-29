@@ -52,7 +52,7 @@ The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends 
 - Default locale: `en`
 - Strategy: `no_prefix`
 - Locale files live in `packages/wcagify/locales/` (`.ts` files), registered via `nuxt.config.ts`
-- Use `$t('key')` in templates, `useI18n()` in scripts
+- Use `$t('key')` in templates, `useI18n()` in scripts (Nuxt layer only — `packages/wcagify/` and `playground/`; the browser extension uses a custom `useI18n()` with no global `$t`, so `t()` in templates is correct there)
 - Use `NuxtLinkLocale` for locale-aware internal links
 
 ## Conventions
