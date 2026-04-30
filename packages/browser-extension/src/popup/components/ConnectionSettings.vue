@@ -225,35 +225,38 @@ async function fetchReports() {
             <span aria-hidden="true">({{ t('connection.required') }})</span>
           </template>
           <div class="flex gap-2">
-            <UInput
-              id="wcagify-url"
-              v-model="wcagifyUrl"
-              type="url"
-              placeholder="http://localhost:3000"
-              required
-              size="lg"
-              aria-required="true"
-              :aria-invalid="status === 'error' ? true : undefined"
-              :aria-describedby="status === 'error' ? 'wcagify-url-error' : undefined"
-              :color="status === 'error' ? 'error' : 'success'"
-              :highlight="status === 'error'"
-              :ui="{ base: 'selectable-focus' }"
-              class="flex-1"
-            >
-              <template v-if="wcagifyUrl?.length" #trailing>
-                <UButton
-                  color="primary"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-lucide-x"
-                  :aria-label="t('form.clear')"
-                  :ui="{
-                    base: 'selectable-focus cursor-pointer'
-                  }"
-                  @click="clearUrl"
-                />
-              </template>
-            </UInput>
+            <div class="relative w-full">
+              <UInput
+                id="wcagify-url"
+                v-model="wcagifyUrl"
+                type="url"
+                placeholder="http://localhost:3000"
+                required
+                size="lg"
+                aria-required="true"
+                :aria-invalid="status === 'error' ? true : undefined"
+                :aria-describedby="status === 'error' ? 'wcagify-url-error' : undefined"
+                :color="status === 'error' ? 'error' : 'success'"
+                :highlight="status === 'error'"
+                :ui="{ base: 'selectable-focus pe-8' }"
+                class="w-full"
+              />
+              <UButton
+                v-if="wcagifyUrl"
+                color="primary"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-x"
+                :aria-label="t('settings.clear')"
+                :ui="{
+                  base: 'selectable-focus cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
+                }"
+                @pointerdown.stop
+                @click.stop="clearUrl"
+                @keydown.enter.stop="clearUrl"
+                @keydown.space.prevent.stop="clearUrl"
+              />
+            </div>
 
             <UButton
               type="submit"

@@ -38,42 +38,71 @@ export default {
     clickHint: 'Click to select · Esc to cancel'
   },
   form: {
-    issueTitle: 'Issue Title',
-    issueTitlePlaceholder: 'e.g. Dropdown not keyboard accessible',
-    sc: 'SC',
-    scLabel: 'Success Criteria',
-    scPlaceholder: 'e.g. 2.1.1 keyboard',
-    severity: 'Severity',
-    severityDescription: 'How severely the issue affects users',
-    samplePage: 'Sample Page',
-    selectPage: 'Select a page',
-    description: 'Description',
-    descriptionDescription: 'Optional context, steps to reproduce, or expected behavior',
-    descriptionPlaceholder: "Write, type '/' for commands...",
-    submit: 'Submit Issue',
-    submitting: 'Submitting...',
-    issueCreated: 'Issue created',
-    failedToCreate: 'Failed to create issue',
     required: 'required',
-    scSearch: 'Search Criteria...',
-    noResults: 'No matching criteria found',
     clear: 'Clear',
-    clearTitle: 'Clear Issue title',
-    clearSc: 'Clear Success Criteria',
-    clearPage: 'Clear Sample Page',
-    clearSeverity: 'Clear severity',
-    clearType: 'Clear type',
-    none: 'None',
-    low: 'Low',
-    medium: 'Medium',
-    high: 'High',
-    type: 'Type',
-    typeDescription: 'Root cause category of the accessibility issue',
-    content: 'Content',
-    design: 'Design',
-    technical: 'Technical',
-    unknown: 'Unknown',
-    wcagLevel: 'Level'
+    descBtnOpen: 'Show more information for',
+    descBtnClose: 'Hide information for',
+    descExpanded: 'Additional information expanded',
+    descCollapsed: 'Additional information collapsed',
+    samplePage: {
+      label: 'Sample Page',
+      placeholder: 'Select a page',
+      description:
+        'Choose from pages you have access to. The URL will be included in the report to help locate the issue.',
+      clear: 'Clear Sample Page Selection',
+      error: 'Please select one of the detected pages.'
+    },
+    issueTitle: {
+      label: 'Issue Title',
+      placeholder: 'e.g. Dropdown not keyboard accessible',
+      description:
+        'Add a concise title describing the accessibility issue. This will be used as the issue title in the report.',
+      clear: 'Clear Issue Title',
+      error: 'Please enter a fitting title for the issue.'
+    },
+    sc: {
+      label: 'SC',
+      ariaLabel: 'Success Criteria',
+      placeholder: 'e.g. 2.1.1 keyboard',
+      description:
+        'Find and select the relevant WCAG success criteria that are not met. This will help categorize the issue and provide guidance on how to fix it.',
+      search: 'Search Criteria...',
+      noResults: 'No matching criteria found',
+      error: 'Please select a valid success criterion from the list.',
+      clear: 'Clear Success Criteria Selection',
+      level: 'Level'
+    },
+    severity: {
+      label: 'Severity',
+      description: 'How severely the issue affects users',
+      clear: 'Clear Severity Level',
+      none: 'None',
+      low: 'Low',
+      medium: 'Medium',
+      high: 'High'
+    },
+    type: {
+      label: 'Type',
+      description:
+        'The nature of the issue, e.g. whether it is a content issue, a design issue, or a technical issue that needs to be fixed in the code.',
+      clear: 'Clear Type Selection',
+      unknown: 'Unknown',
+      content: 'Content',
+      design: 'Design',
+      technical: 'Technical'
+    },
+    description: {
+      label: 'Description',
+      description:
+        'Provide a detailed description of the issue, including what the problem is, where it occurs, and any relevant context. This information will help developers understand and fix the issue.',
+      placeholder: "Write, type '/' for commands..."
+    },
+    submitIssue: {
+      label: 'Submit Issue',
+      loading: 'Submitting...',
+      issueSuccess: 'Issue created',
+      issueFailed: 'Failed to create issue'
+    }
   },
   editor: {
     undo: 'Undo',
@@ -117,6 +146,7 @@ export default {
     languageLabel: 'Language',
     general: 'General',
     wcagifyUrl: 'WCAGify URL',
+    clear: 'Clear WCAGify URL',
     save: 'Save',
     saved: 'Saved',
     accentColor: 'Accent Color',

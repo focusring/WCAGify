@@ -185,49 +185,32 @@
   --ui-text-muted: var(--color-slate-300);
 }
 
-:focus {
-  outline: 0.375rem double black;
-  box-shadow: 0 0 0 0.25rem white;
-  border-radius: 0.125rem;
-}
-
-/* Suppress focus ring on dropdown containers — focus is managed internally by Reka UI.
-   Restore the component border using --ui-border instead of the global focus gap. */
-[role='listbox']:focus,
-[data-slot='focusScope']:focus {
-  outline: 2px solid transparent;
-  box-shadow: 0 0 0 1px var(--ui-border);
-}
-
-/* box-shadow is ignored in forced-colors mode; restore a visible outline so
-   Windows High Contrast users still get a clear focus indicator. */
-@media (forced-colors: active) {
-  [role='listbox']:focus,
-  [data-slot='focusScope']:focus {
-    outline: 1px solid CanvasText;
-  }
-}
-
-.editor-toolbar button:focus,
-.UEditorDragHandle button:focus,
-.editor-toolbar button:focus-visible,
-.selectable-focus:focus,
-.selectable-focus:focus-visible,
-.selectable-focus:has(input:focus),
-.selectable-focus:has(input:focus-visible) {
-  outline: 0.375rem double var(--ui-color-primary-500);
-  outline-offset: -1px;
-  border-radius: 0.125rem;
-  box-shadow: 0 0 0 0.25rem var(--focus-gap-color);
-  transition: none;
-}
-
 .label-title {
   @apply font-medium tracking-wide text-muted;
 }
 
 .label-hint {
   @apply text-slate-600 dark:text-slate-400;
+}
+
+.collapsible-enter-active {
+  display: grid !important;
+  transition: grid-template-rows 0.2s ease-out;
+}
+
+.collapsible-leave-active {
+  display: grid !important;
+  transition: grid-template-rows 0.2s ease-in;
+}
+
+.collapsible-enter-from,
+.collapsible-leave-to {
+  grid-template-rows: 0fr;
+}
+
+.collapsible-enter-to,
+.collapsible-leave-from {
+  grid-template-rows: 1fr;
 }
 
 .icon-animation {
@@ -252,4 +235,62 @@
   border-radius: 0.125rem;
   box-shadow: 0 0 0 0.25rem var(--focus-gap-color);
   transition: none;
+}
+
+/* ************* */
+/* Focus styling */
+/* ************* */
+
+/* Default focus style */
+:focus {
+  outline: 0.375rem double black;
+  box-shadow: 0 0 0 0.25rem white;
+  border-radius: 0.125rem;
+}
+
+/* Custom focus styles for interactible elements */
+.editor-toolbar button:focus,
+.UEditorDragHandle button:focus,
+.editor-toolbar button:focus-visible,
+.selectable-focus:focus,
+.selectable-focus:focus-visible,
+.selectable-focus:has(input:focus),
+.selectable-focus:has(input:focus-visible),
+.selectable-focus[data-highlighted] {
+  outline: 0.375rem double var(--ui-color-primary-500);
+  outline-offset: -1px;
+  border-radius: 0.125rem;
+  box-shadow: 0 0 0 0.25rem var(--focus-gap-color);
+  transition: none;
+}
+
+/* Only [data-highlighted] carries the ring inside dropdowns — suppress :focus-visible on non-highlighted items. */
+[data-slot='focusScope'] .selectable-focus:not([data-highlighted]):focus,
+[data-slot='focusScope'] .selectable-focus:not([data-highlighted]):focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: none;
+}
+
+/* Hide the search input's focus ring. the ring follows the highlighted item instead. */
+[data-slot='focusScope'] input:focus,
+[data-slot='focusScope'] input:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: none;
+}
+
+/* Suppress focus ring on dropdown containers, focus is managed internally by Reka UI.
+   Restore the component border using --ui-border instead of the global focus gap. */
+[role='listbox']:focus,
+[data-slot='focusScope']:focus {
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 1px var(--ui-border);
+}
+
+/* box-shadow is ignored in forced-colors mode; restore a visible outline so
+   Windows High Contrast users still get a clear focus indicator. */
+@media (forced-colors: active) {
+  [role='listbox']:focus,
+  [data-slot='focusScope']:focus {
+    outline: 1px solid CanvasText;
+  }
 }

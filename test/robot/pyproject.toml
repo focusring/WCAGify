@@ -3,10 +3,7 @@ name = "wcagify-robot-tests"
 version = "0.1.0"
 description = "Robot Framework regression / e2e suite covering the integration of the WCAGify browser extension with the playground app."
 requires-python = ">=3.10"
-dependencies = [
-    "robotframework==7.4.2",
-    "robotframework-browser==19.14.2",
-]
+dependencies = ["robotframework==7.4.2", "robotframework-browser==19.14.2"]
 
 [tool.robotframework]
 # Defaults used by `robot` when invoked from this directory.
