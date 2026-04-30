@@ -43,9 +43,13 @@ if [[ ! -d "$VENV_DIR" ]]; then
   "$PYTHON_BIN" -m venv "$VENV_DIR"
 fi
 
-# Activate the venv for the rest of the script
+# On Windows (Git Bash / MSYS2) the venv layout uses Scripts/ instead of bin/.
 # shellcheck disable=SC1091
-source "$VENV_DIR/bin/activate"
+if [[ -f "$VENV_DIR/Scripts/activate" ]]; then
+  source "$VENV_DIR/Scripts/activate"
+else
+  source "$VENV_DIR/bin/activate"
+fi
 
 python -m pip install --upgrade pip >/dev/null
 python -m pip install -r "$ROBOT_DIR/requirements.txt"
