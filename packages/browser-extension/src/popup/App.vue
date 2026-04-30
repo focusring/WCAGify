@@ -5,7 +5,8 @@ import { useSettings } from '../composables/useSettings'
 import logoSvg from '../assets/wcagify-icon.svg'
 import ClearableSelect from './components/ClearableSelect.vue'
 import ConnectionSettings from './components/ConnectionSettings.vue'
-import type ElementPicker from './components/ElementPicker.vue'
+import ContrastChecker from './components/ContrastChecker.vue'
+import ElementPicker from './components/ElementPicker.vue'
 import IssueForm from './components/IssueForm.vue'
 import SettingsPage from './components/SettingsPage.vue'
 
@@ -113,6 +114,31 @@ const currentView = ref<'main' | 'settings'>('main')
               required
             />
           </UFormField> -->
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              {{ t('contrast.testOptions') }}
+            </label>
+            <UCollapsible class="flex flex-col gap-2">
+              <UButton
+                :label="t('contrast.title')"
+                color="primary"
+                variant="subtle"
+                icon="i-lucide-test-tube"
+                :ui="{ leadingIcon: 'size-4' }"
+                block
+              />
+
+              <template #content>
+                <div class="bg-muted p-2 space-y-3 rounded">
+                  <ContrastChecker
+                    :fg-color="picker?.foregroundColor"
+                    :bg-color="picker?.backgroundColor"
+                  />
+                </div>
+              </template>
+            </UCollapsible>
+          </div>
 
           <IssueForm
             :reports="reports"

@@ -1,5 +1,88 @@
 import { getUniqueSelector } from './unique-selector'
 
+function parseRgba(color: string): { r: number; g: number; b: number; a: number } | null {
+  if (!color || color === 'none') return null
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.clearRect(0, 0, 1, 1)
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  return { r, g, b, a }
+}
+
+function getEffectiveBackgroundColor(el: Element): string {
+  const layers: { r: number; g: number; b: number; a: number }[] = []
+
+  // CSS mask icons use background-color as the icon color, not as a real background —
+  // skip the element itself and start from its parent
+  let current: Element | null = hasCssMask(el) ? el.parentElement : el
+  while (current) {
+    const bg = getComputedStyle(current).backgroundColor
+    const parsed = parseRgba(bg)
+    if (parsed && parsed.a > 0) {
+      layers.unshift(parsed)
+      if (parsed.a === 255) break // fully opaque — ancestors can't show through
+    }
+    if (current === document.documentElement) break
+    current = current.parentElement
+  }
+
+  // Browser default canvas is white
+  let r = 255,
+    g = 255,
+    b = 255
+
+  // Alpha-composite from farthest ancestor down to the target element
+  for (const layer of layers) {
+    const a = layer.a / 255
+    r = Math.round(layer.r * a + r * (1 - a))
+    g = Math.round(layer.g * a + g * (1 - a))
+    b = Math.round(layer.b * a + b * (1 - a))
+  }
+
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'
+
+function isVisible(color: string): boolean {
+  const parsed = parseRgba(color)
+  return parsed !== null && parsed.a > 0
+}
+
+function hasCssMask(el: Element): boolean {
+  const style = getComputedStyle(el)
+  const mask = style.getPropertyValue('-webkit-mask-image') || style.getPropertyValue('mask-image')
+  return mask !== '' && mask !== 'none'
+}
+
+function getEffectiveForegroundColor(el: Element): string {
+  const style = getComputedStyle(el)
+
+  // CSS mask icons (Iconify/Lucide via @nuxt/icon): the icon shape is a CSS mask,
+  // background-color is the actual visible icon color
+  if (hasCssMask(el)) return style.backgroundColor
+
+  if (!(el instanceof SVGElement)) return style.color
+
+  // Check own fill, then own stroke
+  if (isVisible(style.fill)) return style.fill
+  if (isVisible(style.stroke)) return style.stroke
+
+  // Walk descendant shapes — Lucide icons use stroke="currentColor" with fill="none"
+  const shapes = el.querySelectorAll(SVG_SHAPE_SELECTOR)
+  for (const shape of shapes) {
+    const s = getComputedStyle(shape)
+    if (isVisible(s.fill)) return s.fill
+    if (isVisible(s.stroke)) return s.stroke
+  }
+
+  return style.color
+}
+
 const OVERLAY_ID = 'wcagify-picker-overlay'
 const PANEL_ID = 'wcagify-picker-panel'
 const BRAND_COLOR = '#15803d'
@@ -172,11 +255,14 @@ function handleClick(e: MouseEvent) {
   if (!currentTarget) return
 
   const selector = getUniqueSelector(currentTarget)
+  const foregroundColor = getEffectiveForegroundColor(currentTarget)
   chrome.runtime.sendMessage({
     type: 'element-picked',
     selector,
     url: document.URL,
-    pageTitle: document.title
+    pageTitle: document.title,
+    foregroundColor,
+    backgroundColor: getEffectiveBackgroundColor(currentTarget)
   })
   cleanup()
 }

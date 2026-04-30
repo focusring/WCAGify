@@ -4,19 +4,46 @@ import { useI18n } from '../../composables/useI18n'
 
 const { t } = useI18n()
 
+function toHex(color: string): string {
+  if (!color) return color
+  const hex = color.match(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/)
+  if (hex) return color.toLowerCase()
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  if (a === 255) {
+    return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')
+  }
+  return '#' + [r, g, b, a].map((v) => v.toString(16).padStart(2, '0')).join('')
+}
+
 const selector = ref('')
 const pageUrl = ref('')
 const pageTitle = ref('')
+const foregroundColor = ref('')
+const backgroundColor = ref('')
 const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 
-defineExpose({ selector, pageUrl, pageTitle })
+defineExpose({ selector, pageUrl, pageTitle, foregroundColor, backgroundColor })
 
-function onMessage(message: { type: string; selector?: string; url?: string; pageTitle?: string }) {
+function onMessage(message: {
+  type: string
+  selector?: string
+  url?: string
+  pageTitle?: string
+  foregroundColor?: string
+  backgroundColor?: string
+}) {
   if (message.type === 'element-picked') {
     selector.value = message.selector ?? ''
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
+    foregroundColor.value = toHex(message.foregroundColor ?? '')
+    backgroundColor.value = toHex(message.backgroundColor ?? '')
     picking.value = false
     pickerTabId.value = undefined
   }
@@ -62,6 +89,8 @@ async function pickElement() {
   selector.value = ''
   pageUrl.value = ''
   pageTitle.value = ''
+  foregroundColor.value = ''
+  backgroundColor.value = ''
 
   chrome.tabs.sendMessage(tab.id, { type: 'start-picker' }).catch(() => {
     picking.value = false
@@ -93,6 +122,28 @@ async function pickElement() {
       <div>
         <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.page') }}</span>
         <span class="ml-1 text-gray-800 dark:text-gray-200">{{ pageTitle }}</span>
+      </div>
+      <div v-if="foregroundColor" class="flex items-center gap-1">
+        <span class="font-medium text-gray-600 dark:text-gray-400">{{
+          t('picker.foregroundColor')
+        }}</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: foregroundColor }"
+          aria-hidden="true"
+        />
+        <code class="text-gray-800 dark:text-gray-200">{{ foregroundColor }}</code>
+      </div>
+      <div v-if="backgroundColor" class="flex items-center gap-1">
+        <span class="font-medium text-gray-600 dark:text-gray-400">{{
+          t('picker.backgroundColor')
+        }}</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: backgroundColor }"
+          aria-hidden="true"
+        />
+        <code class="text-gray-800 dark:text-gray-200">{{ backgroundColor }}</code>
       </div>
     </div>
   </div>

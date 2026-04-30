@@ -34,6 +34,8 @@ export default {
     selector: 'Selector:',
     url: 'URL:',
     page: 'Page:',
+    foregroundColor: 'Foreground:',
+    backgroundColor: 'Background:',
     hoverHint: 'Hover over an element...',
     clickHint: 'Click to select · Esc to cancel'
   },
@@ -129,5 +131,18 @@ export default {
     madeBy: 'Made with ❤️ by',
     inRegion: 'in Europe 🇪🇺',
     version: 'Version'
+  },
+  contrast: {
+    title: 'Contrast Checker',
+    preview: 'Sample preview',
+    foreground: 'Element color',
+    background: 'Background color',
+    normalText: 'Normal text',
+    largeText: 'Large text',
+    contrastRatio: 'Contrast ratio',
+    copy: 'Copy color',
+    eyedropper: 'Pick color from screen',
+    testOptions: 'Test Options',
+    sampleSentence: 'The quick brown fox'
   }
 } as const
