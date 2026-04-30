@@ -38,42 +38,70 @@ export default {
     clickHint: 'Klik om te selecteren · Esc om te annuleren'
   },
   form: {
-    issueTitle: 'Titel probleem',
-    issueTitlePlaceholder: 'bijv. Dropdown niet toegankelijk met toetsenbord',
-    sc: 'SC',
-    scLabel: 'Succescriteria',
-    scPlaceholder: 'bijv. 2.1.1 toetsenbord',
-    severity: 'Ernst',
-    severityDescription: 'Hoe ernstig het probleem gebruikers treft',
-    samplePage: 'Voorbeeldpagina',
-    selectPage: 'Selecteer een pagina',
-    description: 'Beschrijving',
-    descriptionDescription: 'Optionele context, stappen om te reproduceren of verwacht gedrag',
-    descriptionPlaceholder: "Schrijf, typ '/' voor commando's...",
-    submit: 'Probleem indienen',
-    submitting: 'Indienen...',
-    issueCreated: 'Probleem aangemaakt',
-    failedToCreate: 'Probleem aanmaken mislukt',
     required: 'verplicht',
-    scSearch: 'Criteria zoeken...',
-    noResults: 'Geen overeenkomende criteria gevonden',
     clear: 'Wissen',
-    clearTitle: 'Titel probleem wissen',
-    clearSc: 'Succescriteria wissen',
-    clearPage: 'Voorbeeldpagina wissen',
-    clearSeverity: 'Ernst wissen',
-    clearType: 'Type wissen',
-    none: 'Geen',
-    low: 'Laag',
-    medium: 'Gemiddeld',
-    high: 'Hoog',
-    type: 'Type',
-    typeDescription: 'Oorzaakcategorie van het toegankelijkheidsprobleem',
-    content: 'Content',
-    design: 'Ontwerp',
-    technical: 'Technisch',
-    unknown: 'Onbekend',
-    wcagLevel: 'Niveau'
+    descBtnOpen: 'Meer informatie tonen voor',
+    descBtnClose: 'Informatie verbergen voor',
+    descExpanded: 'Extra informatie uitgeklapt',
+    descCollapsed: 'Extra informatie ingeklapt',
+    samplePage: {
+      label: 'Voorbeeldpagina',
+      placeholder: 'Selecteer een pagina',
+      description:
+        "Kies uit pagina's waartoe je toegang hebt. De URL wordt in het rapport opgenomen om het probleem te helpen lokaliseren.",
+      clear: 'Voorbeeldpagina wissen',
+      error: "Selecteer een van de gedetecteerde pagina's."
+    },
+    issueTitle: {
+      label: 'Titel probleem',
+      placeholder: 'bijv. Dropdown niet toegankelijk met toetsenbord',
+      description:
+        'Voeg een beknopte titel toe die het toegankelijkheidsprobleem beschrijft. Dit wordt gebruikt als de probleemtitel in het rapport.',
+      clear: 'Titel probleem wissen',
+      error: 'Voer een titel in die bij het probleem past.'
+    },
+    sc: {
+      label: 'SC',
+      ariaLabel: 'Succescriteria',
+      placeholder: 'bijv. 2.1.1 toetsenbord',
+      description:
+        'Zoek en selecteer de relevante WCAG-succescriteria waaraan niet wordt voldaan. Dit helpt het probleem te categoriseren en biedt richtlijnen voor het oplossen ervan.',
+      search: 'Criteria zoeken...',
+      noResults: 'Geen overeenkomende criteria gevonden',
+      error: 'Selecteer een bestaande succescriterium uit de lijst.',
+      clear: 'Succescriteria wissen',
+      level: 'Niveau'
+    },
+    severity: {
+      label: 'Ernst',
+      description: 'Hoe ernstig het probleem gebruikers treft',
+      clear: 'Ernst wissen',
+      none: 'Geen',
+      low: 'Laag',
+      medium: 'Gemiddeld',
+      high: 'Hoog'
+    },
+    description: {
+      label: 'Beschrijving',
+      description: 'Optionele context, stappen om te reproduceren of verwacht gedrag',
+      placeholder: "Schrijf, typ '/' voor commando's..."
+    },
+    type: {
+      label: 'Type',
+      description:
+        'De aard van het probleem, bijvoorbeeld of het een inhoudsprobleem is, een ontwerpprobleem of een technisch probleem dat in de code moet worden opgelost.',
+      clear: 'Type wissen',
+      unknown: 'Onbekend',
+      content: 'Content',
+      design: 'Ontwerp',
+      technical: 'Technisch'
+    },
+    submitIssue: {
+      label: 'Probleem indienen',
+      loading: 'Indienen...',
+      issueSuccess: 'Probleem aangemaakt',
+      issueFailed: 'Probleem aanmaken mislukt'
+    }
   },
   editor: {
     undo: 'Ongedaan maken',
@@ -117,6 +145,7 @@ export default {
     languageLabel: 'Taal',
     general: 'Algemeen',
     wcagifyUrl: 'WCAGify URL',
+    clear: 'WCAGify URL wissen',
     save: 'Opslaan',
     saved: 'Opgeslagen',
     accentColor: 'Accentkleur',

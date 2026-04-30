@@ -4,13 +4,13 @@ import type { EditorToolbarItem, EditorSuggestionMenuItem, EditorCustomHandlers 
 import type { Editor } from '@tiptap/vue-3'
 import { useI18n } from '../../composables/useI18n'
 import { ImageUpload } from './editor/ImageUploadExtension'
-import { it } from 'zod/locales'
 
 const model = defineModel<string>({ default: '' })
 
 defineProps<{
   placeholder?: string
   label?: string
+  ariaDescribedby?: string
 }>()
 
 const { t } = useI18n()
@@ -140,6 +140,7 @@ const suggestionItems = computed(
     :handlers="customHandlers"
     :placeholder="placeholder"
     :aria-label="label"
+    :aria-describedby="ariaDescribedby"
     :ui="{ base: 'px-3 py-2 min-h-32' }"
     class="bg-elevated hover:bg-accented/75 transition-colors duration-200 w-full rounded-md border input-border"
   >
