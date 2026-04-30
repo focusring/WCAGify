@@ -16,7 +16,11 @@ else
   VENV_BIN="${ROBOT_DIR}/.venv/bin"
 fi
 
-if [[ ! -x "$VENV_BIN/robot" ]]; then
+if [[ -x "$VENV_BIN/robot" ]]; then
+  ROBOT_CMD="$VENV_BIN/robot"
+elif [[ -x "$VENV_BIN/robot.exe" ]]; then
+  ROBOT_CMD="$VENV_BIN/robot.exe"
+else
   echo "Robot Framework venv not found. Run \`pnpm test:robot:setup\` first." >&2
   exit 1
 fi
@@ -25,7 +29,7 @@ cd "$ROBOT_DIR"
 
 # Default to running every suite under tests/ when no path is given.
 if [[ "$#" -eq 0 ]]; then
-  exec "$VENV_BIN/robot" --outputdir results tests
+  exec "$ROBOT_CMD" --outputdir results tests
 else
-  exec "$VENV_BIN/robot" --outputdir results "$@"
+  exec "$ROBOT_CMD" --outputdir results "$@"
 fi
