@@ -115,7 +115,15 @@ const currentView = ref<'main' | 'settings'>('main')
             />
           </UFormField> -->
 
-          <div>
+          <div
+            v-if="
+              picker?.elementColor ||
+              picker?.foregroundColor ||
+              picker?.borderColor ||
+              picker?.outlineColor ||
+              picker?.ringColor
+            "
+          >
             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
               {{ t('contrast.testOptions') }}
             </label>
@@ -134,6 +142,12 @@ const currentView = ref<'main' | 'settings'>('main')
                   <ContrastChecker
                     :fg-color="picker?.foregroundColor"
                     :bg-color="picker?.backgroundColor"
+                    :element-color="picker?.elementColor"
+                    :page-bg-color="picker?.pageBackgroundColor"
+                    :text-color="picker?.textColor"
+                    :border-color="picker?.borderColor"
+                    :outline-color="picker?.outlineColor"
+                    :ring-color="picker?.ringColor"
                   />
                 </div>
               </template>

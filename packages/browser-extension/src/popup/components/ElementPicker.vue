@@ -25,10 +25,28 @@ const pageUrl = ref('')
 const pageTitle = ref('')
 const foregroundColor = ref('')
 const backgroundColor = ref('')
+const elementColor = ref('')
+const pageBackgroundColor = ref('')
+const textColor = ref('')
+const borderColor = ref('')
+const outlineColor = ref('')
+const ringColor = ref('')
 const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 
-defineExpose({ selector, pageUrl, pageTitle, foregroundColor, backgroundColor })
+defineExpose({
+  selector,
+  pageUrl,
+  pageTitle,
+  foregroundColor,
+  backgroundColor,
+  elementColor,
+  pageBackgroundColor,
+  textColor,
+  borderColor,
+  outlineColor,
+  ringColor
+})
 
 function onMessage(message: {
   type: string
@@ -37,6 +55,12 @@ function onMessage(message: {
   pageTitle?: string
   foregroundColor?: string
   backgroundColor?: string
+  elementColor?: string
+  pageBackgroundColor?: string
+  textColor?: string
+  borderColor?: string
+  outlineColor?: string
+  ringColor?: string
 }) {
   if (message.type === 'element-picked') {
     selector.value = message.selector ?? ''
@@ -44,6 +68,12 @@ function onMessage(message: {
     pageTitle.value = message.pageTitle ?? ''
     foregroundColor.value = toHex(message.foregroundColor ?? '')
     backgroundColor.value = toHex(message.backgroundColor ?? '')
+    elementColor.value = toHex(message.elementColor ?? '')
+    pageBackgroundColor.value = toHex(message.pageBackgroundColor ?? '')
+    textColor.value = toHex(message.textColor ?? '')
+    borderColor.value = toHex(message.borderColor ?? '')
+    outlineColor.value = toHex(message.outlineColor ?? '')
+    ringColor.value = toHex(message.ringColor ?? '')
     picking.value = false
     pickerTabId.value = undefined
   }
@@ -91,6 +121,12 @@ async function pickElement() {
   pageTitle.value = ''
   foregroundColor.value = ''
   backgroundColor.value = ''
+  elementColor.value = ''
+  pageBackgroundColor.value = ''
+  textColor.value = ''
+  borderColor.value = ''
+  outlineColor.value = ''
+  ringColor.value = ''
 
   chrome.tabs.sendMessage(tab.id, { type: 'start-picker' }).catch(() => {
     picking.value = false
@@ -111,29 +147,46 @@ async function pickElement() {
     />
 
     <div v-if="selector" class="space-y-1 rounded bg-muted p-2 text-sm">
+      <!-- Selector -->
       <div>
         <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.selector') }}</span>
         <code class="ml-1 break-all text-gray-800 dark:text-gray-200">{{ selector }}</code>
       </div>
+      <!-- URL -->
       <div>
         <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.url') }}</span>
         <span class="ml-1 break-all text-gray-800 dark:text-gray-200">{{ pageUrl }}</span>
       </div>
+      <!-- Page Title -->
       <div>
         <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.page') }}</span>
         <span class="ml-1 text-gray-800 dark:text-gray-200">{{ pageTitle }}</span>
       </div>
-      <div v-if="foregroundColor" class="flex items-center gap-1">
+      <!-- Text Color -->
+      <div v-if="textColor && elementColor" class="flex items-center gap-1">
         <span class="font-medium text-gray-600 dark:text-gray-400">{{
-          t('picker.foregroundColor')
+          t('picker.textcolor')
         }}</span>
         <span
           class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: foregroundColor }"
+          :style="{ backgroundColor: textColor }"
           aria-hidden="true"
         />
-        <code class="text-gray-800 dark:text-gray-200">{{ foregroundColor }}</code>
+        <code class="text-gray-800 dark:text-gray-200">{{ textColor }}</code>
       </div>
+      <!-- Element Color -->
+      <div v-if="elementColor" class="flex items-center gap-1">
+        <span class="font-medium text-gray-600 dark:text-gray-400">{{
+          t('picker.elementColor')
+        }}</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: elementColor }"
+          aria-hidden="true"
+        />
+        <code class="text-gray-800 dark:text-gray-200">{{ elementColor }}</code>
+      </div>
+      <!-- Background Color -->
       <div v-if="backgroundColor" class="flex items-center gap-1">
         <span class="font-medium text-gray-600 dark:text-gray-400">{{
           t('picker.backgroundColor')
@@ -144,6 +197,42 @@ async function pickElement() {
           aria-hidden="true"
         />
         <code class="text-gray-800 dark:text-gray-200">{{ backgroundColor }}</code>
+      </div>
+      <!-- Border Color -->
+      <div v-if="borderColor" class="flex items-center gap-1">
+        <span class="font-medium text-gray-600 dark:text-gray-400">{{
+          t('picker.borderColor')
+        }}</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: borderColor }"
+          aria-hidden="true"
+        />
+        <code class="text-gray-800 dark:text-gray-200">{{ borderColor }}</code>
+      </div>
+      <!-- Outline Color -->
+      <div v-if="outlineColor" class="flex items-center gap-1">
+        <span class="font-medium text-gray-600 dark:text-gray-400">{{
+          t('picker.outlineColor')
+        }}</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: outlineColor }"
+          aria-hidden="true"
+        />
+        <code class="text-gray-800 dark:text-gray-200">{{ outlineColor }}</code>
+      </div>
+      <!-- Ring Color -->
+      <div v-if="ringColor" class="flex items-center gap-1">
+        <span class="font-medium text-gray-600 dark:text-gray-400">{{
+          t('picker.ringColor')
+        }}</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: ringColor }"
+          aria-hidden="true"
+        />
+        <code class="text-gray-800 dark:text-gray-200">{{ ringColor }}</code>
       </div>
     </div>
   </div>

@@ -5,20 +5,85 @@ import { useI18n } from '../../composables/useI18n'
 const props = defineProps<{
   fgColor?: string
   bgColor?: string
+  elementColor?: string
+  pageBgColor?: string
+  textColor?: string
+  borderColor?: string
+  outlineColor?: string
+  ringColor?: string
 }>()
 
 const { t } = useI18n()
 
-const localFg = ref(props.fgColor || '#000000')
-const localBg = ref(props.bgColor || '#ffffff')
+const showTextColor = computed(() => !!props.textColor && !!props.elementColor)
+const showPreviewText = computed(() => {
+  if (props.bgColor) return !!(props.fgColor || props.textColor)
+  return true
+})
+
+// localFg doubles as element color in element mode; falls back to border/outline/ring for boundary-only elements
+const localFg = ref(
+  props.elementColor ||
+    props.borderColor ||
+    props.outlineColor ||
+    props.ringColor ||
+    props.fgColor ||
+    '#000000'
+)
+const localBg = ref(props.pageBgColor || props.bgColor || '#ffffff')
+const localText = ref(props.textColor || '#000000')
 const fgText = ref(localFg.value)
 const bgText = ref(localBg.value)
+const textText = ref(localText.value)
 const pickerSelected = ref(false)
 
 watch(
-  () => props.fgColor,
+  [
+    () => props.elementColor,
+    () => props.borderColor,
+    () => props.outlineColor,
+    () => props.ringColor
+  ],
+  ([elementColor, borderColor, outlineColor, ringColor]) => {
+    const effective = elementColor || borderColor || outlineColor || ringColor
+    if (effective) {
+      pickerSelected.value = true
+      const hex = normalizeHex(effective) ?? effective
+      localFg.value = hex
+      fgText.value = hex
+    }
+  }
+)
+watch(
+  () => props.pageBgColor,
   (val) => {
     if (val) {
+      const hex = normalizeHex(val) ?? val
+      localBg.value = hex
+      bgText.value = hex
+    }
+  }
+)
+watch(
+  () => props.textColor,
+  (val) => {
+    if (val) {
+      const hex = normalizeHex(val) ?? val
+      localText.value = hex
+      textText.value = hex
+    }
+  }
+)
+watch(
+  () => props.fgColor,
+  (val) => {
+    if (
+      val &&
+      !props.elementColor &&
+      !props.borderColor &&
+      !props.outlineColor &&
+      !props.ringColor
+    ) {
       pickerSelected.value = true
       const bgHex = (props.bgColor && normalizeHex(props.bgColor)) || localBg.value
       const hex = normalizeHex(val, bgHex) ?? val
@@ -30,7 +95,7 @@ watch(
 watch(
   () => props.bgColor,
   (val) => {
-    if (val) {
+    if (val && !props.pageBgColor) {
       pickerSelected.value = true
       const hex = normalizeHex(val) ?? val
       localBg.value = hex
@@ -43,6 +108,9 @@ watch(localFg, (val) => {
 })
 watch(localBg, (val) => {
   bgText.value = val
+})
+watch(localText, (val) => {
+  textText.value = val
 })
 
 function compositeOnBg(
@@ -95,10 +163,10 @@ function handleBgInput(val: string) {
   if (hex) localBg.value = hex
 }
 
-function swapColors() {
-  const tmpFg = localFg.value
-  localFg.value = localBg.value
-  localBg.value = tmpFg
+function handleTextInput(val: string) {
+  textText.value = val
+  const hex = normalizeHex(val)
+  if (hex) localText.value = hex
 }
 
 function toLinear(c: number): number {
@@ -144,6 +212,24 @@ const bgInputStyle = computed(() => ({
   backgroundColor: localBg.value,
   color: getTextColor(localBg.value)
 }))
+const textInputStyle = computed(() => ({
+  backgroundColor: localText.value,
+  color: getTextColor(localText.value)
+}))
+
+const textVsElementRatio = computed(() => {
+  const l1 = luminance(localText.value)
+  const l2 = luminance(localFg.value)
+  if (l1 === undefined || l2 === undefined) return undefined
+  const lighter = Math.max(l1, l2)
+  const darker = Math.min(l1, l2)
+  return (lighter + 0.05) / (darker + 0.05)
+})
+const textVsElementLabel = computed(() => {
+  const r = textVsElementRatio.value
+  return r !== undefined ? `${r.toFixed(2)}:1` : '—'
+})
+const textPassAA = computed(() => (textVsElementRatio.value ?? 0) >= 4.5)
 
 async function copyToClipboard(text: string) {
   try {
@@ -184,132 +270,201 @@ async function pickColor(target: 'fg' | 'bg') {
   <div class="space-y-3 flex flex-col">
     <div class="md:flex gap-4 my-0 md:my-none">
       <!-- Preview -->
-      <div class="w-full">
-        <label class="block text-sm font-medium text-muted mb-1">
-          {{ t('contrast.preview') }}
-        </label>
+      <UFormField
+        :label="t('contrast.preview')"
+        class="flex-1 min-w-0"
+        :ui="{ label: 'label-title mb-1' }"
+      >
         <div
-          :style="{ backgroundColor: localBg, color: localFg }"
-          class="rounded border border-gray-200 dark:border-gray-700 px-3 py-2 md:py-6"
+          :style="{ backgroundColor: localBg }"
+          class="w-full rounded border border-gray-200 dark:border-gray-700 px-3 py-2 md:py-6"
         >
-          <p class="text-sm">{{ t('contrast.normalText') }}: {{ t('contrast.sampleSentence') }}</p>
-          <p class="text-lg font-bold">{{ t('contrast.largeText') }}: Aa</p>
+          <div
+            :style="{
+              ...(props.elementColor ? { backgroundColor: localFg } : {}),
+              ...(props.borderColor ? { border: `2px solid ${props.borderColor}` } : {}),
+              ...(props.outlineColor ? { outline: `2px solid ${props.outlineColor}` } : {}),
+              ...(props.ringColor ? { boxShadow: `0 0 0 3px ${props.ringColor}` } : {})
+            }"
+            class="rounded px-1.5 py-2 md:py-6"
+          >
+            <template v-if="showPreviewText">
+              <p class="text-sm" :style="{ color: showTextColor ? localText : localFg }">
+                {{ t('contrast.normalText') }}: {{ t('contrast.sampleSentence') }}
+              </p>
+              <p class="text-lg font-bold" :style="{ color: showTextColor ? localText : localFg }">
+                {{ t('contrast.largeText') }}: Aa
+              </p>
+            </template>
+          </div>
         </div>
-      </div>
+      </UFormField>
 
       <!-- Color inputs -->
-      <div class="space-y-3 md:space-y-2 my-3 md:my-0 w-full">
-        <label for="fg-color-input" class="block text-sm font-medium text-muted mb-1">
-          {{ t('contrast.foreground') }}
-        </label>
-        <div class="flex items-center gap-1">
-          <input
-            id="fg-color-input"
-            type="color"
-            v-model="localFg"
-            :title="t('contrast.foreground')"
-            :aria-label="t('contrast.foreground')"
-            class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
-          />
-          <UFieldGroup class="w-full">
-            <UInput
-              :model-value="fgText"
-              @update:model-value="handleFgInput"
-              :style="fgInputStyle"
-              :aria-label="t('contrast.foreground')"
-              spellcheck="false"
-              class="w-full tracking-widest"
+      <div class="space-y-2 md:space-y-2 my-3 md:my-0 flex-1 min-w-0 relative">
+        <UFormField
+          v-if="showTextColor"
+          :label="t('contrast.text')"
+          label-for="text-color-input"
+          :ui="{ label: 'label-title mb-1' }"
+        >
+          <div class="flex items-center gap-1">
+            <input
+              id="text-color-input"
+              type="color"
+              v-model="localText"
+              :title="t('contrast.text')"
+              :aria-label="t('contrast.text')"
+              class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
             />
-            <UButton
-              :aria-label="t('contrast.copy')"
-              color="neutral"
-              variant="subtle"
-              icon="i-lucide-copy"
-              :ui="{ base: 'shrink-0 cursor-pointer', leadingIcon: 'size-4' }"
-              @click="copyToClipboard(localFg)"
-            />
-          </UFieldGroup>
-        </div>
+            <UFieldGroup class="w-full">
+              <UInput
+                :model-value="textText"
+                @update:model-value="handleTextInput"
+                :style="textInputStyle"
+                :aria-label="t('contrast.text')"
+                spellcheck="false"
+                class="w-full tracking-widest"
+              />
+              <UButton
+                :aria-label="t('contrast.copy')"
+                color="neutral"
+                variant="subtle"
+                icon="i-lucide-copy"
+                :ui="{ base: 'shrink-0 cursor-pointer', leadingIcon: 'size-4' }"
+                @click="copyToClipboard(localText)"
+              />
+            </UFieldGroup>
+          </div>
+        </UFormField>
 
-        <label for="bg-color-input" class="block text-sm font-medium text-muted mb-1">
-          {{ t('contrast.background') }}
-        </label>
-        <div class="flex items-center gap-1">
-          <input
-            id="bg-color-input"
-            type="color"
-            v-model="localBg"
-            :title="t('contrast.background')"
-            :aria-label="t('contrast.background')"
-            class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
-          />
-          <UFieldGroup class="w-full">
-            <UInput
-              :model-value="bgText"
-              @update:model-value="handleBgInput"
-              :style="bgInputStyle"
-              :aria-label="t('contrast.background')"
-              spellcheck="false"
-              class="w-full tracking-widest"
-            />
-            <UButton
-              :aria-label="t('contrast.copy')"
-              color="neutral"
+        <UFormField
+          label-for="fg-color-input"
+          :ui="{ label: 'label-title mb-1 flex items-baseline justify-between flex-1' }"
+        >
+          <template #label>
+            <span>{{ t('contrast.foreground') }}</span>
+            <UBadge
+              v-if="showTextColor"
+              :label="textVsElementLabel"
+              :color="textPassAA ? 'success' : 'error'"
               variant="subtle"
-              icon="i-lucide-copy"
-              :ui="{ base: 'shrink-0 cursor-pointer', leadingIcon: 'size-4' }"
-              @click="copyToClipboard(localBg)"
+              :icon="textPassAA ? 'i-lucide-check' : 'i-lucide-x'"
+              size="lg"
             />
-          </UFieldGroup>
-        </div>
+          </template>
+          <div class="flex items-center gap-1">
+            <input
+              id="fg-color-input"
+              type="color"
+              v-model="localFg"
+              :title="t('contrast.foreground')"
+              :aria-label="t('contrast.foreground')"
+              class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
+            />
+            <UFieldGroup class="w-full">
+              <UInput
+                :model-value="fgText"
+                @update:model-value="handleFgInput"
+                :style="fgInputStyle"
+                :aria-label="t('contrast.foreground')"
+                spellcheck="false"
+                class="w-full tracking-widest"
+              />
+              <UButton
+                :aria-label="t('contrast.copy')"
+                color="neutral"
+                variant="subtle"
+                icon="i-lucide-copy"
+                :ui="{ base: 'shrink-0 cursor-pointer', leadingIcon: 'size-4' }"
+                @click="copyToClipboard(localFg)"
+              />
+            </UFieldGroup>
+          </div>
+        </UFormField>
+
+        <UFormField
+          :label-for="'bg-color-input'"
+          :ui="{ label: 'label-title mb-1 flex items-baseline justify-between flex-1' }"
+        >
+          <template #label>
+            <span>{{ t('contrast.background') }}</span>
+            <UBadge
+              :label="ratioLabel"
+              :color="passAA ? 'success' : 'error'"
+              variant="subtle"
+              :icon="passAA ? 'i-lucide-check' : 'i-lucide-x'"
+              size="lg"
+            />
+          </template>
+          <div class="flex items-center gap-1">
+            <input
+              id="bg-color-input"
+              type="color"
+              v-model="localBg"
+              :title="t('contrast.background')"
+              :aria-label="t('contrast.background')"
+              class="size-8 shrink-0 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
+            />
+            <UFieldGroup class="w-full">
+              <UInput
+                :model-value="bgText"
+                @update:model-value="handleBgInput"
+                :style="bgInputStyle"
+                :aria-label="t('contrast.background')"
+                spellcheck="false"
+                class="w-full tracking-widest"
+              />
+              <UButton
+                :aria-label="t('contrast.copy')"
+                color="neutral"
+                variant="subtle"
+                icon="i-lucide-copy"
+                :ui="{ base: 'shrink-0 cursor-pointer', leadingIcon: 'size-4' }"
+                @click="copyToClipboard(localBg)"
+              />
+            </UFieldGroup>
+          </div>
+        </UFormField>
       </div>
     </div>
 
     <!-- Ratio + WCAG results -->
-    <div class="flex items-center justify-between">
-      <label class="text-sm font-medium text-gray-600 dark:text-gray-400">
-        {{ t('contrast.contrastRatio') }}
-      </label>
-      <UBadge
-        :label="ratioLabel"
-        :color="passAA ? 'success' : 'error'"
-        variant="subtle"
-        :icon="passAA ? 'i-lucide-check' : 'i-lucide-x'"
-      />
-    </div>
-    <div class="grid grid-cols-2 md:flex md:gap-8 gap-x-3 gap-y-1">
-      <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
-        <UIcon
-          :name="passAA ? 'i-lucide-check' : 'i-lucide-x'"
-          class="size-3.5 shrink-0"
-          :class="passAA ? 'text-success-500' : 'text-error-500'"
-        />
-        <span>AA {{ t('contrast.normalText') }} (4.5:1)</span>
+    <UFormField :label="t('contrast.contrastRatio')" :ui="{ label: 'label-title mb-1' }">
+      <div class="grid grid-cols-2 md:flex md:gap-8 gap-x-3 gap-y-1">
+        <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+          <UIcon
+            :name="passAA ? 'i-lucide-check' : 'i-lucide-x'"
+            class="size-3.5 shrink-0"
+            :class="passAA ? 'text-success-500' : 'text-error-500'"
+          />
+          <span>AA {{ t('contrast.normalText') }} (4.5:1)</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+          <UIcon
+            :name="passAAA ? 'i-lucide-check' : 'i-lucide-x'"
+            class="size-3.5 shrink-0"
+            :class="passAAA ? 'text-success-500' : 'text-error-500'"
+          />
+          <span>AAA {{ t('contrast.normalText') }} (7:1)</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+          <UIcon
+            :name="passAALarge ? 'i-lucide-check' : 'i-lucide-x'"
+            class="size-3.5 shrink-0"
+            :class="passAALarge ? 'text-success-500' : 'text-error-500'"
+          />
+          <span>AA {{ t('contrast.largeText') }} (3:1)</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+          <UIcon
+            :name="passAAALarge ? 'i-lucide-check' : 'i-lucide-x'"
+            class="size-3.5 shrink-0"
+            :class="passAAALarge ? 'text-success-500' : 'text-error-500'"
+          />
+          <span>AAA {{ t('contrast.largeText') }} (4.5:1)</span>
+        </div>
       </div>
-      <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
-        <UIcon
-          :name="passAAA ? 'i-lucide-check' : 'i-lucide-x'"
-          class="size-3.5 shrink-0"
-          :class="passAAA ? 'text-success-500' : 'text-error-500'"
-        />
-        <span>AAA {{ t('contrast.normalText') }} (7:1)</span>
-      </div>
-      <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
-        <UIcon
-          :name="passAALarge ? 'i-lucide-check' : 'i-lucide-x'"
-          class="size-3.5 shrink-0"
-          :class="passAALarge ? 'text-success-500' : 'text-error-500'"
-        />
-        <span>AA {{ t('contrast.largeText') }} (3:1)</span>
-      </div>
-      <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
-        <UIcon
-          :name="passAAALarge ? 'i-lucide-check' : 'i-lucide-x'"
-          class="size-3.5 shrink-0"
-          :class="passAAALarge ? 'text-success-500' : 'text-error-500'"
-        />
-        <span>AAA {{ t('contrast.largeText') }} (4.5:1)</span>
-      </div>
-    </div>
+    </UFormField>
   </div>
 </template>

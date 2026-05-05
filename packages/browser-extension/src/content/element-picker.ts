@@ -358,6 +358,160 @@ function handleMouseMove(e: MouseEvent) {
   }
 }
 
+function getVisibleBorderColor(el: Element): string | null {
+  const style = getComputedStyle(el)
+  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+    const width = parseFloat(style.getPropertyValue(`border-${side}-width`))
+    if (!(width > 0)) continue
+    const parsed = parseRgba(style.getPropertyValue(`border-${side}-color`))
+    if (parsed && parsed.a > 0) {
+      const a = parsed.a / 255
+      return `#${Math.round(parsed.r * a + 255 * (1 - a))
+        .toString(16)
+        .padStart(2, '0')}${Math.round(parsed.g * a + 255 * (1 - a))
+        .toString(16)
+        .padStart(2, '0')}${Math.round(parsed.b * a + 255 * (1 - a))
+        .toString(16)
+        .padStart(2, '0')}`
+    }
+  }
+  return null
+}
+
+function getOutlineColor(el: Element): string | null {
+  const style = getComputedStyle(el)
+  const outlineWidth = parseFloat(style.outlineWidth)
+  if (!(outlineWidth > 0) || style.outlineStyle === 'none') return null
+  const parsed = parseRgba(style.outlineColor)
+  if (!parsed || parsed.a === 0) return null
+  const a = parsed.a / 255
+  return `#${Math.round(parsed.r * a + 255 * (1 - a))
+    .toString(16)
+    .padStart(2, '0')}${Math.round(parsed.g * a + 255 * (1 - a))
+    .toString(16)
+    .padStart(2, '0')}${Math.round(parsed.b * a + 255 * (1 - a))
+    .toString(16)
+    .padStart(2, '0')}`
+}
+
+// Matches any CSS color function or hex — Tailwind CSS 4 serialises computed colors as oklch()
+const CSS_COLOR_RE = /(?:rgba?|hsla?|oklch|oklab|lch|lab|color)\([^)]+\)|#[0-9a-fA-F]{3,8}\b/
+
+function parseShadowLayers(boxShadow: string): Array<{ color: string; isRing: boolean }> {
+  const results: Array<{ color: string; isRing: boolean }> = []
+  for (const shadow of splitOuterCommas(boxShadow)) {
+    const trimmed = shadow.trim().replace(/^inset\s+/, '')
+    const colorMatch = trimmed.match(CSS_COLOR_RE)
+    if (!colorMatch) continue
+    const rest = trimmed.slice(colorMatch.index! + colorMatch[0].length).trim()
+    const nums = (rest.match(/-?[\d.]+px/g) ?? []).map(parseFloat)
+    const x = nums[0] ?? 0
+    const y = nums[1] ?? 0
+    const blur = nums[2] ?? 0
+    results.push({ color: colorMatch[0], isRing: x === 0 && y === 0 && blur === 0 })
+  }
+  return results
+}
+
+function shadowLayerToHex(color: string): string | null {
+  const parsed = parseRgba(color)
+  if (!parsed || parsed.a === 0) return null
+  const a = parsed.a / 255
+  return `#${Math.round(parsed.r * a + 255 * (1 - a))
+    .toString(16)
+    .padStart(2, '0')}${Math.round(parsed.g * a + 255 * (1 - a))
+    .toString(16)
+    .padStart(2, '0')}${Math.round(parsed.b * a + 255 * (1 - a))
+    .toString(16)
+    .padStart(2, '0')}`
+}
+
+function getRingColor(el: Element): string | null {
+  const boxShadow = getComputedStyle(el).boxShadow
+  if (!boxShadow || boxShadow === 'none') return null
+  for (const { color, isRing } of parseShadowLayers(boxShadow)) {
+    if (!isRing) continue
+    const hex = shadowLayerToHex(color)
+    if (hex) return hex
+  }
+  return null
+}
+
+function getShadowColor(el: Element): string | null {
+  const boxShadow = getComputedStyle(el).boxShadow
+  if (!boxShadow || boxShadow === 'none') return null
+  for (const { color, isRing } of parseShadowLayers(boxShadow)) {
+    if (isRing) continue
+    const hex = shadowLayerToHex(color)
+    if (hex) return hex
+  }
+  return null
+}
+
+// Returns the element's own background fill as hex, or null if transparent (border is handled separately)
+function getOwnElementColor(el: Element): string | null {
+  const layer = getElementBgLayer(el)
+  if (!layer || layer.a === 0) return null
+  const a = layer.a / 255
+  const r = Math.round(layer.r * a + 255 * (1 - a))
+  const g = Math.round(layer.g * a + 255 * (1 - a))
+  const b = Math.round(layer.b * a + 255 * (1 - a))
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
+function hasDirectTextContent(el: Element): boolean {
+  for (const node of el.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) return true
+  }
+  return false
+}
+
+function isTextInputElement(el: Element): boolean {
+  const tag = el.tagName.toLowerCase()
+  if (tag === 'textarea' || tag === 'select') return true
+  if (tag === 'input') {
+    const type = (el as HTMLInputElement).type.toLowerCase()
+    return !['checkbox', 'radio', 'range', 'color', 'file', 'image', 'hidden'].includes(type)
+  }
+  return false
+}
+
+function getEffectiveTextColor(el: Element): string {
+  if (isTextInputElement(el)) {
+    const input = el as HTMLInputElement | HTMLTextAreaElement
+    if (!input.value && 'placeholder' in input && input.placeholder) {
+      const placeholderColor = getComputedStyle(el, '::placeholder').color
+      if (placeholderColor && placeholderColor !== 'rgba(0, 0, 0, 0)') return placeholderColor
+    }
+  }
+  return getComputedStyle(el).color
+}
+
+// Returns the effective background color behind the element (starts compositing from parentElement)
+function getParentEffectiveBg(el: Element): string {
+  const layers: { r: number; g: number; b: number; a: number }[] = []
+  let current: Element | null = el.parentElement
+  while (current) {
+    const layer = getElementBgLayer(current)
+    if (layer && layer.a > 0) {
+      layers.unshift(layer)
+      if (layer.a === 255) break
+    }
+    if (current === document.documentElement) break
+    current = current.parentElement
+  }
+  let r = 255,
+    g = 255,
+    b = 255
+  for (const layer of layers) {
+    const a = layer.a / 255
+    r = Math.round(layer.r * a + r * (1 - a))
+    g = Math.round(layer.g * a + g * (1 - a))
+    b = Math.round(layer.b * a + b * (1 - a))
+  }
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 function handleClick(e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
@@ -365,14 +519,35 @@ function handleClick(e: MouseEvent) {
   if (!currentTarget) return
 
   const selector = getUniqueSelector(currentTarget)
-  const foregroundColor = getEffectiveForegroundColor(currentTarget)
+  const hasText = hasDirectTextContent(currentTarget) || isTextInputElement(currentTarget)
+  const hasForeground = hasCssMask(currentTarget) || currentTarget instanceof SVGElement || hasText
+  const foregroundColor = hasForeground ? getEffectiveForegroundColor(currentTarget) : undefined
+  const backgroundColor = getEffectiveBackgroundColor(currentTarget)
+  const elementColor = getOwnElementColor(currentTarget) ?? undefined
+  const borderColor = getVisibleBorderColor(currentTarget) ?? undefined
+  const outlineColor = getOutlineColor(currentTarget) ?? undefined
+  const ringColor = getRingColor(currentTarget) ?? undefined
+  const shadowColor = getShadowColor(currentTarget) ?? undefined
+  const pageBackgroundColor =
+    elementColor || borderColor || outlineColor || ringColor
+      ? getParentEffectiveBg(currentTarget)
+      : undefined
+  const textColor = hasText ? getEffectiveTextColor(currentTarget) : undefined
+
   chrome.runtime.sendMessage({
     type: 'element-picked',
     selector,
     url: document.URL,
     pageTitle: document.title,
     foregroundColor,
-    backgroundColor: getEffectiveBackgroundColor(currentTarget)
+    backgroundColor,
+    elementColor,
+    pageBackgroundColor,
+    textColor,
+    borderColor,
+    outlineColor,
+    ringColor,
+    shadowColor
   })
   cleanup()
 }
