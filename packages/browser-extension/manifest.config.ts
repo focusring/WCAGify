@@ -21,7 +21,7 @@ export default defineManifest({
     service_worker: 'src/background/service-worker.ts',
     type: 'module'
   },
-  permissions: ['activeTab', 'tabs', 'storage', 'sidePanel'],
+  permissions: ['activeTab', 'tabs', 'storage', 'sidePanel', 'debugger'],
   host_permissions: ['http://localhost/*', 'https://*/*'],
   content_security_policy: {
     extension_pages:

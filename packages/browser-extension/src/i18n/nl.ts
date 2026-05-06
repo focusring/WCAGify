@@ -173,5 +173,20 @@ export default {
     eyedropper: 'Kleur van scherm kiezen',
     testOptions: 'Testopties',
     sampleSentence: 'De snelle bruine vos'
+  },
+  elementState: {
+    title: 'Elementstatus',
+    active: ':active',
+    hover: ':hover',
+    focus: ':focus',
+    fWithin: ':focus-within',
+    fVisible: ':focus-visible',
+    target: ':target'
+  },
+  zoomCheck: {
+    title: 'Zoomcontrole'
+  },
+  test: {
+    title: 'Test'
   }
 } as const

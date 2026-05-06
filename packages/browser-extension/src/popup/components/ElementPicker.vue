@@ -27,8 +27,9 @@ const foregroundColor = ref('')
 const backgroundColor = ref('')
 const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
+const selectedTabId = ref<number | undefined>()
 
-defineExpose({ selector, pageUrl, pageTitle, foregroundColor, backgroundColor })
+defineExpose({ selector, pageUrl, pageTitle, foregroundColor, backgroundColor, selectedTabId })
 
 function onMessage(message: {
   type: string
@@ -44,6 +45,7 @@ function onMessage(message: {
     pageTitle.value = message.pageTitle ?? ''
     foregroundColor.value = toHex(message.foregroundColor ?? '')
     backgroundColor.value = toHex(message.backgroundColor ?? '')
+    selectedTabId.value = pickerTabId.value
     picking.value = false
     pickerTabId.value = undefined
   }
@@ -85,6 +87,7 @@ async function pickElement() {
   if (!tab?.id) return
 
   pickerTabId.value = tab.id
+  selectedTabId.value = undefined
   picking.value = true
   selector.value = ''
   pageUrl.value = ''

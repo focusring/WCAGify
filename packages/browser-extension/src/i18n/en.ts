@@ -174,5 +174,20 @@ export default {
     eyedropper: 'Pick color from screen',
     testOptions: 'Test Options',
     sampleSentence: 'The quick brown fox'
+  },
+  elementState: {
+    title: 'Element State',
+    active: ':active',
+    hover: ':hover',
+    focus: ':focus',
+    fWithin: ':focus-within',
+    fVisible: ':focus-visible',
+    target: ':target'
+  },
+  zoomCheck: {
+    title: 'Zoom Check'
+  },
+  test: {
+    title: 'Test'
   }
 } as const
