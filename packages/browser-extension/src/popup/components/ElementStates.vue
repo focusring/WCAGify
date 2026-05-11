@@ -13,16 +13,6 @@ let debuggerTabId: number | undefined
 
 const activeStates = ref<string[]>([])
 
-function buttonClass(isActive: boolean) {
-  return [
-    'px-3 py-1.5 text-sm rounded border transition-colors w-full',
-    'disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
-    isActive
-      ? 'bg-primary text-white border-primary'
-      : 'bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-  ]
-}
-
 async function applyPseudoClasses(tabId: number, selector: string | string[], states: string[]) {
   // For shadow DOM the picker returns an array; use the outermost selector
   const selectorStr = Array.isArray(selector) ? selector[0] : selector
@@ -30,21 +20,6 @@ async function applyPseudoClasses(tabId: number, selector: string | string[], st
 
   if (states.length === 0) {
     if (debuggerTabId !== undefined) {
-      await chrome.debugger
-        .sendCommand({ tabId: debuggerTabId }, 'Runtime.evaluate', {
-          expression: `(function(){ try { if (document.activeElement !== document.body) document.activeElement?.blur?.(); } catch(e){} })()`
-        })
-        .catch(() => {})
-      await chrome.debugger
-        .sendCommand({ tabId: debuggerTabId }, 'Input.dispatchMouseEvent', {
-          type: 'mouseMoved',
-          x: 0,
-          y: 0,
-          button: 'none',
-          buttons: 0,
-          clickCount: 0
-        })
-        .catch(() => {})
       await chrome.debugger.detach({ tabId: debuggerTabId }).catch(() => {})
       debuggerTabId = undefined
     }
@@ -98,53 +73,10 @@ async function applyPseudoClasses(tabId: number, selector: string | string[], st
     return
   }
 
-  try {
-    await chrome.debugger.sendCommand({ tabId }, 'CSS.forcePseudoClasses', {
-      nodeId,
-      forcedPseudoClasses: states
-    })
-    return
-  } catch (e: unknown) {
-    const msg = String(e)
-    if (!msg.includes('-32601') && !msg.includes("wasn't found")) throw e
-  }
-
-  // Fallback when CSS.forcePseudoClasses is unavailable: simulate via browser APIs
-  if (states.some((s) => ['focus', 'focus-visible', 'focus-within'].includes(s))) {
-    await chrome.debugger.sendCommand({ tabId }, 'DOM.focus', { nodeId }).catch(() => {})
-  }
-
-  if (states.includes('hover')) {
-    const posResult = (await chrome.debugger.sendCommand({ tabId }, 'Runtime.evaluate', {
-      expression: `(() => { const r = document.querySelector(${JSON.stringify(selectorStr)})?.getBoundingClientRect(); return r ? JSON.stringify({ x: r.left + r.width / 2, y: r.top + r.height / 2 }) : null })()`,
-      returnByValue: true
-    })) as { result: { value?: string } }
-    if (posResult?.result?.value) {
-      const pos = JSON.parse(posResult.result.value) as { x: number; y: number }
-      await chrome.debugger
-        .sendCommand({ tabId }, 'Input.dispatchMouseEvent', {
-          type: 'mouseMoved',
-          x: pos.x,
-          y: pos.y,
-          button: 'none',
-          buttons: 0,
-          clickCount: 0
-        })
-        .catch(() => {})
-    }
-  } else {
-    // Move the synthetic cursor away so any previously applied hover is cleared
-    await chrome.debugger
-      .sendCommand({ tabId }, 'Input.dispatchMouseEvent', {
-        type: 'mouseMoved',
-        x: 0,
-        y: 0,
-        button: 'none',
-        buttons: 0,
-        clickCount: 0
-      })
-      .catch(() => {})
-  }
+  await chrome.debugger.sendCommand({ tabId }, 'CSS.forcePseudoState', {
+    nodeId,
+    forcedPseudoClasses: states
+  })
 }
 
 async function toggleState(key: string) {
@@ -198,58 +130,58 @@ onUnmounted(() => {
 
 <template>
   <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-    <button
-      type="button"
+    <UButton
       :disabled="!selector"
-      :class="buttonClass(activeStates.includes('active'))"
+      :variant="activeStates.includes('active') ? 'solid' : 'outline'"
+      size="sm"
+      :ui="{ base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :label="t('elementState.active')"
       @click="toggleState('active')"
-    >
-      {{ t('elementState.active') }}
-    </button>
+    />
 
-    <button
-      type="button"
+    <UButton
       :disabled="!selector"
-      :class="buttonClass(activeStates.includes('hover'))"
+      :variant="activeStates.includes('hover') ? 'solid' : 'outline'"
+      size="sm"
+      :ui="{ base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :label="t('elementState.hover')"
       @click="toggleState('hover')"
-    >
-      {{ t('elementState.hover') }}
-    </button>
+    />
 
-    <button
-      type="button"
+    <UButton
       :disabled="!selector"
-      :class="buttonClass(activeStates.includes('focus'))"
+      :variant="activeStates.includes('focus') ? 'solid' : 'outline'"
+      size="sm"
+      :ui="{ base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :label="t('elementState.focus')"
       @click="toggleState('focus')"
-    >
-      {{ t('elementState.focus') }}
-    </button>
+    />
 
-    <button
-      type="button"
+    <UButton
       :disabled="!selector"
-      :class="buttonClass(activeStates.includes('focus-within'))"
+      :variant="activeStates.includes('focus-within') ? 'solid' : 'outline'"
+      size="sm"
+      :ui="{ base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :label="t('elementState.fWithin')"
       @click="toggleState('focus-within')"
-    >
-      {{ t('elementState.fWithin') }}
-    </button>
+    />
 
-    <button
-      type="button"
+    <UButton
       :disabled="!selector"
-      :class="buttonClass(activeStates.includes('focus-visible'))"
+      :variant="activeStates.includes('focus-visible') ? 'solid' : 'outline'"
+      size="sm"
+      :ui="{ base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :label="t('elementState.fVisible')"
       @click="toggleState('focus-visible')"
-    >
-      {{ t('elementState.fVisible') }}
-    </button>
+    />
 
-    <button
-      type="button"
+    <UButton
       :disabled="!selector"
-      :class="buttonClass(activeStates.includes('target'))"
+      :variant="activeStates.includes('target') ? 'solid' : 'outline'"
+      size="sm"
+      :ui="{ base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :label="t('elementState.target')"
       @click="toggleState('target')"
-    >
-      {{ t('elementState.target') }}
-    </button>
+    />
   </div>
 </template>
