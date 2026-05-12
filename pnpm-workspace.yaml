@@ -5,56 +5,56 @@ packages:
 
 catalog:
   '@nuxt/fonts': ^0.14.0
-  '@nuxt/ui': ^4.6.1
-  '@tiptap/core': ^3.22.4
-  '@tiptap/vue-3': ^3.22.4
-  nanoid: ^5.1.9
+  '@nuxt/ui': ^4.7.1
+  '@tiptap/core': ^3.23.1
+  '@tiptap/vue-3': ^3.23.1
+  nanoid: ^5.1.11
   sharp: ^0.34.5
-  zod: ^4.3.6
+  zod: ^4.4.3
 
 catalogMode: prefer
 
 catalogs:
   cli:
-    '@clack/prompts': ^1.2.0
+    '@clack/prompts': ^1.4.0
     commander: ^14.0.3
     ejs: ^5.0.2
     picocolors: ^1.1.1
   core:
-    '@iconify-json/lucide': ^1.2.102
-    '@iconify-json/simple-icons': ^1.2.79
-    '@libsql/client': ^0.17.2
+    '@iconify-json/lucide': ^1.2.107
+    '@iconify-json/simple-icons': ^1.2.82
+    '@libsql/client': ^0.17.3
     '@nuxt/a11y': 1.0.0-alpha.1
     '@nuxt/content': ^3.13.0
-    '@nuxt/icon': ^2.2.1
+    '@nuxt/icon': ^2.2.2
     '@nuxt/kit': ^4.4.5
-    '@nuxt/ui': ^4.6.1
-    '@nuxtjs/i18n': ^10.2.4
-    '@vueuse/core': ^14.2.1
+    '@nuxt/ui': ^4.7.1
+    '@nuxtjs/i18n': ^10.3.0
+    '@vueuse/core': ^14.3.0
     nuxt: ^4.4.5
-    nuxt-studio: ^1.6.0
-    tailwindcss: ^4.2.2
-    zod: ^4.3.6
+    nuxt-studio: ^1.7.0
+    tailwindcss: ^4.3.0
+    zod: ^4.4.3
   dev:
     '@nuxt/schema': ^4.4.5
     '@types/ejs': ^3.1.5
-    '@types/node': ^24.12.2
-    '@vitest/coverage-v8': ^4.1.4
-    bumpp: ^11.0.1
+    '@types/node': ^24.12.4
+    '@vitest/coverage-v8': ^4.1.6
+    bumpp: ^11.1.0
     changelogen: ^0.6.2
     changelogithub: ^14.0.0
     husky: ^9.1.7
-    knip: ^6.5.0
+    knip: ^6.13.0
     lint-staged: ^16.4.0
-    oxfmt: ^0.45.0
-    oxlint: ^1.60.0
-    playwright: ^1.59.1
-    tsdown: ^0.21.9
+    oxfmt: ^0.49.0
+    oxlint: ^1.64.0
+    playwright: ^1.60.0
+    tsdown: ^0.22.0
     typescript: ^6.0.3
-    vitest: ^4.1.4
-    vue-tsc: ^3.2.7
+    vitest: ^4.1.6
+    vue-tsc: ^3.2.8
   docs:
-    '@tailwindcss/vite': ^4.2.2
+    '@tailwindcss/vite': ^4.3.0
     vitepress: 2.0.0-alpha.17
 
 linkWorkspacePackages: true
