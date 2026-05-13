@@ -12,7 +12,7 @@ export default defineConfig({
   format: 'esm',
   dts: true,
   outDir: 'dist',
-  clean: true,
+  clean: false,
   hash: false,
   deps: {
     neverBundle: ['@nuxt/content', '@nuxt/kit', '@nuxt/schema']
