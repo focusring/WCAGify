@@ -502,4 +502,23 @@
   .iconify[aria-hidden='true'] {
     display: none !important;
   }
+
+  /* Results indicator row — force flex so the md: breakpoint doesn't need to fire */
+  .results-indicators {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8pt;
+    max-width: none !important;
+  }
+
+  .results-indicators > * {
+    flex: 1 1 auto;
+    max-width: none !important;
+  }
+
+  .results-indicators button {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6pt;
+  }
 }

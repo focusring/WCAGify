@@ -84,9 +84,9 @@ function setNeutralColor(val: string | undefined) {
   <div class="min-h-screen p-4 font-sans">
     <span ref="focusSentinel" tabindex="-1" aria-hidden="true" class="sr-only" />
     <!-- Header -->
-    <div class="flex items-center">
-      <UIcon name="i-lucide-settings" class="size-9 pr-2 text-black dark:text-white" />
-      <h1 class="text-lg font-bold text-black dark:text-white">{{ t('settings.title') }}</h1>
+    <div class="flex items-center gap-2">
+      <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
+      <h1 class="text-lg font-bold text-highlighted">WCAGify</h1>
 
       <UButton
         @click="emit('back')"
@@ -96,7 +96,7 @@ function setNeutralColor(val: string | undefined) {
         color="neutral"
         variant="subtle"
         :ui="{
-          base: 'cursor-pointer selectable-focus ml-auto',
+          base: 'cursor-pointer ml-auto',
           leadingIcon: 'size-5'
         }"
       />
@@ -106,7 +106,7 @@ function setNeutralColor(val: string | undefined) {
 
     <div class="max-w-2xl mx-auto">
       <!-- General -->
-      <h2 class="text-sm font-semibold text-muted tracking-wide mb-3">
+      <h2 class="text-sm font-semibold text-toned tracking-wide mb-3">
         {{ t('settings.general') }}
       </h2>
       <section class="bg-elevated rounded-sm p-4 space-y-3 mb-4">
@@ -123,10 +123,9 @@ function setNeutralColor(val: string | undefined) {
             :items="localeItems"
             :aria-label="t('language')"
             :ui="{
-              trailingIcon: 'icon-animation text-muted',
-              item: 'selectable-focus',
+              trailingIcon: 'icon-animation text-toned',
               content: 'overflow-visible',
-              base: 'bg-default min-w-32 cursor-pointer selectable-focus'
+              base: 'bg-default min-w-32 cursor-pointer'
             }"
             variant="subtle"
             size="lg"
@@ -135,7 +134,7 @@ function setNeutralColor(val: string | undefined) {
       </section>
 
       <!-- Appearance -->
-      <h2 class="text-sm font-semibold text-muted tracking-wide mb-3">
+      <h2 class="text-sm font-semibold text-toned tracking-wide mb-3">
         {{ t('settings.appearance') }}
       </h2>
       <section class="bg-elevated rounded-sm space-y-3 p-4">
@@ -149,7 +148,7 @@ function setNeutralColor(val: string | undefined) {
             @click="cycle"
             :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
             :ui="{
-              base: 'bg-default cursor-pointer min-w-24 selectable-focus',
+              base: 'bg-default cursor-pointer min-w-24',
               leadingIcon: 'size-4'
             }"
             :leading-icon="colorModeIcon"
@@ -192,7 +191,7 @@ function setNeutralColor(val: string | undefined) {
     <USeparator class="my-4" aria-hidden="true" />
 
     <footer
-      class="flex flex-col items-center gap-2 text-center text-xs text-muted pb-2 max-w-md mx-auto whitespace-nowrap"
+      class="flex flex-col items-center gap-2 text-center text-sm text-toned pb-2 max-w-md mx-auto whitespace-nowrap"
     >
       <img :src="logoSvg" alt="Logo WCAGify" class="size-8" />
       <div class="space-y-1.5">
@@ -201,7 +200,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://www.wcagify.com"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-primary hover:underline selectable-focus"
+            class="font-medium text-primary hover:underline"
             >WCAGify</a
           >
           {{ t('settings.license') }}
@@ -209,7 +208,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://wcagify.com/legal/terms-and-conditions"
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline selectable-focus"
+            class="hover:underline"
             >{{ t('settings.terms') }}</a
           >
           ·
@@ -217,7 +216,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://wcagify.com/legal/privacy-policy"
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline selectable-focus"
+            class="hover:underline"
             >{{ t('settings.privacy') }}</a
           >
           ·
@@ -225,7 +224,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://wcagify.com/legal/security-policy"
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline selectable-focus"
+            class="hover:underline"
             >{{ t('settings.security') }}</a
           >
         </p>
@@ -235,7 +234,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://www.focusring.io"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-primary hover:underline selectable-focus"
+            class="font-medium text-primary hover:underline"
             >focusring.io</a
           >
           {{ t('settings.inRegion') }}

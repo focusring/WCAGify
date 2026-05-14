@@ -88,7 +88,7 @@ function onTabKeydown(event: KeyboardEvent) {
               :class="isSaas ? 'text-(--vp-c-brand-1)' : 'text-(--vp-c-text-2)'"
             >
               Cloud-hosted (<abbr title="Software as a Service">SaaS</abbr>)
-              <small class="align-super text-xs text-(--vp-c-text-2)">Soon</small>
+              <small class="align-super text-sm text-(--vp-c-text-2)">Soon</small>
             </span>
           </div>
           <ul class="mt-2 list-none space-y-1 p-0 leading-relaxed">

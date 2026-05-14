@@ -55,12 +55,6 @@ h3 {
   @apply font-medium tracking-wide text-toned;
 }
 
-:focus-visible {
-  outline: 0.375rem double black;
-  box-shadow: 0 0 0 0.25rem white;
-  border-radius: var(--ui-radius);
-}
-
 button[role='switch'] {
   border: 2px solid currentColor !important;
 }
@@ -87,10 +81,16 @@ button[role='switch'] [data-slot='thumb'] {
   --color-green-950: #052e16;
 }
 
-.selectable-focus:focus,
-.selectable-focus:focus-visible,
-.selectable-focus:has(input:focus),
-.selectable-focus:has(input:focus-visible) {
+.icon-animation {
+  @apply group-data-[state=open]:rotate-180 transition-transform duration-200;
+}
+
+/* ************* */
+/* Focus styling */
+/* ************* */
+
+/* Default focus style */
+:focus-visible {
   outline: 0.375rem double var(--ui-color-primary-500);
   outline-offset: -1px;
   border-radius: var(--ui-radius);
@@ -98,6 +98,18 @@ button[role='switch'] [data-slot='thumb'] {
   transition: none;
 }
 
-.icon-animation {
-  @apply group-data-[state=open]:rotate-180 transition-transform duration-200;
+/* Custom focus styles for interactible elements */
+.selectable-focus:has(input:focus-visible),
+.selectable-focus[data-highlighted] {
+  outline: 0.375rem double var(--ui-color-primary-500);
+  outline-offset: -1px;
+  border-radius: var(--ui-radius);
+  box-shadow: 0 0 0 0.25rem var(--focus-gap-color);
+  transition: none;
+}
+
+/* Hide the search input's focus ring. the ring follows the highlighted item instead. */
+[data-slot='focusScope'] input:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: none;
 }

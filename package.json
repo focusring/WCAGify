@@ -54,7 +54,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
-      "sharp"
+      "vue-demi"
     ]
   }
 }

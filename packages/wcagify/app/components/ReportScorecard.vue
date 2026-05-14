@@ -40,21 +40,21 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
       </caption>
       <thead>
         <tr>
-          <th scope="col" class="border-b border-muted py-2 pr-4 font-medium text-muted">
+          <th scope="col" class="border-b border-muted py-2 pr-4 font-medium text-toned">
             {{ t('report.wcagPrinciple') }}
           </th>
           <th
             v-for="level in data.levels"
             :key="level"
             scope="col"
-            class="border-b border-muted py-2 pr-4 text-center font-medium text-muted"
+            class="border-b border-muted py-2 pr-4 text-center font-medium text-toned"
           >
             {{ level }}
           </th>
           <th
             v-if="showTotalColumn"
             scope="col"
-            class="border-b border-muted py-2 text-center font-medium text-muted"
+            class="border-b border-muted py-2 text-center font-medium text-toned"
           >
             {{ t('report.total') }}
           </th>
@@ -68,7 +68,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
           <td
             v-for="level in data.levels"
             :key="level"
-            class="border-b border-muted py-2 pr-4 text-center text-gray-700 dark:text-gray-300"
+            class="border-b border-muted py-2 pr-4 text-center text-default"
           >
             {{
               t('report.scoreFormat', {
@@ -77,10 +77,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
               })
             }}
           </td>
-          <td
-            v-if="showTotalColumn"
-            class="border-b border-muted py-2 text-center text-gray-700 dark:text-gray-300"
-          >
+          <td v-if="showTotalColumn" class="border-b border-muted py-2 text-center text-default">
             {{
               t('report.scoreFormat', {
                 conforming: data.total.conforming[principle],

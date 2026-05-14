@@ -155,7 +155,9 @@ defineExpose({ visiblePrinciples })
           {{ t('report.results') }}
         </h2>
 
-        <div class="md:flex grid grid-cols-2 grid-rows-2 gap-4 mt-4 max-w-lg md:max-w-none">
+        <div
+          class="results-indicators md:flex grid grid-cols-2 grid-rows-2 gap-4 mt-4 max-w-lg md:max-w-none"
+        >
           <ResultsIndicator
             status="passed"
             :count="statusCounts.passed"
@@ -188,7 +190,7 @@ defineExpose({ visiblePrinciples })
 
         <div
           v-if="emptyFilterStatus"
-          class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-muted py-16 text-center bg-muted"
+          class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-default py-16 text-center bg-muted"
         >
           <h3 class="font-semibold!">
             {{ t(`report.emptyFilter.${emptyFilterStatus}.title`) }}

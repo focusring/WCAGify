@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { useSettings } from '../composables/useSettings'
 import logoSvg from '../assets/wcagify-icon.svg'
-import ClearableSelect from './components/ClearableSelect.vue'
+// import ClearableSelect from './components/ClearableSelect.vue'
 import ConnectionSettings from './components/ConnectionSettings.vue'
 import ElementPicker from './components/ElementPicker.vue'
 import IssueForm from './components/IssueForm.vue'
@@ -24,18 +24,17 @@ const currentView = ref<'main' | 'settings'>('main')
       <!-- Header -->
       <div class="flex items-center gap-2">
         <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
-        <h1 class="text-lg font-bold text-black dark:text-white">WCAGify</h1>
+        <h1 class="text-lg font-bold text-highlighted">WCAGify</h1>
 
         <UButton
           @click="currentView = 'settings'"
-          :aria-label="t('settings.title')"
+          :label="t('settings.title').toLowerCase()"
           icon="i-lucide-settings"
-          size="xl"
+          size="lg"
           color="neutral"
           variant="ghost"
           :ui="{
-            base: 'cursor-pointer selectable-focus ml-auto',
-            leadingIcon: 'size-5'
+            base: 'cursor-pointer ml-auto'
           }"
         />
       </div>
@@ -57,10 +56,10 @@ const currentView = ref<'main' | 'settings'>('main')
         <div v-else class="space-y-5 max-w-2xl mx-auto">
           <div class="flex flex-col items-center text-center pt-2">
             <img :src="logoSvg" alt="" aria-hidden="true" class="size-16 mb-3" />
-            <h1 class="text-lg font-bold text-black dark:text-white mb-1">
+            <h1 class="text-lg font-bold text-highlighted mb-1">
               {{ t('setup.title') }}
             </h1>
-            <p class="text-sm text-muted">
+            <p class="text-sm text-toned">
               {{ t('setup.description') }}
             </p>
           </div>
@@ -69,14 +68,12 @@ const currentView = ref<'main' | 'settings'>('main')
             <ConnectionSettings />
           </section>
 
-          <div
-            class="rounded-sm border border-dashed border-gray-300 dark:border-gray-700 p-4 space-y-2"
-          >
-            <h2 class="text-sm font-semibold text-black dark:text-white flex items-center gap-1.5">
-              <UIcon name="i-lucide-info" class="size-4 text-muted" />
+          <div class="rounded-sm border border-dashed border-accented p-4 space-y-2">
+            <h2 class="text-sm font-semibold text-highlighted flex items-center gap-1.5">
+              <UIcon name="i-lucide-info" class="size-4 text-toned" />
               {{ t('setup.helpTitle') }}
             </h2>
-            <ol class="text-sm text-muted list-decimal list-inside space-y-1">
+            <ol class="text-sm text-toned list-decimal list-inside space-y-1">
               <li>{{ t('setup.step1') }}</li>
               <li>{{ t('setup.step2') }}</li>
               <li>{{ t('setup.step3') }}</li>
@@ -85,7 +82,7 @@ const currentView = ref<'main' | 'settings'>('main')
               href="https://wcagify.com/guide/getting-started"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline selectable-focus mt-1"
+              class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline mt-1"
             >
               {{ t('setup.docsLink') }}
               <UIcon name="i-lucide-external-link" class="size-3.5" />

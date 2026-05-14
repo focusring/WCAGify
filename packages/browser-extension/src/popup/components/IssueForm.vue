@@ -220,7 +220,7 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'selectable-focus cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
           @click="info.sample.toggle"
         />
       </div>
@@ -268,7 +268,7 @@ async function submit() {
             :aria-describedby="'issue-title-desc'"
             :placeholder="title ? undefined : t('form.issueTitle.placeholder')"
             :ui="{
-              base: '[&::placeholder]:text-muted py-2 pe-8 text-sm hover:bg-accented/75 selectable-focus'
+              base: '[&::placeholder]:text-toned py-2 pe-8 text-sm hover:bg-accented/75'
             }"
             variant="subtle"
             class="w-full"
@@ -281,7 +281,7 @@ async function submit() {
             icon="i-lucide-x"
             :aria-label="t('form.issueTitle.clear')"
             :ui="{
-              base: 'selectable-focus cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
+              base: 'cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
             }"
             @pointerdown.stop
             @click.stop="clearTitle"
@@ -298,7 +298,7 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'selectable-focus cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
           @click="info.title.toggle"
         />
       </div>
@@ -355,7 +355,7 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'selectable-focus cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
           @click="info.sc.toggle"
         />
       </div>
@@ -407,7 +407,7 @@ async function submit() {
             size="xs"
             variant="ghost"
             color="neutral"
-            :ui="{ base: 'selectable-focus cursor-pointer absolute -top-7.5 right-0' }"
+            :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
             @click="info.severity.toggle"
           />
         </div>
@@ -457,7 +457,7 @@ async function submit() {
             size="xs"
             variant="ghost"
             color="neutral"
-            :ui="{ base: 'selectable-focus cursor-pointer absolute -top-7.5 right-0' }"
+            :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
             @click="info.type.toggle"
           />
         </div>
@@ -511,7 +511,7 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'selectable-focus cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
           @click="info.body.toggle"
         />
       </div>
@@ -524,7 +524,7 @@ async function submit() {
       :label="submitting ? t('form.submitIssue.loading') : t('form.submitIssue.label')"
       size="xl"
       icon="i-lucide-file-input"
-      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer w-full justify-center' }"
     />
     <UAlert
       v-if="submitStatus === 'success'"

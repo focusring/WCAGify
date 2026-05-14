@@ -30,7 +30,7 @@ const columns = computed<TableColumn<SamplePage>[]>(() => [
   <UTable
     :data="report.sample"
     :columns="columns"
-    :ui="{ caption: 'sr-only' }"
+    :ui="{ caption: 'sr-only', td: 'text-toned' }"
     :caption="t('report.representativeSample')"
   >
     <template #url-cell="{ row }">

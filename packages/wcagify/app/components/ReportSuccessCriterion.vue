@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ScGroup, ScStatus } from '@focusring/wcagify'
+import type { ScGroup } from '@focusring/wcagify'
 import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 
 const props = defineProps<{
@@ -11,20 +11,14 @@ const { t } = useI18n()
 
 const statusFilters = inject<Ref<Set<string>>>('statusFilters')
 
-type BadgeColor = 'error' | 'neutral' | 'success' | 'warning' | 'primary' | 'secondary' | 'info'
+const colorMode = useColorMode()
+const statusBadgeVariant = computed(() => (colorMode.value === 'dark' ? 'subtle' : 'solid'))
 
-const statusConfig: Record<ScStatus, { color: BadgeColor; icon: string }> = {
-  passed: { color: 'success', icon: 'i-lucide:check' },
-  failed: { color: 'error', icon: 'i-lucide:x' },
-  'not-present': { color: 'neutral', icon: 'i-lucide:book-dashed' },
-  'not-tested': { color: 'warning', icon: 'i-lucide:mouse-pointer-2-off' }
-}
-
-const levelColors: Record<string, BadgeColor> = {
+const levelColors = {
   A: 'primary',
   AA: 'primary',
   AAA: 'primary'
-}
+} as const
 </script>
 
 <template>
@@ -45,11 +39,36 @@ const levelColors: Record<string, BadgeColor> = {
       </h4>
 
       <UBadge
-        :label="t(`report.scStatus.${criterion.status}`)"
-        variant="subtle"
-        :color="statusConfig[criterion.status].color"
-        :icon="statusConfig[criterion.status].icon"
+        v-if="criterion.status === 'passed'"
+        :label="t('report.scStatus.passed')"
+        :variant="statusBadgeVariant"
+        color="success"
+        icon="i-lucide:check"
         class="shrink-0"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'failed'"
+        :label="t('report.scStatus.failed')"
+        :variant="statusBadgeVariant"
+        color="error"
+        icon="i-lucide:x"
+        class="shrink-0 dark:bg-error/5 text-black dark:text-error-400"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'not-present'"
+        :label="t('report.scStatus.not-present')"
+        :variant="statusBadgeVariant"
+        color="neutral"
+        icon="i-lucide:book-dashed"
+        class="shrink-0"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'not-tested'"
+        :label="t('report.scStatus.not-tested')"
+        :variant="statusBadgeVariant"
+        color="warning"
+        icon="i-lucide:mouse-pointer-2-off"
+        class="shrink-0 text-warning-950 dark:text-warning-400"
       />
     </div>
 

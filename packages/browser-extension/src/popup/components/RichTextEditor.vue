@@ -142,13 +142,13 @@ const suggestionItems = computed(
     :aria-label="label"
     :aria-describedby="ariaDescribedby"
     :ui="{ base: 'px-3 py-2 min-h-32' }"
-    class="bg-elevated hover:bg-accented/75 transition-colors duration-200 w-full rounded-md border input-border"
+    class="bg-elevated hover:bg-accented/75 transition-colors duration-200 w-full rounded-md border border-accented"
   >
     <UEditorToolbar
       :editor="editor"
       :items="fixedToolbarItems"
       :ui="{ separator: 'bg-slate-300 dark:bg-slate-700' }"
-      class="editor-toolbar border-b input-border px-2 py-1 overflow-x-auto"
+      class="editor-toolbar border-b border-accented px-2 py-1 overflow-x-auto"
     />
 
     <UEditorDragHandle :editor="editor" />

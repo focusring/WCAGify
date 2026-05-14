@@ -9,7 +9,7 @@
 
   <UFooter>
     <template #left>
-      <p class="text-sm text-muted">WCAGify &copy; {{ new Date().getFullYear() }}</p>
+      <p class="text-sm text-toned">WCAGify &copy; {{ new Date().getFullYear() }}</p>
     </template>
   </UFooter>
 </template>

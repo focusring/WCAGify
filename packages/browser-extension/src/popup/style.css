@@ -1,6 +1,22 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/PublicSans-VariableFont_wght.ttf') format('woff2');
+}
+
+@font-face {
+  font-family: 'Public Sans';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/PublicSans-Italic-VariableFont_wght.ttf') format('woff2');
+}
+
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
 
@@ -177,17 +193,14 @@
   --focus-gap-color: black;
 
   --ui-radius: 0.125rem;
-
-  --ui-text-muted: var(--color-slate-600);
 }
 
 .dark {
   --focus-gap-color: white;
-  --ui-text-muted: var(--color-slate-300);
 }
 
 .label-title {
-  @apply font-medium tracking-wide text-muted;
+  @apply font-medium tracking-wide text-toned;
 }
 
 .label-hint {
@@ -222,12 +235,8 @@
  * TipTap editor: ensure placeholder and list markers have proper contrast.
  */
 
-.input-border {
-  @apply border-slate-300 dark:border-slate-700;
-}
-
 .tiptap.ProseMirror p.is-editor-empty:first-child::before {
-  color: var(--ui-text-muted);
+  color: var(--ui-text-toned);
 }
 
 .tiptap.ProseMirror:focus {
@@ -244,18 +253,14 @@
 
 /* Default focus style */
 :focus-visible {
-  outline: 0.375rem double black;
-  box-shadow: 0 0 0 0.25rem white;
+  outline: 0.375rem double var(--ui-color-primary-500);
+  outline-offset: -1px;
   border-radius: var(--ui-radius);
+  box-shadow: 0 0 0 0.25rem var(--focus-gap-color);
+  transition: none;
 }
 
 /* Custom focus styles for interactible elements */
-.editor-toolbar button:focus,
-.UEditorDragHandle button:focus,
-.editor-toolbar button:focus-visible,
-.selectable-focus:focus,
-.selectable-focus:focus-visible,
-.selectable-focus:has(input:focus),
 .selectable-focus:has(input:focus-visible),
 .selectable-focus[data-highlighted] {
   outline: 0.375rem double var(--ui-color-primary-500);
@@ -265,33 +270,8 @@
   transition: none;
 }
 
-/* Only [data-highlighted] carries the ring inside dropdowns — suppress :focus-visible on non-highlighted items. */
-[data-slot='focusScope'] .selectable-focus:not([data-highlighted]):focus,
-[data-slot='focusScope'] .selectable-focus:not([data-highlighted]):focus-visible {
-  outline: 2px solid transparent;
-  box-shadow: none;
-}
-
 /* Hide the search input's focus ring. the ring follows the highlighted item instead. */
-[data-slot='focusScope'] input:focus,
 [data-slot='focusScope'] input:focus-visible {
   outline: 2px solid transparent;
   box-shadow: none;
-}
-
-/* Suppress focus ring on dropdown containers, focus is managed internally by Reka UI.
-   Restore the component border using --ui-border instead of the global focus gap. */
-[role='listbox']:focus,
-[data-slot='focusScope']:focus {
-  outline: 2px solid transparent;
-  box-shadow: 0 0 0 1px var(--ui-border);
-}
-
-/* box-shadow is ignored in forced-colors mode; restore a visible outline so
-   Windows High Contrast users still get a clear focus indicator. */
-@media (forced-colors: active) {
-  [role='listbox']:focus,
-  [data-slot='focusScope']:focus {
-    outline: 1px solid CanvasText;
-  }
 }

@@ -100,15 +100,15 @@ function formatDate(dateStr: string): string {
   <USlideover v-model:open="open" :title="t('share.shareReport')" :modal="true">
     <template #body>
       <div v-if="needsAdminLogin" class="flex flex-col items-center justify-center py-12">
-        <UIcon name="i-lucide-shield" class="size-12 text-muted" />
+        <UIcon name="i-lucide-shield" class="size-12 text-toned" />
         <h3 class="mt-4 font-semibold!">
           {{ t('share.adminRequired') }}
         </h3>
-        <p class="mt-2 text-sm text-muted text-center">
+        <p class="mt-2 text-sm text-toned text-center">
           {{ t('share.adminDescription') }}
         </p>
         <form class="mt-6 w-full max-w-xs space-y-4" @submit.prevent="loginAdmin">
-          <label for="admin-secret" class="block text-xs text-muted">
+          <label for="admin-secret" class="block text-sm text-toned">
             {{ t('share.adminSecret') }} <small>{{ t('share.required') }}</small>
           </label>
           <UInput
@@ -134,7 +134,7 @@ function formatDate(dateStr: string): string {
           </h3>
           <div class="mt-3 space-y-3">
             <div>
-              <label for="share-expires-at" class="block text-xs text-muted">
+              <label for="share-expires-at" class="block text-sm text-toned">
                 {{ t('share.expiresAt') }}
               </label>
               <UInput
@@ -146,7 +146,7 @@ function formatDate(dateStr: string): string {
               />
             </div>
             <div>
-              <label for="share-password" class="block text-xs text-muted">
+              <label for="share-password" class="block text-sm text-toned">
                 {{ t('share.password') }}
               </label>
               <UInput id="share-password" v-model="password" type="password" class="mt-1" />
@@ -165,7 +165,7 @@ function formatDate(dateStr: string): string {
             {{ t('share.activeLinks') }}
           </h3>
 
-          <p v-if="!shares?.length" class="mt-3 text-sm text-muted">
+          <p v-if="!shares?.length" class="mt-3 text-sm text-toned">
             {{ t('share.noLinks') }}
           </p>
 
@@ -198,7 +198,7 @@ function formatDate(dateStr: string): string {
                   @click="deleteShareLink(share.token, share.delete_token)"
                 />
               </div>
-              <div class="mt-2 flex items-center gap-4 text-xs text-muted">
+              <div class="mt-2 flex items-center gap-4 text-sm text-toned">
                 <span>{{ t('share.createdAt') }}: {{ formatDate(share.created_at) }}</span>
                 <span v-if="share.expires_at">
                   {{ t('share.expiresAt') }}: {{ formatDate(share.expires_at) }}

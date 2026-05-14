@@ -193,9 +193,11 @@ const columnLabels = computed<Record<string, string>>(() => ({
             v-model="search"
             :placeholder="t('report.searchReports')"
             icon="i-lucide-search"
+            variant="subtle"
             class="max-w-sm"
             :ui="{
-              base: '[&::placeholder]:text-muted py-2 pe-8 text-sm hover:bg-accented/75 selectable-focus'
+              base: '[&::placeholder]:text-toned py-2 pe-8 text-sm hover:bg-accented/75',
+              leadingIcon: 'text-toned'
             }"
           />
 
@@ -222,7 +224,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
               <UButton
                 :label="t('app.columns')"
                 color="neutral"
-                variant="outline"
+                variant="subtle"
                 trailing-icon="i-lucide-chevron-down"
                 class="cursor-pointer"
               />
@@ -251,7 +253,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
               <UButton
                 :label="t('app.columns')"
                 color="neutral"
-                variant="outline"
+                variant="subtle"
                 trailing-icon="i-lucide-chevron-down"
                 class="cursor-pointer"
               />
@@ -276,7 +278,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
               <UButton
                 icon="i-lucide-arrow-up-down"
                 color="neutral"
-                variant="outline"
+                variant="subtle"
                 square
                 class="cursor-pointer"
               />
@@ -312,10 +314,10 @@ const columnLabels = computed<Record<string, string>>(() => ({
             class="group relative rounded-lg border border-default bg-default p-5 transition-colors hover:border-primary hover:bg-elevated"
           >
             <div class="flex items-start justify-between gap-2">
-              <h2 class="font-semibold text-highlighted group-hover:text-primary">
+              <h2 class="text-base! group-hover:text-primary!">
                 <NuxtLinkLocale
                   :to="report.path"
-                  class="no-underline! text-inherit! before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  class="no-underline! text-inherit! before:absolute before:inset-0"
                 >
                   {{ report.title }}
                 </NuxtLinkLocale>
@@ -330,11 +332,11 @@ const columnLabels = computed<Record<string, string>>(() => ({
               </UBadge>
             </div>
 
-            <p v-if="isFieldVisible('commissioner')" class="mt-2 text-sm text-muted">
+            <p v-if="isFieldVisible('commissioner')" class="mt-2 text-sm text-toned">
               {{ report.evaluation.commissioner }}
             </p>
 
-            <div class="mt-4 flex items-center gap-4 text-xs text-dimmed">
+            <div class="mt-4 flex items-center gap-4 text-sm text-toned">
               <span v-if="isFieldVisible('evaluator')" class="flex items-center gap-1">
                 <UIcon name="i-lucide-user" class="size-3.5" />
                 {{ report.evaluation.evaluator }}
@@ -354,13 +356,10 @@ const columnLabels = computed<Record<string, string>>(() => ({
           :data="filteredAndSortedReports"
           :columns="columns"
           :caption="t('app.reports')"
-          :ui="{ caption: 'sr-only' }"
+          :ui="{ caption: 'sr-only', td: 'text-toned' }"
         >
           <template #title-cell="{ row }">
-            <NuxtLinkLocale
-              :to="row.original.path"
-              class="font-medium text-primary underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
+            <NuxtLinkLocale :to="row.original.path" class="font-medium text-primary underline">
               {{ row.original.title }}
             </NuxtLinkLocale>
           </template>
@@ -372,13 +371,13 @@ const columnLabels = computed<Record<string, string>>(() => ({
           </template>
         </UTable>
 
-        <div v-if="filteredAndSortedReports.length === 0" class="px-4 py-3.5 text-sm text-muted">
+        <div v-if="filteredAndSortedReports.length === 0" class="px-4 py-3.5 text-sm text-toned">
           {{ t('app.noReports') }}
         </div>
       </div>
     </template>
 
-    <p v-else class="mt-6 text-muted">
+    <p v-else class="mt-6 text-toned">
       {{ t('app.noReports') }}
     </p>
   </div>

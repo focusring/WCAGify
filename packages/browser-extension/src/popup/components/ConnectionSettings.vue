@@ -165,7 +165,7 @@ async function fetchReports() {
         <span class="text-success">{{ t('connection.connected') }}</span>
         &mdash;
       </div>
-      <span class="text-muted">{{ wcagifyUrl }}</span>
+      <span class="text-toned">{{ wcagifyUrl }}</span>
     </div>
     <div v-if="status === 'idle' || status === 'error'" class="flex gap-2 text-sm">
       <div class="flex gap-2">
@@ -173,17 +173,17 @@ async function fetchReports() {
         <span class="text-error">{{ t('connection.disconnected') }}</span>
         &mdash;
       </div>
-      <span class="text-muted">{{ wcagifyUrl }}</span>
+      <span class="text-toned">{{ wcagifyUrl }}</span>
     </div>
 
     <!-- Scanning state -->
-    <div v-if="mode === 'scanning'" class="text-sm text-muted">
+    <div v-if="mode === 'scanning'" class="text-sm text-toned">
       {{ t('connection.scanning') }}
     </div>
 
     <!-- Multiple instances found: dropdown -->
     <div v-else-if="mode === 'select'">
-      <label for="wcagify-instance" class="block text-sm font-medium text-muted mb-1"
+      <label for="wcagify-instance" class="block text-sm font-medium text-toned mb-1"
         >{{ t('connection.selectInstance') }} <small>({{ t('connection.required') }})</small></label
       >
       <USelect
@@ -193,8 +193,7 @@ async function fetchReports() {
         @update:model-value="connectInstance"
         required
         :ui="{
-          placeholder: 'text-muted',
-          item: 'selectable-focus'
+          placeholder: 'text-toned'
         }"
         aria-required="true"
         class="w-full cursor-pointer"
@@ -238,7 +237,7 @@ async function fetchReports() {
                 :aria-describedby="status === 'error' ? 'wcagify-url-error' : undefined"
                 :color="status === 'error' ? 'error' : 'success'"
                 :highlight="status === 'error'"
-                :ui="{ base: 'selectable-focus pe-8' }"
+                :ui="{ base: '[&::placeholder]:text-toned pe-8' }"
                 class="w-full"
               />
               <UButton
@@ -249,7 +248,7 @@ async function fetchReports() {
                 icon="i-lucide-x"
                 :aria-label="t('settings.clear')"
                 :ui="{
-                  base: 'selectable-focus cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
+                  base: 'cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
                 }"
                 @pointerdown.stop
                 @click.stop="clearUrl"
@@ -263,7 +262,7 @@ async function fetchReports() {
               color="primary"
               size="lg"
               :label="t('connection.connect')"
-              :ui="{ base: 'cursor-pointer selectable-focus' }"
+              :ui="{ base: 'cursor-pointer' }"
             />
 
             <UButton
@@ -274,7 +273,7 @@ async function fetchReports() {
               size="lg"
               :aria-label="t('connection.rescan')"
               :ui="{
-                base: 'shrink-0 cursor-pointer selectable-focus flex-none'
+                base: 'shrink-0 cursor-pointer flex-none'
               }"
             />
           </div>
@@ -328,6 +327,7 @@ async function fetchReports() {
         :placeholder="t('connection.selectReport')"
         :ui="{ base: 'bg-default' }"
         required
+        variant="outline"
       />
     </UFormField>
   </div>

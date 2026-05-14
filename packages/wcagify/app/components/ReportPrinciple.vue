@@ -35,7 +35,7 @@ const principleIcons: Record<string, string> = {
       {{ t(`report.principles.${group.principle}`) }}
     </h2>
 
-    <p class="mt-2 text-sm text-muted">
+    <p class="mt-2 text-sm text-toned">
       {{ t(`report.principleDescriptions.${group.principle}`) }}
     </p>
 
