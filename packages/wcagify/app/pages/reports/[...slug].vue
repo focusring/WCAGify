@@ -59,12 +59,14 @@ const visiblePrinciples = computed(
             icon="i-lucide-share-2"
             variant="outline"
             @click="shareOpen = true"
+            class="cursor-pointer"
           />
           <UButton
             :label="$t('report.downloadPdf')"
             icon="i-lucide-download"
             :loading="isGeneratingPdf"
             @click="downloadPdf"
+            class="cursor-pointer"
           />
         </template>
       </ReportContent>

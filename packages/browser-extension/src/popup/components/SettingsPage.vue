@@ -64,6 +64,7 @@ const accentColorSwatches = ACCENT_COLORS.map((name) => ({
   name,
   value: ACCENT_HEX[name]
 }))
+
 const neutralColorSwatches = NEUTRAL_COLORS.map((name) => ({
   name,
   value: NEUTRAL_HEX[name]

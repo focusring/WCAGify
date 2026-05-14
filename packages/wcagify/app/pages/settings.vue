@@ -5,9 +5,8 @@ import type { AccentColor, NeutralColor } from '../composables/useSettings'
 const { t, locale, locales, setLocale: setNuxtLocale } = useI18n()
 const router = useRouter()
 const { settings } = useSettings()
-const colorMode = useColorMode()
 
-const ACCENT_HEX: Record<string, string> = {
+const ACCENT_HEX: Record<AccentColor, string> = {
   green: '#22c55e',
   blue: '#3b82f6',
   red: '#ef4444',
@@ -17,7 +16,7 @@ const ACCENT_HEX: Record<string, string> = {
   violet: '#8b5cf6'
 }
 
-const NEUTRAL_HEX: Record<string, string> = {
+const NEUTRAL_HEX: Record<NeutralColor, string> = {
   slate: '#64748b',
   gray: '#6b7280',
   zinc: '#71717a',
@@ -25,28 +24,15 @@ const NEUTRAL_HEX: Record<string, string> = {
   stone: '#78716c'
 }
 
-const accentColorSwatches = ACCENT_COLORS.map((name: string) => ({
+const accentColorSwatches = ACCENT_COLORS.map((name) => ({
   name,
-  value: ACCENT_HEX[name] ?? '#000000'
+  value: ACCENT_HEX[name]
 }))
 
-const neutralColorSwatches = NEUTRAL_COLORS.map((name: string) => ({
+const neutralColorSwatches = NEUTRAL_COLORS.map((name) => ({
   name,
-  value: NEUTRAL_HEX[name] ?? '#000000'
+  value: NEUTRAL_HEX[name]
 }))
-
-const themeOptions = computed(() => [
-  { label: t('settings.themeSystem'), value: 'system' },
-  { label: t('settings.themeLight'), value: 'light' },
-  { label: t('settings.themeDark'), value: 'dark' }
-])
-
-const localeOptions = computed(() =>
-  locales.value.map((loc) => ({
-    label: loc.name || loc.code,
-    value: loc.code
-  }))
-)
 
 async function onLocaleChange(code: string) {
   await setNuxtLocale(code as 'en' | 'nl')
@@ -75,82 +61,85 @@ useSeoMeta({
             <span class="sr-only sm:not-sr-only">{{ t('settings.back') }}</span>
           </UButton>
         </div>
-        <p class="text-muted text-lg">
+        <p class="text-lg text-toned">
           {{ t('settings.tagline') }}
         </p>
       </header>
 
       <div class="space-y-8">
-        <!-- Appearance -->
-        <section>
-          <h2 class="text-xs text-muted uppercase tracking-wider mb-4">
-            {{ t('settings.appearance') }}
-          </h2>
-          <div class="bg-elevated border border-default rounded-lg p-4 sm:p-6 space-y-6">
-            <div class="space-y-2">
-              <label for="theme-select" class="block text-sm font-medium">
-                {{ t('settings.theme') }}
-              </label>
-              <USelect
-                id="theme-select"
-                v-model="colorMode.preference"
-                :items="themeOptions"
-                value-key="value"
-                class="max-w-48 cursor-pointer"
-              />
-            </div>
-
-            <div class="space-y-3">
-              <span class="block text-sm font-medium">
-                {{ t('settings.accentColor') }}
-              </span>
-              <SettingsColorPicker
-                :colors="accentColorSwatches"
-                :model-value="settings.accentColor"
-                :label="t('settings.accentColor')"
-                name="accent-color"
-                @update:model-value="settings.accentColor = ($event ?? 'green') as AccentColor"
-              />
-            </div>
-
-            <div class="space-y-3">
-              <span class="block text-sm font-medium">
-                {{ t('settings.backgroundShade') }}
-              </span>
-              <SettingsColorPicker
-                :colors="neutralColorSwatches"
-                :model-value="settings.neutralColor"
-                :label="t('settings.backgroundShade')"
-                name="background-shade"
-                @update:model-value="settings.neutralColor = ($event ?? 'slate') as NeutralColor"
-              />
-            </div>
-          </div>
-        </section>
-
         <!-- Language -->
-        <section>
-          <h2 class="text-xs text-muted uppercase tracking-wider mb-4">
-            {{ t('settings.languageSection') }}
-          </h2>
-          <div class="bg-elevated border border-default rounded-lg p-4 sm:p-6">
-            <div class="space-y-2">
-              <label for="language-select" class="block text-sm font-medium">
-                {{ t('settings.language') }}
-              </label>
-              <ClientOnly>
-                <USelect
-                  id="language-select"
-                  :model-value="locale"
-                  :items="localeOptions"
-                  value-key="value"
-                  class="min-w-32 cursor-pointer"
-                  @update:model-value="onLocaleChange($event)"
-                />
-              </ClientOnly>
-            </div>
-          </div>
-        </section>
+        <h2 class="text-sm! text-toned! tracking-wide mb-3">
+          {{ t('settings.generalSection') }}
+        </h2>
+        <div class="bg-elevated border border-default rounded-sm p-4 sm:p-6">
+          <UFormField
+            :label="t('settings.language')"
+            name="language"
+            orientation="horizontal"
+            :ui="{ label: 'label-title' }"
+          >
+            <ClientOnly>
+              <ULocaleSelect
+                :locales="locales as any"
+                :model-value="locale"
+                @update:model-value="onLocaleChange($event)"
+                :ui="{
+                  base: 'cursor-pointer min-w-32',
+                  item: 'cursor-pointer'
+                }"
+              />
+            </ClientOnly>
+          </UFormField>
+        </div>
+
+        <!-- Appearance -->
+        <h2 class="text-sm! text-toned! tracking-wide mb-3">
+          {{ t('settings.appearance') }}
+        </h2>
+        <div class="bg-elevated border border-default rounded-sm p-4 sm:p-6 space-y-6">
+          <!-- Theme -->
+          <UFormField
+            :label="t('settings.theme')"
+            name="theme-select"
+            orientation="horizontal"
+            :ui="{ label: 'label-title' }"
+            class="items-center"
+          >
+            <UColorModeSelect class="max-w-48" />
+          </UFormField>
+
+          <!-- Accent Color -->
+          <UFormField
+            :label="t('settings.accentColor') + ` - ${settings.accentColor}`"
+            name="accent-color"
+            :ui="{ label: 'label-title' }"
+            class="flex flex-row items-center justify-between"
+          >
+            <SettingsColorPicker
+              :colors="accentColorSwatches"
+              :model-value="settings.accentColor"
+              :label="t('settings.accentColor') + ` - ${settings.accentColor}`"
+              name="accent-color"
+              @update:model-value="settings.accentColor = $event as AccentColor"
+            />
+          </UFormField>
+
+          <!-- Background Shade -->
+          <UFormField
+            :label="t('settings.backgroundShade')"
+            name="background-shade"
+            :ui="{ label: 'label-title' }"
+            class="flex flex-row items-center justify-between"
+          >
+            <SettingsColorPicker
+              :colors="neutralColorSwatches"
+              :model-value="settings.neutralColor"
+              :label="t('settings.backgroundShade')"
+              name="background-shade"
+              @update:model-value="settings.neutralColor = $event as NeutralColor"
+            />
+          </UFormField>
+        </div>
       </div>
     </article>
   </main>

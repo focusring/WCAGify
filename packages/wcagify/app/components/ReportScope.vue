@@ -11,7 +11,7 @@ const { t } = useI18n()
 <template>
   <div class="space-y-6">
     <div>
-      <h3 class="text-lg font-medium text-gray-950 dark:text-white">
+      <h3>
         {{ t('report.scopeItems') }}
       </h3>
       <ul class="mt-2 list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
@@ -22,7 +22,7 @@ const { t } = useI18n()
     </div>
 
     <div v-if="report.outOfScope?.length">
-      <h3 class="text-lg font-medium text-gray-950 dark:text-white">
+      <h3>
         {{ t('report.notInScope') }}
       </h3>
       <ul class="mt-2 list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
@@ -33,7 +33,7 @@ const { t } = useI18n()
     </div>
 
     <div>
-      <h3 class="text-lg font-medium text-gray-950 dark:text-white">
+      <h3>
         {{ t('report.accessibilitySupport') }}
       </h3>
       <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -47,7 +47,7 @@ const { t } = useI18n()
     </div>
 
     <div>
-      <h3 class="text-lg font-medium text-gray-950 dark:text-white">
+      <h3>
         {{ t('report.technologiesUsed') }}
       </h3>
       <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">

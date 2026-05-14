@@ -156,13 +156,9 @@ export default {
     tagline: 'Pas je WCAGify-ervaring aan',
     appearance: 'Weergave',
     theme: 'Thema',
-    themeSystem: 'Systeem',
-    themeLight: 'Licht',
-    themeDark: 'Donker',
     accentColor: 'Accentkleur',
     backgroundShade: 'Achtergrondtint',
-    clearColor: 'Kleur wissen',
-    languageSection: 'Taal',
+    generalSection: 'Algemeen',
     language: 'Taal',
     back: 'terug'
   }

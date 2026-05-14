@@ -31,7 +31,7 @@ const issueType = computed(() => (props.issue as any).type as string | undefined
 
 <template>
   <dl
-    class="flex flex-col gap-2 md:gap-1 px-6 py-4 text-sm font-medium bg-default text-gray-950 dark:text-white"
+    class="flex flex-col gap-2 md:gap-1 px-6 py-4 text-sm font-medium bg-default text-highlighted"
   >
     <div v-if="issue.severity || issueType" class="flex flex-row gap-4">
       <div v-if="issue.severity" class="flex gap-1 w-full">

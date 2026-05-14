@@ -151,7 +151,6 @@ export default {
     saved: 'Saved',
     accentColor: 'Accent Color',
     backgroundShade: 'Background Shade',
-    clearColor: 'Clear color',
     license: 'is released under the MIT License.',
     terms: 'Terms',
     privacy: 'Privacy',

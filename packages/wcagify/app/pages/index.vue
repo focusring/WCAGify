@@ -182,7 +182,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
     <h1 class="text-3xl font-bold">
       {{ t('app.reports') }}
     </h1>
-    <p class="mt-1 text-muted">
+    <p class="mt-1 text-toned">
       {{ t('app.description') }}
     </p>
 
@@ -194,6 +194,9 @@ const columnLabels = computed<Record<string, string>>(() => ({
             :placeholder="t('report.searchReports')"
             icon="i-lucide-search"
             class="max-w-sm"
+            :ui="{
+              base: '[&::placeholder]:text-muted py-2 pe-8 text-sm hover:bg-accented/75 selectable-focus'
+            }"
           />
 
           <div class="ml-auto flex items-center gap-1">

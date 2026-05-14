@@ -30,7 +30,7 @@ const levelColors: Record<string, BadgeColor> = {
 <template>
   <div
     v-show="!statusFilters || statusFilters.has(criterion.status)"
-    class="rounded-lg border border-gray-200 dark:border-muted bg-muted overflow-hidden"
+    class="rounded-lg border border-muted bg-muted overflow-hidden"
   >
     <div class="flex items-center gap-3 px-4 py-3">
       <UBadge
@@ -40,7 +40,7 @@ const levelColors: Record<string, BadgeColor> = {
         class="shrink-0"
       />
 
-      <h4 class="font-medium text-gray-950 dark:text-white text-base w-full">
+      <h4 class="font-medium text-highlighted text-base w-full">
         {{ criterion.name }}
       </h4>
 

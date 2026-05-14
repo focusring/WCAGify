@@ -101,7 +101,7 @@ function formatDate(dateStr: string): string {
     <template #body>
       <div v-if="needsAdminLogin" class="flex flex-col items-center justify-center py-12">
         <UIcon name="i-lucide-shield" class="size-12 text-muted" />
-        <h3 class="mt-4 text-lg font-semibold text-gray-950 dark:text-white">
+        <h3 class="mt-4 font-semibold!">
           {{ t('share.adminRequired') }}
         </h3>
         <p class="mt-2 text-sm text-muted text-center">
@@ -129,7 +129,7 @@ function formatDate(dateStr: string): string {
 
       <div v-else class="space-y-6">
         <div>
-          <h3 class="text-sm font-medium text-gray-950 dark:text-white">
+          <h3 class="text-sm!">
             {{ t('share.createLink') }}
           </h3>
           <div class="mt-3 space-y-3">
@@ -161,7 +161,7 @@ function formatDate(dateStr: string): string {
         <USeparator aria-hidden="true" />
 
         <div>
-          <h3 class="text-sm font-medium text-gray-950 dark:text-white">
+          <h3 class="text-sm!">
             {{ t('share.activeLinks') }}
           </h3>
 

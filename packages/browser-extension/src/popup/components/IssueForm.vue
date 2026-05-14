@@ -526,18 +526,21 @@ async function submit() {
       icon="i-lucide-file-input"
       :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer selectable-focus w-full justify-center' }"
     />
-
-    <div
+    <UAlert
       v-if="submitStatus === 'success'"
-      class="rounded bg-green-50 dark:bg-green-900/30 p-2 text-sm text-green-700 dark:text-green-400"
-    >
-      {{ submitMessage }}
-    </div>
-    <div
+      color="success"
+      variant="subtle"
+      icon="i-lucide-circle-check"
+      :description="submitMessage"
+      class="px-3 py-2 items-center"
+    />
+    <UAlert
       v-if="submitStatus === 'error'"
-      class="rounded bg-red-50 dark:bg-red-900/30 p-2 text-sm text-red-700 dark:text-red-400"
-    >
-      {{ submitMessage }}
-    </div>
+      color="error"
+      variant="subtle"
+      icon="i-lucide-triangle-alert"
+      :description="submitMessage"
+      class="px-3 py-2 items-center"
+    />
   </UForm>
 </template>

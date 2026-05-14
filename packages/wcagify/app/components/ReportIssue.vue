@@ -30,7 +30,7 @@ const issueId = `issue-${sanitizedPath}`
         base: 'px-4 py-3 items-start gap-3 text-left rounded-none ring-0 border-t border-muted'
       }"
     >
-      <h5 class="font-medium text-gray-950 dark:text-white text-base w-full">
+      <h5 class="font-medium text-highlighted text-base w-full">
         <span v-if="index !== undefined && index !== null">{{ index }}. </span>{{ issue.title }}
       </h5>
 

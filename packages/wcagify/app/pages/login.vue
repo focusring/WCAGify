@@ -40,7 +40,7 @@ useSeoMeta({
     <!-- Setup required (production, no secret configured) -->
     <div v-if="status && !status.configured && !status.dev" class="max-w-sm text-center">
       <UIcon name="i-lucide-shield-alert" class="size-12 text-muted" />
-      <h1 class="mt-4 text-xl font-semibold text-gray-950 dark:text-white">
+      <h1 class="mt-4 text-xl font-semibold text-highlighted">
         {{ t('admin.setupRequired') }}
       </h1>
       <p class="mt-2 text-sm text-muted">
@@ -57,7 +57,7 @@ WCAGIFY_ADMIN_SECRET=your-secret-here</pre
     <div v-else-if="status && status.configured" class="max-w-sm w-full">
       <div class="text-center">
         <UIcon name="i-lucide-shield" class="size-12 text-muted" />
-        <h1 class="mt-4 text-xl font-semibold text-gray-950 dark:text-white">
+        <h1 class="mt-4 text-xl font-semibold text-highlighted">
           {{ t('admin.loginTitle') }}
         </h1>
         <p class="mt-2 text-sm text-muted">

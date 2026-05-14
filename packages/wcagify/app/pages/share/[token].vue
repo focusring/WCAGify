@@ -101,7 +101,7 @@ async function downloadPdf() {
   <div v-if="passwordRequired && !authenticated" class="mx-auto max-w-sm mt-24">
     <div class="text-center">
       <UIcon name="i-lucide-lock" class="size-12 text-muted" />
-      <h1 class="mt-4 text-xl font-semibold text-gray-950 dark:text-white">
+      <h1 class="mt-4 text-xl font-semibold text-highlighted">
         {{ t('share.passwordRequired') }}
       </h1>
       <p class="mt-2 text-sm text-muted">

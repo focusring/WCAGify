@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { t } = useI18n()
+import { en as uiEn, nl as uiNl } from '@nuxt/ui/locale'
+
+const { t, locale } = useI18n()
+const uiLocale = computed(() => (locale.value === 'nl' ? uiNl : uiEn))
 const head = useLocaleHead({ seo: true })
 const { status: adminStatus, refresh: refreshAdminStatus } = useAdminAuth()
 
@@ -29,7 +32,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="uiLocale">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

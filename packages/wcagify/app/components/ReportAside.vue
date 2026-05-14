@@ -73,14 +73,14 @@ const navigation = computed<NavItem[]>(() => [
     class="px-2 py-3 rounded-lg border border-accented"
     :aria-label="$t('report.navigationTitle')"
   >
-    <h2 class="mb-3 px-2 text-2xl font-semibold text-gray-950 dark:text-white">
+    <h2 class="mb-3 px-2">
       {{ $t('report.navigationTitle') }}
     </h2>
     <ul class="space-y-1">
       <li v-for="item in navigation" :key="item.hash">
         <a
           :href="`#${item.hash}`"
-          class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-950 dark:text-white no-underline!"
+          class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-elevated text-highlighted no-underline!"
         >
           <UIcon v-if="item.icon" :name="item.icon" class="size-4 shrink-0" />
           {{ item.title }}
@@ -98,8 +98,8 @@ const navigation = computed<NavItem[]>(() => [
               class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors no-underline!"
               :class="
                 visiblePrinciples && !visiblePrinciples.has(child.hash)
-                  ? 'pointer-events-none text-gray-500 dark:text-gray-400'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-950 dark:text-white'
+                  ? 'pointer-events-none text-toned'
+                  : 'hover:bg-elevated text-highlighted'
               "
               :tabindex="visiblePrinciples && !visiblePrinciples.has(child.hash) ? -1 : undefined"
             >
