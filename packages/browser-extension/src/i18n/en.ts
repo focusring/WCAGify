@@ -140,7 +140,7 @@ export default {
   language: 'Language',
   settings: {
     title: 'Settings',
-    back: 'Back',
+    back: 'Return',
     appearance: 'Appearance',
     colorMode: 'Theme',
     languageLabel: 'Language',

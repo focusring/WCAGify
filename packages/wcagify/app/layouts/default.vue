@@ -20,8 +20,8 @@ const isSettingsPage = computed(() => route.path === localePath('/settings'))
         :label="t('settings.title').toLowerCase()"
         icon="i-lucide-settings"
         size="lg"
-        :color="isSettingsPage ? 'primary' : 'neutral'"
-        variant="ghost"
+        color="neutral"
+        :variant="isSettingsPage ? 'subtle' : 'ghost'"
       />
     </template>
   </UHeader>

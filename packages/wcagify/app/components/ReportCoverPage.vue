@@ -21,7 +21,7 @@ const conformanceResult = computed(() => {
 
 <template>
   <div class="cover-page hidden print:flex print:flex-col print:justify-center print:min-h-full">
-    <h1 class="text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+    <h1 class="text-4xl font-bold tracking-tight text-black sm:text-5xl">
       {{ t('report.accessibilityConformanceReportFor', { title: report.title }) }}
     </h1>
     <dl class="mt-12 grid grid-cols-1 gap-y-6 text-base">
@@ -29,7 +29,7 @@ const conformanceResult = computed(() => {
         <dt class="text-gray-500">
           {{ t('report.commissionedBy') }}
         </dt>
-        <dd class="mt-0.5 text-lg font-medium text-gray-950">
+        <dd class="mt-0.5 text-lg font-medium text-black">
           {{ report.evaluation.commissioner }}
         </dd>
       </div>
@@ -37,7 +37,7 @@ const conformanceResult = computed(() => {
         <dt class="text-gray-500">
           {{ t('report.evaluatedBy') }}
         </dt>
-        <dd class="mt-0.5 text-lg font-medium text-gray-950">
+        <dd class="mt-0.5 text-lg font-medium text-black">
           {{ report.evaluation.evaluator }}
         </dd>
       </div>
@@ -45,7 +45,7 @@ const conformanceResult = computed(() => {
         <dt class="text-gray-500">
           {{ t('report.date') }}
         </dt>
-        <dd class="mt-0.5 text-lg font-medium text-gray-950">
+        <dd class="mt-0.5 text-lg font-medium text-black">
           {{ report.evaluation.date }}
         </dd>
       </div>
@@ -53,7 +53,7 @@ const conformanceResult = computed(() => {
         <dt class="text-gray-500">
           {{ t('report.conformanceResult') }}
         </dt>
-        <dd class="mt-0.5 text-lg font-medium text-gray-950">
+        <dd class="mt-0.5 text-lg font-medium text-black">
           {{ conformanceResult }}
         </dd>
       </div>

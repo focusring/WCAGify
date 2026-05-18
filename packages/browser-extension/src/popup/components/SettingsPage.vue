@@ -81,20 +81,20 @@ function setNeutralColor(val: string | undefined) {
 </script>
 
 <template>
-  <div class="min-h-screen p-4 font-sans">
+  <div class="min-h-screen py-4 font-sans">
     <span ref="focusSentinel" tabindex="-1" aria-hidden="true" class="sr-only" />
     <!-- Header -->
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 px-4">
       <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
       <h1 class="text-lg font-bold text-highlighted">WCAGify</h1>
 
       <UButton
-        @click="emit('back')"
-        :aria-label="t('settings.back')"
-        icon="i-lucide-arrow-big-left"
+        :label="t('settings.title').toLowerCase()"
+        icon="i-lucide-settings"
         size="lg"
         color="neutral"
         variant="subtle"
+        aria-current="page"
         :ui="{
           base: 'cursor-pointer ml-auto',
           leadingIcon: 'size-5'
@@ -104,12 +104,30 @@ function setNeutralColor(val: string | undefined) {
 
     <USeparator class="my-3" aria-hidden="true" />
 
-    <div class="max-w-2xl mx-auto">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="flex items-center justify-between sm:mt-8 mb-3">
+        <h2 class="text-xl sm:text-2xl font-medium">
+          {{ t('settings.title') }}
+        </h2>
+        <UButton
+          @click="emit('back')"
+          icon="i-lucide-arrow-big-left"
+          color="neutral"
+          variant="subtle"
+          :ui="{
+            base: 'cursor-pointer shrink-0 h-9',
+            leadingIcon: 'size-4'
+          }"
+        >
+          <span class="sr-only sm:not-sr-only">{{ t('settings.back').toLowerCase() }}</span>
+        </UButton>
+      </div>
+
       <!-- General -->
-      <h2 class="text-sm font-semibold text-toned tracking-wide mb-3">
+      <h3 class="text-sm font-semibold text-toned tracking-wide mb-2">
         {{ t('settings.general') }}
-      </h2>
-      <section class="bg-elevated rounded-sm p-4 space-y-3 mb-4">
+      </h3>
+      <section class="bg-elevated rounded-sm px-4 py-3 space-y-3 mb-4">
         <ConnectionSettings />
 
         <!-- Language -->
@@ -134,10 +152,10 @@ function setNeutralColor(val: string | undefined) {
       </section>
 
       <!-- Appearance -->
-      <h2 class="text-sm font-semibold text-toned tracking-wide mb-3">
+      <h3 class="text-sm font-semibold text-toned tracking-wide mb-2">
         {{ t('settings.appearance') }}
-      </h2>
-      <section class="bg-elevated rounded-sm space-y-3 p-4">
+      </h3>
+      <section class="bg-elevated rounded-sm space-y-3 px-4 py-3">
         <!-- Theme -->
         <UFormField
           :label="t('settings.colorMode')"
@@ -191,7 +209,7 @@ function setNeutralColor(val: string | undefined) {
     <USeparator class="my-4" aria-hidden="true" />
 
     <footer
-      class="flex flex-col items-center gap-2 text-center text-sm text-toned pb-2 max-w-md mx-auto whitespace-nowrap"
+      class="flex flex-col items-center gap-2 text-center text-sm text-toned pb-2 max-w-md mx-auto"
     >
       <img :src="logoSvg" alt="Logo WCAGify" class="size-8" />
       <div class="space-y-1.5">

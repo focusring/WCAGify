@@ -53,8 +53,9 @@
   "packageManager": "pnpm@10.33.4",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@parcel/watcher",
       "esbuild",
-      "vue-demi"
+      "sharp"
     ]
   }
 }

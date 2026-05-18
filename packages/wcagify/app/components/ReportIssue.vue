@@ -15,9 +15,6 @@ const { resolveSamplePage } = useWcagData()
 
 const samplePage = computed(() => resolveSamplePage(props.report.sample, props.issue.sample))
 
-const colorMode = useColorMode()
-const statusBadgeVariant = computed(() => (colorMode.value === 'dark' ? 'subtle' : 'solid'))
-
 const sanitizedPath = props.issue.path.split('/').filter(Boolean).join('-')
 const issueId = `issue-${sanitizedPath}`
 </script>
@@ -41,16 +38,16 @@ const issueId = `issue-${sanitizedPath}`
         <UBadge
           v-if="samplePage"
           :label="samplePage.title"
-          variant="outline"
+          variant="solid"
           color="neutral"
-          class="shrink-0"
+          class="shrink-0 ring-1 text-highlighted bg-white ring-black dark:bg-black dark:ring-slate-300"
         />
         <UBadge
           :label="t('report.scStatus.failed')"
-          :variant="statusBadgeVariant"
+          variant="solid"
           color="error"
           icon="i-lucide-x"
-          class="shrink-0 dark:bg-error/5 text-black dark:text-error-400"
+          class="shrink-0 ring-1 text-black bg-error-400 ring-black dark:ring-error-400"
         />
         <UIcon
           name="i-lucide-chevron-down"

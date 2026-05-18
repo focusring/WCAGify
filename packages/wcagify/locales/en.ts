@@ -157,6 +157,6 @@ export default {
     backgroundShade: 'Background shade',
     generalSection: 'General',
     language: 'Language',
-    back: 'back'
+    back: 'return'
   }
 }

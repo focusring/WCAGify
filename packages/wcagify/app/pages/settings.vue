@@ -47,18 +47,18 @@ useSeoMeta({
   <main class="flex-1 py-12 sm:py-16 w-full">
     <article class="max-w-2xl mx-auto">
       <header class="mb-12">
-        <div class="flex items-baseline justify-between gap-4 mb-4">
+        <div class="flex items-center justify-between mb-4">
           <h1 class="text-3xl sm:text-4xl font-medium">
             {{ t('settings.title') }}
           </h1>
           <UButton
             color="neutral"
-            variant="ghost"
-            icon="i-lucide-arrow-left"
-            class="-mx-1.5 shrink-0 cursor-pointer"
+            variant="subtle"
+            icon="i-lucide-arrow-big-left"
+            class="shrink-0 cursor-pointer h-9"
             @click="router.back()"
           >
-            <span class="sr-only sm:not-sr-only">{{ t('settings.back') }}</span>
+            <span class="sr-only sm:not-sr-only">{{ t('settings.back').toLowerCase() }}</span>
           </UButton>
         </div>
         <p class="text-lg text-toned">
