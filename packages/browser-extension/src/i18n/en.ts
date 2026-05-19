@@ -34,6 +34,11 @@ export default {
     selector: 'Selector:',
     url: 'URL:',
     page: 'Page:',
+    text: 'Text',
+    icon: 'Icon',
+    element: 'Element',
+    background: 'Background',
+    border: 'Border',
     hoverHint: 'Hover over an element...',
     clickHint: 'Click to select · Esc to cancel'
   },

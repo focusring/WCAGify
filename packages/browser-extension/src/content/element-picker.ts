@@ -1,5 +1,415 @@
 import { getUniqueSelector } from './unique-selector'
 
+function parseRgba(color: string): { r: number; g: number; b: number; a: number } | null {
+  if (!color || color === 'none') return null
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.clearRect(0, 0, 1, 1)
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  return { r, g, b, a }
+}
+
+// Splits on top-level commas, ignoring those inside () or []. Used for gradient stops, background-image layers, and CSS selector lists.
+function splitOuterCommas(s: string): string[] {
+  const parts: string[] = []
+  let depth = 0
+  let start = 0
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i]
+    if (ch === '(' || ch === '[') depth++
+    else if (ch === ')' || ch === ']') depth--
+    else if (ch === ',' && depth === 0) {
+      parts.push(s.slice(start, i).trim())
+      start = i + 1
+    }
+  }
+  const last = s.slice(start).trim()
+  if (last) parts.push(last)
+  return parts
+}
+
+// Like parseRgba but uses a sentinel to reject non-color tokens (e.g. "45deg", "to right" from inside a gradient).
+function tryParseColor(color: string): { r: number; g: number; b: number; a: number } | null {
+  if (!color || color === 'none') return null
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.fillStyle = '#1b2c3d'
+  const sentinel = ctx.fillStyle
+  ctx.fillStyle = color
+  if (ctx.fillStyle === sentinel) return null
+  ctx.clearRect(0, 0, 1, 1)
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  return { r, g, b, a }
+}
+
+// Strips position hints ("red 10%" → "red") from a gradient color stop.
+function extractColorFromStop(stop: string): string {
+  stop = stop.trim()
+  if (stop.startsWith('#')) return stop.split(/\s+/)[0]!
+  const funcMatch = /^[a-z-]+\(/i.exec(stop)
+  if (funcMatch) {
+    let depth = 0
+    for (let i = funcMatch[0].length - 1; i < stop.length; i++) {
+      if (stop[i] === '(') depth++
+      else if (stop[i] === ')') {
+        depth--
+        if (depth === 0) return stop.slice(0, i + 1)
+      }
+    }
+  }
+  return stop.split(/\s+/)[0]!
+}
+
+// Averages the stops of a CSS gradient into one representative color. Not physically accurate, but good enough to display a swatch.
+function parseGradientAvgColor(
+  gradient: string
+): { r: number; g: number; b: number; a: number } | null {
+  const match = /^(?:linear|radial|conic)-gradient\(\s*([\s\S]*?)\s*\)$/i.exec(gradient.trim())
+  if (!match) return null
+
+  const colors: { r: number; g: number; b: number; a: number }[] = []
+  for (const arg of splitOuterCommas(match[1] ?? '')) {
+    const parsed = tryParseColor(extractColorFromStop(arg))
+    if (parsed) colors.push(parsed)
+  }
+  if (colors.length === 0) return null
+
+  const sum = colors.reduce(
+    (acc, c) => ({ r: acc.r + c.r, g: acc.g + c.g, b: acc.b + c.b, a: acc.a + c.a }),
+    { r: 0, g: 0, b: 0, a: 0 }
+  )
+  return {
+    r: Math.round(sum.r / colors.length),
+    g: Math.round(sum.g / colors.length),
+    b: Math.round(sum.b / colors.length),
+    a: Math.round(sum.a / colors.length)
+  }
+}
+
+// One element's own visible background: gradient (averaged, composited over background-color) if present, else just background-color.
+function getElementBgLayer(el: Element): { r: number; g: number; b: number; a: number } | null {
+  const style = getComputedStyle(el)
+  const bgImage = style.backgroundImage
+
+  if (bgImage && bgImage !== 'none') {
+    for (const layer of splitOuterCommas(bgImage)) {
+      if (/^(?:linear|radial|conic)-gradient\(/i.test(layer)) {
+        const gradColor = parseGradientAvgColor(layer)
+        if (gradColor) {
+          const bgParsed = parseRgba(style.backgroundColor)
+          if (!bgParsed || bgParsed.a === 0) return gradColor
+          const ga = gradColor.a / 255
+          const bga = bgParsed.a / 255
+          const outA = ga + bga * (1 - ga)
+          if (outA === 0) return null
+          return {
+            r: Math.round((gradColor.r * ga + bgParsed.r * bga * (1 - ga)) / outA),
+            g: Math.round((gradColor.g * ga + bgParsed.g * bga * (1 - ga)) / outA),
+            b: Math.round((gradColor.b * ga + bgParsed.b * bga * (1 - ga)) / outA),
+            a: Math.round(outA * 255)
+          }
+        }
+      }
+    }
+  }
+
+  return parseRgba(style.backgroundColor)
+}
+
+function formatLayer(layer: { r: number; g: number; b: number; a: number }): string {
+  if (layer.a === 255) return `rgb(${layer.r}, ${layer.g}, ${layer.b})`
+  return `rgba(${layer.r}, ${layer.g}, ${layer.b}, ${layer.a / 255})`
+}
+
+// The picked element's own background. CSS-mask icons return '' because their background-color is the icon color, not a surface.
+function getElementOwnColor(el: Element): string {
+  if (hasCssMask(el)) return ''
+  const layer = getElementBgLayer(el)
+  if (!layer || layer.a === 0) return ''
+  return formatLayer(layer)
+}
+
+// The first visible background *behind* the picked element — walks parent → <html>. The element's own background is reported by getElementOwnColor and excluded here. Skips CSS-mask elements (their bg-color is the icon color). Returns '' so the popup can hide the Background row.
+function getOwnBackgroundColor(el: Element): string {
+  for (let current: Element | null = el.parentElement; current; current = current.parentElement) {
+    if (!hasCssMask(current)) {
+      const layer = getElementBgLayer(current)
+      if (layer && layer.a > 0) return formatLayer(layer)
+    }
+    if (current === document.documentElement) break
+  }
+  return ''
+}
+
+const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'
+
+function isVisible(color: string): boolean {
+  const parsed = parseRgba(color)
+  return parsed !== null && parsed.a > 0
+}
+
+function hasCssMask(el: Element): boolean {
+  const style = getComputedStyle(el)
+  const mask = style.getPropertyValue('-webkit-mask-image') || style.getPropertyValue('mask-image')
+  return mask !== '' && mask !== 'none'
+}
+
+// Tags whose text content is not rendered visually (filters the text walker).
+const NON_VISIBLE_TEXT_TAGS = new Set(['script', 'style', 'noscript', 'title', 'desc'])
+
+const FIELD_SELECTOR = 'input, textarea, select'
+
+// Input types whose value is not rendered as text.
+const NON_TEXT_INPUT_TYPES = new Set([
+  'checkbox',
+  'radio',
+  'hidden',
+  'color',
+  'range',
+  'image',
+  'submit',
+  'reset',
+  'button'
+])
+
+function addVisibleColor(set: Set<string>, color: string): void {
+  const parsed = parseRgba(color)
+  if (parsed && parsed.a > 0) set.add(color)
+}
+
+function isVisibleTextField(field: Element): boolean {
+  if (field instanceof HTMLInputElement) return !NON_TEXT_INPUT_TYPES.has(field.type)
+  return field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement
+}
+
+function hasFieldValue(field: Element): boolean {
+  if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+    return field.value.length > 0
+  }
+  if (field instanceof HTMLSelectElement) return field.selectedOptions.length > 0
+  return false
+}
+
+function getFieldPlaceholder(field: Element): string {
+  if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+    return field.placeholder
+  }
+  return ''
+}
+
+// Unique computed `color` values for visible text inside el: text nodes, input/textarea values, and ::placeholder when empty.
+function getTextColors(el: Element): string[] {
+  const colors = new Set<string>()
+
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => {
+      if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT
+      for (let p = node.parentElement; p; p = p.parentElement) {
+        if (NON_VISIBLE_TEXT_TAGS.has(p.localName)) return NodeFilter.FILTER_REJECT
+      }
+      return NodeFilter.FILTER_ACCEPT
+    }
+  })
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const parent = node.parentElement
+    if (parent) addVisibleColor(colors, getComputedStyle(parent).color)
+  }
+
+  // Form fields don't expose value/placeholder as DOM text nodes — check explicitly.
+  const fields: Element[] = []
+  if (el.matches(FIELD_SELECTOR)) fields.push(el)
+  for (const f of el.querySelectorAll(FIELD_SELECTOR)) fields.push(f)
+  for (const field of fields) {
+    if (!isVisibleTextField(field)) continue
+    if (hasFieldValue(field)) {
+      addVisibleColor(colors, getComputedStyle(field).color)
+    } else if (getFieldPlaceholder(field)) {
+      addVisibleColor(colors, getComputedStyle(field, '::placeholder').color)
+    }
+  }
+
+  return [...colors]
+}
+
+// Visible color of one SVG: own fill/stroke, else first visible fill/stroke on a shape descendant (Lucide icons set stroke="currentColor" on the <path>, not the <svg>).
+function getSvgColor(svg: SVGElement): string | undefined {
+  const ownStyle = getComputedStyle(svg)
+  if (isVisible(ownStyle.fill)) return ownStyle.fill
+  if (isVisible(ownStyle.stroke)) return ownStyle.stroke
+  for (const shape of svg.querySelectorAll(SVG_SHAPE_SELECTOR)) {
+    const s = getComputedStyle(shape)
+    if (isVisible(s.fill)) return s.fill
+    if (isVisible(s.stroke)) return s.stroke
+  }
+  return undefined
+}
+
+// Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon). Walks descendants so icons inside a picked button/link surface.
+function getIconColors(el: Element): string[] {
+  const colors = new Set<string>()
+
+  const svgs: SVGElement[] = []
+  if (el instanceof SVGElement) svgs.push(el)
+  for (const svg of el.querySelectorAll('svg')) svgs.push(svg)
+  for (const svg of svgs) {
+    const c = getSvgColor(svg)
+    if (c) addVisibleColor(colors, c)
+  }
+
+  if (hasCssMask(el)) addVisibleColor(colors, getComputedStyle(el).backgroundColor)
+  for (const child of el.querySelectorAll('*')) {
+    if (hasCssMask(child)) addVisibleColor(colors, getComputedStyle(child).backgroundColor)
+  }
+
+  return [...colors]
+}
+
+// Unique visible border colors. A side counts when width > 0, style is not none/hidden, and alpha > 0.
+function getBorderColors(el: Element): string[] {
+  const style = getComputedStyle(el)
+  const sides = ['top', 'right', 'bottom', 'left'] as const
+  const colors = new Set<string>()
+  for (const side of sides) {
+    const sideStyle = style.getPropertyValue(`border-${side}-style`)
+    if (sideStyle === 'none' || sideStyle === 'hidden') continue
+    if (parseFloat(style.getPropertyValue(`border-${side}-width`)) <= 0) continue
+    const color = style.getPropertyValue(`border-${side}-color`)
+    const parsed = parseRgba(color)
+    if (parsed && parsed.a > 0) colors.add(color)
+  }
+  return [...colors]
+}
+
+// True if el has its own text/media/mask, or wraps an icon. <a>/<button> are excluded from the descendant check — they're interactive targets, not icon containers.
+const MEDIA_SELECTOR = 'img, svg, i, picture, canvas, video, audio'
+function hasOwnVisibleContent(el: Element): boolean {
+  if (el.matches(MEDIA_SELECTOR)) return true
+  if (hasCssMask(el)) return true
+  for (const node of el.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) return true
+  }
+  if (!el.matches('a, button') && el.querySelector(MEDIA_SELECTOR)) return true
+  return false
+}
+
+// Elements targeted by :hover / :active / :focus* rules. Built lazily, reset per picker session.
+const STATE_PSEUDO_PATTERN = /:(?:hover|active|focus(?:-visible|-within)?)\b/g
+const STATE_PSEUDO_TEST = /:(?:hover|active|focus(?:-visible|-within)?)\b/
+
+let interactiveStyledCache: WeakSet<Element> | null = null
+
+// Returns the compound the state pseudo is attached to, pseudo stripped. "foo:hover .bar" → "foo". ".ctas a:active .x" → "a".
+function extractStateCompound(selector: string): string | null {
+  const match = selector.match(STATE_PSEUDO_TEST)
+  if (!match || match.index === undefined) return null
+  const pseudoIdx = match.index
+
+  let depth = 0
+  let start = 0
+  for (let i = pseudoIdx - 1; i >= 0; i--) {
+    const ch = selector[i]
+    if (ch === ')' || ch === ']') depth++
+    else if (ch === '(' || ch === '[') depth--
+    else if (depth === 0 && (ch === ' ' || ch === '>' || ch === '+' || ch === '~')) {
+      start = i + 1
+      break
+    }
+  }
+
+  let end = selector.length
+  depth = 0
+  for (let i = pseudoIdx + match[0].length; i < selector.length; i++) {
+    const ch = selector[i]
+    if (ch === '(' || ch === '[') depth++
+    else if (ch === ')' || ch === ']') depth--
+    else if (depth === 0 && (ch === ' ' || ch === '>' || ch === '+' || ch === '~')) {
+      end = i
+      break
+    }
+  }
+
+  const compound = selector.substring(start, end).replace(STATE_PSEUDO_PATTERN, '').trim()
+  return compound || null
+}
+
+function buildInteractiveStyledSet(): WeakSet<Element> {
+  const set = new WeakSet<Element>()
+
+  function visit(rules: CSSRuleList): void {
+    for (const rule of rules) {
+      if (rule instanceof CSSStyleRule) {
+        if (!STATE_PSEUDO_TEST.test(rule.selectorText)) continue
+        for (const part of splitOuterCommas(rule.selectorText)) {
+          const compound = extractStateCompound(part.trim())
+          if (!compound) continue
+          try {
+            for (const el of document.querySelectorAll(compound)) {
+              set.add(el)
+            }
+          } catch {} // invalid selector
+        }
+      } else if (rule instanceof CSSGroupingRule) {
+        visit(rule.cssRules)
+      }
+    }
+  }
+
+  for (const sheet of document.styleSheets) {
+    try {
+      visit(sheet.cssRules)
+    } catch {} // cross-origin sheet
+  }
+
+  return set
+}
+
+function hasInteractiveStyling(el: Element): boolean {
+  interactiveStyledCache ??= buildInteractiveStyledSet()
+  return interactiveStyledCache.has(el)
+}
+
+// Resolve a picker hit to its "interactive unit". Keep content-bearing hits (text/icon). Otherwise prefer the outermost <a>/<button>/custom-element with hover/focus styling; fall back to the outermost <a>/<button>, optionally promoted one level to a custom-element wrapper.
+function getPickTarget(el: Element): Element {
+  if (hasOwnVisibleContent(el)) return el
+
+  let outermostStyled: Element | null = null
+  let current: Element | null = el
+  while (current && current !== document.body) {
+    const isInteractive = current.matches('a, button')
+    const isCustom = current.localName.includes('-')
+    if ((isInteractive || isCustom) && hasInteractiveStyling(current)) {
+      outermostStyled = current
+    }
+    current = current.parentElement
+  }
+  if (outermostStyled) return outermostStyled
+
+  let result: Element = el
+  let foundInteractive = false
+  let foundCustomWrapper = false
+  current = el
+  while (current && current !== document.body) {
+    const isInteractiveTag = current.matches('a, button')
+    const canPromoteCustom =
+      foundInteractive && !foundCustomWrapper && current.localName.includes('-')
+
+    if (isInteractiveTag || canPromoteCustom) {
+      result = current
+    }
+    if (canPromoteCustom) foundCustomWrapper = true
+    if (isInteractiveTag) foundInteractive = true
+    current = current.parentElement
+  }
+  return result
+}
+
 const OVERLAY_ID = 'wcagify-picker-overlay'
 const PANEL_ID = 'wcagify-picker-panel'
 const BRAND_COLOR = '#15803d'
@@ -158,9 +568,10 @@ function handleMouseMove(e: MouseEvent) {
     !target.closest(`#${PANEL_ID}`) &&
     !target.classList.contains('wcagify-highlight')
   ) {
-    currentTarget = target
-    highlightElement(target)
-    const selector = getUniqueSelector(target)
+    const resolved = getPickTarget(target)
+    currentTarget = resolved
+    highlightElement(resolved)
+    const selector = getUniqueSelector(resolved)
     updateInfoPanel(Array.isArray(selector) ? selector.join(' > ') : selector)
   }
 }
@@ -176,7 +587,12 @@ function handleClick(e: MouseEvent) {
     type: 'element-picked',
     selector,
     url: document.URL,
-    pageTitle: document.title
+    pageTitle: document.title,
+    textColors: getTextColors(currentTarget),
+    iconColors: getIconColors(currentTarget),
+    elementColor: getElementOwnColor(currentTarget),
+    backgroundColor: getOwnBackgroundColor(currentTarget),
+    borderColors: getBorderColors(currentTarget)
   })
   cleanup()
 }
@@ -190,6 +606,7 @@ function handleKeyDown(e: KeyboardEvent) {
 
 async function startPicker() {
   cleanup()
+  interactiveStyledCache = null
   injectStyles()
 
   try {

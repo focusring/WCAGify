@@ -4,19 +4,71 @@ import { useI18n } from '../../composables/useI18n'
 
 const { t } = useI18n()
 
+function toHex(color: string): string {
+  if (!color) return color
+  const hex = color.match(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/)
+  if (hex) return color.toLowerCase()
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
+  if (a === 255) {
+    return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')
+  }
+  return '#' + [r, g, b, a].map((v) => v.toString(16).padStart(2, '0')).join('')
+}
+
 const selector = ref('')
 const pageUrl = ref('')
 const pageTitle = ref('')
+const textColors = ref<string[]>([])
+const iconColors = ref<string[]>([])
+const elementColor = ref('')
+const backgroundColor = ref('')
+const borderColors = ref<string[]>([])
 const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
+const selectedTabId = ref<number | undefined>()
 
-defineExpose({ selector, pageUrl, pageTitle })
+defineExpose({
+  selector,
+  pageUrl,
+  pageTitle,
+  textColors,
+  iconColors,
+  elementColor,
+  backgroundColor,
+  borderColors,
+  selectedTabId
+})
 
-function onMessage(message: { type: string; selector?: string; url?: string; pageTitle?: string }) {
+function numberedLabel(base: string, idx: number, total: number): string {
+  return total > 1 ? `${base} ${idx + 1}:` : `${base}:`
+}
+
+function onMessage(message: {
+  type: string
+  selector?: string
+  url?: string
+  pageTitle?: string
+  textColors?: string[]
+  iconColors?: string[]
+  elementColor?: string
+  backgroundColor?: string
+  borderColors?: string[]
+}) {
   if (message.type === 'element-picked') {
     selector.value = message.selector ?? ''
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
+    textColors.value = (message.textColors ?? []).map(toHex)
+    iconColors.value = (message.iconColors ?? []).map(toHex)
+    elementColor.value = toHex(message.elementColor ?? '')
+    backgroundColor.value = toHex(message.backgroundColor ?? '')
+    borderColors.value = (message.borderColors ?? []).map(toHex)
+    selectedTabId.value = pickerTabId.value
     picking.value = false
     pickerTabId.value = undefined
   }
@@ -58,10 +110,16 @@ async function pickElement() {
   if (!tab?.id) return
 
   pickerTabId.value = tab.id
+  selectedTabId.value = undefined
   picking.value = true
   selector.value = ''
   pageUrl.value = ''
   pageTitle.value = ''
+  textColors.value = []
+  iconColors.value = []
+  elementColor.value = ''
+  backgroundColor.value = ''
+  borderColors.value = []
 
   chrome.tabs.sendMessage(tab.id, { type: 'start-picker' }).catch(() => {
     picking.value = false
@@ -93,6 +151,57 @@ async function pickElement() {
       <div>
         <span class="label-title">{{ t('picker.page') }}</span>
         <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
+      </div>
+      <div v-for="(color, i) in textColors" :key="`text-${i}`" class="flex items-center gap-1">
+        <span class="label-title">
+          {{ numberedLabel(t('picker.text'), i, textColors.length) }}
+        </span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: color }"
+          aria-hidden="true"
+        />
+        <code class="text-highlighted">{{ color }}</code>
+      </div>
+      <div v-for="(color, i) in iconColors" :key="`icon-${i}`" class="flex items-center gap-1">
+        <span class="label-title">
+          {{ numberedLabel(t('picker.icon'), i, iconColors.length) }}
+        </span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: color }"
+          aria-hidden="true"
+        />
+        <code class="text-highlighted">{{ color }}</code>
+      </div>
+      <div v-if="elementColor" class="flex items-center gap-1">
+        <span class="label-title">{{ t('picker.element') }}:</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: elementColor }"
+          aria-hidden="true"
+        />
+        <code class="text-highlighted">{{ elementColor }}</code>
+      </div>
+      <div v-if="backgroundColor" class="flex items-center gap-1">
+        <span class="label-title">{{ t('picker.background') }}:</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: backgroundColor }"
+          aria-hidden="true"
+        />
+        <code class="text-highlighted">{{ backgroundColor }}</code>
+      </div>
+      <div v-for="(color, i) in borderColors" :key="`border-${i}`" class="flex items-center gap-1">
+        <span class="label-title">
+          {{ numberedLabel(t('picker.border'), i, borderColors.length) }}
+        </span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: color }"
+          aria-hidden="true"
+        />
+        <code class="text-highlighted">{{ color }}</code>
       </div>
     </div>
   </div>

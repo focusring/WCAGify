@@ -34,6 +34,11 @@ export default {
     selector: 'Selector:',
     url: 'URL:',
     page: 'Pagina:',
+    text: 'Tekst',
+    icon: 'Pictogram',
+    element: 'Element',
+    background: 'Achtergrond',
+    border: 'Rand',
     hoverHint: 'Beweeg over een element...',
     clickHint: 'Klik om te selecteren · Esc om te annuleren'
   },
