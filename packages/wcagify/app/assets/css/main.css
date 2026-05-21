@@ -65,18 +65,6 @@ button[role='switch'] [data-slot='thumb'] {
   background-color: black !important;
 }
 
-.btn-link {
-  @apply p-0 hover:underline text-primary-800 dark:text-primary-400;
-}
-
-.btn-outline {
-  @apply cursor-pointer ring-primary-800 text-primary-800 dark:text-primary-500 dark:ring-primary-500;
-}
-
-.btn-primary {
-  @apply cursor-pointer bg-primary-800 hover:bg-primary-900 active:bg-primary-950 dark:bg-primary-500 dark:hover:bg-primary-400 active:dark:bg-primary-300 text-white dark:text-black;
-}
-
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
 
@@ -111,7 +99,7 @@ button[role='switch'] [data-slot='thumb'] {
 }
 
 /* Custom focus styles for interactible elements */
-.selectable-focus:has(input:focus-visible),
+.selectable-focus:has(:focus-visible),
 .selectable-focus[data-highlighted] {
   outline: 0.375rem double var(--ui-color-primary-500);
   outline-offset: -1px;

@@ -97,12 +97,7 @@ function formatDate(dateStr: string): string {
 </script>
 
 <template>
-  <USlideover
-    v-model:open="open"
-    :title="t('share.shareReport')"
-    :close="{ class: 'cursor-pointer' }"
-    :modal="true"
-  >
+  <USlideover v-model:open="open" :title="t('share.shareReport')" :modal="true">
     <template #body>
       <div v-if="needsAdminLogin" class="flex flex-col items-center justify-center py-12">
         <UIcon name="i-lucide-shield" class="size-12 text-toned" />
@@ -167,12 +162,7 @@ function formatDate(dateStr: string): string {
           <p v-if="shareError" class="text-sm text-error">
             {{ t('share.error') }}
           </p>
-          <UButton
-            :label="t('share.createLink')"
-            icon="i-lucide-plus"
-            :ui="{ base: 'btn-primary' }"
-            @click="createShareLink"
-          />
+          <UButton :label="t('share.createLink')" icon="i-lucide-plus" @click="createShareLink" />
         </div>
 
         <USeparator aria-hidden="true" />
@@ -202,14 +192,13 @@ function formatDate(dateStr: string): string {
                 :icon="copiedToken === share.token ? 'i-lucide-check' : 'i-lucide-copy'"
                 :label="copiedToken === share.token ? t('share.copied') : t('share.copyLink')"
                 variant="outline"
-                :ui="{ base: 'btn-outline' }"
                 @click="copyLink(share.token)"
               />
               <UButton
                 icon="i-lucide-trash-2"
                 color="error"
                 variant="ghost"
-                class="cursor-pointer text-error-800 dark:text-error-500"
+                class="text-error-800 dark:text-error-500"
                 :aria-label="t('share.deleteLink')"
                 @click="deleteShareLink(share.token, share.delete_token)"
               />

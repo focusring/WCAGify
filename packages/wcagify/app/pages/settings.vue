@@ -55,7 +55,7 @@ useSeoMeta({
             color="neutral"
             variant="subtle"
             icon="i-lucide-arrow-big-left"
-            class="shrink-0 cursor-pointer h-9"
+            class="shrink-0 h-9"
             @click="router.back()"
           >
             <span class="sr-only sm:not-sr-only">{{ t('settings.back').toLowerCase() }}</span>
@@ -84,8 +84,9 @@ useSeoMeta({
                 :model-value="locale"
                 @update:model-value="onLocaleChange($event)"
                 :ui="{
-                  base: 'cursor-pointer min-w-32',
-                  item: 'cursor-pointer'
+                  base: 'cursor-pointer min-w-32 ring-neutral-500',
+                  item: 'cursor-pointer',
+                  trailingIcon: 'text-toned icon-animation'
                 }"
               />
             </ClientOnly>
@@ -105,7 +106,14 @@ useSeoMeta({
             :ui="{ label: 'label-title' }"
             class="items-center"
           >
-            <UColorModeSelect class="max-w-48" />
+            <UColorModeSelect
+              class="max-w-48"
+              :ui="{
+                base: 'cursor-pointer ring-neutral-500',
+                item: 'cursor-pointer',
+                trailingIcon: 'text-toned icon-animation'
+              }"
+            />
           </UFormField>
 
           <!-- Accent Color -->
