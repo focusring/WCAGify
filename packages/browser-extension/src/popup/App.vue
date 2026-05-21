@@ -24,7 +24,7 @@ const currentView = ref<'main' | 'settings'>('main')
       <!-- Header -->
       <div class="flex items-center gap-2">
         <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
-        <h1 class="text-lg font-bold text-highlighted">WCAGify</h1>
+        <h1>WCAGify</h1>
 
         <UButton
           @click="currentView = 'settings'"
@@ -56,10 +56,8 @@ const currentView = ref<'main' | 'settings'>('main')
         <div v-else class="space-y-5 max-w-2xl mx-auto">
           <div class="flex flex-col items-center text-center pt-2">
             <img :src="logoSvg" alt="" aria-hidden="true" class="size-16 mb-3" />
-            <h1 class="text-lg font-bold text-highlighted mb-1">
-              {{ t('setup.title') }}
-            </h1>
-            <p class="text-sm text-toned">
+            <h1>{{ t('setup.title') }}</h1>
+            <p class="text-sm text-toned mt-1">
               {{ t('setup.description') }}
             </p>
           </div>

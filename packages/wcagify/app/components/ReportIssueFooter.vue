@@ -13,41 +13,36 @@ const { resolveSamplePage } = useWcagData()
 
 const samplePage = computed(() => resolveSamplePage(props.report.sample, props.issue.sample))
 
-const severityColor = {
-  low: 'success',
-  medium: 'warning',
-  high: 'error'
-} as const
-
-type BadgeColor = 'error' | 'neutral' | 'success' | 'warning' | 'primary' | 'secondary' | 'info'
-
-function getSeverityColor(severity: string): BadgeColor {
-  return (severityColor[severity.toLowerCase() as keyof typeof severityColor] ??
-    'neutral') as BadgeColor
+const severityClasses: Record<string, string> = {
+  low: 'bg-success-500 ring-success-500',
+  medium: 'bg-warning-500 ring-warning-500',
+  high: 'bg-error-500 ring-error-500'
+}
+function getSeverityClass(severity: string): string {
+  return severityClasses[severity.toLowerCase()] ?? 'bg-neutral-500 ring-neutral-500'
 }
 
 const issueType = computed(() => (props.issue as any).type as string | undefined)
 </script>
 
 <template>
-  <dl
-    class="flex flex-col gap-2 md:gap-1 px-6 py-4 text-sm font-medium bg-default text-highlighted"
-  >
+  <dl class="flex flex-col gap-2 px-6 py-4 text-sm font-medium bg-default text-highlighted">
     <div v-if="issue.severity || issueType" class="flex flex-row gap-4">
       <div v-if="issue.severity" class="flex gap-1 w-full">
         <dt>{{ t('report.severity') }}:</dt>
         <UBadge
           :label="t(`report.severityLevel.${issue.severity.toLowerCase()}`)"
-          :color="getSeverityColor(issue.severity)"
-          variant="subtle"
+          :class="[
+            'shrink-0 ring-1 text-black ring-black! dark:ring-current',
+            getSeverityClass(issue.severity)
+          ]"
         />
       </div>
       <div v-if="issueType" class="flex gap-1 w-full">
         <dt>{{ t('report.type') }}:</dt>
         <UBadge
           :label="t(`report.typesort.${issueType.toLowerCase()}`)"
-          variant="subtle"
-          color="primary"
+          class="shrink-0 ring-1 text-black bg-primary-400 ring-black dark:ring-primary-400"
         />
       </div>
     </div>
@@ -60,7 +55,7 @@ const issueType = computed(() => (props.issue as any).type as string | undefined
           target="_blank"
           variant="link"
           trailing-icon="i-lucide-external-link"
-          class="p-0 underline"
+          :ui="{ base: 'btn-link', trailingIcon: 'size-4' }"
         />
       </div>
       <div v-if="samplePage" class="flex gap-1 items-center w-full">
@@ -71,7 +66,7 @@ const issueType = computed(() => (props.issue as any).type as string | undefined
           target="_blank"
           variant="link"
           trailing-icon="i-lucide-external-link"
-          class="p-0 underline"
+          :ui="{ base: 'btn-link', trailingIcon: 'size-4' }"
         />
       </div>
     </div>

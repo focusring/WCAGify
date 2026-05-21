@@ -199,6 +199,14 @@
   --focus-gap-color: white;
 }
 
+h1 {
+  @apply text-lg font-bold tracking-wide text-black dark:text-white;
+}
+
+h3 {
+  @apply text-sm font-semibold text-toned tracking-wide mb-2;
+}
+
 .label-title {
   @apply font-medium tracking-wide text-toned;
 }

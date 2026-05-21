@@ -99,7 +99,7 @@ watch(isOpen, async (open, _, onCleanup) => {
             : t('form.sc.ariaLabel')
       "
       :ui="{
-        base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5',
+        base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5 pe-12!',
         placeholder: 'text-toned',
         trailingIcon: 'text-toned icon-animation',
         item: 'grid grid-cols-[minmax(2.5rem,auto)_auto_1fr_auto] items-center cursor-pointer selectable-focus',

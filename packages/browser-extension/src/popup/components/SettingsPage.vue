@@ -86,7 +86,7 @@ function setNeutralColor(val: string | undefined) {
     <!-- Header -->
     <div class="flex items-center gap-2 px-4">
       <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
-      <h1 class="text-lg font-bold text-highlighted">WCAGify</h1>
+      <h1>WCAGify</h1>
 
       <UButton
         :label="t('settings.title').toLowerCase()"
@@ -124,9 +124,7 @@ function setNeutralColor(val: string | undefined) {
       </div>
 
       <!-- General -->
-      <h3 class="text-sm font-semibold text-toned tracking-wide mb-2">
-        {{ t('settings.general') }}
-      </h3>
+      <h3>{{ t('settings.general') }}</h3>
       <section class="bg-elevated rounded-sm px-4 py-3 space-y-3 mb-4">
         <ConnectionSettings />
 
@@ -152,9 +150,7 @@ function setNeutralColor(val: string | undefined) {
       </section>
 
       <!-- Appearance -->
-      <h3 class="text-sm font-semibold text-toned tracking-wide mb-2">
-        {{ t('settings.appearance') }}
-      </h3>
+      <h3>{{ t('settings.appearance') }}</h3>
       <section class="bg-elevated rounded-sm space-y-3 px-4 py-3">
         <!-- Theme -->
         <UFormField

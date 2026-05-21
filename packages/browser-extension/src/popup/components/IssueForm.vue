@@ -169,7 +169,7 @@ async function submit() {
 </script>
 
 <template>
-  <UForm :state="{}" class="space-y-3" @submit="submit">
+  <form class="space-y-3" @submit.prevent="submit">
     <UFormField
       :label="t('form.samplePage.label')"
       name="issue-sample"
@@ -177,41 +177,11 @@ async function submit() {
       :ui="{
         label: 'label-title',
         labelWrapper: 'flex items-center justify-start gap-1',
-        base: 'relative'
+        hint: 'label-hint flex items-center'
       }"
     >
       <template #hint>
-        <span class="label-hint" aria-hidden="true">({{ t('form.required') }})</span>
-      </template>
-
-      <span id="issue-sample-desc" class="sr-only">
-        {{ t('form.samplePage.description') }}
-      </span>
-
-      <div class="relative">
-        <div aria-live="polite" aria-atomic="true" class="sr-only">
-          {{ info.sample.liveText }}
-        </div>
-
-        <Transition name="collapsible">
-          <div v-show="info.sample.open" id="issue-sample-more-desc" class="grid">
-            <p class="label-hint overflow-hidden min-h-0 mb-1">
-              {{ t('form.samplePage.description') }}
-            </p>
-          </div>
-        </Transition>
-
-        <ClearableSelect
-          id="issue-sample"
-          :aria-describedby="'issue-sample-desc'"
-          v-model="sampleModel"
-          :label="t('form.samplePage.label')"
-          :items="samplePages.map((p) => ({ label: `${p.title} — ${p.url}`, value: p.id }))"
-          :placeholder="t('form.samplePage.placeholder')"
-          :clear-label="t('form.samplePage.clear')"
-          required
-        />
-
+        <span aria-hidden="true">({{ t('form.required') }})</span>
         <UButton
           :aria-label="`${info.sample.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.samplePage.label')}`"
           :aria-expanded="info.sample.open"
@@ -220,10 +190,37 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer' }"
           @click="info.sample.toggle"
         />
+      </template>
+
+      <span id="issue-sample-desc" class="sr-only">
+        {{ t('form.samplePage.description') }}
+      </span>
+
+      <div aria-live="polite" aria-atomic="true" class="sr-only">
+        {{ info.sample.liveText }}
       </div>
+
+      <Transition name="collapsible">
+        <div v-show="info.sample.open" id="issue-sample-more-desc" class="grid">
+          <p class="label-hint overflow-hidden min-h-0 mb-1">
+            {{ t('form.samplePage.description') }}
+          </p>
+        </div>
+      </Transition>
+
+      <ClearableSelect
+        id="issue-sample"
+        :aria-describedby="'issue-sample-desc'"
+        v-model="sampleModel"
+        :label="t('form.samplePage.label')"
+        :items="samplePages.map((p) => ({ label: `${p.title} — ${p.url}`, value: p.id }))"
+        :placeholder="t('form.samplePage.placeholder')"
+        :clear-label="t('form.samplePage.clear')"
+        required
+      />
     </UFormField>
 
     <UFormField
@@ -233,63 +230,11 @@ async function submit() {
       :ui="{
         label: 'label-title',
         labelWrapper: 'flex items-center justify-start gap-1',
-        hint: 'label-hint'
+        hint: 'label-hint flex items-center'
       }"
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-      </template>
-
-      <span id="issue-title-desc" class="sr-only">
-        {{ t('form.issueTitle.description') }}
-      </span>
-
-      <div class="relative">
-        <div aria-live="polite" aria-atomic="true" class="sr-only">
-          {{ info.title.liveText }}
-        </div>
-
-        <Transition name="collapsible">
-          <div v-show="info.title.open" id="issue-title-more-desc" class="grid">
-            <p class="label-hint overflow-hidden min-h-0 mb-1">
-              {{ t('form.issueTitle.description') }}
-            </p>
-          </div>
-        </Transition>
-
-        <div class="relative w-full">
-          <UInput
-            id="issue-title"
-            v-model="title"
-            type="text"
-            maxlength="200"
-            required
-            aria-required="true"
-            :aria-describedby="'issue-title-desc'"
-            :placeholder="title ? undefined : t('form.issueTitle.placeholder')"
-            :ui="{
-              base: '[&::placeholder]:text-toned py-2 pe-8 text-sm hover:bg-accented/75'
-            }"
-            variant="subtle"
-            class="w-full"
-          />
-          <UButton
-            v-if="title"
-            color="primary"
-            variant="ghost"
-            size="xs"
-            icon="i-lucide-x"
-            :aria-label="t('form.issueTitle.clear')"
-            :ui="{
-              base: 'cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
-            }"
-            @pointerdown.stop
-            @click.stop="clearTitle"
-            @keydown.enter.stop="clearTitle"
-            @keydown.space.prevent.stop="clearTitle"
-          />
-        </div>
-
         <UButton
           :aria-label="`${info.title.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.issueTitle.label')}`"
           :aria-expanded="info.title.open"
@@ -298,8 +243,57 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer' }"
           @click="info.title.toggle"
+        />
+      </template>
+
+      <span id="issue-title-desc" class="sr-only">
+        {{ t('form.issueTitle.description') }}
+      </span>
+
+      <div aria-live="polite" aria-atomic="true" class="sr-only">
+        {{ info.title.liveText }}
+      </div>
+
+      <Transition name="collapsible">
+        <div v-show="info.title.open" id="issue-title-more-desc" class="grid">
+          <p class="label-hint overflow-hidden min-h-0 mb-1">
+            {{ t('form.issueTitle.description') }}
+          </p>
+        </div>
+      </Transition>
+
+      <div class="relative w-full">
+        <UInput
+          id="issue-title"
+          v-model="title"
+          type="text"
+          maxlength="200"
+          required
+          aria-required="true"
+          :aria-describedby="'issue-title-desc'"
+          :placeholder="title ? undefined : t('form.issueTitle.placeholder')"
+          :ui="{
+            base: '[&::placeholder]:text-toned py-2 pe-8 text-sm hover:bg-accented/75'
+          }"
+          variant="subtle"
+          class="w-full"
+        />
+        <UButton
+          v-if="title"
+          color="primary"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-x"
+          :aria-label="t('form.issueTitle.clear')"
+          :ui="{
+            base: 'cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
+          }"
+          @pointerdown.stop
+          @click.stop="clearTitle"
+          @keydown.enter.stop="clearTitle"
+          @keydown.space.prevent.stop="clearTitle"
         />
       </div>
     </UFormField>
@@ -312,41 +306,11 @@ async function submit() {
       :ui="{
         label: 'label-title',
         labelWrapper: 'flex items-center justify-start gap-1',
-        hint: 'label-hint'
+        hint: 'label-hint flex items-center'
       }"
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-      </template>
-
-      <span id="issue-sc-desc" class="sr-only">
-        {{ t('form.sc.description') }}
-      </span>
-
-      <div class="relative">
-        <div aria-live="polite" aria-atomic="true" class="sr-only">
-          {{ info.sc.liveText }}
-        </div>
-
-        <Transition name="collapsible">
-          <div v-show="info.sc.open" id="issue-sc-more-desc" class="grid">
-            <p class="label-hint overflow-hidden min-h-0 mb-1">
-              {{ t('form.sc.description') }}
-            </p>
-          </div>
-        </Transition>
-
-        <ScCombobox
-          id="issue-sc"
-          v-model="sc"
-          :wcag-version="wcagVersion"
-          :target-level="targetLevel"
-          required
-          :placeholder="t('form.sc.placeholder')"
-          :aria-describedby="'issue-sc-desc'"
-          @update:model-value="scTouched = true"
-        />
-
         <UButton
           :aria-label="`${info.sc.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.sc.label')}`"
           :aria-expanded="info.sc.open"
@@ -355,10 +319,37 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer' }"
           @click="info.sc.toggle"
         />
+      </template>
+
+      <span id="issue-sc-desc" class="sr-only">
+        {{ t('form.sc.description') }}
+      </span>
+
+      <div aria-live="polite" aria-atomic="true" class="sr-only">
+        {{ info.sc.liveText }}
       </div>
+
+      <Transition name="collapsible">
+        <div v-show="info.sc.open" id="issue-sc-more-desc" class="grid">
+          <p class="label-hint overflow-hidden min-h-0 mb-1">
+            {{ t('form.sc.description') }}
+          </p>
+        </div>
+      </Transition>
+
+      <ScCombobox
+        id="issue-sc"
+        v-model="sc"
+        :wcag-version="wcagVersion"
+        :target-level="targetLevel"
+        required
+        :placeholder="t('form.sc.placeholder')"
+        :aria-describedby="'issue-sc-desc'"
+        @update:model-value="scTouched = true"
+      />
     </UFormField>
 
     <div class="flex sm:flex-row flex-col gap-3">
@@ -368,37 +359,11 @@ async function submit() {
         :ui="{
           label: 'label-title after:content-none',
           labelWrapper: 'flex items-center justify-start gap-1',
-          hint: 'label-hint'
+          hint: 'label-hint flex items-center'
         }"
         class="w-full"
       >
-        <span id="issue-severity-desc" class="sr-only">
-          {{ t('form.severity.description') }}
-        </span>
-
-        <div class="relative">
-          <div aria-live="polite" aria-atomic="true" class="sr-only">
-            {{ info.severity.liveText }}
-          </div>
-
-          <Transition name="collapsible">
-            <div v-show="info.severity.open" id="issue-severity-more-desc" class="grid">
-              <p class="label-hint overflow-hidden min-h-0 mb-1">
-                {{ t('form.severity.description') }}
-              </p>
-            </div>
-          </Transition>
-
-          <ClearableSelect
-            id="issue-severity"
-            :aria-describedby="'issue-severity-desc'"
-            v-model="severity"
-            :label="t('form.severity.label')"
-            :items="severityOptions"
-            :placeholder="t('form.severity.none')"
-            :clear-label="`${t('form.severity.label')} ${t('form.clear')}`"
-          />
-
+        <template #hint>
           <UButton
             :aria-label="`${info.severity.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.severity.label')}`"
             :aria-expanded="info.severity.open"
@@ -407,48 +372,49 @@ async function submit() {
             size="xs"
             variant="ghost"
             color="neutral"
-            :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
+            :ui="{ base: 'cursor-pointer' }"
             @click="info.severity.toggle"
           />
+        </template>
+
+        <span id="issue-severity-desc" class="sr-only">
+          {{ t('form.severity.description') }}
+        </span>
+
+        <div aria-live="polite" aria-atomic="true" class="sr-only">
+          {{ info.severity.liveText }}
         </div>
+
+        <Transition name="collapsible">
+          <div v-show="info.severity.open" id="issue-severity-more-desc" class="grid">
+            <p class="label-hint overflow-hidden min-h-0 mb-1">
+              {{ t('form.severity.description') }}
+            </p>
+          </div>
+        </Transition>
+
+        <ClearableSelect
+          id="issue-severity"
+          :aria-describedby="'issue-severity-desc'"
+          v-model="severity"
+          :label="t('form.severity.label')"
+          :items="severityOptions"
+          :placeholder="t('form.severity.none')"
+          :clear-label="`${t('form.severity.label')} ${t('form.clear')}`"
+        />
       </UFormField>
+
       <UFormField
         :label="t('form.type.label')"
         name="issue-type"
         :ui="{
           label: 'label-title after:content-none',
           labelWrapper: 'flex items-center justify-start gap-1',
-          hint: 'label-hint'
+          hint: 'label-hint flex items-center'
         }"
         class="w-full"
       >
-        <span id="issue-type-desc" class="sr-only">
-          {{ t('form.type.description') }}
-        </span>
-
-        <div class="relative">
-          <div aria-live="polite" aria-atomic="true" class="sr-only">
-            {{ info.type.liveText }}
-          </div>
-
-          <Transition name="collapsible">
-            <div v-show="info.type.open" id="issue-type-more-desc" class="grid">
-              <p class="label-hint overflow-hidden min-h-0 mb-1">
-                {{ t('form.type.description') }}
-              </p>
-            </div>
-          </Transition>
-
-          <ClearableSelect
-            id="issue-type"
-            :aria-describedby="'issue-type-desc'"
-            v-model="type"
-            :label="t('form.type.label')"
-            :items="typeOptions"
-            :placeholder="t('form.type.unknown')"
-            :clear-label="`${t('form.type.label')} ${t('form.clear')}`"
-          />
-
+        <template #hint>
           <UButton
             :aria-label="`${info.type.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.type.label')}`"
             :aria-expanded="info.type.open"
@@ -457,10 +423,36 @@ async function submit() {
             size="xs"
             variant="ghost"
             color="neutral"
-            :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
+            :ui="{ base: 'cursor-pointer' }"
             @click="info.type.toggle"
           />
+        </template>
+
+        <span id="issue-type-desc" class="sr-only">
+          {{ t('form.type.description') }}
+        </span>
+
+        <div aria-live="polite" aria-atomic="true" class="sr-only">
+          {{ info.type.liveText }}
         </div>
+
+        <Transition name="collapsible">
+          <div v-show="info.type.open" id="issue-type-more-desc" class="grid">
+            <p class="label-hint overflow-hidden min-h-0 mb-1">
+              {{ t('form.type.description') }}
+            </p>
+          </div>
+        </Transition>
+
+        <ClearableSelect
+          id="issue-type"
+          :aria-describedby="'issue-type-desc'"
+          v-model="type"
+          :label="t('form.type.label')"
+          :items="typeOptions"
+          :placeholder="t('form.type.unknown')"
+          :clear-label="`${t('form.type.label')} ${t('form.clear')}`"
+        />
       </UFormField>
     </div>
 
@@ -471,38 +463,11 @@ async function submit() {
       :ui="{
         label: 'label-title after:content-none',
         labelWrapper: 'flex items-center justify-start gap-1',
-        hint: 'label-hint',
-        base: 'relative'
+        hint: 'label-hint flex items-center'
       }"
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-      </template>
-
-      <span id="issue-description-desc" class="sr-only">
-        {{ t('form.description.description') }}
-      </span>
-
-      <div class="relative">
-        <div aria-live="polite" aria-atomic="true" class="sr-only">
-          {{ info.body.liveText }}
-        </div>
-
-        <Transition name="collapsible">
-          <div v-show="info.body.open" id="issue-description-more-desc" class="grid">
-            <p class="label-hint overflow-hidden min-h-0 mb-1">
-              {{ t('form.description.description') }}
-            </p>
-          </div>
-        </Transition>
-
-        <RichTextEditor
-          v-model="description"
-          :placeholder="t('form.description.placeholder')"
-          :label="t('form.description.label')"
-          :aria-describedby="'issue-description-desc'"
-        />
-
         <UButton
           :aria-label="`${info.body.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.description.label')}`"
           :aria-expanded="info.body.open"
@@ -511,10 +476,33 @@ async function submit() {
           size="xs"
           variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer absolute -top-7.5 right-0' }"
+          :ui="{ base: 'cursor-pointer' }"
           @click="info.body.toggle"
         />
+      </template>
+
+      <span id="issue-description-desc" class="sr-only">
+        {{ t('form.description.description') }}
+      </span>
+
+      <div aria-live="polite" aria-atomic="true" class="sr-only">
+        {{ info.body.liveText }}
       </div>
+
+      <Transition name="collapsible">
+        <div v-show="info.body.open" id="issue-description-more-desc" class="grid">
+          <p class="label-hint overflow-hidden min-h-0 mb-1">
+            {{ t('form.description.description') }}
+          </p>
+        </div>
+      </Transition>
+
+      <RichTextEditor
+        v-model="description"
+        :placeholder="t('form.description.placeholder')"
+        :label="t('form.description.label')"
+        :aria-describedby="'issue-description-desc'"
+      />
     </UFormField>
 
     <UButton
@@ -542,5 +530,5 @@ async function submit() {
       :description="submitMessage"
       class="px-3 py-2 items-center"
     />
-  </UForm>
+  </form>
 </template>

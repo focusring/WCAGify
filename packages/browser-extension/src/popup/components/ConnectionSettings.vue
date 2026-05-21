@@ -183,28 +183,39 @@ async function fetchReports() {
 
     <!-- Multiple instances found: dropdown -->
     <div v-else-if="mode === 'select'">
-      <label for="wcagify-instance" class="block text-sm font-medium text-toned mb-1"
-        >{{ t('connection.selectInstance') }} <small>({{ t('connection.required') }})</small></label
-      >
-      <USelect
-        id="wcagify-instance"
-        :model-value="wcagifyUrl"
-        :items="instances.map((i) => ({ label: i.label, value: i.url }))"
-        @update:model-value="connectInstance"
+      <UFormField
+        :label="t('connection.selectInstance')"
+        name="wcagify-instance"
         required
         :ui="{
-          placeholder: 'text-toned'
+          label: 'label-title after:content-none',
+          labelWrapper: 'flex items-center justify-start gap-1',
+          hint: 'label-hint'
         }"
-        aria-required="true"
-        class="w-full cursor-pointer"
-      />
+      >
+        <template #hint>
+          <span aria-hidden="true">({{ t('connection.required') }})</span>
+        </template>
+
+        <ClearableSelect
+          id="wcagify-instance"
+          :model-value="wcagifyUrl"
+          @update:model-value="(v) => (v ? connectInstance(v) : clearUrl())"
+          :label="t('connection.selectInstance')"
+          :items="instances.map((i) => ({ label: i.label, value: i.url }))"
+          :clear-label="t('form.clear')"
+          required
+          variant="outline"
+        />
+      </UFormField>
+
       <UButton
         variant="link"
         :label="t('connection.enterManually')"
-        color="success"
-        size="sm"
+        icon="i-lucide-square-pen"
+        color="primary"
         @click="switchToManual"
-        :ui="{ base: 'cursor-pointer px-0 mt-1' }"
+        :ui="{ base: 'cursor-pointer p-0 mt-2' }"
       />
     </div>
 
@@ -320,12 +331,12 @@ async function fetchReports() {
       <template #hint>
         <span aria-hidden="true">({{ t('connection.required') }})</span>
       </template>
+
       <ClearableSelect
         id="wcagify-report"
         v-model="reportSlug"
         :items="reports.map((r) => ({ label: r.title, value: r.slug }))"
         :placeholder="t('connection.selectReport')"
-        :ui="{ base: 'bg-default' }"
         required
         variant="outline"
       />

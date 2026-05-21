@@ -28,7 +28,7 @@ const levelColors = {
         :label="criterion.level"
         variant="subtle"
         :color="levelColors[criterion.level] ?? 'primary'"
-        class="shrink-0 ring-1 text-black bg-primary-300 ring-black dark:ring-primary-400"
+        class="shrink-0 ring-1 text-black bg-primary-300 dark:bg-primary-400 ring-black dark:ring-primary-400"
       />
 
       <h4 class="font-medium text-highlighted text-base w-full">
