@@ -13,7 +13,7 @@ export default defineAppConfig({
           color: 'primary',
           variant: 'solid',
           class:
-            'bg-primary-800 hover:bg-primary-900 active:bg-primary-950 dark:bg-primary-500 dark:hover:bg-primary-400 active:dark:bg-primary-300 text-white dark:text-black'
+            'bg-primary-800 hover:bg-primary-900 active:bg-primary-950 dark:bg-primary-500 dark:hover:bg-primary-400 dark:active:bg-primary-300 text-white dark:text-black'
         },
         {
           color: 'primary',
@@ -28,7 +28,7 @@ export default defineAppConfig({
         {
           color: 'neutral',
           variant: 'subtle',
-          class: 'text-neutral-800 dark:text-neutral-300 ring-neutral-500/75'
+          class: 'text-neutral-800 dark:text-neutral-300 ring-neutral-500'
         },
         {
           color: 'primary',
@@ -68,7 +68,7 @@ export default defineAppConfig({
         {
           color: 'neutral',
           variant: 'subtle',
-          class: 'ring-neutral-500 '
+          class: 'ring-neutral-500'
         }
       ]
     }

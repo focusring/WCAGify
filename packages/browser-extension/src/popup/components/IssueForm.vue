@@ -188,9 +188,8 @@ async function submit() {
           aria-controls="issue-sample-more-desc"
           icon="i-lucide-info"
           size="xs"
-          variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer' }"
+          variant="ghost"
           @click="info.sample.toggle"
         />
       </template>
@@ -241,9 +240,8 @@ async function submit() {
           aria-controls="issue-title-more-desc"
           icon="i-lucide-info"
           size="xs"
-          variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer' }"
+          variant="ghost"
           @click="info.title.toggle"
         />
       </template>
@@ -275,20 +273,18 @@ async function submit() {
           :aria-describedby="'issue-title-desc'"
           :placeholder="title ? undefined : t('form.issueTitle.placeholder')"
           :ui="{
-            base: '[&::placeholder]:text-toned py-2 pe-8 text-sm hover:bg-accented/75'
+            base: 'py-2'
           }"
           variant="subtle"
-          class="w-full"
         />
         <UButton
           v-if="title"
-          color="primary"
           variant="ghost"
           size="xs"
           icon="i-lucide-x"
           :aria-label="t('form.issueTitle.clear')"
           :ui="{
-            base: 'cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
+            base: 'absolute end-2 top-1/2 -translate-y-1/2'
           }"
           @pointerdown.stop
           @click.stop="clearTitle"
@@ -317,9 +313,8 @@ async function submit() {
           aria-controls="issue-sc-more-desc"
           icon="i-lucide-info"
           size="xs"
-          variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer' }"
+          variant="ghost"
           @click="info.sc.toggle"
         />
       </template>
@@ -370,9 +365,8 @@ async function submit() {
             aria-controls="issue-severity-more-desc"
             icon="i-lucide-info"
             size="xs"
-            variant="ghost"
             color="neutral"
-            :ui="{ base: 'cursor-pointer' }"
+            variant="ghost"
             @click="info.severity.toggle"
           />
         </template>
@@ -421,9 +415,8 @@ async function submit() {
             aria-controls="issue-type-more-desc"
             icon="i-lucide-info"
             size="xs"
-            variant="ghost"
             color="neutral"
-            :ui="{ base: 'cursor-pointer' }"
+            variant="ghost"
             @click="info.type.toggle"
           />
         </template>
@@ -474,9 +467,8 @@ async function submit() {
           aria-controls="issue-description-more-desc"
           icon="i-lucide-info"
           size="xs"
-          variant="ghost"
           color="neutral"
-          :ui="{ base: 'cursor-pointer' }"
+          variant="ghost"
           @click="info.body.toggle"
         />
       </template>
@@ -512,7 +504,7 @@ async function submit() {
       :label="submitting ? t('form.submitIssue.loading') : t('form.submitIssue.label')"
       size="xl"
       icon="i-lucide-file-input"
-      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer w-full justify-center' }"
+      :ui="{ leadingIcon: 'size-5', base: 'w-full justify-center' }"
     />
     <UAlert
       v-if="submitStatus === 'success'"
@@ -520,7 +512,6 @@ async function submit() {
       variant="subtle"
       icon="i-lucide-circle-check"
       :description="submitMessage"
-      class="px-3 py-2 items-center"
     />
     <UAlert
       v-if="submitStatus === 'error'"
@@ -528,7 +519,6 @@ async function submit() {
       variant="subtle"
       icon="i-lucide-triangle-alert"
       :description="submitMessage"
-      class="px-3 py-2 items-center"
     />
   </form>
 </template>

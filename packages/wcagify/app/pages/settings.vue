@@ -107,11 +107,11 @@ useSeoMeta({
             class="items-center"
           >
             <UColorModeSelect
-              class="max-w-48"
               :ui="{
-                base: 'cursor-pointer ring-neutral-500',
+                base: 'cursor-pointer max-w-48 ring-neutral-500',
                 item: 'cursor-pointer',
-                trailingIcon: 'text-toned icon-animation'
+                trailingIcon: 'text-toned icon-animation',
+                leadingIcon: 'text-toned'
               }"
             />
           </UFormField>

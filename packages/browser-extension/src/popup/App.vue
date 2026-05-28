@@ -34,7 +34,7 @@ const currentView = ref<'main' | 'settings'>('main')
           color="neutral"
           variant="ghost"
           :ui="{
-            base: 'cursor-pointer ml-auto'
+            base: 'ml-auto'
           }"
         />
       </div>

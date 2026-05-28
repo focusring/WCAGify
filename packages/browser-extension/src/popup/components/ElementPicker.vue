@@ -77,7 +77,7 @@ async function pickElement() {
       variant="outline"
       icon="i-lucide-square-mouse-pointer"
       size="xl"
-      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer w-full justify-center' }"
+      :ui="{ leadingIcon: 'size-5', base: 'w-full justify-center' }"
       :label="picking ? t('picker.picking') : t('picker.pickElement')"
     />
 

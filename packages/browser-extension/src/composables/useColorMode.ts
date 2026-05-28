@@ -1,45 +1,47 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 
 type ColorMode = 'system' | 'light' | 'dark'
 
 const preference = ref<ColorMode>('system')
-let initialized = false
+let initPromise: Promise<void> | undefined
 
 function getSystemDark(): boolean {
   return globalThis.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-function apply(pref: ColorMode) {
+function apply(pref: ColorMode = preference.value) {
   const isDark = pref === 'dark' || (pref === 'system' && getSystemDark())
   document.documentElement.classList.toggle('dark', isDark)
 }
 
-export function useColorMode() {
-  if (!initialized) {
-    initialized = true
-
-    chrome.storage.local.get(['colorMode']).then((result) => {
+function initColorMode(): Promise<void> {
+  if (!initPromise) {
+    initPromise = chrome.storage.local.get(['colorMode']).then((result) => {
       if (result.colorMode) preference.value = result.colorMode as ColorMode
-      apply(preference.value)
-    })
+      apply()
 
-    globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (preference.value === 'system') apply('system')
-    })
+      globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (preference.value === 'system') apply()
+      })
 
-    watch(preference, (val) => {
-      chrome.storage.local.set({ colorMode: val })
+      watch(preference, (val) => {
+        chrome.storage.local.set({ colorMode: val })
+        apply(val)
+      })
     })
   }
+  return initPromise
+}
 
-  onMounted(() => apply(preference.value))
+function cycle() {
+  const modes: ColorMode[] = ['system', 'light', 'dark']
+  const idx = modes.indexOf(preference.value)
+  preference.value = modes[(idx + 1) % modes.length]!
+}
 
-  function cycle() {
-    const modes: ColorMode[] = ['system', 'light', 'dark']
-    const idx = modes.indexOf(preference.value)
-    preference.value = modes[(idx + 1) % modes.length]!
-    apply(preference.value)
-  }
-
+export function useColorMode() {
+  void initColorMode()
   return { preference, cycle }
 }
+
+export { initColorMode }

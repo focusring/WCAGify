@@ -152,6 +152,18 @@
   --color-neutral-900: #171717;
   --color-neutral-950: #0a0a0a;
 
+  --color-shade-50: var(--ui-color-neutral-50);
+  --color-shade-100: var(--ui-color-neutral-100);
+  --color-shade-200: var(--ui-color-neutral-200);
+  --color-shade-300: var(--ui-color-neutral-300);
+  --color-shade-400: var(--ui-color-neutral-400);
+  --color-shade-500: var(--ui-color-neutral-500);
+  --color-shade-600: var(--ui-color-neutral-600);
+  --color-shade-700: var(--ui-color-neutral-700);
+  --color-shade-800: var(--ui-color-neutral-800);
+  --color-shade-900: var(--ui-color-neutral-900);
+  --color-shade-950: var(--ui-color-neutral-950);
+
   --color-stone-50: #fafaf9;
   --color-stone-100: #f5f5f4;
   --color-stone-200: #e7e5e4;
@@ -192,11 +204,23 @@
 
   --focus-gap-color: black;
 
+  --ui-text-dimmed: var(--color-shade-400);
+  --ui-text-muted: var(--color-shade-500);
+  --ui-text-toned: var(--color-shade-600);
+  --ui-text-default: var(--color-shade-700);
+  --ui-text-highlighted: var(--color-shade-950);
+
   --ui-radius: 0.125rem;
 }
 
 .dark {
   --focus-gap-color: white;
+
+  --ui-text-dimmed: var(--color-shade-500);
+  --ui-text-muted: var(--color-shade-400);
+  --ui-text-toned: var(--color-shade-300);
+  --ui-text-default: var(--color-shade-200);
+  --ui-text-highlighted: white;
 }
 
 h1 {
@@ -212,7 +236,7 @@ h3 {
 }
 
 .label-hint {
-  @apply text-slate-600 dark:text-slate-400;
+  @apply text-shade-600 dark:text-shade-400;
 }
 
 .collapsible-enter-active {

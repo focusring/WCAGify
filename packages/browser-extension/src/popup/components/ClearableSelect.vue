@@ -81,8 +81,9 @@ const triggerAriaLabel = computed(() => {
       :placeholder="placeholder"
       :ui="{
         placeholder: 'text-toned',
+        trailingIcon: 'icon-animation text-toned',
         item: 'cursor-pointer selectable-focus',
-        base: 'pe-14 cursor-pointer w-full py-2',
+        base: 'pe-14 py-2',
         content: 'z-50'
       }"
       :portal="false"
@@ -91,20 +92,15 @@ const triggerAriaLabel = computed(() => {
       :aria-describedby="ariaDescribedby"
       :aria-required="required ? 'true' : undefined"
       :variant="variant"
-    >
-      <template #trailing>
-        <UIcon name="i-lucide-chevron-down" class="text-toned size-5 icon-animation" />
-      </template>
-    </USelectMenu>
+    />
     <UButton
       v-if="model"
-      color="primary"
       variant="ghost"
       size="xs"
       icon="i-lucide-x"
       :aria-label="clearLabel || t('form.clear')"
       :ui="{
-        base: 'cursor-pointer absolute end-8 top-1/2 -translate-y-1/2'
+        base: 'absolute end-8 top-1/2 -translate-y-1/2'
       }"
       @pointerdown.stop
       @click.stop="model = undefined"
