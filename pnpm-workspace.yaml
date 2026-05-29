@@ -5,9 +5,9 @@ packages:
 
 catalog:
   '@nuxt/fonts': ^0.14.0
-  '@nuxt/ui': ^4.7.1
-  '@tiptap/core': ^3.23.1
-  '@tiptap/vue-3': ^3.23.1
+  '@nuxt/ui': ^4.8.1
+  '@tiptap/core': ^3.23.6
+  '@tiptap/vue-3': ^3.23.6
   nanoid: ^5.1.11
   sharp: ^0.34.5
   zod: ^4.4.3
@@ -21,15 +21,15 @@ catalogs:
     ejs: ^5.0.2
     picocolors: ^1.1.1
   core:
-    '@iconify-json/lucide': ^1.2.107
-    '@iconify-json/simple-icons': ^1.2.82
+    '@iconify-json/lucide': ^1.2.110
+    '@iconify-json/simple-icons': ^1.2.84
     '@libsql/client': ^0.17.3
     '@nuxt/a11y': 1.0.0-alpha.1
-    '@nuxt/content': ^3.13.0
+    '@nuxt/content': ^3.14.0
     '@nuxt/icon': ^2.2.2
     '@nuxt/kit': ^4.4.5
-    '@nuxt/ui': ^4.7.1
-    '@nuxtjs/i18n': ^10.3.0
+    '@nuxt/ui': ^4.8.1
+    '@nuxtjs/i18n': ^10.4.0
     '@vueuse/core': ^14.3.0
     nuxt: ^4.4.5
     nuxt-studio: ^1.7.0
@@ -39,20 +39,20 @@ catalogs:
     '@nuxt/schema': ^4.4.5
     '@types/ejs': ^3.1.5
     '@types/node': ^24.12.4
-    '@vitest/coverage-v8': ^4.1.6
+    '@vitest/coverage-v8': ^4.1.7
     bumpp: ^11.1.0
     changelogen: ^0.6.2
     changelogithub: ^14.0.0
     husky: ^9.1.7
-    knip: ^6.13.0
+    knip: ^6.14.2
     lint-staged: ^17.0.5
-    oxfmt: ^0.49.0
-    oxlint: ^1.64.0
+    oxfmt: ^0.52.0
+    oxlint: ^1.67.0
     playwright: ^1.60.0
-    tsdown: ^0.22.0
+    tsdown: ^0.22.1
     typescript: ^6.0.3
-    vitest: ^4.1.6
-    vue-tsc: ^3.2.8
+    vitest: ^4.1.7
+    vue-tsc: ^3.3.2
   docs:
     '@tailwindcss/vite': ^4.3.0
     vitepress: 2.0.0-alpha.17
