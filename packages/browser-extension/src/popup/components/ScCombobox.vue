@@ -88,7 +88,7 @@ watch(isOpen, async (open, _, onCleanup) => {
       :search-input="{
         placeholder: t('form.sc.search'),
         leadingIcon: 'i-lucide-search',
-        ui: { base: 'ps-13 mx-1.5 py-2 selectable-focus' }
+        ui: { base: 'ps-13 mx-1.5 py-2' }
       }"
       :placeholder="placeholder"
       :aria-label="
@@ -99,9 +99,9 @@ watch(isOpen, async (open, _, onCleanup) => {
             : t('form.sc.ariaLabel')
       "
       :ui="{
-        base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5 selectable-focus',
-        placeholder: 'text-muted',
-        trailingIcon: 'text-muted icon-animation',
+        base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5 pe-12!',
+        placeholder: 'text-toned',
+        trailingIcon: 'text-toned icon-animation',
         item: 'grid grid-cols-[minmax(2.5rem,auto)_auto_1fr_auto] items-center cursor-pointer selectable-focus',
         content: 'py-1 z-50',
         viewport: 'mt-2',
@@ -111,7 +111,6 @@ watch(isOpen, async (open, _, onCleanup) => {
       :required="required"
       :aria-describedby="ariaDescribedby"
       variant="subtle"
-      class="w-full cursor-pointer"
     >
       <template #default>
         <!-- Select bar -->
@@ -119,14 +118,18 @@ watch(isOpen, async (open, _, onCleanup) => {
           <UBadge
             class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
             :color="
-              selectedItem.level === 'A' ? 'info' : selectedItem.level === 'AA' ? 'warning' : 'info'
+              selectedItem.level === 'A'
+                ? 'info'
+                : selectedItem.level === 'AA'
+                  ? 'warning'
+                  : 'success'
             "
             >{{ selectedItem.level }}</UBadge
           >
           <span class="font-medium shrink-0">{{ selectedItem.sc }}</span>
           <span class="min-w-0 truncate">{{ selectedItem.name }}</span>
         </template>
-        <span v-else class="text-muted">{{ placeholder ?? '\xA0' }}</span>
+        <span v-else class="text-toned">{{ placeholder ?? '\xA0' }}</span>
       </template>
       <!-- Select bar items -->
       <template #item="{ item }">
@@ -134,7 +137,7 @@ watch(isOpen, async (open, _, onCleanup) => {
         <UBadge
           aria-hidden="true"
           class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
-          :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'info'"
+          :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'success'"
           >{{ item.level }}</UBadge
         >
         <span aria-hidden="true" class="font-medium shrink-0">{{ item.sc }}</span>
@@ -154,12 +157,11 @@ watch(isOpen, async (open, _, onCleanup) => {
       as="span"
       role="button"
       tabindex="0"
-      color="primary"
       variant="ghost"
       size="xs"
       icon="i-lucide-x"
       :aria-label="t('form.sc.clear')"
-      :ui="{ base: 'selectable-focus cursor-pointer absolute end-8 top-1/2 -translate-y-1/2' }"
+      :ui="{ base: 'absolute end-8 top-1/2 -translate-y-1/2' }"
       @pointerdown.stop
       @click.stop="model = ''"
       @keydown.enter.stop="model = ''"

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const localePath = useLocalePath()
+
+const route = useRoute()
+const isSettingsPage = computed(() => route.path === localePath('/settings'))
 </script>
 
 <template>
   <UHeader :toggle="false">
     <template #left>
-      <NuxtLinkLocale to="/">
+      <NuxtLinkLocale class="h-9" to="/">
         <AppLogo />
       </NuxtLinkLocale>
     </template>
@@ -15,10 +18,10 @@ const localePath = useLocalePath()
       <UButton
         :to="localePath('/settings')"
         :label="t('settings.title').toLowerCase()"
-        color="neutral"
         icon="i-lucide-settings"
-        variant="ghost"
-        class="no-underline!"
+        size="lg"
+        color="neutral"
+        :variant="isSettingsPage ? 'subtle' : 'ghost'"
       />
     </template>
   </UHeader>
@@ -33,7 +36,7 @@ const localePath = useLocalePath()
 
   <UFooter>
     <template #left>
-      <p class="text-sm text-muted">WCAGify &copy; {{ new Date().getFullYear() }}</p>
+      <p class="text-sm text-toned">WCAGify &copy; {{ new Date().getFullYear() }}</p>
     </template>
 
     <template #right>

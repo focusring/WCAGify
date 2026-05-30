@@ -153,14 +153,10 @@ export default {
     tagline: 'Customize your WCAGify experience',
     appearance: 'Appearance',
     theme: 'Theme',
-    themeSystem: 'System',
-    themeLight: 'Light',
-    themeDark: 'Dark',
     accentColor: 'Accent color',
     backgroundShade: 'Background shade',
-    clearColor: 'Clear color',
-    languageSection: 'Language',
+    generalSection: 'General',
     language: 'Language',
-    back: 'back'
+    back: 'return'
   }
 }

@@ -22,7 +22,7 @@ const issueId = `issue-${sanitizedPath}`
 <template>
   <UCollapsible :unmount-on-hide="false" :id="issueId" as="article">
     <UButton
-      class="group cursor-pointer"
+      class="group"
       color="neutral"
       variant="subtle"
       block
@@ -30,7 +30,7 @@ const issueId = `issue-${sanitizedPath}`
         base: 'px-4 py-3 items-start gap-3 text-left rounded-none ring-0 border-t border-muted'
       }"
     >
-      <h5 class="font-medium text-gray-950 dark:text-white text-base w-full">
+      <h5 class="font-medium text-highlighted text-base w-full">
         <span v-if="index !== undefined && index !== null">{{ index }}. </span>{{ issue.title }}
       </h5>
 
@@ -38,21 +38,18 @@ const issueId = `issue-${sanitizedPath}`
         <UBadge
           v-if="samplePage"
           :label="samplePage.title"
-          variant="outline"
+          variant="solid"
           color="neutral"
           class="shrink-0"
         />
         <UBadge
           :label="t('report.scStatus.failed')"
-          variant="subtle"
+          variant="solid"
           color="error"
           icon="i-lucide-x"
           class="shrink-0"
         />
-        <UIcon
-          name="i-lucide-chevron-down"
-          class="mt-0.5 shrink-0 size-5 text-muted transition-transform group-data-[state=open]:rotate-180"
-        />
+        <UIcon name="i-lucide-chevron-down" class="mt-0.5 shrink-0 size-5 icon-animation" />
       </template>
     </UButton>
 

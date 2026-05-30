@@ -39,15 +39,15 @@ useSeoMeta({
   <main class="flex-1 flex items-center justify-center py-12 sm:py-16">
     <!-- Setup required (production, no secret configured) -->
     <div v-if="status && !status.configured && !status.dev" class="max-w-sm text-center">
-      <UIcon name="i-lucide-shield-alert" class="size-12 text-muted" />
-      <h1 class="mt-4 text-xl font-semibold text-gray-950 dark:text-white">
+      <UIcon name="i-lucide-shield-alert" class="size-12 text-toned" />
+      <h1 class="mt-4 text-xl font-semibold text-highlighted">
         {{ t('admin.setupRequired') }}
       </h1>
-      <p class="mt-2 text-sm text-muted">
+      <p class="mt-2 text-sm text-toned">
         {{ t('admin.setupDescription') }}
       </p>
       <pre
-        class="mt-4 rounded-lg bg-elevated border border-default p-3 text-xs text-left font-mono"
+        class="mt-4 rounded-lg bg-elevated border border-default p-3 text-sm text-left font-mono"
       >
 WCAGIFY_ADMIN_SECRET=your-secret-here</pre
       >
@@ -56,16 +56,16 @@ WCAGIFY_ADMIN_SECRET=your-secret-here</pre
     <!-- Login form -->
     <div v-else-if="status && status.configured" class="max-w-sm w-full">
       <div class="text-center">
-        <UIcon name="i-lucide-shield" class="size-12 text-muted" />
-        <h1 class="mt-4 text-xl font-semibold text-gray-950 dark:text-white">
+        <UIcon name="i-lucide-shield" class="size-12 text-toned" />
+        <h1 class="mt-4 text-xl font-semibold text-highlighted">
           {{ t('admin.loginTitle') }}
         </h1>
-        <p class="mt-2 text-sm text-muted">
+        <p class="mt-2 text-sm text-toned">
           {{ t('admin.loginDescription') }}
         </p>
       </div>
       <form class="mt-6 space-y-4" @submit.prevent="submit">
-        <label for="admin-secret" class="block text-xs text-muted">
+        <label for="admin-secret" class="block text-sm text-toned">
           {{ t('admin.secret') }}
         </label>
         <UInput

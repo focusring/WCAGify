@@ -15,6 +15,7 @@ const mode = ref<'scanning' | 'select' | 'manual'>('scanning')
 const autoConnected = ref(false)
 const manuallyConnected = ref(false)
 const urlCleared = ref(false)
+const rescanned = ref(false)
 
 watch(wcagifyUrl, (val) => {
   if (val) urlCleared.value = false
@@ -72,6 +73,7 @@ function clearUrl() {
   reportSlug.value = ''
   autoConnected.value = false
   manuallyConnected.value = false
+  rescanned.value = false
 }
 
 function switchToManual() {
@@ -85,6 +87,7 @@ function rescan() {
   status.value = 'idle'
   errorMessage.value = ''
   reports.value = []
+  rescanned.value = true
   scan()
 }
 
@@ -114,9 +117,19 @@ const statusAlert = computed(() => {
   return undefined
 })
 
+const inputColor = computed<'success' | 'info' | 'warning' | 'error' | undefined>(() => {
+  if (status.value === 'loading') return undefined
+  if (status.value === 'error') return 'error'
+  if (urlCleared.value) return 'warning'
+  if (status.value === 'connected' && manuallyConnected.value) return 'success'
+  if (status.value === 'connected' && autoConnected.value && rescanned.value) return 'info'
+  return undefined
+})
+
 async function fetchReports() {
   autoConnected.value = false
   manuallyConnected.value = false
+  rescanned.value = false
   status.value = 'loading'
   errorMessage.value = ''
 
@@ -159,53 +172,62 @@ async function fetchReports() {
 <template>
   <div class="space-y-3">
     <!-- Connected state (always visible on top) -->
-    <div v-if="status === 'connected'" class="flex sm:flex-row flex-col items-center gap-2 text-sm">
+    <div v-if="status === 'connected'" class="flex sm:flex-row flex-col gap-2 text-sm">
       <div class="flex gap-2">
         <UChip color="success" standalone inset />
-        <span class="text-success">{{ t('connection.connected') }}</span>
+        <span class="text-success-900 dark:text-success-400">{{ t('connection.connected') }}</span>
         &mdash;
+        <span class="text-toned">{{ wcagifyUrl }}</span>
       </div>
-      <span class="text-muted">{{ wcagifyUrl }}</span>
     </div>
     <div v-if="status === 'idle' || status === 'error'" class="flex gap-2 text-sm">
       <div class="flex gap-2">
         <UChip color="error" standalone inset />
-        <span class="text-error">{{ t('connection.disconnected') }}</span>
+        <span class="text-error-800 dark:text-error-300">{{ t('connection.disconnected') }}</span>
         &mdash;
+        <span class="text-toned">{{ wcagifyUrl }}</span>
       </div>
-      <span class="text-muted">{{ wcagifyUrl }}</span>
     </div>
 
     <!-- Scanning state -->
-    <div v-if="mode === 'scanning'" class="text-sm text-muted">
+    <div v-if="mode === 'scanning'" class="text-sm text-toned">
       {{ t('connection.scanning') }}
     </div>
 
     <!-- Multiple instances found: dropdown -->
     <div v-else-if="mode === 'select'">
-      <label for="wcagify-instance" class="block text-sm font-medium text-muted mb-1"
-        >{{ t('connection.selectInstance') }} <small>({{ t('connection.required') }})</small></label
-      >
-      <USelect
-        id="wcagify-instance"
-        :model-value="wcagifyUrl"
-        :items="instances.map((i) => ({ label: i.label, value: i.url }))"
-        @update:model-value="connectInstance"
+      <UFormField
+        :label="t('connection.selectInstance')"
+        name="wcagify-instance"
         required
         :ui="{
-          placeholder: 'text-muted',
-          item: 'selectable-focus'
+          label: 'label-title after:content-none',
+          labelWrapper: 'flex items-center justify-start gap-1',
+          hint: 'label-hint'
         }"
-        aria-required="true"
-        class="w-full cursor-pointer"
-      />
+      >
+        <template #hint>
+          <span aria-hidden="true">({{ t('connection.required') }})</span>
+        </template>
+
+        <ClearableSelect
+          id="wcagify-instance"
+          :model-value="wcagifyUrl"
+          @update:model-value="(v) => (v ? connectInstance(v) : clearUrl())"
+          :label="t('connection.selectInstance')"
+          :items="instances.map((i) => ({ label: i.label, value: i.url }))"
+          :clear-label="t('form.clear')"
+          required
+          variant="outline"
+        />
+      </UFormField>
+
       <UButton
         variant="link"
         :label="t('connection.enterManually')"
-        color="success"
-        size="sm"
+        icon="i-lucide-square-pen"
         @click="switchToManual"
-        :ui="{ base: 'cursor-pointer px-0 mt-1' }"
+        :ui="{ base: 'mt-2' }"
       />
     </div>
 
@@ -228,7 +250,13 @@ async function fetchReports() {
             <div class="relative w-full">
               <UInput
                 id="wcagify-url"
-                v-model="wcagifyUrl"
+                :model-value="wcagifyUrl"
+                @update:model-value="
+                  (v) => {
+                    wcagifyUrl = v
+                    rescanned = false
+                  }
+                "
                 type="url"
                 placeholder="http://localhost:3000"
                 required
@@ -236,20 +264,17 @@ async function fetchReports() {
                 aria-required="true"
                 :aria-invalid="status === 'error' ? true : undefined"
                 :aria-describedby="status === 'error' ? 'wcagify-url-error' : undefined"
-                :color="status === 'error' ? 'error' : 'success'"
-                :highlight="status === 'error'"
-                :ui="{ base: 'selectable-focus pe-8' }"
-                class="w-full"
+                :color="inputColor"
+                :highlight="!!inputColor"
               />
               <UButton
                 v-if="wcagifyUrl"
-                color="primary"
                 variant="ghost"
                 size="xs"
                 icon="i-lucide-x"
                 :aria-label="t('settings.clear')"
                 :ui="{
-                  base: 'selectable-focus cursor-pointer absolute end-2 top-1/2 -translate-y-1/2'
+                  base: 'absolute end-2 top-1/2 -translate-y-1/2'
                 }"
                 @pointerdown.stop
                 @click.stop="clearUrl"
@@ -258,13 +283,7 @@ async function fetchReports() {
               />
             </div>
 
-            <UButton
-              type="submit"
-              color="primary"
-              size="lg"
-              :label="t('connection.connect')"
-              :ui="{ base: 'cursor-pointer selectable-focus' }"
-            />
+            <UButton type="submit" size="lg" :label="t('connection.connect')" />
 
             <UButton
               @click="rescan"
@@ -274,7 +293,7 @@ async function fetchReports() {
               size="lg"
               :aria-label="t('connection.rescan')"
               :ui="{
-                base: 'shrink-0 cursor-pointer selectable-focus flex-none'
+                base: 'shrink-0 flex-none'
               }"
             />
           </div>
@@ -289,7 +308,6 @@ async function fetchReports() {
       icon="i-lucide-loader-circle"
       :description="t('connection.connecting')"
       :ui="{ icon: 'animate-spin' }"
-      class="px-3 py-2 items-center"
     />
 
     <UAlert
@@ -298,15 +316,9 @@ async function fetchReports() {
       variant="subtle"
       icon="i-lucide-triangle-alert"
       :description="t('connection.urlClearedWarning')"
-      class="px-3 py-2 items-center"
     />
 
-    <UAlert
-      v-if="statusAlert"
-      v-bind="statusAlert"
-      variant="subtle"
-      class="px-3 py-2 items-center"
-    />
+    <UAlert v-if="statusAlert" v-bind="statusAlert" variant="subtle" />
 
     <UFormField
       v-if="status === 'connected' && reports.length > 0"
@@ -321,13 +333,14 @@ async function fetchReports() {
       <template #hint>
         <span aria-hidden="true">({{ t('connection.required') }})</span>
       </template>
+
       <ClearableSelect
         id="wcagify-report"
         v-model="reportSlug"
         :items="reports.map((r) => ({ label: r.title, value: r.slug }))"
         :placeholder="t('connection.selectReport')"
-        :ui="{ base: 'bg-default' }"
         required
+        variant="outline"
       />
     </UFormField>
   </div>

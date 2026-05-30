@@ -64,6 +64,7 @@ const accentColorSwatches = ACCENT_COLORS.map((name) => ({
   name,
   value: ACCENT_HEX[name]
 }))
+
 const neutralColorSwatches = NEUTRAL_COLORS.map((name) => ({
   name,
   value: NEUTRAL_HEX[name]
@@ -80,35 +81,45 @@ function setNeutralColor(val: string | undefined) {
 </script>
 
 <template>
-  <div class="min-h-screen p-4 font-sans">
+  <div class="min-h-screen py-4 font-sans">
     <span ref="focusSentinel" tabindex="-1" aria-hidden="true" class="sr-only" />
     <!-- Header -->
-    <div class="flex items-center">
-      <UIcon name="i-lucide-settings" class="size-9 pr-2 text-black dark:text-white" />
-      <h1 class="text-lg font-bold text-black dark:text-white">{{ t('settings.title') }}</h1>
+    <div class="flex items-center gap-2 px-4">
+      <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
+      <h1>WCAGify</h1>
 
       <UButton
-        @click="emit('back')"
-        :aria-label="t('settings.back')"
-        icon="i-lucide-arrow-big-left"
+        :label="t('settings.title').toLowerCase()"
+        icon="i-lucide-settings"
         size="lg"
         color="neutral"
         variant="subtle"
-        :ui="{
-          base: 'cursor-pointer selectable-focus ml-auto',
-          leadingIcon: 'size-5'
-        }"
+        aria-current="page"
+        :ui="{ base: 'ml-auto', leadingIcon: 'size-5' }"
       />
     </div>
 
     <USeparator class="my-3" aria-hidden="true" />
 
-    <div class="max-w-2xl mx-auto">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="flex items-center justify-between sm:mt-8 mb-3">
+        <h2 class="text-xl sm:text-2xl font-medium">
+          {{ t('settings.title') }}
+        </h2>
+        <UButton
+          @click="emit('back')"
+          icon="i-lucide-arrow-big-left"
+          color="neutral"
+          variant="subtle"
+          :ui="{ base: 'shrink-0 h-9', leadingIcon: 'size-4' }"
+        >
+          <span class="sr-only sm:not-sr-only">{{ t('settings.back').toLowerCase() }}</span>
+        </UButton>
+      </div>
+
       <!-- General -->
-      <h2 class="text-sm font-semibold text-muted tracking-wide mb-3">
-        {{ t('settings.general') }}
-      </h2>
-      <section class="bg-elevated rounded-sm p-4 space-y-3 mb-4">
+      <h3>{{ t('settings.general') }}</h3>
+      <section class="bg-elevated rounded-sm px-4 py-3 space-y-3 mb-4">
         <ConnectionSettings />
 
         <!-- Language -->
@@ -117,15 +128,17 @@ function setNeutralColor(val: string | undefined) {
           :ui="{ label: 'label-title' }"
           class="flex flex-row items-center justify-between"
         >
-          <USelect
+          <USelectMenu
             v-model="locale"
+            value-key="value"
             :items="localeItems"
+            :search-input="false"
             :aria-label="t('language')"
             :ui="{
-              trailingIcon: 'icon-animation text-muted',
-              item: 'selectable-focus',
-              content: 'overflow-visible',
-              base: 'bg-default min-w-32 cursor-pointer selectable-focus'
+              trailingIcon: 'icon-animation text-toned',
+              content: 'z-50',
+              item: 'cursor-pointer selectable-focus',
+              base: 'bg-default min-w-32'
             }"
             variant="subtle"
             size="lg"
@@ -134,10 +147,8 @@ function setNeutralColor(val: string | undefined) {
       </section>
 
       <!-- Appearance -->
-      <h2 class="text-sm font-semibold text-muted tracking-wide mb-3">
-        {{ t('settings.appearance') }}
-      </h2>
-      <section class="bg-elevated rounded-sm space-y-3 p-4">
+      <h3>{{ t('settings.appearance') }}</h3>
+      <section class="bg-elevated rounded-sm space-y-3 px-4 py-3">
         <!-- Theme -->
         <UFormField
           :label="t('settings.colorMode')"
@@ -148,7 +159,7 @@ function setNeutralColor(val: string | undefined) {
             @click="cycle"
             :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
             :ui="{
-              base: 'bg-default cursor-pointer min-w-24 selectable-focus',
+              base: 'bg-default min-w-24',
               leadingIcon: 'size-4'
             }"
             :leading-icon="colorModeIcon"
@@ -191,7 +202,7 @@ function setNeutralColor(val: string | undefined) {
     <USeparator class="my-4" aria-hidden="true" />
 
     <footer
-      class="flex flex-col items-center gap-2 text-center text-xs text-muted pb-2 max-w-md mx-auto whitespace-nowrap"
+      class="flex flex-col items-center gap-2 text-center text-sm text-toned pb-2 max-w-md mx-auto"
     >
       <img :src="logoSvg" alt="Logo WCAGify" class="size-8" />
       <div class="space-y-1.5">
@@ -200,7 +211,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://www.wcagify.com"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-primary hover:underline selectable-focus"
+            class="font-medium text-primary hover:underline"
             >WCAGify</a
           >
           {{ t('settings.license') }}
@@ -208,7 +219,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://wcagify.com/legal/terms-and-conditions"
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline selectable-focus"
+            class="hover:underline"
             >{{ t('settings.terms') }}</a
           >
           ·
@@ -216,7 +227,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://wcagify.com/legal/privacy-policy"
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline selectable-focus"
+            class="hover:underline"
             >{{ t('settings.privacy') }}</a
           >
           ·
@@ -224,7 +235,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://wcagify.com/legal/security-policy"
             target="_blank"
             rel="noopener noreferrer"
-            class="hover:underline selectable-focus"
+            class="hover:underline"
             >{{ t('settings.security') }}</a
           >
         </p>
@@ -234,7 +245,7 @@ function setNeutralColor(val: string | undefined) {
             href="https://www.focusring.io"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-primary hover:underline selectable-focus"
+            class="font-medium text-primary hover:underline"
             >focusring.io</a
           >
           {{ t('settings.inRegion') }}

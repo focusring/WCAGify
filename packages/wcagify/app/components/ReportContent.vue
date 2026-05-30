@@ -83,7 +83,7 @@ defineExpose({ visiblePrinciples })
     </div>
 
     <section id="executive-summary" class="mt-12 scroll-mt-20">
-      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-file-text" class="size-6 shrink-0" />
         {{ t('report.executiveSummary') }}
       </h2>
@@ -92,10 +92,10 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-gray-200 dark:border-gray-800" />
+    <hr class="my-12 border-default" />
 
     <section id="scorecard" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-list-checks" class="size-6 shrink-0" />
         {{ t('report.resultsPerPrinciple') }}
       </h2>
@@ -108,10 +108,10 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-gray-200 dark:border-gray-800" />
+    <hr class="my-12 border-default" />
 
     <section id="about" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-info" class="size-6 shrink-0" />
         {{ t('report.aboutThisReport') }}
       </h2>
@@ -122,10 +122,10 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-gray-200 dark:border-gray-800" />
+    <hr class="my-12 border-default" />
 
     <section id="scope" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-target" class="size-6 shrink-0" />
         {{ t('report.scope') }}
       </h2>
@@ -134,10 +134,10 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-gray-200 dark:border-gray-800" />
+    <hr class="my-12 border-default" />
 
     <section id="sample" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+      <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-layers" class="size-6 shrink-0" />
         {{ t('report.representativeSample') }}
       </h2>
@@ -147,15 +147,17 @@ defineExpose({ visiblePrinciples })
     </section>
 
     <template v-if="issuesByPrinciple.length">
-      <hr class="my-12 border-gray-200 dark:border-gray-800" />
+      <hr class="my-12 border-default" />
 
       <section id="issues" class="min-h-screen scroll-mt-20">
-        <h2 class="flex items-center gap-2 text-2xl font-semibold text-gray-950 dark:text-white">
+        <h2 class="flex items-center gap-2">
           <UIcon name="i-lucide-bar-chart-2" class="size-6 shrink-0" />
           {{ t('report.results') }}
         </h2>
 
-        <div class="md:flex grid grid-cols-2 grid-rows-2 gap-4 mt-4 max-w-lg md:max-w-none">
+        <div
+          class="results-indicators md:flex grid grid-cols-2 grid-rows-2 gap-4 mt-4 max-w-lg md:max-w-none"
+        >
           <ResultsIndicator
             status="passed"
             :count="statusCounts.passed"
@@ -188,12 +190,12 @@ defineExpose({ visiblePrinciples })
 
         <div
           v-if="emptyFilterStatus"
-          class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-muted py-16 text-center bg-muted"
+          class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-default py-16 text-center bg-muted"
         >
-          <h3 class="text-lg font-semibold text-gray-950 dark:text-white">
+          <h3 class="font-semibold!">
             {{ t(`report.emptyFilter.${emptyFilterStatus}.title`) }}
           </h3>
-          <p class="max-w-sm text-sm text-gray-600 dark:text-gray-400">
+          <p class="max-w-sm text-sm text-toned">
             {{ t(`report.emptyFilter.${emptyFilterStatus}.description`) }}
           </p>
         </div>
@@ -210,18 +212,18 @@ defineExpose({ visiblePrinciples })
     </template>
 
     <template v-if="reportTips.length">
-      <hr class="my-12 border-gray-200 dark:border-gray-800" />
+      <hr class="my-12 border-default" />
 
       <section id="tips">
-        <h2 class="text-2xl font-semibold text-gray-950 dark:text-white">
+        <h2>
           {{ t('report.tips') }}
         </h2>
         <ol class="mt-6 list-decimal list-outside space-y-8 pl-6">
           <li v-for="tip in reportTips" :key="tip.path">
-            <h3 class="font-medium text-gray-950 dark:text-white">
+            <h3 class="text-base!">
               {{ tip.title }}
             </h3>
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm text-toned">
               {{ $t('report.difficulty') }}:
               {{
                 tip.difficulty ? $t(`report.difficultyLevel.${tip.difficulty.toLowerCase()}`) : ''

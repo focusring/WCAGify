@@ -150,7 +150,6 @@ export default {
     saved: 'Opgeslagen',
     accentColor: 'Accentkleur',
     backgroundShade: 'Achtergrondtint',
-    clearColor: 'Kleur wissen',
     license: 'is uitgebracht onder de MIT-licentie.',
     terms: 'Voorwaarden',
     privacy: 'Privacy',

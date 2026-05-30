@@ -17,60 +17,29 @@ const conformanceResult = computed(() => {
   )
   return t('report.criteriaMet', { conforming: data.conforming.all, total: data.totals.all })
 })
+
+const metaRows = computed(() => [
+  { label: t('report.commissionedBy'), value: props.report.evaluation.commissioner },
+  { label: t('report.evaluatedBy'), value: props.report.evaluation.evaluator },
+  { label: t('report.date'), value: props.report.evaluation.date },
+  { label: t('report.wcagVersion'), value: `WCAG ${props.report.evaluation.targetWcagVersion}` },
+  { label: t('report.conformanceTarget'), value: props.report.evaluation.targetLevel },
+  { label: t('report.conformanceResult'), value: conformanceResult.value }
+])
 </script>
 
 <template>
   <header class="py-12">
-    <h1 class="text-4xl font-bold tracking-tight text-gray-950 dark:text-white sm:text-5xl">
+    <h1 class="text-4xl font-bold tracking-tight text-highlighted sm:text-5xl">
       {{ t('report.accessibilityConformanceReportFor', { title: report.title }) }}
     </h1>
     <dl class="mt-6 grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:grid-cols-3">
-      <div>
-        <dt class="text-gray-500 dark:text-gray-400">
-          {{ t('report.commissionedBy') }}
+      <div v-for="row in metaRows" :key="row.label">
+        <dt class="text-toned">
+          {{ row.label }}
         </dt>
-        <dd class="mt-0.5 text-gray-950 dark:text-white">
-          {{ report.evaluation.commissioner }}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-gray-500 dark:text-gray-400">
-          {{ t('report.evaluatedBy') }}
-        </dt>
-        <dd class="mt-0.5 text-gray-950 dark:text-white">
-          {{ report.evaluation.evaluator }}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-gray-500 dark:text-gray-400">
-          {{ t('report.date') }}
-        </dt>
-        <dd class="mt-0.5 text-gray-950 dark:text-white">
-          {{ report.evaluation.date }}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-gray-500 dark:text-gray-400">
-          {{ t('report.wcagVersion') }}
-        </dt>
-        <dd class="mt-0.5 text-gray-950 dark:text-white">
-          WCAG {{ report.evaluation.targetWcagVersion }}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-gray-500 dark:text-gray-400">
-          {{ t('report.conformanceTarget') }}
-        </dt>
-        <dd class="mt-0.5 text-gray-950 dark:text-white">
-          {{ report.evaluation.targetLevel }}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-gray-500 dark:text-gray-400">
-          {{ t('report.conformanceResult') }}
-        </dt>
-        <dd class="mt-0.5 text-gray-950 dark:text-white">
-          {{ conformanceResult }}
+        <dd class="mt-0.5 text-highlighted">
+          {{ row.value }}
         </dd>
       </div>
     </dl>

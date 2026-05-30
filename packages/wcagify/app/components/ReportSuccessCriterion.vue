@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ScGroup, ScStatus } from '@focusring/wcagify'
+import type { ScGroup } from '@focusring/wcagify'
 import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 
 const props = defineProps<{
@@ -10,45 +10,46 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const statusFilters = inject<Ref<Set<string>>>('statusFilters')
-
-type BadgeColor = 'error' | 'neutral' | 'success' | 'warning' | 'primary' | 'secondary' | 'info'
-
-const statusConfig: Record<ScStatus, { color: BadgeColor; icon: string }> = {
-  passed: { color: 'success', icon: 'i-lucide:check' },
-  failed: { color: 'error', icon: 'i-lucide:x' },
-  'not-present': { color: 'neutral', icon: 'i-lucide:book-dashed' },
-  'not-tested': { color: 'warning', icon: 'i-lucide:mouse-pointer-2-off' }
-}
-
-const levelColors: Record<string, BadgeColor> = {
-  A: 'primary',
-  AA: 'primary',
-  AAA: 'primary'
-}
 </script>
 
 <template>
   <div
     v-show="!statusFilters || statusFilters.has(criterion.status)"
-    class="rounded-lg border border-gray-200 dark:border-muted bg-muted overflow-hidden"
+    class="rounded-lg border border-muted bg-muted overflow-hidden"
   >
     <div class="flex items-center gap-3 px-4 py-3">
-      <UBadge
-        :label="criterion.level"
-        variant="subtle"
-        :color="levelColors[criterion.level] ?? 'primary'"
-        class="shrink-0"
-      />
+      <UBadge :label="criterion.level" variant="subtle" class="shrink-0" />
 
-      <h4 class="font-medium text-gray-950 dark:text-white text-base w-full">
+      <h4 class="font-medium text-highlighted text-base w-full">
         {{ criterion.name }}
       </h4>
 
       <UBadge
-        :label="t(`report.scStatus.${criterion.status}`)"
-        variant="subtle"
-        :color="statusConfig[criterion.status].color"
-        :icon="statusConfig[criterion.status].icon"
+        v-if="criterion.status === 'passed'"
+        :label="t('report.scStatus.passed')"
+        color="success"
+        icon="i-lucide-check"
+        class="shrink-0"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'not-present'"
+        :label="t('report.scStatus.not-present')"
+        color="info"
+        icon="i-lucide-book-dashed"
+        class="shrink-0"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'not-tested'"
+        :label="t('report.scStatus.not-tested')"
+        color="warning"
+        icon="i-lucide-mouse-pointer-2-off"
+        class="shrink-0"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'failed'"
+        :label="t('report.scStatus.failed')"
+        color="error"
+        icon="i-lucide-x"
         class="shrink-0"
       />
     </div>

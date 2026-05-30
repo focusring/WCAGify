@@ -69,6 +69,6 @@ watch(file, async (newFile) => {
         />
       </template>
     </UFileUpload>
-    <p v-if="errorMessage" class="mt-1 text-xs text-red-600">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="mt-1 text-sm text-error">{{ errorMessage }}</p>
   </NodeViewWrapper>
 </template>

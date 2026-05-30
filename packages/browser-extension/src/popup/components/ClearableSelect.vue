@@ -42,13 +42,15 @@ const props = withDefaults(
     placeholder?: string
     required?: boolean
     clearLabel?: string
+    variant?: 'outline' | 'soft' | 'subtle' | 'ghost' | 'none'
   }>(),
   {
     valueKey: 'value',
     required: false,
     clearLabel: undefined,
     label: undefined,
-    ariaDescribedby: undefined
+    ariaDescribedby: undefined,
+    variant: 'subtle'
   }
 )
 
@@ -78,9 +80,10 @@ const triggerAriaLabel = computed(() => {
       :search-input="false"
       :placeholder="placeholder"
       :ui="{
-        placeholder: 'text-muted',
+        placeholder: 'text-toned',
+        trailingIcon: 'icon-animation text-toned',
         item: 'cursor-pointer selectable-focus',
-        base: 'pe-14 cursor-pointer w-full selectable-focus py-2',
+        base: 'pe-14 py-2',
         content: 'z-50'
       }"
       :portal="false"
@@ -88,21 +91,16 @@ const triggerAriaLabel = computed(() => {
       :aria-label="triggerAriaLabel"
       :aria-describedby="ariaDescribedby"
       :aria-required="required ? 'true' : undefined"
-      variant="subtle"
-    >
-      <template #trailing>
-        <UIcon name="i-lucide-chevron-down" class="text-muted size-5 icon-animation" />
-      </template>
-    </USelectMenu>
+      :variant="variant"
+    />
     <UButton
       v-if="model"
-      color="primary"
       variant="ghost"
       size="xs"
       icon="i-lucide-x"
       :aria-label="clearLabel || t('form.clear')"
       :ui="{
-        base: 'selectable-focus cursor-pointer absolute end-8 top-1/2 -translate-y-1/2'
+        base: 'absolute end-8 top-1/2 -translate-y-1/2'
       }"
       @pointerdown.stop
       @click.stop="model = undefined"

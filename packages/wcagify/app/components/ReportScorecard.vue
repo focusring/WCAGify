@@ -23,7 +23,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
 
 <template>
   <div class="space-y-4">
-    <p class="text-lg font-medium text-gray-950 dark:text-white">
+    <p class="text-lg font-medium text-highlighted">
       {{
         t('report.conformanceLevel', {
           level: targetLevel,
@@ -40,24 +40,21 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
       </caption>
       <thead>
         <tr>
-          <th
-            scope="col"
-            class="border-b border-gray-200 py-2 pr-4 font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400"
-          >
+          <th scope="col" class="border-b border-muted py-2 pr-4 font-medium text-toned">
             {{ t('report.wcagPrinciple') }}
           </th>
           <th
             v-for="level in data.levels"
             :key="level"
             scope="col"
-            class="border-b border-gray-200 py-2 pr-4 text-center font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400"
+            class="border-b border-muted py-2 pr-4 text-center font-medium text-toned"
           >
             {{ level }}
           </th>
           <th
             v-if="showTotalColumn"
             scope="col"
-            class="border-b border-gray-200 py-2 text-center font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400"
+            class="border-b border-muted py-2 text-center font-medium text-toned"
           >
             {{ t('report.total') }}
           </th>
@@ -65,16 +62,13 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
       </thead>
       <tbody>
         <tr v-for="principle in PRINCIPLES" :key="principle">
-          <th
-            scope="row"
-            class="border-b border-gray-200 py-2 pr-4 font-medium text-gray-950 dark:border-gray-700 dark:text-white"
-          >
+          <th scope="row" class="border-b border-muted py-2 pr-4 font-medium text-highlighted">
             {{ t(`report.principles.${principle}`) }}
           </th>
           <td
             v-for="level in data.levels"
             :key="level"
-            class="border-b border-gray-200 py-2 pr-4 text-center text-gray-700 dark:border-gray-700 dark:text-gray-300"
+            class="border-b border-muted py-2 pr-4 text-center text-default"
           >
             {{
               t('report.scoreFormat', {
@@ -83,10 +77,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
               })
             }}
           </td>
-          <td
-            v-if="showTotalColumn"
-            class="border-b border-gray-200 py-2 text-center text-gray-700 dark:border-gray-700 dark:text-gray-300"
-          >
+          <td v-if="showTotalColumn" class="border-b border-muted py-2 text-center text-default">
             {{
               t('report.scoreFormat', {
                 conforming: data.total.conforming[principle],
@@ -98,16 +89,13 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
       </tbody>
       <tfoot>
         <tr>
-          <th
-            scope="row"
-            class="border-b border-gray-200 py-2 pr-4 font-medium text-gray-950 dark:border-gray-700 dark:text-white"
-          >
+          <th scope="row" class="border-b border-muted py-2 pr-4 font-medium text-highlighted">
             {{ t('report.total') }}
           </th>
           <td
             v-for="level in data.levels"
             :key="level"
-            class="border-b border-gray-200 py-2 pr-4 text-center font-medium text-gray-950 dark:border-gray-700 dark:text-white"
+            class="border-b border-muted py-2 pr-4 text-center font-medium text-highlighted"
           >
             {{
               t('report.scoreFormat', {
@@ -118,7 +106,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
           </td>
           <td
             v-if="showTotalColumn"
-            class="border-b border-gray-200 py-2 text-center font-medium text-gray-950 dark:border-gray-700 dark:text-white"
+            class="border-b border-muted py-2 text-center font-medium text-highlighted"
           >
             {{
               t('report.scoreFormat', {

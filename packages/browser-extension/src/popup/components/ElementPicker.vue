@@ -77,22 +77,22 @@ async function pickElement() {
       variant="outline"
       icon="i-lucide-square-mouse-pointer"
       size="xl"
-      :ui="{ leadingIcon: 'size-5', base: 'cursor-pointer selectable-focus w-full justify-center' }"
+      :ui="{ leadingIcon: 'size-5', base: 'w-full justify-center' }"
       :label="picking ? t('picker.picking') : t('picker.pickElement')"
     />
 
     <div v-if="selector" class="space-y-1 rounded bg-muted p-2 text-sm">
       <div>
-        <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.selector') }}</span>
-        <code class="ml-1 break-all text-gray-800 dark:text-gray-200">{{ selector }}</code>
+        <span class="label-title">{{ t('picker.selector') }}</span>
+        <code class="ml-1 break-all text-highlighted">{{ selector }}</code>
       </div>
       <div>
-        <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.url') }}</span>
-        <span class="ml-1 break-all text-gray-800 dark:text-gray-200">{{ pageUrl }}</span>
+        <span class="label-title">{{ t('picker.url') }}</span>
+        <span class="ml-1 break-all text-highlighted">{{ pageUrl }}</span>
       </div>
       <div>
-        <span class="font-medium text-gray-600 dark:text-gray-400">{{ t('picker.page') }}</span>
-        <span class="ml-1 text-gray-800 dark:text-gray-200">{{ pageTitle }}</span>
+        <span class="label-title">{{ t('picker.page') }}</span>
+        <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
       </div>
     </div>
   </div>
