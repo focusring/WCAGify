@@ -13,17 +13,17 @@
     "@nuxt/ui": "catalog:",
     "@tiptap/core": "catalog:",
     "@tiptap/vue-3": "catalog:",
-    "vue": "^3.5.34",
+    "vue": "^3.5.35",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.4.0",
     "@types/chrome": "^0.1.42",
-    "@vitejs/plugin-vue": "^6.0.6",
+    "@vitejs/plugin-vue": "^6.0.7",
     "happy-dom": "^20.9.0",
     "tailwindcss": "catalog:core",
     "typescript": "catalog:dev",
-    "vite": "^8.0.12",
+    "vite": "^8.0.14",
     "vitest": "catalog:dev"
   }
 }

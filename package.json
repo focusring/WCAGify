@@ -50,7 +50,7 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@10.34.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
