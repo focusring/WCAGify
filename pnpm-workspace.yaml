@@ -18,7 +18,7 @@ catalogs:
   cli:
     '@clack/prompts': ^1.4.0
     commander: ^14.0.3
-    ejs: ^5.0.2
+    ejs: ^6.0.1
     picocolors: ^1.1.1
   core:
     '@iconify-json/lucide': ^1.2.110
