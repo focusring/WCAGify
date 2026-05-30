@@ -2,6 +2,12 @@ import { ref, watch } from 'vue'
 
 type ColorMode = 'system' | 'light' | 'dark'
 
+const COLOR_MODES: readonly ColorMode[] = ['system', 'light', 'dark']
+
+function isColorMode(value: unknown): value is ColorMode {
+  return typeof value === 'string' && (COLOR_MODES as readonly string[]).includes(value)
+}
+
 const preference = ref<ColorMode>('system')
 let initPromise: Promise<void> | undefined
 
@@ -17,7 +23,7 @@ function apply(pref: ColorMode = preference.value) {
 function initColorMode(): Promise<void> {
   if (!initPromise) {
     initPromise = chrome.storage.local.get(['colorMode']).then((result) => {
-      if (result.colorMode) preference.value = result.colorMode as ColorMode
+      if (isColorMode(result.colorMode)) preference.value = result.colorMode
       apply()
 
       globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

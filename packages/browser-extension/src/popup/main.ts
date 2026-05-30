@@ -12,4 +12,5 @@ app.use(ui)
 
 const { ready } = useI18n()
 
-Promise.all([ready, initColorMode()]).then(() => app.mount('#app'))
+initColorMode().catch((err) => console.error('Failed to initialize color mode', err))
+ready.then(() => app.mount('#app'))

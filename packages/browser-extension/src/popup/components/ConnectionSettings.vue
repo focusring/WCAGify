@@ -172,21 +172,21 @@ async function fetchReports() {
 <template>
   <div class="space-y-3">
     <!-- Connected state (always visible on top) -->
-    <div v-if="status === 'connected'" class="flex sm:flex-row flex-col items-center gap-2 text-sm">
+    <div v-if="status === 'connected'" class="flex sm:flex-row flex-col gap-2 text-sm">
       <div class="flex gap-2">
         <UChip color="success" standalone inset />
         <span class="text-success-900 dark:text-success-400">{{ t('connection.connected') }}</span>
         &mdash;
+        <span class="text-toned">{{ wcagifyUrl }}</span>
       </div>
-      <span class="text-toned">{{ wcagifyUrl }}</span>
     </div>
     <div v-if="status === 'idle' || status === 'error'" class="flex gap-2 text-sm">
       <div class="flex gap-2">
         <UChip color="error" standalone inset />
         <span class="text-error-800 dark:text-error-300">{{ t('connection.disconnected') }}</span>
         &mdash;
+        <span class="text-toned">{{ wcagifyUrl }}</span>
       </div>
-      <span class="text-toned">{{ wcagifyUrl }}</span>
     </div>
 
     <!-- Scanning state -->
