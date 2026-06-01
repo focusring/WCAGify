@@ -28,13 +28,13 @@
     @top-center {
       content: 'WCAGify';
       font-size: 9pt;
-      color: #6b7280;
+      color: #4a5565;
     }
 
     @bottom-center {
       content: counter(page);
       font-size: 9pt;
-      color: #6b7280;
+      color: #4a5565;
     }
   }
 
@@ -109,7 +109,7 @@
   }
 
   .cover-page dt {
-    color: #6b7280 !important;
+    color: #4a5565 !important;
     font-size: 10pt;
   }
 
@@ -333,7 +333,7 @@
   }
 
   dt {
-    color: #6b7280 !important;
+    color: #4a5565 !important;
   }
 
   dd {

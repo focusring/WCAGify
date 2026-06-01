@@ -26,7 +26,7 @@ const conformanceResult = computed(() => {
     </h1>
     <dl class="mt-12 grid grid-cols-1 gap-y-6 text-base">
       <div>
-        <dt class="text-gray-500">
+        <dt class="text-gray-600">
           {{ t('report.commissionedBy') }}
         </dt>
         <dd class="mt-0.5 text-lg font-medium text-black">
@@ -34,7 +34,7 @@ const conformanceResult = computed(() => {
         </dd>
       </div>
       <div>
-        <dt class="text-gray-500">
+        <dt class="text-gray-600">
           {{ t('report.evaluatedBy') }}
         </dt>
         <dd class="mt-0.5 text-lg font-medium text-black">
@@ -42,7 +42,7 @@ const conformanceResult = computed(() => {
         </dd>
       </div>
       <div>
-        <dt class="text-gray-500">
+        <dt class="text-gray-600">
           {{ t('report.date') }}
         </dt>
         <dd class="mt-0.5 text-lg font-medium text-black">
@@ -50,7 +50,7 @@ const conformanceResult = computed(() => {
         </dd>
       </div>
       <div>
-        <dt class="text-gray-500">
+        <dt class="text-gray-600">
           {{ t('report.conformanceResult') }}
         </dt>
         <dd class="mt-0.5 text-lg font-medium text-black">

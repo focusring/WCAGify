@@ -36,7 +36,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <main class="flex-1 flex items-center justify-center py-12 sm:py-16">
+  <div class="flex-1 flex items-center justify-center py-12 sm:py-16">
     <!-- Setup required (production, no secret configured) -->
     <div v-if="status && !status.configured && !status.dev" class="max-w-sm text-center">
       <UIcon name="i-lucide-shield-alert" class="size-12 text-toned" />
@@ -83,5 +83,5 @@ WCAGIFY_ADMIN_SECRET=your-secret-here</pre
         <UButton type="submit" :label="t('admin.signIn')" :loading="loading" block />
       </form>
     </div>
-  </main>
+  </div>
 </template>

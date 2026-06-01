@@ -28,6 +28,7 @@ const statusFilters = inject<Ref<Set<string>>>('statusFilters')
         v-if="criterion.status === 'passed'"
         :label="t('report.scStatus.passed')"
         color="success"
+        variant="subtle"
         icon="i-lucide-check"
         class="shrink-0"
       />
@@ -35,13 +36,15 @@ const statusFilters = inject<Ref<Set<string>>>('statusFilters')
         v-else-if="criterion.status === 'not-present'"
         :label="t('report.scStatus.not-present')"
         color="info"
+        variant="subtle"
         icon="i-lucide-book-dashed"
         class="shrink-0"
       />
       <UBadge
         v-else-if="criterion.status === 'not-tested'"
         :label="t('report.scStatus.not-tested')"
-        color="warning"
+        color="error"
+        variant="subtle"
         icon="i-lucide-mouse-pointer-2-off"
         class="shrink-0"
       />
@@ -49,6 +52,7 @@ const statusFilters = inject<Ref<Set<string>>>('statusFilters')
         v-else-if="criterion.status === 'failed'"
         :label="t('report.scStatus.failed')"
         color="error"
+        variant="subtle"
         icon="i-lucide-x"
         class="shrink-0"
       />

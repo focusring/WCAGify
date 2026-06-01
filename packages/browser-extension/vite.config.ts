@@ -141,6 +141,9 @@ export default defineConfig({
           ]
         },
         selectMenu: {
+          slots: {
+            content: 'ring-shade-500'
+          },
           compoundVariants: [
             {
               variant: ['outline', 'subtle'],

@@ -327,8 +327,8 @@ const columnLabels = computed<Record<string, string>>(() => ({
               <UBadge
                 v-if="isFieldVisible('target')"
                 :label="`WCAG ${report.evaluation.targetWcagVersion} ${report.evaluation.targetLevel}`"
-                variant="subtle"
                 color="neutral"
+                variant="subtle"
                 class="shrink-0 group-hover:bg-default"
               />
             </div>
@@ -371,8 +371,8 @@ const columnLabels = computed<Record<string, string>>(() => ({
           <template #targetLevel-cell="{ row }">
             <UBadge
               :label="`WCAG ${row.original.evaluation.targetWcagVersion} ${row.original.evaluation.targetLevel}`"
-              variant="subtle"
               color="neutral"
+              variant="subtle"
             />
           </template>
         </UTable>
