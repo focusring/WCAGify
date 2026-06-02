@@ -8,6 +8,9 @@
   .print\:hidden {
     display: none !important;
   }
+  .print\:block {
+    display: block !important;
+  }
   .print\:flex {
     display: flex !important;
   }
@@ -456,7 +459,7 @@
   }
 
   /* Status / level / sample badges — use subtle backgrounds for visual distinction */
-  [data-slot='base'][class*='bg-error'] {
+  /* [data-slot='base'][class*='bg-error'] {
     background: #fee2e2 !important;
     color: #991b1b !important;
     border: 0.5pt solid #fecaca !important;
@@ -482,8 +485,9 @@
     color: #374151 !important;
     border: 0.5pt solid #e5e7eb !important;
   }
+  span[data-slot='base'] */
 
-  span[data-slot='base'] {
+  .bd {
     display: inline-flex !important;
     align-items: center;
     gap: 3pt;
@@ -491,6 +495,32 @@
     border-radius: 3pt;
     font-size: 8.5pt;
     font-weight: 600;
+    color: black !important;
+    border: 0.5pt solid black !important;
+  }
+
+  .bd.bd-primary {
+    background: #00c16a !important;
+  }
+
+  .bd.bd-success {
+    background: #00dc82 !important;
+  }
+
+  .bd.bd-info {
+    background: #51a2ff !important;
+  }
+
+  .bd.bd-warning {
+    background: #fdc700 !important;
+  }
+
+  .bd.bd-error {
+    background: #fb2c36 !important;
+  }
+
+  .bd.bd-neutral {
+    background: #f1f5f9 !important;
   }
 
   span[data-slot='base'] .iconify {
