@@ -35,32 +35,20 @@ const issueId = `issue-${sanitizedPath}`
       </h5>
 
       <template #trailing>
-        <div class="flex gap-2 print:hidden">
-          <UBadge
-            v-if="samplePage"
-            :label="samplePage.title"
-            color="neutral"
-            variant="subtle"
-            class="shrink-0"
-          />
-          <UBadge
-            :label="t('report.scStatus.failed')"
-            color="error"
-            variant="subtle"
-            icon="i-lucide-x"
-            class="shrink-0"
-          />
-        </div>
-
-        <!-- Print-only Badges -->
-        <div class="hidden print:block">
-          <div class="bd bd-neutral" v-if="samplePage">
-            <span>{{ samplePage.title }}</span>
-          </div>
-          <div class="bd bd-error" v-else-if="criterion.status === 'failed'">
-            <span>{{ t('report.scStatus.failed') }}</span>
-          </div>
-        </div>
+        <UBadge
+          v-if="samplePage"
+          :label="samplePage.title"
+          color="neutral"
+          variant="subtle"
+          class="shrink-0"
+        />
+        <UBadge
+          :label="t('report.scStatus.failed')"
+          color="error"
+          variant="subtle"
+          icon="i-lucide-x"
+          class="shrink-0"
+        />
         <UIcon name="i-lucide-chevron-down" class="mt-0.5 shrink-0 size-5 icon-animation" />
       </template>
     </UButton>

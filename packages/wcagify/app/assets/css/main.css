@@ -32,6 +32,13 @@ a:not([class]) {
   }
 }
 
+/* for testing */
+/* #__nuxt {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+} */
+
 :root {
   --ui-text-highlighted: var(--color-slate-950);
   --focus-gap-color: black;

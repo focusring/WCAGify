@@ -376,10 +376,11 @@
   }
 
   article[id^='issue-'] > button {
-    width: 100%;
+    width: 96%;
     background: white !important;
     border: 0 !important;
-    padding: 8pt 10pt !important;
+    padding: 8pt 0pt !important;
+    margin: 0 auto !important;
     display: flex !important;
     align-items: baseline;
     gap: 8pt;
@@ -398,12 +399,9 @@
     display: none !important;
   }
 
-  article[id^='issue-'] [data-slot='content'] {
-    padding: 0 10pt;
-  }
-
   article[id^='issue-'] [data-slot='content'] > .prose {
     margin: 6pt 0 8pt;
+    padding: 0 10pt;
     font-size: 10.5pt;
   }
 
@@ -412,6 +410,10 @@
     font-size: 11pt;
     font-weight: 600;
     margin: 8pt 0 4pt;
+  }
+
+  .sc-header {
+    padding: 0pt 10pt !important;
   }
 
   /* Issue footer (Type / Severity / Success criteria / Sample) */
@@ -459,68 +461,33 @@
   }
 
   /* Status / level / sample badges — use subtle backgrounds for visual distinction */
-  /* [data-slot='base'][class*='bg-error'] {
-    background: #fee2e2 !important;
-    color: #991b1b !important;
-    border: 0.5pt solid #fecaca !important;
+  [data-slot='base'][class*='bg-error'] {
+    background: #f76870 !important;
   }
   [data-slot='base'][class*='bg-success'] {
-    background: #dcfce7 !important;
-    color: #166534 !important;
-    border: 0.5pt solid #bbf7d0 !important;
+    background: #00dc82 !important;
   }
   [data-slot='base'][class*='bg-warning'] {
-    background: #fef3c7 !important;
-    color: #92400e !important;
-    border: 0.5pt solid #fde68a !important;
+    background: #fdc700 !important;
   }
   [data-slot='base'][class*='bg-primary'] {
-    background: #e0f2fe !important;
-    color: #075985 !important;
-    border: 0.5pt solid #bae6fd !important;
+    background: #00c16a !important;
   }
   [data-slot='base'][class*='ring-accented'],
   [data-slot='base'][class*='bg-default'] {
-    background: white !important;
-    color: #374151 !important;
-    border: 0.5pt solid #e5e7eb !important;
+    background: #f9f3f4 !important;
   }
-  span[data-slot='base'] */
 
-  .bd {
-    display: inline-flex !important;
+  span[data-slot='base'] {
+    display: inline-block !important; /* inline-flex give dubble border, weasy-print bug */
     align-items: center;
     gap: 3pt;
-    padding: 1pt 5pt !important;
-    border-radius: 3pt;
+    padding: 4pt 5pt !important;
+    border-radius: 2pt;
     font-size: 8.5pt;
     font-weight: 600;
     color: black !important;
     border: 0.5pt solid black !important;
-  }
-
-  .bd.bd-primary {
-    background: #00c16a !important;
-  }
-
-  .bd.bd-success {
-    background: #00dc82 !important;
-  }
-
-  .bd.bd-info {
-    background: #51a2ff !important;
-  }
-
-  .bd.bd-warning {
-    background: #fdc700 !important;
-  }
-
-  .bd.bd-error {
-    background: #fb2c36 !important;
-  }
-
-  .bd.bd-neutral {
-    background: #f1f5f9 !important;
   }
 
   span[data-slot='base'] .iconify {

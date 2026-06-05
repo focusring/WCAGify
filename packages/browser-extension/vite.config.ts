@@ -40,25 +40,50 @@ export default defineConfig({
               color: 'neutral',
               variant: 'subtle',
               class: 'text-shade-800 dark:text-shade-300 ring-shade-500'
+            },
+            {
+              color: 'primary',
+              variant: 'subtle',
+              class: 'text-primary-700 dark:text-primary-400 ring-primary-600 dark:ring-primary-500'
             }
           ]
         },
         badge: {
           compoundVariants: [
             {
+              color: 'primary',
+              variant: 'subtle',
+              class:
+                'text-black bg-primary-500/70 ring-black dark:text-white dark:bg-primary-400/10 dark:ring-primary-600'
+            },
+            {
               color: 'success',
-              variant: 'solid',
-              class: 'text-black bg-success-400 ring-1 ring-black dark:ring-success-400'
+              variant: 'subtle',
+              class:
+                'text-black bg-success-400/70 ring-black dark:text-success-400 dark:bg-success-400/10 dark:ring-success-600'
             },
             {
               color: 'info',
-              variant: 'solid',
-              class: 'text-black bg-info-400 ring-1 ring-black dark:ring-info-400'
+              variant: 'subtle',
+              class:
+                'text-black bg-info-400/70 ring-black dark:text-info-400 dark:bg-info-400/10 dark:ring-info-600'
             },
             {
               color: 'warning',
-              variant: 'solid',
-              class: 'text-black bg-warning-400 ring-1 ring-black dark:ring-warning-400'
+              variant: 'subtle',
+              class:
+                'text-black bg-warning-400/70 ring-black dark:text-warning-400 dark:bg-warning-400/10 dark:ring-warning-600'
+            },
+            {
+              color: 'error',
+              variant: 'subtle',
+              class:
+                'text-black bg-error-500/70 ring-black dark:text-error-200 dark:bg-error-300/10 dark:ring-error-600'
+            },
+            {
+              color: 'neutral',
+              variant: 'subtle',
+              class: 'ring-shade-500'
             }
           ]
         },

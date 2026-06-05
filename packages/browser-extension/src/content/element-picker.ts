@@ -82,6 +82,9 @@ function injectStyles() {
       z-index: 2147483645;
       border-radius: 2px;
     }
+    .wcagify-highlight--selected {
+      border-style: dotted;
+    }
   `
   document.head.appendChild(style)
 }
@@ -133,8 +136,8 @@ function clearHighlight() {
   document.querySelectorAll('.wcagify-highlight').forEach((el) => el.remove())
 }
 
-function cleanup() {
-  clearHighlight()
+function cleanup(keepHighlight = false) {
+  if (!keepHighlight) clearHighlight()
   activeOverlay?.removeEventListener('mousemove', handleMouseMove)
   activeOverlay?.removeEventListener('click', handleClick)
   activeOverlay?.remove()
@@ -178,7 +181,8 @@ function handleClick(e: MouseEvent) {
     url: document.URL,
     pageTitle: document.title
   })
-  cleanup()
+  document.querySelector('.wcagify-highlight')?.classList.add('wcagify-highlight--selected')
+  cleanup(true)
 }
 
 function handleKeyDown(e: KeyboardEvent) {
