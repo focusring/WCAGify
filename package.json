@@ -40,7 +40,7 @@
   },
   "lint-staged": {
     "*.{ts,vue,js,mjs}": [
-      "oxlint",
+      "oxlint --no-error-on-unmatched-pattern",
       "oxfmt"
     ],
     "*.{json,yaml,yml,md,css}": [
