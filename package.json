@@ -36,6 +36,7 @@
     "oxfmt": "catalog:dev",
     "oxlint": "catalog:dev",
     "playwright": "catalog:dev",
+    "unpdf": "catalog:dev",
     "vitest": "catalog:dev"
   },
   "lint-staged": {

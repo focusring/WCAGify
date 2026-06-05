@@ -129,6 +129,9 @@ catalogs:
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
+    unpdf:
+      specifier: ^1.6.2
+      version: 1.6.2
     vitest:
       specifier: ^4.1.8
       version: 4.1.8
@@ -174,6 +177,9 @@ importers:
       playwright:
         specifier: catalog:dev
         version: 1.60.0
+      unpdf:
+        specifier: catalog:dev
+        version: 1.6.2
       vitest:
         specifier: catalog:dev
         version: 4.1.8(@opentelemetry/api@1.9.0)(@types/node@25.6.0)(@vitest/coverage-v8@4.1.8)(happy-dom@20.10.1)(vite@8.0.16(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(terser@5.46.2)(yaml@2.9.0))
@@ -7595,6 +7601,14 @@ packages:
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
+
+  unpdf@1.6.2:
+    resolution: {integrity: sha512-zQ80ySoPuPHOsvIoRp/nJyQt8TOUoTh1+WBCGcBvlddQNgKDLRwm0AY3x8Q35I7+kIiRSgqMx+Ma2pl9McIp7A==}
+    peerDependencies:
+      '@napi-rs/canvas': ^0.1.69
+    peerDependenciesMeta:
+      '@napi-rs/canvas':
+        optional: true
 
   unplugin-auto-import@21.0.0:
     resolution: {integrity: sha512-vWuC8SwqJmxZFYwPojhOhOXDb5xFhNNcEVb9K/RFkyk/3VnfaOjzitWN7v+8DEKpMjSsY2AEGXNgt6I0yQrhRQ==}
@@ -16370,6 +16384,8 @@ snapshots:
       unist-util-visit-parents: 6.0.2
 
   universalify@2.0.1: {}
+
+  unpdf@1.6.2: {}
 
   unplugin-auto-import@21.0.0(@nuxt/kit@4.4.6(magicast@0.5.2))(@vueuse/core@14.3.0(vue@3.5.35(typescript@6.0.3))):
     dependencies:

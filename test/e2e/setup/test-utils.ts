@@ -185,6 +185,50 @@ export async function startDevServer(
   return { process: child, url }
 }
 
+export async function startPreviewServer(
+  projectPath: string,
+  port = 3100
+): Promise<{
+  process: ChildProcess
+  url: string
+}> {
+  // The PDF pipeline depends on production-built CSS: WeasyPrint raises
+  // NotImplementedError on the dev server's unminified Tailwind/Nuxt UI CSS
+  // (oklch(), @property, cascade layers, …). So report-PDF e2e tests must run
+  // against a production build + the Nitro node server, not `nuxt dev`.
+  try {
+    execSync('npx nuxt build', {
+      cwd: projectPath,
+      stdio: 'pipe',
+      shell: true,
+      timeout: 300_000,
+      // 'pipe' buffers the (verbose) build output so it can be surfaced on
+      // failure; raise maxBuffer well above the 1 MB default to avoid ENOBUFS.
+      maxBuffer: 64 * 1024 * 1024,
+      env: { ...process.env, NO_COLOR: '1' }
+    })
+  } catch (error) {
+    const execError = error as { stdout?: string; stderr?: string; message?: string }
+    throw new Error(`nuxt build failed:\nstdout: ${execError.stdout}\nstderr: ${execError.stderr}`)
+  }
+
+  const url = `http://localhost:${port}`
+  const child = spawn('node', ['.output/server/index.mjs'], {
+    cwd: projectPath,
+    stdio: 'ignore',
+    shell: true,
+    detached: true,
+    env: { ...process.env, NO_COLOR: '1', PORT: String(port) }
+  })
+
+  child.on('error', (err) => {
+    throw new Error(`Preview server process error: ${err.message}`)
+  })
+
+  await waitForServer(url, 120_000)
+  return { process: child, url }
+}
+
 export function stopDevServer(child: ChildProcess): void {
   if (child.pid) {
     try {

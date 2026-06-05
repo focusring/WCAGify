@@ -33,7 +33,12 @@ jobs:
         working-directory: playground
 
       - name: Run E2E tests
+        # The PDF e2e suite renders against the live WeasyPrint service (the same
+        # one production uses); the test warms the service and retries to absorb
+        # cold starts. The other e2e suites are unaffected.
         run: pnpm test:e2e
+        env:
+          NUXT_WEASYPRINT_URL: https://magnificent-encouragement-production.up.railway.app
 
       - name: Upload test artifacts on failure
         if: failure()
