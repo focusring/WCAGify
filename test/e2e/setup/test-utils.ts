@@ -196,13 +196,21 @@ export async function startPreviewServer(
   // NotImplementedError on the dev server's unminified Tailwind/Nuxt UI CSS
   // (oklch(), @property, cascade layers, …). So report-PDF e2e tests must run
   // against a production build + the Nitro node server, not `nuxt dev`.
-  execSync('npx nuxt build', {
-    cwd: projectPath,
-    stdio: 'ignore',
-    shell: true,
-    timeout: 300_000,
-    env: { ...process.env, NO_COLOR: '1' }
-  })
+  try {
+    execSync('npx nuxt build', {
+      cwd: projectPath,
+      stdio: 'pipe',
+      shell: true,
+      timeout: 300_000,
+      // 'pipe' buffers the (verbose) build output so it can be surfaced on
+      // failure; raise maxBuffer well above the 1 MB default to avoid ENOBUFS.
+      maxBuffer: 64 * 1024 * 1024,
+      env: { ...process.env, NO_COLOR: '1' }
+    })
+  } catch (error) {
+    const execError = error as { stdout?: string; stderr?: string; message?: string }
+    throw new Error(`nuxt build failed:\nstdout: ${execError.stdout}\nstderr: ${execError.stderr}`)
+  }
 
   const url = `http://localhost:${port}`
   const child = spawn('node', ['.output/server/index.mjs'], {

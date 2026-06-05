@@ -139,8 +139,11 @@ describe('PDF E2E', () => {
       slug: string
       title: string
     }>
-    reportSlug = reports[0]?.slug ?? ''
-    reportTitle = reports[0]?.title ?? ''
+    if (!reports[0]?.slug) {
+      throw new Error('Expected at least one report from /api/reports, got none')
+    }
+    reportSlug = reports[0].slug
+    reportTitle = reports[0].title
 
     // Warm the service now so the first real render isn't paying a cold start.
     if (weasyReachable) await warmUpWeasyprint(WEASYPRINT_URL)
