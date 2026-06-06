@@ -129,9 +129,10 @@ function validatePdfUa(pdfPath: string): { compliant: boolean; failures: HornChe
   const result = spawnSync(
     HORN_BIN,
     ['validate', pdfPath, '--format', 'json', '--fail-on', 'error'],
-    { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 }
+    // timeout kills a hung horn (status null + ETIMEDOUT error) so CI can't stall.
+    { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024, timeout: 30_000 }
   )
-  if (result.error || result.status === 2) {
+  if (result.error || result.status === null || result.status === 2) {
     throw new Error(`Horn could not validate ${pdfPath}: ${result.stderr || result.error?.message}`)
   }
   const report = JSON.parse(result.stdout) as { files: Array<{ results: HornCheck[] }> }
