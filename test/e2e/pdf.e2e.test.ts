@@ -1,5 +1,7 @@
-import { type ChildProcess } from 'node:child_process'
-import { readFile } from 'node:fs/promises'
+import { spawnSync, type ChildProcess } from 'node:child_process'
+import { readFile, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { chromium, type Browser } from 'playwright'
 import { extractText, getDocumentProxy } from 'unpdf'
@@ -24,6 +26,20 @@ const PROJECT_NAME = 'pdf-test'
 const DEFAULT_WEASYPRINT_URL = 'https://magnificent-encouragement-production.up.railway.app'
 const WEASYPRINT_URL = process.env.NUXT_WEASYPRINT_URL ?? DEFAULT_WEASYPRINT_URL
 const isCI = Boolean(process.env.CI)
+
+// PDF/UA accessibility is validated with Horn (https://horn.report) — focusring's
+// own Matterhorn-Protocol checker. CI installs the `horn` CLI before the e2e job;
+// locally the a11y test skips unless the binary is on PATH (or HORN_BIN points at
+// it). To run it locally: HORN_BIN=/path/to/horn pnpm test:e2e
+const HORN_BIN = process.env.HORN_BIN ?? 'horn'
+function isHornInstalled(): boolean {
+  try {
+    return spawnSync(HORN_BIN, ['--version'], { stdio: 'ignore' }).status === 0
+  } catch {
+    return false
+  }
+}
+const hornInstalled = isHornInstalled()
 
 // Reachability probe. Any HTTP response (even 404) means the service is up; only a
 // network error / timeout counts as unreachable. Retried to ride out a cold start.
@@ -96,6 +112,33 @@ async function fetchReportPdf(url: string): Promise<Response> {
     response = await fetch(url)
   }
   return response
+}
+
+type HornCheck = {
+  rule_id: string
+  checkpoint: number
+  description: string
+  severity: string
+  outcome: { status: string }
+}
+
+// Validate a PDF against PDF/UA-1 with the Horn CLI. `compliant` reflects Horn's
+// own --fail-on error verdict (exit 0); non-passing checks are returned for
+// diagnostics. Throws (exit 2) if Horn itself can't run.
+function validatePdfUa(pdfPath: string): { compliant: boolean; failures: HornCheck[] } {
+  const result = spawnSync(
+    HORN_BIN,
+    ['validate', pdfPath, '--format', 'json', '--fail-on', 'error'],
+    { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 }
+  )
+  if (result.error || result.status === 2) {
+    throw new Error(`Horn could not validate ${pdfPath}: ${result.stderr || result.error?.message}`)
+  }
+  const report = JSON.parse(result.stdout) as { files: Array<{ results: HornCheck[] }> }
+  const failures = report.files.flatMap((file) =>
+    file.results.filter((check) => check.outcome?.status !== 'Pass')
+  )
+  return { compliant: result.status === 0, failures }
 }
 
 describe('PDF E2E', () => {
@@ -222,6 +265,31 @@ describe('PDF E2E', () => {
         } finally {
           await page.close()
         }
+      }
+    )
+  })
+
+  describe('PDF accessibility (PDF/UA)', () => {
+    it.skipIf(!weasyReachable || !hornInstalled)(
+      'generates a PDF/UA-1 compliant PDF (validated by Horn)',
+      async () => {
+        const response = await fetchReportPdf(`${baseUrl}/api/reports/${reportSlug}.pdf`)
+        expect(response.status).toBe(200)
+        const bytes = Buffer.from(await response.arrayBuffer())
+        assertLooksLikePdf(bytes)
+
+        const pdfPath = join(tmpdir(), 'wcagify-report-a11y.pdf')
+        await writeFile(pdfPath, bytes)
+
+        const { compliant, failures } = validatePdfUa(pdfPath)
+        const errors = failures.filter((check) => check.severity === 'error')
+        expect(
+          compliant,
+          `Horn reported PDF/UA error-level failures:\n` +
+            errors
+              .map((check) => `  ${check.rule_id} (cp${check.checkpoint}): ${check.description}`)
+              .join('\n')
+        ).toBe(true)
       }
     )
   })

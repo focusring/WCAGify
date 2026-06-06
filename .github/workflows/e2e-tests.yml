@@ -32,6 +32,15 @@ jobs:
       - run: pnpm nuxt prepare
         working-directory: playground
 
+      - name: Install Horn (PDF/UA validator)
+        # Horn (https://horn.report) validates the generated PDF against PDF/UA-1.
+        # The pdf e2e suite invokes the `horn` CLI; it skips that check if absent.
+        run: |
+          curl -sL https://github.com/focusring/horn/releases/latest/download/horn-linux-x86_64 \
+            -o /usr/local/bin/horn
+          chmod +x /usr/local/bin/horn
+          horn --version
+
       - name: Run E2E tests
         # The PDF e2e suite renders against the live WeasyPrint service (the same
         # one production uses); the test warms the service and retries to absorb
