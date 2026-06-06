@@ -49,7 +49,20 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm publish --access public --no-git-checks
 
+      - name: Build browser extension
+        run: pnpm --filter @wcagify/browser-extension build
+
+      - name: Zip browser extension
+        working-directory: packages/browser-extension/dist
+        # zip from inside dist so manifest.json sits at the archive root (store requirement)
+        run: zip -r "../../../wcagify-extension-${{ github.ref_name }}.zip" . -x "*.map"
+
       - name: GitHub Release
         run: npx changelogithub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attach extension to release
+        run: gh release upload "${{ github.ref_name }}" "wcagify-extension-${{ github.ref_name }}.zip" --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
