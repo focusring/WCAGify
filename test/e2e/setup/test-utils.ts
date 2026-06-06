@@ -128,19 +128,33 @@ export function patchPackageJsonForLocalWcagify(projectPath: string, tarballPath
 }
 
 export function installDependencies(projectPath: string): void {
-  // Disable pnpm trust-downgrade checks for test projects.
-  // Several transitive deps (chokidar, semver, …) lost provenance attestation
-  // in a patch release, triggering ERR_PNPM_TRUST_DOWNGRADE.
-  // --trust-policy-ignore-after 1 ignores downgrades for packages published
-  // more than 1 minute ago, which covers all currently known problem packages.
-  // This is safe because these are throwaway projects created just for tests.
+  // These are throwaway projects created just for tests, so we relax pnpm's
+  // supply-chain policies that would otherwise add noise or flakiness:
+  //
+  // - --trust-policy-ignore-after 1 ignores trust downgrades for packages
+  //   published more than 1 minute ago. Several transitive deps (chokidar,
+  //   semver, …) lost provenance attestation in a patch release, which would
+  //   otherwise trigger ERR_PNPM_TRUST_DOWNGRADE.
+  // - --config.minimumReleaseAge=0 disables pnpm v11's default 24h minimum
+  //   release-age gate. The scaffold resolves deps fresh (no lockfile), so a
+  //   just-published transitive version would otherwise fail with
+  //   ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION.
+  //
+  // No --ignore-workspace: under pnpm v11 that flag also discards the project's
+  // own pnpm-workspace.yaml — including its allowBuilds list — so the native
+  // build scripts (esbuild, sharp, …) would be skipped and fail under CI with
+  // ERR_PNPM_IGNORED_BUILDS. The scaffold ships its own pnpm-workspace.yaml,
+  // which shadows this monorepo's workspace and keeps the install isolated.
   try {
-    execSync('pnpm install --no-frozen-lockfile --ignore-workspace --trust-policy-ignore-after 1', {
-      cwd: projectPath,
-      stdio: 'pipe',
-      timeout: 120_000,
-      env: { ...process.env, NO_COLOR: '1', CI: '1' }
-    })
+    execSync(
+      'pnpm install --no-frozen-lockfile --trust-policy-ignore-after 1 --config.minimumReleaseAge=0',
+      {
+        cwd: projectPath,
+        stdio: 'pipe',
+        timeout: 120_000,
+        env: { ...process.env, NO_COLOR: '1', CI: '1' }
+      }
+    )
   } catch (error) {
     const execError = error as { stdout?: string; stderr?: string; message?: string }
     throw new Error(

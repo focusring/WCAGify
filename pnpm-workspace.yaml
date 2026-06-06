@@ -3,6 +3,12 @@ packages:
   - playground
   - docs
 
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  sharp: true
+  vue-demi: false
+
 catalog:
   '@nuxt/fonts': ^0.14.0
   '@nuxt/ui': ^4.8.1
@@ -59,9 +65,6 @@ catalogs:
     vitepress: 2.0.0-alpha.17
 
 linkWorkspacePackages: true
-
-onlyBuiltDependencies:
-  - esbuild
 
 shellEmulator: true
 
