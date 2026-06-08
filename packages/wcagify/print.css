@@ -369,10 +369,12 @@
 
   /* Issue article (failure detail) */
   article[id^='issue-'] {
-    break-inside: avoid;
-    border-top: 0.5pt solid #e5e7eb;
+    break-inside: auto;
+    border: 0.5pt solid #e5e7eb;
     background: white !important;
     padding: 0;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   article[id^='issue-'] > button {
@@ -385,6 +387,7 @@
     align-items: baseline;
     gap: 8pt;
     text-align: left;
+    break-after: avoid;
   }
 
   article[id^='issue-'] > button h5 {
@@ -413,7 +416,11 @@
   }
 
   .sc-header {
-    padding: 0pt 10pt !important;
+    padding: 0pt 8pt !important;
+  }
+
+  .sc-list > * + * {
+    margin-top: 8pt !important;
   }
 
   /* Issue footer (Type / Severity / Success criteria / Sample) */
@@ -422,12 +429,13 @@
     grid-template-columns: 1fr 1fr;
     column-gap: 16pt;
     row-gap: 4pt;
-    margin: 0 0 8pt !important;
+    margin: 0 !important;
     padding: 8pt 10pt !important;
     border-top: 0.5pt solid #e5e7eb;
     background: #f9fafb !important;
     font-size: 9.5pt;
     line-height: 1.4;
+    break-before: avoid;
   }
 
   article[id^='issue-'] dl > div {
@@ -500,7 +508,6 @@
     display: none !important;
   }
 
-  /* Results indicator row — force flex so the md: breakpoint doesn't need to fire */
   .results-indicators {
     display: flex !important;
     flex-wrap: wrap;
@@ -517,5 +524,18 @@
     flex-direction: row !important;
     align-items: center !important;
     gap: 6pt;
+  }
+
+  .results-indicators button[class*='bg-success'] {
+    background: #00dc82 !important;
+  }
+  .results-indicators button[class*='bg-error'] {
+    background: #f76870 !important;
+  }
+  .results-indicators button[class*='bg-warning'] {
+    background: #fdc700 !important;
+  }
+  .results-indicators button[class*='bg-info'] {
+    background: #51a2ff !important;
   }
 }
