@@ -1,6 +1,6 @@
 {
   "name": "@wcagify/monorepo",
-  "version": "0.4.11",
+  "version": "0.5.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -36,11 +36,12 @@
     "oxfmt": "catalog:dev",
     "oxlint": "catalog:dev",
     "playwright": "catalog:dev",
+    "unpdf": "catalog:dev",
     "vitest": "catalog:dev"
   },
   "lint-staged": {
     "*.{ts,vue,js,mjs}": [
-      "oxlint",
+      "oxlint --no-error-on-unmatched-pattern",
       "oxfmt"
     ],
     "*.{json,yaml,yml,md,css}": [
@@ -48,14 +49,7 @@
     ]
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
-  "packageManager": "pnpm@10.34.1",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "esbuild",
-      "sharp"
-    ]
-  }
+  "packageManager": "pnpm@11.5.2"
 }

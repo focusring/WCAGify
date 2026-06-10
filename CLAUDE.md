@@ -57,7 +57,7 @@ The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends 
 
 ## Conventions
 
-- Node >= 22, pnpm 10
+- Node >= 24, pnpm 11
 - Linter: OXlint (plugins: typescript, import, unicorn, vue)
 - Formatter: oxfmt
 - Components use `U` prefix (Nuxt UI)

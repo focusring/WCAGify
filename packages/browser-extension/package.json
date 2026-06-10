@@ -1,6 +1,6 @@
 {
   "name": "@wcagify/browser-extension",
-  "version": "0.4.11",
+  "version": "0.5.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -20,10 +20,10 @@
     "@crxjs/vite-plugin": "^2.4.0",
     "@types/chrome": "^0.1.42",
     "@vitejs/plugin-vue": "^6.0.7",
-    "happy-dom": "^20.9.0",
+    "happy-dom": "^20.10.1",
     "tailwindcss": "catalog:core",
     "typescript": "catalog:dev",
-    "vite": "^8.0.14",
+    "vite": "^8.0.16",
     "vitest": "catalog:dev"
   }
 }
