@@ -44,10 +44,6 @@ defineExpose({
   selectedTabId
 })
 
-function numberedLabel(base: string, idx: number, total: number): string {
-  return total > 1 ? `${base} ${idx + 1}:` : `${base}:`
-}
-
 function onMessage(message: {
   type: string
   selector?: string
@@ -152,27 +148,27 @@ async function pickElement() {
         <span class="label-title">{{ t('picker.page') }}</span>
         <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
       </div>
-      <div v-for="(color, i) in textColors" :key="`text-${i}`" class="flex items-center gap-1">
-        <span class="label-title">
-          {{ numberedLabel(t('picker.text'), i, textColors.length) }}
+      <div v-if="textColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.text') }}:</span>
+        <span v-for="(color, i) in textColors" :key="`text-${i}`" class="flex items-center gap-1">
+          <span
+            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+            :style="{ backgroundColor: color }"
+            aria-hidden="true"
+          />
+          <code class="text-highlighted">{{ color }}</code>
         </span>
-        <span
-          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
       </div>
-      <div v-for="(color, i) in iconColors" :key="`icon-${i}`" class="flex items-center gap-1">
-        <span class="label-title">
-          {{ numberedLabel(t('picker.icon'), i, iconColors.length) }}
+      <div v-if="iconColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.icon') }}:</span>
+        <span v-for="(color, i) in iconColors" :key="`icon-${i}`" class="flex items-center gap-1">
+          <span
+            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+            :style="{ backgroundColor: color }"
+            aria-hidden="true"
+          />
+          <code class="text-highlighted">{{ color }}</code>
         </span>
-        <span
-          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
       </div>
       <div v-if="elementColor" class="flex items-center gap-1">
         <span class="label-title">{{ t('picker.element') }}:</span>
@@ -192,16 +188,20 @@ async function pickElement() {
         />
         <code class="text-highlighted">{{ backgroundColor }}</code>
       </div>
-      <div v-for="(color, i) in borderColors" :key="`border-${i}`" class="flex items-center gap-1">
-        <span class="label-title">
-          {{ numberedLabel(t('picker.border'), i, borderColors.length) }}
-        </span>
+      <div v-if="borderColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.border') }}:</span>
         <span
-          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
+          v-for="(color, i) in borderColors"
+          :key="`border-${i}`"
+          class="flex items-center gap-1"
+        >
+          <span
+            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+            :style="{ backgroundColor: color }"
+            aria-hidden="true"
+          />
+          <code class="text-highlighted">{{ color }}</code>
+        </span>
       </div>
     </div>
   </div>

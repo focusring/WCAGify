@@ -128,15 +128,42 @@ function formatLayer(layer: { r: number; g: number; b: number; a: number }): str
   return `rgba(${layer.r}, ${layer.g}, ${layer.b}, ${layer.a / 255})`
 }
 
-// The picked element's own background. CSS-mask icons return '' because their background-color is the icon color, not a surface.
+// Fraction of el's box covered by child's box — distinguishes a full surface from a small icon/text span.
+function boxCoverage(child: Element, elRect: DOMRect): number {
+  const c = child.getBoundingClientRect()
+  const w = Math.min(elRect.right, c.right) - Math.max(elRect.left, c.left)
+  const h = Math.min(elRect.bottom, c.bottom) - Math.max(elRect.top, c.top)
+  if (w <= 0 || h <= 0) return 0
+  return (w * h) / (elRect.width * elRect.height)
+}
+
+// When a transparent wrapper (e.g. <a> around a styled <button>) paints its surface via a descendant, return that
+// descendant's background. Document order yields the outermost filling surface first. Skips CSS-mask icons.
+function getFillingDescendantBgLayer(
+  el: Element
+): { r: number; g: number; b: number; a: number } | null {
+  const rect = el.getBoundingClientRect()
+  if (rect.width === 0 || rect.height === 0) return null
+  for (const child of el.querySelectorAll('*')) {
+    if (hasCssMask(child)) continue
+    if (boxCoverage(child, rect) < 0.9) continue
+    const layer = getElementBgLayer(child)
+    if (layer && layer.a > 0) return layer
+  }
+  return null
+}
+
+// The element's own background, or for a transparent wrapper the descendant that paints its surface.
+// CSS-mask icons return '' (their background-color is the icon color, not a surface).
 function getElementOwnColor(el: Element): string {
   if (hasCssMask(el)) return ''
-  const layer = getElementBgLayer(el)
+  let layer = getElementBgLayer(el)
+  if (!layer || layer.a === 0) layer = getFillingDescendantBgLayer(el)
   if (!layer || layer.a === 0) return ''
   return formatLayer(layer)
 }
 
-// The first visible background *behind* the picked element — walks parent → <html>. The element's own background is reported by getElementOwnColor and excluded here. Skips CSS-mask elements (their bg-color is the icon color). Returns '' so the popup can hide the Background row.
+// The first visible background *behind* the picked element, walks parent → <html>. The element's own background is reported by getElementOwnColor and excluded here. Skips CSS-mask elements (their bg-color is the icon color). Returns '' so the popup can hide the Background row.
 function getOwnBackgroundColor(el: Element): string {
   for (let current: Element | null = el.parentElement; current; current = current.parentElement) {
     if (!hasCssMask(current)) {
@@ -149,11 +176,6 @@ function getOwnBackgroundColor(el: Element): string {
 }
 
 const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'
-
-function isVisible(color: string): boolean {
-  const parsed = parseRgba(color)
-  return parsed !== null && parsed.a > 0
-}
 
 function hasCssMask(el: Element): boolean {
   const style = getComputedStyle(el)
@@ -238,17 +260,39 @@ function getTextColors(el: Element): string[] {
   return [...colors]
 }
 
-// Visible color of one SVG: own fill/stroke, else first visible fill/stroke on a shape descendant (Lucide icons set stroke="currentColor" on the <path>, not the <svg>).
-function getSvgColor(svg: SVGElement): string | undefined {
-  const ownStyle = getComputedStyle(svg)
-  if (isVisible(ownStyle.fill)) return ownStyle.fill
-  if (isVisible(ownStyle.stroke)) return ownStyle.stroke
+// Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers
+// (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.
+function svgPaintColor(color: string, opacity: string): string | null {
+  const parsed = tryParseColor(color)
+  if (!parsed || parsed.a === 0) return null
+  if (parseFloat(opacity || '1') <= 0) return null
+  return color
+}
+
+// Every visible fill/stroke color across an SVG's shape descendants, so multi-color icons surface all their colors
+// (computed style already includes paint inherited from <svg>/<g>). Falls back to the root's own paint when no shape
+// yields a color — covers icons whose color sits on the <svg> root, e.g. Lucide stroke="currentColor".
+function getSvgColors(svg: SVGElement): string[] {
+  const colors = new Set<string>()
   for (const shape of svg.querySelectorAll(SVG_SHAPE_SELECTOR)) {
     const s = getComputedStyle(shape)
-    if (isVisible(s.fill)) return s.fill
-    if (isVisible(s.stroke)) return s.stroke
+    if (s.display === 'none' || s.visibility === 'hidden' || parseFloat(s.opacity || '1') === 0)
+      continue
+    const fill = svgPaintColor(s.fill, s.fillOpacity)
+    if (fill) colors.add(fill)
+    const stroke = svgPaintColor(s.stroke, s.strokeOpacity)
+    if (stroke) colors.add(stroke)
   }
-  return undefined
+  if (colors.size === 0) {
+    const s = getComputedStyle(svg)
+    const fill = svgPaintColor(s.fill, s.fillOpacity)
+    if (fill) colors.add(fill)
+    else {
+      const stroke = svgPaintColor(s.stroke, s.strokeOpacity)
+      if (stroke) colors.add(stroke)
+    }
+  }
+  return [...colors]
 }
 
 // Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon). Walks descendants so icons inside a picked button/link surface.
@@ -259,8 +303,7 @@ function getIconColors(el: Element): string[] {
   if (el instanceof SVGElement) svgs.push(el)
   for (const svg of el.querySelectorAll('svg')) svgs.push(svg)
   for (const svg of svgs) {
-    const c = getSvgColor(svg)
-    if (c) addVisibleColor(colors, c)
+    for (const c of getSvgColors(svg)) addVisibleColor(colors, c)
   }
 
   if (hasCssMask(el)) addVisibleColor(colors, getComputedStyle(el).backgroundColor)
