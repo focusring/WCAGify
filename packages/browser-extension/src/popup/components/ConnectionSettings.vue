@@ -278,8 +278,7 @@ async function fetchReports() {
                 }"
                 @pointerdown.stop
                 @click.stop="clearUrl"
-                @keydown.enter.stop="clearUrl"
-                @keydown.space.prevent.stop="clearUrl"
+                @keydown.enter.space.prevent.stop="clearUrl"
               />
             </div>
 

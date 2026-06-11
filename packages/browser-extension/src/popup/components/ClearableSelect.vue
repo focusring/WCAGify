@@ -11,25 +11,50 @@ function onTabKeydown(e: KeyboardEvent) {
   if (e.key === 'Tab') isOpen.value = false
 }
 
-watch(isOpen, async (open, _, onCleanup) => {
-  if (open) {
-    document.addEventListener('keydown', onTabKeydown)
-    onCleanup(() => document.removeEventListener('keydown', onTabKeydown))
-    await nextTick()
-    const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
-    if (focusScope) {
-      focusScope.setAttribute('role', 'dialog')
-      focusScope.setAttribute('aria-modal', 'true')
-    }
-  } else {
-    document.removeEventListener('keydown', onTabKeydown)
-    await nextTick()
-    const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
-    if (focusScope) {
-      focusScope.removeAttribute('role')
-      focusScope.removeAttribute('aria-modal')
-    }
+// Reka UI's Select opens only on pointerdown and selects only on pointerup or
+// a real keydown. Narrator (and other AT) activate elements with a simulated
+// click that has neither, so translate those clicks ourselves. Real pointer
+// interaction always fires pointerup right before click; AT clicks don't.
+let lastPointerupAt = 0
+
+function onPointerupCapture() {
+  lastPointerupAt = Date.now()
+}
+
+function onClickCapture(e: MouseEvent) {
+  if (Date.now() - lastPointerupAt < 500) return
+  const target = e.target as HTMLElement | null
+  const option = target?.closest<HTMLElement>('[role="option"]')
+  if (option) {
+    option.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }))
+    return
   }
+  if (target?.closest('[role="combobox"]')) isOpen.value = !isOpen.value
+}
+
+function focusSelectedOrFirstOption() {
+  if (!isOpen.value) return
+  const listbox = wrapperRef.value?.querySelector<HTMLElement>('[role="listbox"]')
+  if (!listbox || listbox.contains(document.activeElement)) return
+  const option =
+    listbox.querySelector<HTMLElement>(
+      '[role="option"][data-state="checked"]:not([data-disabled])'
+    ) ?? listbox.querySelector<HTMLElement>('[role="option"]:not([data-disabled])')
+  option?.focus()
+}
+
+let focusRetryTimer: ReturnType<typeof setTimeout> | undefined
+
+watch(isOpen, async (open, _, onCleanup) => {
+  clearTimeout(focusRetryTimer)
+  if (!open) return
+  document.addEventListener('keydown', onTabKeydown)
+  onCleanup(() => document.removeEventListener('keydown', onTabKeydown))
+  await nextTick()
+  focusSelectedOrFirstOption()
+  // Reka re-focuses the trigger during an AT's simulated click; move focus to
+  // an option again once the content has settled.
+  focusRetryTimer = setTimeout(focusSelectedOrFirstOption, 100)
 })
 
 const props = withDefaults(
@@ -69,15 +94,19 @@ const triggerAriaLabel = computed(() => {
 </script>
 
 <template>
-  <div ref="wrapperRef" class="relative w-full">
-    <USelectMenu
+  <div
+    ref="wrapperRef"
+    class="relative w-full"
+    @pointerup.capture="onPointerupCapture"
+    @click.capture="onClickCapture"
+  >
+    <USelect
       :id="id"
       v-model="model"
       :open="isOpen"
       @update:open="isOpen = $event"
       :items="items"
       :value-key="valueKey"
-      :search-input="false"
       :placeholder="placeholder"
       :ui="{
         placeholder: 'text-toned',
@@ -104,8 +133,7 @@ const triggerAriaLabel = computed(() => {
       }"
       @pointerdown.stop
       @click.stop="model = undefined"
-      @keydown.enter.stop="model = undefined"
-      @keydown.space.prevent.stop="model = undefined"
+      @keydown.enter.space.prevent.stop="model = undefined"
     />
   </div>
 </template>

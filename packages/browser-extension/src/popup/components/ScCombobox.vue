@@ -164,8 +164,7 @@ watch(isOpen, async (open, _, onCleanup) => {
       :ui="{ base: 'absolute end-8 top-1/2 -translate-y-1/2' }"
       @pointerdown.stop
       @click.stop="model = ''"
-      @keydown.enter.stop="model = ''"
-      @keydown.space.prevent.stop="model = ''"
+      @keydown.enter.space.prevent.stop="model = ''"
     />
   </div>
 </template>

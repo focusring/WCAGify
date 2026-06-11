@@ -39,7 +39,7 @@ const currentView = ref<'main' | 'settings'>('main')
         />
       </div>
 
-      <USeparator class="mt-3 mb-4" aria-hidden="true" />
+      <USeparator decorative class="mt-3 mb-4" />
 
       <div class="space-y-4">
         <ElementPicker v-if="reports.length > 0" ref="picker" class="flex-1" />

@@ -288,8 +288,7 @@ async function submit() {
           }"
           @pointerdown.stop
           @click.stop="clearTitle"
-          @keydown.enter.stop="clearTitle"
-          @keydown.space.prevent.stop="clearTitle"
+          @keydown.enter.space.prevent.stop="clearTitle"
         />
       </div>
     </UFormField>

@@ -32,7 +32,7 @@ const isSettingsPage = computed(() => route.path === localePath('/settings'))
     </UContainer>
   </UMain>
 
-  <USeparator aria-hidden="true" />
+  <USeparator decorative />
 
   <UFooter>
     <template #left>

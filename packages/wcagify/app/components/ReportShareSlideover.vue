@@ -165,7 +165,7 @@ function formatDate(dateStr: string): string {
           <UButton :label="t('share.createLink')" icon="i-lucide-plus" @click="createShareLink" />
         </div>
 
-        <USeparator aria-hidden="true" />
+        <USeparator decorative />
 
         <h3 class="text-sm! mb-3">
           {{ t('share.activeLinks') }}

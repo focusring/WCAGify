@@ -167,6 +167,34 @@ export default defineConfig({
               class: { base: 'ring-error-700 dark:ring-error-400' }
             }
           ]
+        },
+        select: {
+          compoundVariants: [
+            {
+              variant: ['outline', 'subtle'],
+              class: { base: 'text-sm ring-shade-500 cursor-pointer w-full' }
+            },
+            {
+              color: 'success',
+              variant: ['outline', 'subtle'],
+              class: { base: 'ring-success-600 dark:ring-success-400' }
+            },
+            {
+              color: 'info',
+              variant: ['outline', 'subtle'],
+              class: { base: 'ring-info-500 dark:ring-info-400' }
+            },
+            {
+              color: 'warning',
+              variant: ['outline', 'subtle'],
+              class: { base: 'ring-warning-900 dark:ring-warning-500' }
+            },
+            {
+              color: 'error',
+              variant: ['outline', 'subtle'],
+              class: { base: 'ring-error-700 dark:ring-error-400' }
+            }
+          ]
         }
       }
     }),

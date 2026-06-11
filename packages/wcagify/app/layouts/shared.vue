@@ -5,7 +5,7 @@
     </UContainer>
   </UMain>
 
-  <USeparator aria-hidden="true" />
+  <USeparator decorative />
 
   <UFooter>
     <template #left>
