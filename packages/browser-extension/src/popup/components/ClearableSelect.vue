@@ -11,10 +11,8 @@ function onTabKeydown(e: KeyboardEvent) {
   if (e.key === 'Tab') isOpen.value = false
 }
 
-// Reka UI's Select opens only on pointerdown and selects only on pointerup or
-// a real keydown. Narrator (and other AT) activate elements with a simulated
-// click that has neither, so translate those clicks ourselves. Real pointer
-// interaction always fires pointerup right before click; AT clicks don't.
+// Reka UI's Select reacts to pointerup/keydown, not click. AT activation (e.g. Narrator Invoke) sends a simulated click with neither.
+// Translate those clicks here; real pointers fire pointerup just before click.
 let lastPointerupAt = 0
 
 function onPointerupCapture() {
@@ -34,16 +32,16 @@ function onClickCapture(e: MouseEvent) {
 
 function focusSelectedOrFirstOption() {
   if (!isOpen.value) return
-  const listbox = wrapperRef.value?.querySelector<HTMLElement>('[role="listbox"]')
-  if (!listbox || listbox.contains(document.activeElement)) return
+  const popup = wrapperRef.value?.querySelector<HTMLElement>('[data-reka-popper-content-wrapper]')
+  if (!popup || popup.contains(document.activeElement)) return
   const option =
-    listbox.querySelector<HTMLElement>(
+    popup.querySelector<HTMLElement>(
       '[role="option"][data-state="checked"]:not([data-disabled])'
-    ) ?? listbox.querySelector<HTMLElement>('[role="option"]:not([data-disabled])')
+    ) ?? popup.querySelector<HTMLElement>('[role="option"]:not([data-disabled])')
   option?.focus()
 }
 
-let focusRetryTimer: ReturnType<typeof setTimeout> | undefined
+let focusRetryTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 watch(isOpen, async (open, _, onCleanup) => {
   clearTimeout(focusRetryTimer)
@@ -51,10 +49,14 @@ watch(isOpen, async (open, _, onCleanup) => {
   document.addEventListener('keydown', onTabKeydown)
   onCleanup(() => document.removeEventListener('keydown', onTabKeydown))
   await nextTick()
+  patchPopupForNarrator()
   focusSelectedOrFirstOption()
-  // Reka re-focuses the trigger during an AT's simulated click; move focus to
-  // an option again once the content has settled.
-  focusRetryTimer = setTimeout(focusSelectedOrFirstOption, 100)
+  // Reka re-focuses the trigger during an AT's simulated click.
+  // Move focus back to an option once the content has settled.
+  focusRetryTimer = setTimeout(() => {
+    patchPopupForNarrator()
+    focusSelectedOrFirstOption()
+  }, 100)
 })
 
 const props = withDefaults(
@@ -80,6 +82,31 @@ const props = withDefaults(
 )
 
 const { t } = useI18n()
+
+// Narrator scan mode walks the raw a11y tree, stopping on every node. Making the content element the modal dialog drops the listbox's phantom "list"/"selection"
+// stops (Blink confines scanning to a modal, skips its root). Options then need explicit posinset/setsize; their aria-hidden children make each a single stop;
+// Reka's body-edge focus guards are hidden too (empty stops).
+function patchPopupForNarrator() {
+  const popup = wrapperRef.value?.querySelector<HTMLElement>('[data-reka-popper-content-wrapper]')
+  if (!popup) return
+  const content = popup.querySelector<HTMLElement>('[data-slot="content"]')
+  if (content) {
+    content.setAttribute('role', 'dialog')
+    content.setAttribute('aria-modal', 'true')
+    const popupLabel = props.label ?? props.placeholder
+    if (popupLabel) content.setAttribute('aria-label', popupLabel)
+  }
+  const options = popup.querySelectorAll('[role="option"]')
+  options.forEach((option, index) => {
+    option.setAttribute('aria-posinset', String(index + 1))
+    option.setAttribute('aria-setsize', String(options.length))
+    // Options keep their accessible name: aria-labelledby includes hidden nodes.
+    for (const child of option.children) child.setAttribute('aria-hidden', 'true')
+  })
+  for (const guard of document.querySelectorAll('[data-reka-focus-guard]')) {
+    guard.setAttribute('aria-hidden', 'true')
+  }
+}
 
 const selectedLabel = computed(
   () => props.items.find((item) => (item[props.valueKey] ?? item.value) === model.value)?.label
