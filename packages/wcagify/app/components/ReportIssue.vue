@@ -22,7 +22,7 @@ const issueId = `issue-${sanitizedPath}`
 <template>
   <UCollapsible :unmount-on-hide="false" :id="issueId" as="article">
     <UButton
-      class="group cursor-pointer"
+      class="group"
       color="neutral"
       variant="subtle"
       block
@@ -49,10 +49,7 @@ const issueId = `issue-${sanitizedPath}`
           icon="i-lucide-x"
           class="shrink-0 ring-1 text-black bg-error-400 ring-black dark:ring-error-400"
         />
-        <UIcon
-          name="i-lucide-chevron-down"
-          class="mt-0.5 shrink-0 size-5 text-toned transition-transform group-data-[state=open]:rotate-180"
-        />
+        <UIcon name="i-lucide-chevron-down" class="mt-0.5 shrink-0 size-5 icon-animation" />
       </template>
     </UButton>
 

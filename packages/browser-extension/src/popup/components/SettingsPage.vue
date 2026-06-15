@@ -86,7 +86,7 @@ function setNeutralColor(val: string | undefined) {
     <!-- Header -->
     <div class="flex items-center gap-2 px-4">
       <img :src="logoSvg" alt="" aria-hidden="true" class="size-7" />
-      <h1 class="text-lg font-bold text-highlighted">WCAGify</h1>
+      <h1>WCAGify</h1>
 
       <UButton
         :label="t('settings.title').toLowerCase()"
@@ -95,10 +95,7 @@ function setNeutralColor(val: string | undefined) {
         color="neutral"
         variant="subtle"
         aria-current="page"
-        :ui="{
-          base: 'cursor-pointer ml-auto',
-          leadingIcon: 'size-5'
-        }"
+        :ui="{ base: 'ml-auto', leadingIcon: 'size-5' }"
       />
     </div>
 
@@ -114,19 +111,14 @@ function setNeutralColor(val: string | undefined) {
           icon="i-lucide-arrow-big-left"
           color="neutral"
           variant="subtle"
-          :ui="{
-            base: 'cursor-pointer shrink-0 h-9',
-            leadingIcon: 'size-4'
-          }"
+          :ui="{ base: 'shrink-0 h-9', leadingIcon: 'size-4' }"
         >
           <span class="sr-only sm:not-sr-only">{{ t('settings.back').toLowerCase() }}</span>
         </UButton>
       </div>
 
       <!-- General -->
-      <h3 class="text-sm font-semibold text-toned tracking-wide mb-2">
-        {{ t('settings.general') }}
-      </h3>
+      <h3>{{ t('settings.general') }}</h3>
       <section class="bg-elevated rounded-sm px-4 py-3 space-y-3 mb-4">
         <ConnectionSettings />
 
@@ -136,14 +128,17 @@ function setNeutralColor(val: string | undefined) {
           :ui="{ label: 'label-title' }"
           class="flex flex-row items-center justify-between"
         >
-          <USelect
+          <USelectMenu
             v-model="locale"
+            value-key="value"
             :items="localeItems"
+            :search-input="false"
             :aria-label="t('language')"
             :ui="{
               trailingIcon: 'icon-animation text-toned',
-              content: 'overflow-visible',
-              base: 'bg-default min-w-32 cursor-pointer'
+              content: 'z-50',
+              item: 'cursor-pointer selectable-focus',
+              base: 'bg-default min-w-32'
             }"
             variant="subtle"
             size="lg"
@@ -152,9 +147,7 @@ function setNeutralColor(val: string | undefined) {
       </section>
 
       <!-- Appearance -->
-      <h3 class="text-sm font-semibold text-toned tracking-wide mb-2">
-        {{ t('settings.appearance') }}
-      </h3>
+      <h3>{{ t('settings.appearance') }}</h3>
       <section class="bg-elevated rounded-sm space-y-3 px-4 py-3">
         <!-- Theme -->
         <UFormField
@@ -166,7 +159,7 @@ function setNeutralColor(val: string | undefined) {
             @click="cycle"
             :aria-label="`${t('colorMode.dark')}/${t('colorMode.light')}/${t('colorMode.system')}: ${colorModeLabel}`"
             :ui="{
-              base: 'bg-default cursor-pointer min-w-24',
+              base: 'bg-default min-w-24',
               leadingIcon: 'size-4'
             }"
             :leading-icon="colorModeIcon"

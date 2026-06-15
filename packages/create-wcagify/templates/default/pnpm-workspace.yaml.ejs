@@ -1,0 +1,8 @@
+# pnpm v11 reads package settings from here, not the "pnpm" field in
+# package.json. allowBuilds lists the dependencies permitted to run install/
+# build scripts (native binaries); everything else is blocked by default.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  sharp: true
+  vue-demi: true

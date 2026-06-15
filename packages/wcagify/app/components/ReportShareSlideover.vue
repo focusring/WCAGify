@@ -108,18 +108,22 @@ function formatDate(dateStr: string): string {
           {{ t('share.adminDescription') }}
         </p>
         <form class="mt-6 w-full max-w-xs space-y-4" @submit.prevent="loginAdmin">
-          <label for="admin-secret" class="block text-sm text-toned">
-            {{ t('share.adminSecret') }} <small>{{ t('share.required') }}</small>
-          </label>
-          <UInput
-            id="admin-secret"
-            v-model="adminSecret"
-            type="password"
-            :placeholder="t('share.adminSecret')"
-            aria-required="true"
-            autofocus
-            required
-          />
+          <UFormField
+            :label="t('share.adminSecret')"
+            orientation="vertical"
+            name="admin-secret"
+            :ui="{ label: 'text-sm label-title' }"
+          >
+            <UInput
+              id="admin-secret"
+              v-model="adminSecret"
+              type="password"
+              :placeholder="t('share.adminSecret')"
+              aria-required="true"
+              autofocus
+              required
+            />
+          </UFormField>
           <p v-if="adminError" class="text-sm text-error">
             {{ t('share.adminError') }}
           </p>
@@ -128,91 +132,91 @@ function formatDate(dateStr: string): string {
       </div>
 
       <div v-else class="space-y-6">
-        <div>
-          <h3 class="text-sm!">
-            {{ t('share.createLink') }}
-          </h3>
-          <div class="mt-3 space-y-3">
-            <div>
-              <label for="share-expires-at" class="block text-sm text-toned">
-                {{ t('share.expiresAt') }}
-              </label>
-              <UInput
-                id="share-expires-at"
-                v-model="expiresAt"
-                type="date"
-                :placeholder="t('share.noExpiry')"
-                class="mt-1"
-              />
-            </div>
-            <div>
-              <label for="share-password" class="block text-sm text-toned">
-                {{ t('share.password') }}
-              </label>
-              <UInput id="share-password" v-model="password" type="password" class="mt-1" />
-            </div>
-            <p v-if="shareError" class="text-sm text-error">
-              {{ t('share.error') }}
-            </p>
-            <UButton :label="t('share.createLink')" icon="i-lucide-plus" @click="createShareLink" />
-          </div>
+        <h3 class="text-sm! mb-3">
+          {{ t('share.createLink') }}
+        </h3>
+        <div class="space-y-3">
+          <UFormField
+            :label="t('share.expiresAt')"
+            name="share-expiry-date"
+            orientation="vertical"
+            :ui="{ label: 'text-sm label-title' }"
+          >
+            <UInput
+              id="share-expires-at"
+              v-model="expiresAt"
+              type="date"
+              :placeholder="t('share.noExpiry')"
+              class="mt-1"
+            />
+          </UFormField>
+
+          <UFormField
+            :label="t('share.password')"
+            name="share-password"
+            orientation="vertical"
+            :ui="{ label: 'text-sm label-title' }"
+          >
+            <UInput id="share-password" v-model="password" type="password" class="mt-1" />
+          </UFormField>
+          <p v-if="shareError" class="text-sm text-error">
+            {{ t('share.error') }}
+          </p>
+          <UButton :label="t('share.createLink')" icon="i-lucide-plus" @click="createShareLink" />
         </div>
 
         <USeparator aria-hidden="true" />
 
-        <div>
-          <h3 class="text-sm!">
-            {{ t('share.activeLinks') }}
-          </h3>
+        <h3 class="text-sm! mb-3">
+          {{ t('share.activeLinks') }}
+        </h3>
 
-          <p v-if="!shares?.length" class="mt-3 text-sm text-toned">
-            {{ t('share.noLinks') }}
-          </p>
+        <p v-if="!shares?.length" class="mt-3 text-sm text-toned">
+          {{ t('share.noLinks') }}
+        </p>
 
-          <ul v-else class="mt-3 space-y-3">
-            <li
-              v-for="share in shares"
-              :key="share.token"
-              class="rounded-lg border border-default p-3"
-            >
-              <div class="flex items-center gap-2">
-                <UInput
-                  :model-value="shareUrl(share.token)"
-                  readonly
-                  class="flex-1"
-                  @focus="($event.target as HTMLInputElement).select()"
-                />
-                <UButton
-                  :icon="copiedToken === share.token ? 'i-lucide-check' : 'i-lucide-copy'"
-                  :label="copiedToken === share.token ? t('share.copied') : t('share.copyLink')"
-                  variant="outline"
-                  size="sm"
-                  @click="copyLink(share.token)"
-                />
-                <UButton
-                  icon="i-lucide-trash-2"
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  :aria-label="t('share.deleteLink')"
-                  @click="deleteShareLink(share.token, share.delete_token)"
-                />
-              </div>
-              <div class="mt-2 flex items-center gap-4 text-sm text-toned">
-                <span>{{ t('share.createdAt') }}: {{ formatDate(share.created_at) }}</span>
-                <span v-if="share.expires_at">
-                  {{ t('share.expiresAt') }}: {{ formatDate(share.expires_at) }}
-                </span>
-                <UIcon
-                  v-if="share.passwordProtected"
-                  name="i-lucide-lock"
-                  class="size-3"
-                  :aria-label="t('share.passwordProtected')"
-                />
-              </div>
-            </li>
-          </ul>
-        </div>
+        <ul v-else class="space-y-3">
+          <li
+            v-for="share in shares"
+            :key="share.token"
+            class="rounded-lg border border-default p-3"
+          >
+            <div class="flex items-center gap-2">
+              <UInput
+                :model-value="shareUrl(share.token)"
+                readonly
+                class="flex-1"
+                @focus="($event.target as HTMLInputElement).select()"
+              />
+              <UButton
+                :icon="copiedToken === share.token ? 'i-lucide-check' : 'i-lucide-copy'"
+                :label="copiedToken === share.token ? t('share.copied') : t('share.copyLink')"
+                variant="outline"
+                @click="copyLink(share.token)"
+              />
+              <UButton
+                icon="i-lucide-trash-2"
+                color="error"
+                variant="ghost"
+                class="text-error-800 dark:text-error-500"
+                :aria-label="t('share.deleteLink')"
+                @click="deleteShareLink(share.token, share.delete_token)"
+              />
+            </div>
+            <div class="mt-2 flex items-center gap-4 text-sm text-toned">
+              <span>{{ t('share.createdAt') }}: {{ formatDate(share.created_at) }}</span>
+              <span v-if="share.expires_at">
+                {{ t('share.expiresAt') }}: {{ formatDate(share.expires_at) }}
+              </span>
+              <UIcon
+                v-if="share.passwordProtected"
+                name="i-lucide-lock"
+                class="size-4 text-primary-800 dark:text-primary-400"
+                :aria-label="t('share.passwordProtected')"
+              />
+            </div>
+          </li>
+        </ul>
       </div>
     </template>
   </USlideover>

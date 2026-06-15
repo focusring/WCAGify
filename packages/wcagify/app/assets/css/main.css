@@ -99,7 +99,7 @@ button[role='switch'] [data-slot='thumb'] {
 }
 
 /* Custom focus styles for interactible elements */
-.selectable-focus:has(input:focus-visible),
+.selectable-focus:has(:focus-visible),
 .selectable-focus[data-highlighted] {
   outline: 0.375rem double var(--ui-color-primary-500);
   outline-offset: -1px;

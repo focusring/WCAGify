@@ -1,5 +1,5 @@
 <template>
-  <UIcon name="i-logo:wcagify" class="shrink-0 w-28 h-9 text-highlighted" />
+  <UIcon name="i-logo:wcagify" class="shrink-0 w-28 h-9 text-black dark:text-white" />
   <span class="visually-hidden">Home</span>
 </template>
 

@@ -133,7 +133,7 @@ const columns = computed<TableColumn<ReportsCollectionItem>[]>(() => [
         variant: 'ghost',
         label: t('report.title'),
         icon: sortIcon(isSorted),
-        class: '-mx-2.5 cursor-pointer',
+        class: '-mx-2.5',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     }
@@ -155,7 +155,7 @@ const columns = computed<TableColumn<ReportsCollectionItem>[]>(() => [
         variant: 'ghost',
         label: t('report.date'),
         icon: sortIcon(isSorted),
-        class: '-mx-2.5 cursor-pointer',
+        class: '-mx-2.5',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
     },
@@ -187,7 +187,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
     </p>
 
     <template v-if="reports?.length">
-      <div class="mt-6 rounded-lg border border-accented divide-y divide-accented">
+      <div class="mt-6 rounded-lg border border-neutral-500/75 divide-y divide-neutral-500/75">
         <div class="flex items-center gap-2 px-4 py-3.5">
           <UInput
             v-model="search"
@@ -196,7 +196,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
             variant="subtle"
             class="max-w-sm"
             :ui="{
-              base: '[&::placeholder]:text-toned py-2 pe-8 text-sm hover:bg-accented/75',
+              base: '[&::placeholder]:text-toned py-2 pe-8 text-sm ring-neutral-500/75 hover:bg-accented/75',
               leadingIcon: 'text-toned'
             }"
           />
@@ -220,13 +220,14 @@ const columnLabels = computed<Record<string, string>>(() => ({
                   }))
               "
               :content="{ align: 'end' as const }"
+              :ui="{ content: 'ring-neutral-500' }"
             >
               <UButton
                 :label="t('app.columns')"
                 color="neutral"
                 variant="subtle"
+                size="lg"
                 trailing-icon="i-lucide-chevron-down"
-                class="cursor-pointer"
               />
             </UDropdownMenu>
 
@@ -249,13 +250,14 @@ const columnLabels = computed<Record<string, string>>(() => ({
                   }))
               "
               :content="{ align: 'end' as const }"
+              :ui="{ content: 'ring-neutral-500' }"
             >
               <UButton
                 :label="t('app.columns')"
                 color="neutral"
                 variant="subtle"
+                size="lg"
                 trailing-icon="i-lucide-chevron-down"
-                class="cursor-pointer"
               />
             </UDropdownMenu>
 
@@ -279,8 +281,8 @@ const columnLabels = computed<Record<string, string>>(() => ({
                 icon="i-lucide-arrow-up-down"
                 color="neutral"
                 variant="subtle"
+                size="lg"
                 square
-                class="cursor-pointer"
               />
             </UDropdownMenu>
 
@@ -288,21 +290,21 @@ const columnLabels = computed<Record<string, string>>(() => ({
               :color="view === 'table' ? 'primary' : 'neutral'"
               :variant="view === 'table' ? 'subtle' : 'ghost'"
               icon="i-lucide-table"
+              size="lg"
               square
               :aria-label="t('app.tableView')"
               :aria-pressed="view === 'table'"
               @click="view = 'table'"
-              class="cursor-pointer"
             />
             <UButton
               :color="view === 'grid' ? 'primary' : 'neutral'"
               :variant="view === 'grid' ? 'subtle' : 'ghost'"
               icon="i-lucide-layout-grid"
+              size="lg"
               square
               :aria-label="t('app.gridView')"
               :aria-pressed="view === 'grid'"
               @click="view = 'grid'"
-              class="cursor-pointer"
             />
           </div>
         </div>
@@ -311,25 +313,24 @@ const columnLabels = computed<Record<string, string>>(() => ({
           <div
             v-for="report in filteredAndSortedReports"
             :key="report.path"
-            class="group relative rounded-lg border border-default bg-default p-5 transition-colors hover:border-primary hover:bg-elevated"
+            class="group relative rounded-lg border border-neutral-500/75 bg-default p-5 transition-colors hover:border-primary-600 dark:hover:border-primary hover:bg-muted selectable-focus"
           >
             <div class="flex items-start justify-between gap-2">
-              <h2 class="text-base! group-hover:text-primary!">
+              <h2 class="text-base! group-hover:text-primary-700! dark:group-hover:text-primary!">
                 <NuxtLinkLocale
                   :to="report.path"
-                  class="no-underline! text-inherit! before:absolute before:inset-0"
+                  class="hover:underline text-inherit! before:absolute before:inset-0 focus-visible:outline-none! focus-visible:shadow-none!"
                 >
                   {{ report.title }}
                 </NuxtLinkLocale>
               </h2>
               <UBadge
                 v-if="isFieldVisible('target')"
+                :label="`WCAG ${report.evaluation.targetWcagVersion} ${report.evaluation.targetLevel}`"
                 variant="subtle"
                 color="neutral"
-                class="shrink-0"
-              >
-                WCAG {{ report.evaluation.targetWcagVersion }} {{ report.evaluation.targetLevel }}
-              </UBadge>
+                class="shrink-0 group-hover:bg-default"
+              />
             </div>
 
             <p v-if="isFieldVisible('commissioner')" class="mt-2 text-sm text-toned">
@@ -356,18 +357,23 @@ const columnLabels = computed<Record<string, string>>(() => ({
           :data="filteredAndSortedReports"
           :columns="columns"
           :caption="t('app.reports')"
-          :ui="{ caption: 'sr-only', td: 'text-toned' }"
+          :ui="{ caption: 'sr-only', td: 'text-toned', separator: 'bg-neutral-500/75' }"
         >
           <template #title-cell="{ row }">
-            <NuxtLinkLocale :to="row.original.path" class="font-medium text-primary underline">
+            <NuxtLinkLocale
+              :to="row.original.path"
+              class="font-medium text-primary hover:underline flex items-center gap-1"
+            >
+              <UIcon name="i-lucide-notepad-text" class="size-4!" />
               {{ row.original.title }}
             </NuxtLinkLocale>
           </template>
           <template #targetLevel-cell="{ row }">
-            <UBadge variant="subtle" color="neutral">
-              WCAG {{ row.original.evaluation.targetWcagVersion }}
-              {{ row.original.evaluation.targetLevel }}
-            </UBadge>
+            <UBadge
+              :label="`WCAG ${row.original.evaluation.targetWcagVersion} ${row.original.evaluation.targetLevel}`"
+              variant="subtle"
+              color="neutral"
+            />
           </template>
         </UTable>
 

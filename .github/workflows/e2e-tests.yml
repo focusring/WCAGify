@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: pnpm
 
       - run: pnpm install --ignore-scripts
@@ -32,8 +32,28 @@ jobs:
       - run: pnpm nuxt prepare
         working-directory: playground
 
+      - name: Install Horn (PDF/UA validator)
+        # Horn (https://horn.report) validates the generated PDF against PDF/UA-1.
+        # The pdf e2e suite invokes the `horn` CLI; it skips that check if absent.
+        # Pinned by version + SHA-256: the release publishes no checksum file, so
+        # the hash is hard-pinned here and must be bumped when upgrading Horn.
+        env:
+          HORN_VERSION: v0.2.1
+          HORN_SHA256: 3bf3e7a574bc44c3a72af39b7c74bc3f6661d926d4cdc738add300c657aad2f4
+        run: |
+          curl -fsSL "https://github.com/focusring/horn/releases/download/${HORN_VERSION}/horn-linux-x86_64" \
+            -o /usr/local/bin/horn
+          echo "${HORN_SHA256}  /usr/local/bin/horn" | sha256sum -c -
+          chmod +x /usr/local/bin/horn
+          horn --version
+
       - name: Run E2E tests
+        # The PDF e2e suite renders against the live WeasyPrint service (the same
+        # one production uses); the test warms the service and retries to absorb
+        # cold starts. The other e2e suites are unaffected.
         run: pnpm test:e2e
+        env:
+          NUXT_WEASYPRINT_URL: https://magnificent-encouragement-production.up.railway.app
 
       - name: Upload test artifacts on failure
         if: failure()

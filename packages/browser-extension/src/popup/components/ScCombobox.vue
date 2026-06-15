@@ -99,7 +99,7 @@ watch(isOpen, async (open, _, onCleanup) => {
             : t('form.sc.ariaLabel')
       "
       :ui="{
-        base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5',
+        base: 'text-left grid grid-cols-[minmax(2rem,auto)_auto_1fr_auto] py-1.5 h-9 pr-7.5 pe-12!',
         placeholder: 'text-toned',
         trailingIcon: 'text-toned icon-animation',
         item: 'grid grid-cols-[minmax(2.5rem,auto)_auto_1fr_auto] items-center cursor-pointer selectable-focus',
@@ -111,7 +111,6 @@ watch(isOpen, async (open, _, onCleanup) => {
       :required="required"
       :aria-describedby="ariaDescribedby"
       variant="subtle"
-      class="w-full cursor-pointer"
     >
       <template #default>
         <!-- Select bar -->
@@ -119,7 +118,11 @@ watch(isOpen, async (open, _, onCleanup) => {
           <UBadge
             class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
             :color="
-              selectedItem.level === 'A' ? 'info' : selectedItem.level === 'AA' ? 'warning' : 'info'
+              selectedItem.level === 'A'
+                ? 'info'
+                : selectedItem.level === 'AA'
+                  ? 'warning'
+                  : 'success'
             "
             >{{ selectedItem.level }}</UBadge
           >
@@ -134,7 +137,7 @@ watch(isOpen, async (open, _, onCleanup) => {
         <UBadge
           aria-hidden="true"
           class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
-          :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'info'"
+          :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'success'"
           >{{ item.level }}</UBadge
         >
         <span aria-hidden="true" class="font-medium shrink-0">{{ item.sc }}</span>
@@ -154,12 +157,11 @@ watch(isOpen, async (open, _, onCleanup) => {
       as="span"
       role="button"
       tabindex="0"
-      color="primary"
       variant="ghost"
       size="xs"
       icon="i-lucide-x"
       :aria-label="t('form.sc.clear')"
-      :ui="{ base: 'cursor-pointer absolute end-8 top-1/2 -translate-y-1/2' }"
+      :ui="{ base: 'absolute end-8 top-1/2 -translate-y-1/2' }"
       @pointerdown.stop
       @click.stop="model = ''"
       @keydown.enter.stop="model = ''"

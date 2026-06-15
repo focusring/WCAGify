@@ -41,7 +41,7 @@ const columns = computed<TableColumn<SamplePage>[]>(() => [
         variant="link"
         trailing-icon="i-lucide-external-link"
         :aria-label="`${row.original.title} (${t('report.externalLink')})`"
-        class="p-0 underline"
+        :ui="{ trailingIcon: 'size-4' }"
       />
     </template>
   </UTable>

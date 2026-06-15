@@ -10,12 +10,6 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const statusFilters = inject<Ref<Set<string>>>('statusFilters')
-
-const levelColors = {
-  A: 'primary',
-  AA: 'primary',
-  AAA: 'primary'
-} as const
 </script>
 
 <template>
@@ -24,12 +18,7 @@ const levelColors = {
     class="rounded-lg border border-muted bg-muted overflow-hidden"
   >
     <div class="flex items-center gap-3 px-4 py-3">
-      <UBadge
-        :label="criterion.level"
-        variant="subtle"
-        :color="levelColors[criterion.level] ?? 'primary'"
-        class="shrink-0 ring-1 text-black bg-primary-300 ring-black dark:ring-primary-400"
-      />
+      <UBadge :label="criterion.level" variant="subtle" class="shrink-0" />
 
       <h4 class="font-medium text-highlighted text-base w-full">
         {{ criterion.name }}
@@ -40,28 +29,28 @@ const levelColors = {
         :label="t('report.scStatus.passed')"
         color="success"
         icon="i-lucide-check"
-        class="shrink-0 ring-1 text-black bg-success-400 ring-black dark:ring-success-400"
-      />
-      <UBadge
-        v-else-if="criterion.status === 'failed'"
-        :label="t('report.scStatus.failed')"
-        color="error"
-        icon="i-lucide-x"
-        class="shrink-0 ring-1 text-black bg-error-400 ring-black dark:ring-error-400"
+        class="shrink-0"
       />
       <UBadge
         v-else-if="criterion.status === 'not-present'"
         :label="t('report.scStatus.not-present')"
-        color="neutral"
+        color="info"
         icon="i-lucide-book-dashed"
-        class="shrink-0 ring-1 text-black bg-info-400 ring-black dark:ring-info-400"
+        class="shrink-0"
       />
       <UBadge
         v-else-if="criterion.status === 'not-tested'"
         :label="t('report.scStatus.not-tested')"
         color="warning"
         icon="i-lucide-mouse-pointer-2-off"
-        class="shrink-0 ring-1 text-black bg-warning-400 ring-black dark:ring-warning-400"
+        class="shrink-0"
+      />
+      <UBadge
+        v-else-if="criterion.status === 'failed'"
+        :label="t('report.scStatus.failed')"
+        color="error"
+        icon="i-lucide-x"
+        class="shrink-0"
       />
     </div>
 
