@@ -28,6 +28,9 @@ const iconColors = ref<string[]>([])
 const elementColor = ref('')
 const backgroundColor = ref('')
 const borderColors = ref<string[]>([])
+const ringColors = ref<string[]>([])
+const boxShadowColors = ref<string[]>([])
+const outlineColor = ref('')
 const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 const selectedTabId = ref<number | undefined>()
@@ -41,6 +44,9 @@ defineExpose({
   elementColor,
   backgroundColor,
   borderColors,
+  ringColors,
+  boxShadowColors,
+  outlineColor,
   selectedTabId
 })
 
@@ -54,6 +60,9 @@ function onMessage(message: {
   elementColor?: string
   backgroundColor?: string
   borderColors?: string[]
+  ringColors?: string[]
+  boxShadowColors?: string[]
+  outlineColor?: string
 }) {
   if (message.type === 'element-picked') {
     selector.value = message.selector ?? ''
@@ -64,6 +73,9 @@ function onMessage(message: {
     elementColor.value = toHex(message.elementColor ?? '')
     backgroundColor.value = toHex(message.backgroundColor ?? '')
     borderColors.value = (message.borderColors ?? []).map(toHex)
+    ringColors.value = (message.ringColors ?? []).map(toHex)
+    boxShadowColors.value = (message.boxShadowColors ?? []).map(toHex)
+    outlineColor.value = toHex(message.outlineColor ?? '')
     selectedTabId.value = pickerTabId.value
     picking.value = false
     pickerTabId.value = undefined
@@ -116,6 +128,9 @@ async function pickElement() {
   elementColor.value = ''
   backgroundColor.value = ''
   borderColors.value = []
+  ringColors.value = []
+  boxShadowColors.value = []
+  outlineColor.value = ''
 
   chrome.tabs.sendMessage(tab.id, { type: 'start-picker' }).catch(() => {
     picking.value = false
@@ -202,6 +217,41 @@ async function pickElement() {
           />
           <code class="text-highlighted">{{ color }}</code>
         </span>
+      </div>
+      <div v-if="ringColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.ring') }}:</span>
+        <span v-for="(color, i) in ringColors" :key="`ring-${i}`" class="flex items-center gap-1">
+          <span
+            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+            :style="{ backgroundColor: color }"
+            aria-hidden="true"
+          />
+          <code class="text-highlighted">{{ color }}</code>
+        </span>
+      </div>
+      <div v-if="boxShadowColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.boxShadow') }}:</span>
+        <span
+          v-for="(color, i) in boxShadowColors"
+          :key="`shadow-${i}`"
+          class="flex items-center gap-1"
+        >
+          <span
+            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+            :style="{ backgroundColor: color }"
+            aria-hidden="true"
+          />
+          <code class="text-highlighted">{{ color }}</code>
+        </span>
+      </div>
+      <div v-if="outlineColor" class="flex items-center gap-1">
+        <span class="label-title">{{ t('picker.outline') }}:</span>
+        <span
+          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
+          :style="{ backgroundColor: outlineColor }"
+          aria-hidden="true"
+        />
+        <code class="text-highlighted">{{ outlineColor }}</code>
       </div>
     </div>
   </div>

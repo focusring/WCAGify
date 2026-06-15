@@ -39,6 +39,9 @@ export default {
     element: 'Element',
     background: 'Achtergrond',
     border: 'Rand',
+    ring: 'Ring',
+    boxShadow: 'Schaduw',
+    outline: 'Contour',
     hoverHint: 'Beweeg over een element...',
     clickHint: 'Klik om te selecteren · Esc om te annuleren'
   },

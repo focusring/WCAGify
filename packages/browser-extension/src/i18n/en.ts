@@ -39,6 +39,9 @@ export default {
     element: 'Element',
     background: 'Background',
     border: 'Border',
+    ring: 'Ring',
+    boxShadow: 'Box-shadow',
+    outline: 'Outline',
     hoverHint: 'Hover over an element...',
     clickHint: 'Click to select · Esc to cancel'
   },
