@@ -40,6 +40,8 @@ function toHex(color: string): string {
 const selector = ref('')
 const pageUrl = ref('')
 const pageTitle = ref('')
+const role = ref('')
+const ariaHidden = ref(false)
 const textColors = ref<string[]>([])
 const iconColors = ref<string[]>([])
 const elementColor = ref('')
@@ -90,6 +92,8 @@ defineExpose({
   selector,
   pageUrl,
   pageTitle,
+  role,
+  ariaHidden,
   textColors,
   iconColors,
   elementColor,
@@ -108,6 +112,8 @@ function onMessage(message: {
   selector?: string
   url?: string
   pageTitle?: string
+  role?: string
+  ariaHidden?: boolean
   textColors?: string[]
   iconColors?: string[]
   elementColor?: string
@@ -123,6 +129,8 @@ function onMessage(message: {
     selector.value = message.selector ?? ''
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
+    role.value = message.role ?? ''
+    ariaHidden.value = message.ariaHidden ?? false
     textColors.value = (message.textColors ?? []).map(toHex)
     iconColors.value = (message.iconColors ?? []).map(toHex)
     elementColor.value = toHex(message.elementColor ?? '')
@@ -191,6 +199,8 @@ async function pickElement() {
   selector.value = ''
   pageUrl.value = ''
   pageTitle.value = ''
+  role.value = ''
+  ariaHidden.value = false
   textColors.value = []
   iconColors.value = []
   elementColor.value = ''
@@ -232,6 +242,13 @@ async function pickElement() {
       <div>
         <span class="label-title">{{ t('picker.page') }}</span>
         <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
+      </div>
+      <div v-if="role || ariaHidden">
+        <span class="label-title">{{ t('picker.role') }}:</span>
+        <code v-if="role" class="ml-1 text-highlighted">{{ role }}</code>
+        <span v-if="ariaHidden" class="ml-1 text-highlighted">{{
+          role ? `(${t('picker.ariaHidden')})` : t('picker.ariaHidden')
+        }}</span>
       </div>
       <div v-if="media">
         <span class="label-title">{{ t('picker.media') }}:</span>

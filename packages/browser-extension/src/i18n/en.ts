@@ -34,6 +34,8 @@ export default {
     selector: 'Selector:',
     url: 'URL:',
     page: 'Page:',
+    role: 'Role',
+    ariaHidden: 'hidden from accessibility tree',
     text: 'Text',
     icon: 'Icon',
     element: 'Element',

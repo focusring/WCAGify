@@ -34,6 +34,8 @@ export default {
     selector: 'Selector:',
     url: 'URL:',
     page: 'Pagina:',
+    role: 'Rol',
+    ariaHidden: 'verborgen voor toegankelijkheidsboom',
     text: 'Tekst',
     icon: 'Pictogram',
     element: 'Element',
