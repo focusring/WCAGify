@@ -1,5 +1,13 @@
 import { execSync, spawn, type ChildProcess } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync
+} from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -199,6 +207,32 @@ export async function startDevServer(
   return { process: child, url }
 }
 
+// Nitro's standalone build traces the `libsql` JS but not its optional
+// platform-native binding (@libsql/<platform>, e.g. @libsql/darwin-arm64 locally
+// or @libsql/linux-x64-gnu in CI). Without it the share API crashes at runtime
+// with "Cannot find module '@libsql/...'". Copy the installed binding (pnpm keeps
+// it under node_modules/.pnpm) into the output so the preview server can serve
+// share routes. No-op if the build already includes it or none is installed.
+function copyLibsqlNativeBinding(projectPath: string): void {
+  const pnpmDir = join(projectPath, 'node_modules/.pnpm')
+  const outDir = join(projectPath, '.output/server/node_modules/@libsql')
+  if (!existsSync(pnpmDir)) return
+
+  const isPlatformBinding = /darwin|linux|win32|android/
+  for (const entry of readdirSync(pnpmDir)) {
+    if (!entry.startsWith('@libsql+')) continue
+    const scopeDir = join(pnpmDir, entry, 'node_modules/@libsql')
+    if (!existsSync(scopeDir)) continue
+    for (const pkg of readdirSync(scopeDir)) {
+      if (!isPlatformBinding.test(pkg)) continue
+      const dest = join(outDir, pkg)
+      if (existsSync(dest)) continue
+      mkdirSync(outDir, { recursive: true })
+      cpSync(join(scopeDir, pkg), dest, { recursive: true })
+    }
+  }
+}
+
 export async function startPreviewServer(
   projectPath: string,
   port = 3100
@@ -225,6 +259,8 @@ export async function startPreviewServer(
     const execError = error as { stdout?: string; stderr?: string; message?: string }
     throw new Error(`nuxt build failed:\nstdout: ${execError.stdout}\nstderr: ${execError.stderr}`)
   }
+
+  copyLibsqlNativeBinding(projectPath)
 
   const url = `http://localhost:${port}`
   const child = spawn('node', ['.output/server/index.mjs'], {
