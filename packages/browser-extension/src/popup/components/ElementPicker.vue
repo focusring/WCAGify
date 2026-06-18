@@ -10,7 +10,26 @@ const pageTitle = ref('')
 const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 
+// Long-lived port to the page tab; its disconnect on panel close is what the content script uses to tear down any active or persisted highlight overlay.
+let pickerPort: chrome.runtime.Port | undefined = undefined
+let pickerPortTabId: number | undefined = undefined
+
 defineExpose({ selector, pageUrl, pageTitle })
+
+function connectPickerPort(tabId: number) {
+  if (pickerPort && pickerPortTabId === tabId) return
+  pickerPort?.disconnect()
+  const port = chrome.tabs.connect(tabId, { name: 'wcagify-picker' })
+  pickerPort = port
+  pickerPortTabId = tabId
+  port.onDisconnect.addListener(() => {
+    void chrome.runtime.lastError
+    if (pickerPort === port) {
+      pickerPort = undefined
+      pickerPortTabId = undefined
+    }
+  })
+}
 
 function onMessage(message: { type: string; selector?: string; url?: string; pageTitle?: string }) {
   if (message.type === 'element-picked') {
@@ -45,6 +64,10 @@ onMounted(() => {
 })
 onUnmounted(() => {
   cancelPicker()
+  // Disconnecting the port triggers the content script's teardown, removing any persisted highlight that outlived the picking session.
+  pickerPort?.disconnect()
+  pickerPort = undefined
+  pickerPortTabId = undefined
   chrome.runtime.onMessage.removeListener(onMessage)
   globalThis.removeEventListener('keydown', onKeyDown)
 })
@@ -57,6 +80,7 @@ async function pickElement() {
   )
   if (!tab?.id) return
 
+  connectPickerPort(tab.id)
   pickerTabId.value = tab.id
   picking.value = true
   selector.value = ''

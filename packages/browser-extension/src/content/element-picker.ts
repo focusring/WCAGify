@@ -17,6 +17,9 @@ let pickerLocale: 'en' | 'nl' = 'en'
 let activeOverlay: HTMLElement | undefined = undefined
 let infoPanel: HTMLElement | undefined = undefined
 let currentTarget: Element | undefined = undefined
+let highlightEl: HTMLElement | undefined = undefined
+let highlightTarget: Element | undefined = undefined
+let repositionRaf = 0
 
 function injectStyles() {
   if (document.getElementById('wcagify-picker-styles')) return
@@ -120,20 +123,72 @@ function updateInfoPanel(selector: string) {
 
 function highlightElement(el: Element) {
   clearHighlight()
-  const rect = el.getBoundingClientRect()
-  const highlight = document.createElement('div')
-  highlight.className = 'wcagify-highlight'
-  Object.assign(highlight.style, {
+  highlightTarget = el
+  highlightEl = document.createElement('div')
+  highlightEl.className = 'wcagify-highlight'
+  document.body.appendChild(highlightEl)
+  positionHighlight()
+  startTracking()
+}
+
+// Track the target's live viewport rect so the overlay stays glued on scroll/resize, hiding when off-screen (reappears when scrolled back).
+function positionHighlight() {
+  if (!highlightEl || !highlightTarget) return
+
+  if (!highlightTarget.isConnected) {
+    clearHighlight()
+    return
+  }
+
+  const rect = highlightTarget.getBoundingClientRect()
+  const offScreen =
+    rect.bottom <= 0 ||
+    rect.right <= 0 ||
+    rect.top >= window.innerHeight ||
+    rect.left >= window.innerWidth
+
+  if (offScreen) {
+    highlightEl.style.display = 'none'
+    return
+  }
+
+  Object.assign(highlightEl.style, {
+    display: 'block',
     top: `${rect.top}px`,
     left: `${rect.left}px`,
     width: `${rect.width}px`,
     height: `${rect.height}px`
   })
-  document.body.appendChild(highlight)
+}
+
+function scheduleReposition() {
+  if (repositionRaf) return
+  repositionRaf = requestAnimationFrame(() => {
+    repositionRaf = 0
+    positionHighlight()
+  })
+}
+
+// Scroll events don't bubble; capture phase catches scrolling in nested containers too, not just the document.
+function startTracking() {
+  window.addEventListener('scroll', scheduleReposition, { passive: true, capture: true })
+  window.addEventListener('resize', scheduleReposition, { passive: true })
+}
+
+function stopTracking() {
+  window.removeEventListener('scroll', scheduleReposition, { capture: true })
+  window.removeEventListener('resize', scheduleReposition)
+  if (repositionRaf) {
+    cancelAnimationFrame(repositionRaf)
+    repositionRaf = 0
+  }
 }
 
 function clearHighlight() {
+  stopTracking()
   document.querySelectorAll('.wcagify-highlight').forEach((el) => el.remove())
+  highlightEl = undefined
+  highlightTarget = undefined
 }
 
 function cleanup(keepHighlight = false) {
@@ -181,7 +236,7 @@ function handleClick(e: MouseEvent) {
     url: document.URL,
     pageTitle: document.title
   })
-  document.querySelector('.wcagify-highlight')?.classList.add('wcagify-highlight--selected')
+  highlightEl?.classList.add('wcagify-highlight--selected')
   cleanup(true)
 }
 
@@ -222,4 +277,10 @@ chrome.runtime.onMessage.addListener((message: { type: string }) => {
   if (message.type === 'cancel-picker') {
     cleanup()
   }
+})
+
+// The side panel holds an open port while the picker/highlight is alive; its disconnect on panel close reliably tears everything down, including a persisted highlight.
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name !== 'wcagify-picker') return
+  port.onDisconnect.addListener(() => cleanup())
 })
