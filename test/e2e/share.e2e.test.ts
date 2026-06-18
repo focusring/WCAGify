@@ -22,6 +22,42 @@ interface ShareResponse {
   delete_token: string
 }
 
+// Fill the share password and submit, returning only once the JS handler has
+// actually run (i.e. a POST to the share route was issued).
+//
+// Why the retry: these tests run against `nuxt dev`, which compiles the share
+// page's client bundle on demand. The first interaction can race hydration — a
+// click before the form's `@submit.prevent` handler is bound triggers a *native*
+// form submit (a full-page reload to `?`) instead of the JS password check, so no
+// POST is sent and no error/unlock ever appears. We click, watch for the POST,
+// and retry on the reloaded page until hydration catches up.
+async function submitSharePassword(page: Page, token: string, value: string): Promise<void> {
+  const deadline = Date.now() + 30_000
+  let lastError: unknown
+  while (Date.now() < deadline) {
+    try {
+      const input = await page.waitForSelector('input[type="password"]', { timeout: 10_000 })
+      await input.fill(value)
+      const [posted] = await Promise.all([
+        page
+          .waitForResponse(
+            (r) => r.url().includes(`/api/share/${token}`) && r.request().method() === 'POST',
+            { timeout: 3_000 }
+          )
+          .then(() => true)
+          .catch(() => false),
+        page.click('button[type="submit"]')
+      ])
+      if (posted) return
+    } catch (error) {
+      lastError = error
+    }
+  }
+  throw new Error(
+    `Share password form never issued a POST within 30s (dev hydration race did not resolve): ${lastError ?? 'no POST observed'}`
+  )
+}
+
 describe('Share E2E', () => {
   let browser: Browser
   let devServerProcess: ChildProcess
@@ -115,7 +151,11 @@ describe('Share E2E', () => {
       context = await browser.newContext()
       page = await context.newPage()
 
-      await page.goto(`${baseUrl}/share/${share.token}`, { waitUntil: 'networkidle' })
+      // Don't wait for 'networkidle': the Nuxt dev server keeps a persistent Vite
+      // HMR connection open, so the network never goes idle and goto would hang for
+      // the full timeout. The password form is server-rendered, so the default
+      // 'load' wait plus waitForSelector below is enough (mirrors the no-password test).
+      await page.goto(`${baseUrl}/share/${share.token}`)
       await page.waitForSelector('input[type="password"]', { timeout: 30_000 })
 
       expect(await page.$('input[type="password"]')).toBeTruthy()
@@ -123,25 +163,18 @@ describe('Share E2E', () => {
     })
 
     it('rejects wrong password', async () => {
-      const input = await page.waitForSelector('input[type="password"]')
-      await input.fill('wrong-password')
+      await submitSharePassword(page, share.token, 'wrong-password')
 
-      await page.click('button[type="submit"]')
       await page.waitForSelector('[role="alert"]', { timeout: 10_000 })
-
       const alert = await page.textContent('[role="alert"]')
       expect(alert).toBeTruthy()
       expect(await page.$('#executive-summary')).toBeFalsy()
     })
 
     it('unlocks with correct password', async () => {
-      const input = await page.waitForSelector('input[type="password"]')
-      await input.fill('')
-      await input.fill(password)
+      await submitSharePassword(page, share.token, password)
 
-      await page.click('button[type="submit"]')
       await page.waitForSelector('#executive-summary', { timeout: 30_000 })
-
       expect(await page.$('#executive-summary')).toBeTruthy()
       expect(await page.$('#scorecard')).toBeTruthy()
       expect(await page.$('#issues')).toBeTruthy()
