@@ -8,6 +8,9 @@
   .print\:hidden {
     display: none !important;
   }
+  .print\:block {
+    display: block !important;
+  }
   .print\:flex {
     display: flex !important;
   }
@@ -28,13 +31,13 @@
     @top-center {
       content: 'WCAGify';
       font-size: 9pt;
-      color: #6b7280;
+      color: #4a5565;
     }
 
     @bottom-center {
       content: counter(page);
       font-size: 9pt;
-      color: #6b7280;
+      color: #4a5565;
     }
   }
 
@@ -109,7 +112,7 @@
   }
 
   .cover-page dt {
-    color: #6b7280 !important;
+    color: #4a5565 !important;
     font-size: 10pt;
   }
 
@@ -333,7 +336,7 @@
   }
 
   dt {
-    color: #6b7280 !important;
+    color: #4a5565 !important;
   }
 
   dd {
@@ -366,21 +369,25 @@
 
   /* Issue article (failure detail) */
   article[id^='issue-'] {
-    break-inside: avoid;
-    border-top: 0.5pt solid #e5e7eb;
+    break-inside: auto;
+    border: 0.5pt solid #e5e7eb;
     background: white !important;
     padding: 0;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   article[id^='issue-'] > button {
-    width: 100%;
+    width: 96%;
     background: white !important;
     border: 0 !important;
-    padding: 8pt 10pt !important;
+    padding: 8pt 0pt !important;
+    margin: 0 auto !important;
     display: flex !important;
     align-items: baseline;
     gap: 8pt;
     text-align: left;
+    break-after: avoid;
   }
 
   article[id^='issue-'] > button h5 {
@@ -395,12 +402,9 @@
     display: none !important;
   }
 
-  article[id^='issue-'] [data-slot='content'] {
-    padding: 0 10pt;
-  }
-
   article[id^='issue-'] [data-slot='content'] > .prose {
     margin: 6pt 0 8pt;
+    padding: 0 10pt;
     font-size: 10.5pt;
   }
 
@@ -411,18 +415,27 @@
     margin: 8pt 0 4pt;
   }
 
+  .sc-header {
+    padding: 0pt 8pt !important;
+  }
+
+  .sc-list > * + * {
+    margin-top: 8pt !important;
+  }
+
   /* Issue footer (Type / Severity / Success criteria / Sample) */
   article[id^='issue-'] dl {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     column-gap: 16pt;
     row-gap: 4pt;
-    margin: 0 0 8pt !important;
+    margin: 0 !important;
     padding: 8pt 10pt !important;
     border-top: 0.5pt solid #e5e7eb;
     background: #f9fafb !important;
     font-size: 9.5pt;
     line-height: 1.4;
+    break-before: avoid;
   }
 
   article[id^='issue-'] dl > div {
@@ -457,40 +470,32 @@
 
   /* Status / level / sample badges — use subtle backgrounds for visual distinction */
   [data-slot='base'][class*='bg-error'] {
-    background: #fee2e2 !important;
-    color: #991b1b !important;
-    border: 0.5pt solid #fecaca !important;
+    background: #f76870 !important;
   }
   [data-slot='base'][class*='bg-success'] {
-    background: #dcfce7 !important;
-    color: #166534 !important;
-    border: 0.5pt solid #bbf7d0 !important;
+    background: #00dc82 !important;
   }
   [data-slot='base'][class*='bg-warning'] {
-    background: #fef3c7 !important;
-    color: #92400e !important;
-    border: 0.5pt solid #fde68a !important;
+    background: #fdc700 !important;
   }
   [data-slot='base'][class*='bg-primary'] {
-    background: #e0f2fe !important;
-    color: #075985 !important;
-    border: 0.5pt solid #bae6fd !important;
+    background: #00c16a !important;
   }
   [data-slot='base'][class*='ring-accented'],
   [data-slot='base'][class*='bg-default'] {
-    background: white !important;
-    color: #374151 !important;
-    border: 0.5pt solid #e5e7eb !important;
+    background: #f9f3f4 !important;
   }
 
   span[data-slot='base'] {
-    display: inline-flex !important;
+    display: inline-block !important; /* inline-flex give dubble border, weasy-print bug */
     align-items: center;
     gap: 3pt;
-    padding: 1pt 5pt !important;
-    border-radius: 3pt;
+    padding: 4pt 5pt !important;
+    border-radius: 2pt;
     font-size: 8.5pt;
     font-weight: 600;
+    color: black !important;
+    border: 0.5pt solid black !important;
   }
 
   span[data-slot='base'] .iconify {
@@ -503,7 +508,6 @@
     display: none !important;
   }
 
-  /* Results indicator row — force flex so the md: breakpoint doesn't need to fire */
   .results-indicators {
     display: flex !important;
     flex-wrap: wrap;
@@ -520,5 +524,18 @@
     flex-direction: row !important;
     align-items: center !important;
     gap: 6pt;
+  }
+
+  .results-indicators button[class*='bg-success'] {
+    background: #00dc82 !important;
+  }
+  .results-indicators button[class*='bg-error'] {
+    background: #f76870 !important;
+  }
+  .results-indicators button[class*='bg-warning'] {
+    background: #fdc700 !important;
+  }
+  .results-indicators button[class*='bg-info'] {
+    background: #51a2ff !important;
   }
 }

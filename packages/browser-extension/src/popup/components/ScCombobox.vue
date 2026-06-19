@@ -116,7 +116,7 @@ watch(isOpen, async (open, _, onCleanup) => {
         <!-- Select bar -->
         <template v-if="selectedItem">
           <UBadge
-            class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
+            class="shrink-0 w-fit text-sm font-semibold py-0.5 px-1.5"
             :color="
               selectedItem.level === 'A'
                 ? 'info'
@@ -124,8 +124,9 @@ watch(isOpen, async (open, _, onCleanup) => {
                   ? 'warning'
                   : 'success'
             "
-            >{{ selectedItem.level }}</UBadge
           >
+            {{ selectedItem.level }}
+          </UBadge>
           <span class="font-medium shrink-0">{{ selectedItem.sc }}</span>
           <span class="min-w-0 truncate">{{ selectedItem.name }}</span>
         </template>
@@ -136,7 +137,7 @@ watch(isOpen, async (open, _, onCleanup) => {
         <span class="sr-only">{{ levelLabel(item.level) }} {{ item.sc }}, {{ item.name }}</span>
         <UBadge
           aria-hidden="true"
-          class="shrink-0 w-fit text-sm text-highlighted font-semibold py-0.5 px-1.5"
+          class="shrink-0 w-fit text-sm font-semibold py-0.5 px-1.5"
           :color="item.level === 'A' ? 'info' : item.level === 'AA' ? 'warning' : 'success'"
           >{{ item.level }}</UBadge
         >

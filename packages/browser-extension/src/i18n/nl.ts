@@ -84,7 +84,9 @@ export default {
     description: {
       label: 'Beschrijving',
       description: 'Optionele context, stappen om te reproduceren of verwacht gedrag',
-      placeholder: "Schrijf, typ '/' voor commando's..."
+      placeholder: "Schrijf, typ '/' voor commando's...",
+      error: 'Voer een beschrijving in voor het probleem.',
+      clear: 'Beschrijving wissen'
     },
     type: {
       label: 'Type',

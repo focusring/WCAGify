@@ -18,7 +18,7 @@ const hasVisibleCriteria = computed(
   <div v-show="hasVisibleCriteria">
     <h3 class="py-2">{{ guideline.guideline }}: {{ guideline.name }}</h3>
 
-    <div class="mt-2 space-y-3">
+    <div class="mt-2 space-y-3 sc-list">
       <ReportSuccessCriterion
         v-for="criterion in guideline.criteria"
         :key="criterion.sc"

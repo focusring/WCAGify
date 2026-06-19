@@ -44,7 +44,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <main class="flex-1 py-12 sm:py-16 w-full">
+  <div class="flex-1 py-12 sm:py-16 w-full">
     <article class="max-w-2xl mx-auto">
       <header class="mb-12">
         <div class="flex items-center justify-between mb-4">
@@ -71,33 +71,31 @@ useSeoMeta({
         <h2 class="text-sm! text-toned! tracking-wide mb-3">
           {{ t('settings.generalSection') }}
         </h2>
-        <div class="bg-elevated border border-default rounded-sm p-4 sm:p-6">
-          <UFormField
-            :label="t('settings.language')"
-            name="language"
-            orientation="horizontal"
-            :ui="{ label: 'label-title' }"
-          >
-            <ClientOnly>
-              <ULocaleSelect
-                :locales="locales as any"
-                :model-value="locale"
-                @update:model-value="onLocaleChange($event)"
-                :ui="{
-                  base: 'cursor-pointer min-w-32 ring-neutral-500',
-                  item: 'cursor-pointer',
-                  trailingIcon: 'text-toned icon-animation'
-                }"
-              />
-            </ClientOnly>
-          </UFormField>
-        </div>
+        <UFormField
+          :label="t('settings.language')"
+          name="language"
+          orientation="horizontal"
+          :ui="{ label: 'label-title', root: 'bg-elevated rounded-sm p-4 sm:p-6' }"
+        >
+          <ClientOnly>
+            <ULocaleSelect
+              :locales="locales as any"
+              :model-value="locale"
+              @update:model-value="onLocaleChange($event)"
+              :ui="{
+                base: 'cursor-pointer min-w-32 ring-neutral-500',
+                item: 'cursor-pointer',
+                trailingIcon: 'text-toned icon-animation'
+              }"
+            />
+          </ClientOnly>
+        </UFormField>
 
         <!-- Appearance -->
         <h2 class="text-sm! text-toned! tracking-wide mb-3">
           {{ t('settings.appearance') }}
         </h2>
-        <div class="bg-elevated border border-default rounded-sm p-4 sm:p-6 space-y-6">
+        <div class="bg-elevated rounded-sm p-4 sm:p-6 space-y-6">
           <!-- Theme -->
           <UFormField
             :label="t('settings.theme')"
@@ -150,5 +148,5 @@ useSeoMeta({
         </div>
       </div>
     </article>
-  </main>
+  </div>
 </template>

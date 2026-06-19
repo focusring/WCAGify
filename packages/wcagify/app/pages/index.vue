@@ -187,7 +187,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
     </p>
 
     <template v-if="reports?.length">
-      <div class="mt-6 rounded-lg border border-neutral-500/75 divide-y divide-neutral-500/75">
+      <div class="mt-6 rounded-lg border border-accented divide-y divide-accented">
         <div class="flex items-center gap-2 px-4 py-3.5">
           <UInput
             v-model="search"
@@ -220,7 +220,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
                   }))
               "
               :content="{ align: 'end' as const }"
-              :ui="{ content: 'ring-neutral-500' }"
+              :ui="{ content: 'ring-neutral-500/75' }"
             >
               <UButton
                 :label="t('app.columns')"
@@ -250,7 +250,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
                   }))
               "
               :content="{ align: 'end' as const }"
-              :ui="{ content: 'ring-neutral-500' }"
+              :ui="{ content: 'ring-neutral-500/75' }"
             >
               <UButton
                 :label="t('app.columns')"
@@ -327,8 +327,8 @@ const columnLabels = computed<Record<string, string>>(() => ({
               <UBadge
                 v-if="isFieldVisible('target')"
                 :label="`WCAG ${report.evaluation.targetWcagVersion} ${report.evaluation.targetLevel}`"
-                variant="subtle"
                 color="neutral"
+                variant="subtle"
                 class="shrink-0 group-hover:bg-default"
               />
             </div>
@@ -357,7 +357,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
           :data="filteredAndSortedReports"
           :columns="columns"
           :caption="t('app.reports')"
-          :ui="{ caption: 'sr-only', td: 'text-toned', separator: 'bg-neutral-500/75' }"
+          :ui="{ caption: 'sr-only', td: 'text-toned', separator: 'border-accented' }"
         >
           <template #title-cell="{ row }">
             <NuxtLinkLocale
@@ -371,8 +371,8 @@ const columnLabels = computed<Record<string, string>>(() => ({
           <template #targetLevel-cell="{ row }">
             <UBadge
               :label="`WCAG ${row.original.evaluation.targetWcagVersion} ${row.original.evaluation.targetLevel}`"
-              variant="subtle"
               color="neutral"
+              variant="subtle"
             />
           </template>
         </UTable>

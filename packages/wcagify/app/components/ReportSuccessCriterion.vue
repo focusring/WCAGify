@@ -17,41 +17,44 @@ const statusFilters = inject<Ref<Set<string>>>('statusFilters')
     v-show="!statusFilters || statusFilters.has(criterion.status)"
     class="rounded-lg border border-muted bg-muted overflow-hidden"
   >
-    <div class="flex items-center gap-3 px-4 py-3">
+    <!-- Success criterion header get x padding using sc-header class on print -->
+    <div class="flex items-center gap-3 px-4 py-3 sc-header">
       <UBadge :label="criterion.level" variant="subtle" class="shrink-0" />
 
       <h4 class="font-medium text-highlighted text-base w-full">
         {{ criterion.name }}
       </h4>
 
-      <UBadge
-        v-if="criterion.status === 'passed'"
-        :label="t('report.scStatus.passed')"
-        color="success"
-        icon="i-lucide-check"
-        class="shrink-0"
-      />
-      <UBadge
-        v-else-if="criterion.status === 'not-present'"
-        :label="t('report.scStatus.not-present')"
-        color="info"
-        icon="i-lucide-book-dashed"
-        class="shrink-0"
-      />
-      <UBadge
-        v-else-if="criterion.status === 'not-tested'"
-        :label="t('report.scStatus.not-tested')"
-        color="warning"
-        icon="i-lucide-mouse-pointer-2-off"
-        class="shrink-0"
-      />
-      <UBadge
-        v-else-if="criterion.status === 'failed'"
-        :label="t('report.scStatus.failed')"
-        color="error"
-        icon="i-lucide-x"
-        class="shrink-0"
-      />
+      <div class="shrink-0">
+        <UBadge
+          v-if="criterion.status === 'passed'"
+          :label="t('report.scStatus.passed')"
+          color="success"
+          variant="subtle"
+          icon="i-lucide-check"
+        />
+        <UBadge
+          v-else-if="criterion.status === 'not-present'"
+          :label="t('report.scStatus.not-present')"
+          color="info"
+          variant="subtle"
+          icon="i-lucide-book-dashed"
+        />
+        <UBadge
+          v-else-if="criterion.status === 'not-tested'"
+          :label="t('report.scStatus.not-tested')"
+          color="warning"
+          variant="subtle"
+          icon="i-lucide-mouse-pointer-2-off"
+        />
+        <UBadge
+          v-else-if="criterion.status === 'failed'"
+          :label="t('report.scStatus.failed')"
+          color="error"
+          variant="subtle"
+          icon="i-lucide-x"
+        />
+      </div>
     </div>
 
     <div v-if="criterion.issues.length > 0">

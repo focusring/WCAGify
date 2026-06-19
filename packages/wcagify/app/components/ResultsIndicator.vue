@@ -17,7 +17,7 @@ const config: Record<Status, { icon: string; class: string }> = {
   failed: { icon: 'i-lucide:x', class: 'bg-error' },
   'not-present': {
     icon: 'i-lucide:book-dashed',
-    class: 'bg-secondary'
+    class: 'bg-info'
   },
   'not-tested': {
     icon: 'i-lucide:mouse-pointer-2-off',
