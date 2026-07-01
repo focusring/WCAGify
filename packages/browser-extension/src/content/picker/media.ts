@@ -1,4 +1,5 @@
 import type { MediaInfo } from './types'
+import { getSvgHref } from './css-utils'
 
 const MEDIA_FORMATS = new Set([
   'png',
@@ -58,13 +59,18 @@ export function videoFormat(video: HTMLVideoElement): string {
   return format
 }
 
-// Informational descriptor for raster/video elements, which have no styleable fill/color. Returns kind + detected format ('' when undeterminable), or null when el is not an <img>/<video>.
+// Informational descriptor for raster/video elements, which have no styleable fill/color. Returns kind + detected
+// format ('' when undeterminable), or null when el is not an <img>/<video>/SVG <image>.
 export function getMediaInfo(el: Element): MediaInfo | null {
   if (el instanceof HTMLImageElement) {
     return { kind: 'image', format: extractMediaFormat(el.currentSrc || el.src) }
   }
   if (el instanceof HTMLVideoElement) {
     return { kind: 'video', format: videoFormat(el) }
+  }
+  // An SVG <image> embeds a raster (href ≙ <img src>, xlink:href on legacy markup) — not a vector shape, so it's an image, not an icon. Reported here so it doesn't fall through to icon-color detection as a default-fill #000000.
+  if (el instanceof SVGImageElement) {
+    return { kind: 'image', format: extractMediaFormat(getSvgHref(el)) }
   }
   return null
 }

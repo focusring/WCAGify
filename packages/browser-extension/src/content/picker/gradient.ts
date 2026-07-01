@@ -1,10 +1,12 @@
 import type { GradientInfo } from './types'
 import {
   SVG_SHAPE_SELECTOR,
+  collectSvgRoots,
   findFillingDescendant,
   formatLayer,
+  getSvgHref,
   hasCssMask,
-  hasTextClip,
+  scanDescendants,
   splitOuterCommas,
   tryParseColor
 } from './css-utils'
@@ -59,18 +61,6 @@ export function parseGradient(bgImage: string): GradientInfo | null {
   return colors.length > 0 ? { type: g.type, colors } : null
 }
 
-// A gradient used as a text fill (background-clip: text) on el or a descendant. It lives in background-image but
-// represents the text color, so it's reported as the element's gradient, not its background.
-function getClipTextGradient(el: Element): GradientInfo | null {
-  for (const node of [el, ...el.querySelectorAll('*')]) {
-    const style = getComputedStyle(node)
-    if (!hasTextClip(style)) continue
-    const g = parseGradient(style.backgroundImage)
-    if (g) return g
-  }
-  return null
-}
-
 // The gradient id from an SVG paint reference like url("#id") or url("file.svg#id").
 function gradientUrlId(paint: string): string {
   return /url\(["']?[^)]*?#([\w:.-]+)["']?\)/i.exec(paint)?.[1] ?? ''
@@ -86,7 +76,7 @@ function getGradientStops(grad: Element, depth = 0): string[] {
     if (parsed && parsed.a > 0) colors.push(formatLayer(parsed))
   }
   if (colors.length === 0 && depth < 4) {
-    const href = grad.getAttribute('href') || grad.getAttribute('xlink:href') || ''
+    const href = getSvgHref(grad)
     if (href.startsWith('#')) {
       const ref = document.getElementById(href.slice(1))
       if (ref) return getGradientStops(ref, depth + 1)
@@ -135,27 +125,30 @@ function getSvgGradient(svg: SVGElement): GradientInfo | null {
 
 // Gradient counterpart of getFillingDescendantBgLayer: the filling descendant's background-image gradient.
 function getFillingDescendantGradient(el: Element): GradientInfo | null {
-  return findFillingDescendant(el, (child) =>
-    parseGradient(getComputedStyle(child).backgroundImage)
-  )
+  return findFillingDescendant(el, (childStyle) => parseGradient(childStyle.backgroundImage))
 }
 
 // A gradient on the element's own appearance, not the surface behind it: a text fill (background-clip: text), an SVG
-// fill/stroke gradient reference, or its own (or a filling descendant's) background-image gradient.
-export function getElementGradient(el: Element): GradientInfo | null {
-  const clip = getClipTextGradient(el)
-  if (clip) return clip
+// fill/stroke gradient reference, or its own (or a filling descendant's) background-image gradient. The clip-text
+// candidates (el + descendants, document order) come from the shared scanDescendants pass; the first that resolves to
+// a gradient wins.
+export function getElementGradient(
+  el: Element,
+  style: CSSStyleDeclaration = getComputedStyle(el),
+  clipTextBackgroundImages: string[] = scanDescendants(el, style).clipTextBackgroundImages
+): GradientInfo | null {
+  for (const bg of clipTextBackgroundImages) {
+    const clip = parseGradient(bg)
+    if (clip) return clip
+  }
 
-  const svgs: SVGElement[] = []
-  if (el instanceof SVGElement) svgs.push(el)
-  for (const svg of el.querySelectorAll('svg')) svgs.push(svg)
-  for (const svg of svgs) {
+  for (const svg of collectSvgRoots(el)) {
     const g = getSvgGradient(svg)
     if (g) return g
   }
 
-  if (!hasCssMask(el)) {
-    const own = parseGradient(getComputedStyle(el).backgroundImage)
+  if (!hasCssMask(style)) {
+    const own = parseGradient(style.backgroundImage)
     if (own) return own
     const descendant = getFillingDescendantGradient(el)
     if (descendant) return descendant

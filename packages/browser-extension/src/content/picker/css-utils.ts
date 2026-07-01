@@ -11,10 +11,45 @@ function getColorCtx(): CanvasRenderingContext2D | null {
   return colorCtx
 }
 
+// getComputedStyle emits colors almost exclusively as rgb()/rgba(), so a direct numeric parse resolves the common case
+// without the canvas getImageData readback below. Covers legacy comma syntax and modern space/slash syntax with integer
+// channels and a numeric-or-percentage alpha; returns null (→ canvas) for hex, named, hsl, oklch, color(), percentage
+// channels and anything malformed. Channels stay exact here, so semi-transparent colors avoid the small
+// premultiplied-rounding drift the canvas path introduces.
+const RGB_FUNC = /^rgba?\(([^)]+)\)$/i
+function fastParseRgb(color: string): Rgba | null {
+  const m = RGB_FUNC.exec(color.trim())
+  if (!m) return null
+  const parts = m[1]!
+    .replace('/', ' ')
+    .split(/[\s,]+/)
+    .filter(Boolean)
+  if (parts.length < 3 || parts.length > 4) return null
+  const rgb: number[] = []
+  for (let i = 0; i < 3; i++) {
+    const channel = parts[i]!
+    if (channel.includes('%')) return null // percentage channels are rare — defer to canvas
+    const n = Number(channel)
+    if (!Number.isFinite(n)) return null
+    rgb.push(Math.max(0, Math.min(255, Math.round(n))))
+  }
+  let a = 255
+  if (parts.length === 4) {
+    const alpha = parts[3]!
+    const value = alpha.endsWith('%') ? Number(alpha.slice(0, -1)) / 100 : Number(alpha)
+    if (!Number.isFinite(value)) return null
+    a = Math.max(0, Math.min(255, Math.round(value * 255)))
+  }
+  return { r: rgb[0]!, g: rgb[1]!, b: rgb[2]!, a }
+}
+
 // Resolve a CSS color string to rgba, or null for non-color tokens (e.g. "45deg", "to right" from a gradient).
-// fillStyle keeps its previous value on an unparseable input; two sentinels distinguish that from a real color.
+// Tries the rgb()/rgba() fast path first; otherwise resolves via canvas fillStyle, which keeps its previous value on an
+// unparseable input — two sentinels distinguish that from a real color.
 export function tryParseColor(color: string): Rgba | null {
   if (!color || color === 'none') return null
+  const fast = fastParseRgb(color)
+  if (fast) return fast
   const ctx = getColorCtx()
   if (!ctx) return null
   ctx.fillStyle = '#1b2c3d'
@@ -57,8 +92,7 @@ export function splitOuterCommas(s: string): string[] {
   return parts
 }
 
-export function hasCssMask(el: Element): boolean {
-  const style = getComputedStyle(el)
+export function hasCssMask(style: CSSStyleDeclaration): boolean {
   const mask = style.getPropertyValue('-webkit-mask-image') || style.getPropertyValue('mask-image')
   return mask !== '' && mask !== 'none'
 }
@@ -83,17 +117,61 @@ function boxCoverage(child: Element, elRect: DOMRect): number {
 // of el's box — document order yields the outermost filling surface first. Skips CSS-mask icons.
 export function findFillingDescendant<T>(
   el: Element,
-  extract: (child: Element) => T | null
+  extract: (childStyle: CSSStyleDeclaration) => T | null
 ): T | null {
   const rect = el.getBoundingClientRect()
   if (rect.width === 0 || rect.height === 0) return null
   for (const child of el.querySelectorAll('*')) {
-    if (hasCssMask(child)) continue
+    const childStyle = getComputedStyle(child)
+    if (hasCssMask(childStyle)) continue
     if (boxCoverage(child, rect) < 0.9) continue
-    const result = extract(child)
+    const result = extract(childStyle)
     if (result) return result
   }
   return null
 }
 
+// One document-order pass over el and its descendants that reads each element's computed style once, so the icon-mask
+// and clip-text-fill detectors don't each walk the subtree separately. Collects the background-color of every CSS-mask
+// element (icon paint) and the background-image of every background-clip:text element (text fill — the caller resolves
+// these to a gradient). el is visited first, reusing elStyle.
+export interface DescendantScan {
+  maskBackgroundColors: string[]
+  clipTextBackgroundImages: string[]
+}
+
+export function scanDescendants(
+  el: Element,
+  elStyle: CSSStyleDeclaration = getComputedStyle(el)
+): DescendantScan {
+  const maskBackgroundColors: string[] = []
+  const clipTextBackgroundImages: string[] = []
+  let isRoot = true
+  for (const node of [el, ...el.querySelectorAll('*')]) {
+    const style = isRoot ? elStyle : getComputedStyle(node)
+    isRoot = false
+    if (hasCssMask(style)) maskBackgroundColors.push(style.backgroundColor)
+    if (hasTextClip(style)) clipTextBackgroundImages.push(style.backgroundImage)
+  }
+  return { maskBackgroundColors, clipTextBackgroundImages }
+}
+
 export const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'
+
+// The reference a <use>/gradient/<image> carries via href, falling back to legacy xlink:href. Raw value ('#id',
+// 'sprite.svg#id', a data:/http URL…); '' when neither attribute is present. Callers strip the leading '#' as needed.
+export function getSvgHref(el: Element): string {
+  return el.getAttribute('href') || el.getAttribute('xlink:href') || ''
+}
+
+// The SVG roots to inspect for el's paint: el itself when it's an SVG element, plus any descendant <svg>. With
+// excludeImage, an <image> root is skipped — it embeds a raster (reported by getMediaInfo), not styleable shapes, so
+// its default-black computed fill would otherwise surface as a spurious icon color.
+export function collectSvgRoots(el: Element, options?: { excludeImage?: boolean }): SVGElement[] {
+  const svgs: SVGElement[] = []
+  if (el instanceof SVGElement && !(options?.excludeImage && el instanceof SVGImageElement)) {
+    svgs.push(el)
+  }
+  for (const svg of el.querySelectorAll('svg')) svgs.push(svg)
+  return svgs
+}

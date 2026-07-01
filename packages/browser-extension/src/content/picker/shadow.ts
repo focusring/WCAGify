@@ -38,8 +38,10 @@ function isRingGeometry(s: ShadowLayer): boolean {
 
 // Splits computed box-shadow into ring layers and drop-shadow layers. A layer is a ring by its geometry, or when its
 // color matches --tw-ring-color (catches borderline-geometry Tailwind rings). Both dedupe by color and skip transparent placeholders (Tailwind composes box-shadow from `0 0 #0000` sentinels).
-export function getShadowColors(el: Element): { ring: string[]; boxShadow: string[] } {
-  const style = getComputedStyle(el)
+export function getShadowColors(
+  el: Element,
+  style: CSSStyleDeclaration = getComputedStyle(el)
+): { ring: string[]; boxShadow: string[] } {
   const boxShadow = style.boxShadow
   if (!boxShadow || boxShadow === 'none') return { ring: [], boxShadow: [] }
 
@@ -61,8 +63,10 @@ export function getShadowColors(el: Element): { ring: string[]; boxShadow: strin
 }
 
 // Native CSS outline color, when the outline is actually drawn (style not none, width > 0, visible color). Skips unparseable keywords such as `invert`.
-export function getOutlineColor(el: Element): string {
-  const style = getComputedStyle(el)
+export function getOutlineColor(
+  el: Element,
+  style: CSSStyleDeclaration = getComputedStyle(el)
+): string {
   if (style.outlineStyle === 'none' || parseFloat(style.outlineWidth) <= 0) return ''
   const parsed = tryParseColor(style.outlineColor)
   if (!parsed || parsed.a === 0) return ''

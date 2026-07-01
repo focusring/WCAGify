@@ -1,11 +1,11 @@
 import { getUniqueSelector } from '../unique-selector'
 import { getBorderColors, getElementOwnColor, getIconColors, getTextColors } from './color'
 import { getElementGradient } from './gradient'
-import { getBackgroundInfo } from './background'
+import { firstSolidBackgroundColor, getBackgroundInfo } from './background'
 import { getMediaInfo } from './media'
 import { getAriaRole, isAccessibilityHidden } from './role'
 import { getOutlineColor, getShadowColors } from './shadow'
-import { hasCssMask, sameColor, tryParseColor } from './css-utils'
+import { sameColor, scanDescendants, tryParseColor } from './css-utils'
 import type { ElementInfo, Rgba } from './types'
 
 // Roles worth surfacing as their own nested section: interactive widgets + media/indicators — the elements that carry
@@ -68,7 +68,9 @@ function isDisabled(el: Element): boolean {
 // Runs every detector on one element. `role` defaults to the element's own computed role but can be overridden (the
 // child scan passes the surfaceable role so e.g. an <svg> is labelled img).
 export function collectElementInfo(el: Element, role: string = getAriaRole(el)): ElementInfo {
-  const shadow = getShadowColors(el)
+  const style = getComputedStyle(el)
+  const scan = scanDescendants(el, style)
+  const shadow = getShadowColors(el, style)
   const sel = getUniqueSelector(el)
   return {
     selector: Array.isArray(sel) ? sel.join(' > ') : sel,
@@ -77,14 +79,14 @@ export function collectElementInfo(el: Element, role: string = getAriaRole(el)):
     disabled: isDisabled(el),
     label: elementLabel(el),
     textColors: getTextColors(el),
-    iconColors: getIconColors(el),
-    elementColor: getElementOwnColor(el),
-    elementGradient: getElementGradient(el),
-    background: getBackgroundInfo(el),
-    borderColors: getBorderColors(el),
+    iconColors: getIconColors(el, style, scan.maskBackgroundColors),
+    elementColor: getElementOwnColor(el, style),
+    elementGradient: getElementGradient(el, style, scan.clipTextBackgroundImages),
+    background: getBackgroundInfo(el, style),
+    borderColors: getBorderColors(el, style),
     ringColors: shadow.ring,
     boxShadowColors: shadow.boxShadow,
-    outlineColor: getOutlineColor(el),
+    outlineColor: getOutlineColor(el, style),
     media: getMediaInfo(el)
   }
 }
@@ -92,19 +94,11 @@ export function collectElementInfo(el: Element, role: string = getAriaRole(el)):
 // First solid (non-transparent) background-color walking from el upward (inclusive). This is the effective surface the
 // selected element visually sits on: its own background (Case 1) or, when transparent, the nearest ancestor's (Case 2).
 function effectiveBackgroundColor(el: Element): Rgba | null {
-  for (let current: Element | null = el; current; current = current.parentElement) {
-    if (!hasCssMask(current)) {
-      const c = tryParseColor(getComputedStyle(current).backgroundColor)
-      if (c && c.a > 0) return c
-    }
-    if (current === document.documentElement) break
-  }
-  return null
+  return firstSolidBackgroundColor(el)
 }
 
-// Drops a child's solid background color when it's the same surface the selected element already sits on, so child
-// sections don't repeat the component's background. Gradients, media and blur are always kept — they're meaningful
-// regardless. Comparison is on resolved rgba (via tryParseColor), so #fff / white / rgb(255,255,255) all match.
+// Drops a child's solid background color when it's the same surface the selected element already sits on, so child sections don't repeat the component's background. Gradients, media and blur are always kept.
+// Comparison is on resolved rgba (via tryParseColor), so #fff / white / rgb(255,255,255) all match.
 function dedupeChildBackground(info: ElementInfo, reference: Rgba | null): void {
   const bg = info.background
   if (bg.gradient || bg.media || !bg.color) return

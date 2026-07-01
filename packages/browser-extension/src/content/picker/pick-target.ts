@@ -4,7 +4,7 @@ import { hasCssMask, splitOuterCommas } from './css-utils'
 const MEDIA_SELECTOR = 'img, svg, i, picture, canvas, video, audio'
 function hasOwnVisibleContent(el: Element): boolean {
   if (el.matches(MEDIA_SELECTOR)) return true
-  if (hasCssMask(el)) return true
+  if (hasCssMask(getComputedStyle(el))) return true
   for (const node of el.childNodes) {
     if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) return true
   }

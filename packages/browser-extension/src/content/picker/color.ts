@@ -1,32 +1,33 @@
 import type { Rgba } from './types'
 import {
   SVG_SHAPE_SELECTOR,
+  collectSvgRoots,
   findFillingDescendant,
   formatLayer,
+  getSvgHref,
   hasCssMask,
   hasTextClip,
+  scanDescendants,
   tryParseColor
 } from './css-utils'
 
-// One element's own visible solid background-color. Gradients are reported separately by getElementGradient.
-function getElementBgLayer(el: Element): Rgba | null {
-  return tryParseColor(getComputedStyle(el).backgroundColor)
-}
-
 // The filling descendant's background color (see findFillingDescendant).
 function getFillingDescendantBgLayer(el: Element): Rgba | null {
-  return findFillingDescendant(el, (child) => {
-    const layer = getElementBgLayer(child)
+  return findFillingDescendant(el, (childStyle) => {
+    const layer = tryParseColor(childStyle.backgroundColor)
     return layer && layer.a > 0 ? layer : null
   })
 }
 
 // The element's own background, or for a transparent wrapper the descendant that paints its surface. CSS-mask icons
 // and background-clip:text return '' — their background paints the icon/text, not a surface (clip:text gradients go to getElementGradient).
-export function getElementOwnColor(el: Element): string {
-  if (hasCssMask(el)) return ''
-  if (hasTextClip(getComputedStyle(el))) return ''
-  let layer = getElementBgLayer(el)
+export function getElementOwnColor(
+  el: Element,
+  style: CSSStyleDeclaration = getComputedStyle(el)
+): string {
+  if (hasCssMask(style)) return ''
+  if (hasTextClip(style)) return ''
+  let layer = tryParseColor(style.backgroundColor)
   if (!layer || layer.a === 0) layer = getFillingDescendantBgLayer(el)
   if (!layer || layer.a === 0) return ''
   return formatLayer(layer)
@@ -119,7 +120,7 @@ function svgPaintColor(color: string, opacity: string): string | null {
 
 // The in-document id a <use> references via href/xlink:href. '' for an unreachable external sprite ("sprite.svg#id") or when absent.
 function useSymbolId(use: Element): string {
-  const href = use.getAttribute('href') || use.getAttribute('xlink:href') || ''
+  const href = getSvgHref(use)
   return href.startsWith('#') ? href.slice(1) : ''
 }
 
@@ -183,30 +184,29 @@ function getSvgColors(svg: SVGElement): string[] {
   return [...colors]
 }
 
-// Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon). Walks descendants so icons inside a picked button/link surface.
-export function getIconColors(el: Element): string[] {
+// Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon). The mask
+// colors (el + descendants, so icons inside a picked button/link surface) come from the shared scanDescendants pass.
+export function getIconColors(
+  el: Element,
+  style: CSSStyleDeclaration = getComputedStyle(el),
+  maskBackgroundColors: string[] = scanDescendants(el, style).maskBackgroundColors
+): string[] {
   const colors = new Set<string>()
 
-  const svgs: SVGElement[] = []
-  if (el instanceof SVGElement) svgs.push(el)
-  for (const svg of el.querySelectorAll('svg')) svgs.push(svg)
-  for (const svg of svgs) {
+  for (const svg of collectSvgRoots(el, { excludeImage: true })) {
     for (const c of getSvgColors(svg)) addVisibleColor(colors, c)
   }
 
-  if (hasCssMask(el)) addVisibleColor(colors, getComputedStyle(el).backgroundColor)
-  for (const child of el.querySelectorAll('*')) {
-    if (hasCssMask(child)) addVisibleColor(colors, getComputedStyle(child).backgroundColor)
-  }
+  for (const c of maskBackgroundColors) addVisibleColor(colors, c)
 
   return [...colors]
 }
 
-// Unique visible border colors. A side counts when width > 0, style is not none/hidden, and alpha > 0.
-export function getBorderColors(el: Element): string[] {
-  const style = getComputedStyle(el)
+// Visible border colors from one computed style (an element's own or a pseudo-element's) into `colors`. A side counts
+// when width > 0, style is not none/hidden, and alpha > 0. Reads computed values, so CSS variables and the full
+// cascade are already resolved (e.g. Framer's `border-color: var(--border-color)` → its token/fallback color).
+function collectBorderColors(style: CSSStyleDeclaration, colors: Set<string>): void {
   const sides = ['top', 'right', 'bottom', 'left'] as const
-  const colors = new Set<string>()
   for (const side of sides) {
     const sideStyle = style.getPropertyValue(`border-${side}-style`)
     if (sideStyle === 'none' || sideStyle === 'hidden') continue
@@ -214,6 +214,22 @@ export function getBorderColors(el: Element): string[] {
     const color = style.getPropertyValue(`border-${side}-color`)
     const parsed = tryParseColor(color)
     if (parsed && parsed.a > 0) colors.add(color)
+  }
+}
+
+// Unique visible border colors on el and its ::before/::after pseudo-elements. Page builders like Framer paint the
+// "border" on a generated ::after (position:absolute; inset:0; border-color: var(--border-color)) rather than on the
+// element itself, so a border DevTools shows would be missed if we only read the element's own computed style.
+export function getBorderColors(
+  el: Element,
+  style: CSSStyleDeclaration = getComputedStyle(el)
+): string[] {
+  const colors = new Set<string>()
+  collectBorderColors(style, colors)
+  for (const pseudo of ['::before', '::after'] as const) {
+    const pseudoStyle = getComputedStyle(el, pseudo)
+    if (pseudoStyle.content === 'none') continue // pseudo-element doesn't generate a box → its border isn't rendered
+    collectBorderColors(pseudoStyle, colors)
   }
   return [...colors]
 }

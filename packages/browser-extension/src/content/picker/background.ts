@@ -1,4 +1,4 @@
-import type { BackgroundInfo, MediaInfo } from './types'
+import type { BackgroundInfo, MediaInfo, Rgba } from './types'
 import { formatLayer, hasCssMask, splitOuterCommas, tryParseColor } from './css-utils'
 import { parseGradient } from './gradient'
 import { extractMediaFormat, videoFormat } from './media'
@@ -12,23 +12,20 @@ function firstBackgroundUrl(bgImage: string): string {
   return ''
 }
 
-// Background image as { kind, format }, reusing extractMediaFormat (allow-list + data: parsing). null when the
-// background-image has no url() layer (e.g. gradient only).
+// Background image as { kind, format }, reusing extractMediaFormat (allow-list + data: parsing). null when the background-image has no url() layer (e.g. gradient only).
 function bgImageMedia(bgImage: string): MediaInfo | null {
   const url = firstBackgroundUrl(bgImage)
   return url ? { kind: 'image', format: extractMediaFormat(url) } : null
 }
 
 // A blur() in filter or backdrop-filter.
-function hasBlur(el: Element): boolean {
-  const style = getComputedStyle(el)
+function hasBlur(style: CSSStyleDeclaration): boolean {
   const backdrop =
     style.getPropertyValue('backdrop-filter') || style.getPropertyValue('-webkit-backdrop-filter')
   return /\bblur\(/i.test(style.filter) || /\bblur\(/i.test(backdrop)
 }
 
-// CSS background-image can't reference a <video>; "background videos" are absolutely/fixed-positioned <video>s layered
-// behind content. Heuristic: a positioned <video> that doesn't contain el, covers el's centre, and is at least as large as el. Best-effort — won't catch every layering technique.
+// CSS background-image can't reference a <video>; "background videos" are absolutely/fixed-positioned <video>s layered behind content. Heuristic: a positioned <video> that doesn't contain el, covers el's centre, and is at least as large as el. Best-effort — won't catch every layering technique.
 function findBackgroundVideo(el: Element): MediaInfo | null {
   const r = el.getBoundingClientRect()
   if (r.width === 0 || r.height === 0) return null
@@ -46,17 +43,35 @@ function findBackgroundVideo(el: Element): MediaInfo | null {
   return null
 }
 
+// First solid (non-transparent) background-color walking from `start` upward to <html> (inclusive), skipping CSS-mask
+// elements (their background paints an icon, not a surface). null when everything up the chain is transparent. Shared
+// canonical walker for "the effective surface an element sits on" (see collect.ts) and getBackgroundInfo's color rule.
+export function firstSolidBackgroundColor(start: Element | null): Rgba | null {
+  for (let current = start; current; current = current.parentElement) {
+    const style = getComputedStyle(current)
+    if (!hasCssMask(style)) {
+      const c = tryParseColor(style.backgroundColor)
+      if (c && c.a > 0) return c
+    }
+    if (current === document.documentElement) break
+  }
+  return null
+}
+
 // Structured description of the first visible background behind el. Walks parent → <html>, recording the top most background image/gradient and the first solid color behind it, then stops (that color backs everything below).
 // Falls back to a layered background <video> when there's no CSS image/gradient. Skips CSS-mask elements.
-export function getBackgroundInfo(el: Element): BackgroundInfo {
+export function getBackgroundInfo(
+  el: Element,
+  elStyle: CSSStyleDeclaration = getComputedStyle(el)
+): BackgroundInfo {
   let color = ''
   let media: MediaInfo | null = null
   let gradient: BackgroundInfo['gradient'] = null
-  let blur = hasBlur(el)
+  let blur = hasBlur(elStyle)
 
   for (let current: Element | null = el.parentElement; current; current = current.parentElement) {
-    if (!hasCssMask(current)) {
-      const style = getComputedStyle(current)
+    const style = getComputedStyle(current)
+    if (!hasCssMask(style)) {
       const bgImage = style.backgroundImage
       if (bgImage && bgImage !== 'none') {
         if (!media) media = bgImageMedia(bgImage)
@@ -66,7 +81,7 @@ export function getBackgroundInfo(el: Element): BackgroundInfo {
         const c = tryParseColor(style.backgroundColor)
         if (c && c.a > 0) color = formatLayer(c)
       }
-      if (hasBlur(current)) blur = true
+      if (hasBlur(style)) blur = true
       if (color) break
     }
     if (current === document.documentElement) break
