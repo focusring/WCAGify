@@ -109,8 +109,7 @@ export function getTextColors(el: Element): string[] {
   return [...colors]
 }
 
-// Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers
-// (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.
+// Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.
 function svgPaintColor(color: string, opacity: string): string | null {
   const parsed = tryParseColor(color)
   if (!parsed || parsed.a === 0) return null
@@ -118,14 +117,55 @@ function svgPaintColor(color: string, opacity: string): string | null {
   return color
 }
 
-// Every visible fill/stroke color across an SVG's shape descendants, so multi-color icons surface all their colors
-// (computed style already includes paint inherited from <svg>/<g>). Falls back to the root's own paint when no shape yields a color — covers icons whose color sits on the <svg> root, e.g. Lucide stroke="currentColor".
+// The in-document id a <use> references via href/xlink:href. '' for an unreachable external sprite ("sprite.svg#id") or when absent.
+function useSymbolId(use: Element): string {
+  const href = use.getAttribute('href') || use.getAttribute('xlink:href') || ''
+  return href.startsWith('#') ? href.slice(1) : ''
+}
+
+// A <use> paints the symbol's shapes in a cloned shadow tree getComputedStyle(use) can't see (its own fill reads as initial black), so resolve the symbol's shapes from raw paint attributes:
+// literal colors as-is, currentColor/unset (the sprite norm) as the `color` inherited at the <use> site — also the fallback for an external/missing symbol.
+function getUseColors(use: Element): string[] {
+  const inherited = getComputedStyle(use).color // what the symbol's currentColor fills resolve to here
+  const symbol = (() => {
+    const id = useSymbolId(use)
+    return id ? document.getElementById(id) : null
+  })()
+  if (!symbol) return svgPaintColor(inherited, '1') ? [inherited] : []
+
+  const colors = new Set<string>()
+  let recoloredByCurrentColor = false
+  for (const node of [symbol, ...symbol.querySelectorAll('*')]) {
+    for (const prop of ['fill', 'stroke'] as const) {
+      const raw = node.getAttribute(prop)
+      if (!raw || raw === 'none') continue
+      if (raw === 'currentColor' || raw === 'inherit') recoloredByCurrentColor = true
+      else {
+        const c = svgPaintColor(raw, node.getAttribute(`${prop}-opacity`) ?? '1')
+        if (c) colors.add(c)
+      }
+    }
+  }
+  // currentColor anywhere, or a symbol with no literal paint at all (recolor-by-`color` sprite), renders as `inherited`.
+  if ((recoloredByCurrentColor || colors.size === 0) && svgPaintColor(inherited, '1')) {
+    colors.add(inherited)
+  }
+  return [...colors]
+}
+
+// Every visible fill/stroke color across an SVG's shape descendants, so multi-color icons surface all their colors (computed style already includes paint inherited from <svg>/<g>).
+// Falls back to the root's own paint when no shape yields a color — covers icons whose color sits on the <svg> root, e.g. Lucide stroke="currentColor".
 function getSvgColors(svg: SVGElement): string[] {
   const colors = new Set<string>()
   for (const shape of svg.querySelectorAll(SVG_SHAPE_SELECTOR)) {
     const s = getComputedStyle(shape)
     if (s.display === 'none' || s.visibility === 'hidden' || parseFloat(s.opacity || '1') === 0)
       continue
+    // A <use>'s paint lives in the referenced symbol, not on the <use> element itself.
+    if (shape.localName === 'use') {
+      for (const c of getUseColors(shape)) colors.add(c)
+      continue
+    }
     const fill = svgPaintColor(s.fill, s.fillOpacity)
     if (fill) colors.add(fill)
     const stroke = svgPaintColor(s.stroke, s.strokeOpacity)

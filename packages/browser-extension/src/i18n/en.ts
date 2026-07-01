@@ -36,6 +36,7 @@ export default {
     page: 'Page:',
     role: 'Role',
     ariaHidden: 'hidden from accessibility tree',
+    disabled: 'disabled',
     text: 'Text',
     icon: 'Icon',
     element: 'Element',

@@ -1,25 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '../../composables/useI18n'
+import PickedElementSection from './PickedElementSection.vue'
+import type { ElementInfo } from '../../content/picker/types'
 
 const { t } = useI18n()
-
-interface MediaInfo {
-  kind: 'image' | 'video'
-  format: string
-}
-
-interface GradientInfo {
-  type: string
-  colors: string[]
-}
-
-interface BackgroundInfo {
-  color: string
-  media: MediaInfo | null
-  gradient: GradientInfo | null
-  blur: boolean
-}
 
 function toHex(color: string): string {
   if (!color) return color
@@ -37,121 +22,67 @@ function toHex(color: string): string {
   return '#' + [r, g, b, a].map((v) => v.toString(16).padStart(2, '0')).join('')
 }
 
-const selector = ref('')
+// Convert every color field of a detected element to hex for display, leaving structure/labels untouched.
+function mapColors(info: ElementInfo): ElementInfo {
+  return {
+    ...info,
+    textColors: info.textColors.map(toHex),
+    iconColors: info.iconColors.map(toHex),
+    elementColor: toHex(info.elementColor),
+    elementGradient: info.elementGradient
+      ? { type: info.elementGradient.type, colors: info.elementGradient.colors.map(toHex) }
+      : null,
+    background: {
+      ...info.background,
+      color: toHex(info.background.color),
+      gradient: info.background.gradient
+        ? {
+            type: info.background.gradient.type,
+            colors: info.background.gradient.colors.map(toHex)
+          }
+        : null
+    },
+    borderColors: info.borderColors.map(toHex),
+    ringColors: info.ringColors.map(toHex),
+    boxShadowColors: info.boxShadowColors.map(toHex),
+    outlineColor: toHex(info.outlineColor)
+  }
+}
+
 const pageUrl = ref('')
 const pageTitle = ref('')
-const role = ref('')
-const ariaHidden = ref(false)
-const textColors = ref<string[]>([])
-const iconColors = ref<string[]>([])
-const elementColor = ref('')
-const elementGradient = ref<GradientInfo | null>(null)
-const background = ref<BackgroundInfo | null>(null)
-const borderColors = ref<string[]>([])
-const ringColors = ref<string[]>([])
-const boxShadowColors = ref<string[]>([])
-const outlineColor = ref('')
-const media = ref<MediaInfo | null>(null)
+const selected = ref<ElementInfo | null>(null)
+const children = ref<ElementInfo[]>([])
 const picking = ref(false)
-
-const mediaLabel = computed(() => {
-  if (!media.value) return ''
-  const kind = t(media.value.kind === 'image' ? 'picker.image' : 'picker.video')
-  return media.value.format ? `${kind} .${media.value.format}` : `${kind} (${t('picker.unknown')})`
-})
-
-const hasBackground = computed(() => {
-  const bg = background.value
-  return !!bg && !!(bg.color || bg.media || bg.gradient || bg.blur)
-})
-// Three-part label "<type> <format>" reusing the media value's kind/format detection. GIFs get their own type word.
-const backgroundMediaLabel = computed(() => {
-  const m = background.value?.media
-  if (!m) return ''
-  const type =
-    m.kind === 'video'
-      ? t('picker.video')
-      : m.format === 'gif'
-        ? t('picker.gif')
-        : t('picker.image')
-  return m.format ? `${type} ${m.format}` : `${type} (${t('picker.unknown')})`
-})
-// Gradient stops are truncated to the first two with a "+N" indicator, keeping the row short for many-stop gradients.
-const gradientStopsShown = (g?: GradientInfo | null) => g?.colors.slice(0, 2) ?? []
-const gradientStopsMore = (g?: GradientInfo | null) => Math.max((g?.colors.length ?? 0) - 2, 0)
-// A preview swatch rendered with the actual gradient (synthesised direction, since stops carry no angle/position).
-const gradientCss = (g?: GradientInfo | null) => {
-  if (!g) return ''
-  const direction = g.type === 'linear' ? '90deg, ' : ''
-  return `${g.type}-gradient(${direction}${g.colors.join(', ')})`
-}
 const pickerTabId = ref<number | undefined>()
 const selectedTabId = ref<number | undefined>()
+const childPage = ref(1)
 
-defineExpose({
-  selector,
-  pageUrl,
-  pageTitle,
-  role,
-  ariaHidden,
-  textColors,
-  iconColors,
-  elementColor,
-  elementGradient,
-  background,
-  borderColors,
-  ringColors,
-  boxShadowColors,
-  outlineColor,
-  media,
-  selectedTabId
+const selector = computed(() => selected.value?.selector ?? '')
+// Stacking every child section gets unreadable past a handful, so beyond this many they're paginated in groups.
+const CHILD_PAGINATION_THRESHOLD = 3
+const CHILD_PAGE_SIZE = 3
+const isChildPaginated = computed(() => children.value.length > CHILD_PAGINATION_THRESHOLD)
+const pagedChildren = computed(() => {
+  const start = (childPage.value - 1) * CHILD_PAGE_SIZE
+  return children.value.slice(start, start + CHILD_PAGE_SIZE)
 })
+
+defineExpose({ selector, pageUrl, pageTitle, selectedTabId })
 
 function onMessage(message: {
   type: string
-  selector?: string
   url?: string
   pageTitle?: string
-  role?: string
-  ariaHidden?: boolean
-  textColors?: string[]
-  iconColors?: string[]
-  elementColor?: string
-  elementGradient?: GradientInfo | null
-  background?: BackgroundInfo | null
-  borderColors?: string[]
-  ringColors?: string[]
-  boxShadowColors?: string[]
-  outlineColor?: string
-  media?: { kind: 'image' | 'video'; format: string } | null
+  selected?: ElementInfo
+  children?: ElementInfo[]
 }) {
   if (message.type === 'element-picked') {
-    selector.value = message.selector ?? ''
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
-    role.value = message.role ?? ''
-    ariaHidden.value = message.ariaHidden ?? false
-    textColors.value = (message.textColors ?? []).map(toHex)
-    iconColors.value = (message.iconColors ?? []).map(toHex)
-    elementColor.value = toHex(message.elementColor ?? '')
-    const eg = message.elementGradient ?? null
-    elementGradient.value = eg ? { type: eg.type, colors: eg.colors.map(toHex) } : null
-    const bg = message.background ?? null
-    background.value = bg
-      ? {
-          color: toHex(bg.color),
-          media: bg.media,
-          gradient: bg.gradient
-            ? { type: bg.gradient.type, colors: bg.gradient.colors.map(toHex) }
-            : null,
-          blur: bg.blur
-        }
-      : null
-    borderColors.value = (message.borderColors ?? []).map(toHex)
-    ringColors.value = (message.ringColors ?? []).map(toHex)
-    boxShadowColors.value = (message.boxShadowColors ?? []).map(toHex)
-    outlineColor.value = toHex(message.outlineColor ?? '')
-    media.value = message.media ?? null
+    selected.value = message.selected ? mapColors(message.selected) : null
+    children.value = (message.children ?? []).map(mapColors)
+    childPage.value = 1
     selectedTabId.value = pickerTabId.value
     picking.value = false
     pickerTabId.value = undefined
@@ -196,21 +127,10 @@ async function pickElement() {
   pickerTabId.value = tab.id
   selectedTabId.value = undefined
   picking.value = true
-  selector.value = ''
   pageUrl.value = ''
   pageTitle.value = ''
-  role.value = ''
-  ariaHidden.value = false
-  textColors.value = []
-  iconColors.value = []
-  elementColor.value = ''
-  elementGradient.value = null
-  background.value = null
-  borderColors.value = []
-  ringColors.value = []
-  boxShadowColors.value = []
-  outlineColor.value = ''
-  media.value = null
+  selected.value = null
+  children.value = []
 
   chrome.tabs.sendMessage(tab.id, { type: 'start-picker' }).catch(() => {
     picking.value = false
@@ -230,7 +150,7 @@ async function pickElement() {
       :label="picking ? t('picker.picking') : t('picker.pickElement')"
     />
 
-    <div v-if="selector" class="space-y-1 rounded bg-muted p-2 text-sm">
+    <div v-if="selected" class="space-y-1 rounded bg-muted p-2 text-sm">
       <div>
         <span class="label-title">{{ t('picker.selector') }}</span>
         <code class="ml-1 break-all text-highlighted">{{ selector }}</code>
@@ -243,162 +163,29 @@ async function pickElement() {
         <span class="label-title">{{ t('picker.page') }}</span>
         <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
       </div>
-      <div v-if="role || ariaHidden">
-        <span class="label-title">{{ t('picker.role') }}:</span>
-        <code v-if="role" class="ml-1 text-highlighted">{{ role }}</code>
-        <span v-if="ariaHidden" class="ml-1 text-highlighted">{{
-          role ? `(${t('picker.ariaHidden')})` : t('picker.ariaHidden')
-        }}</span>
-      </div>
-      <div v-if="media">
-        <span class="label-title">{{ t('picker.media') }}:</span>
-        <span class="ml-1 text-highlighted">{{ mediaLabel }}</span>
-      </div>
-      <div v-if="textColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.text') }}:</span>
-        <span v-for="(color, i) in textColors" :key="`text-${i}`" class="flex items-center gap-1">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
-      </div>
-      <div v-if="iconColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.icon') }}:</span>
-        <span v-for="(color, i) in iconColors" :key="`icon-${i}`" class="flex items-center gap-1">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
-      </div>
-      <div
-        v-if="elementColor || elementGradient"
-        class="flex flex-wrap items-center gap-x-2 gap-y-1"
-      >
-        <span class="label-title">{{ t('picker.element') }}:</span>
-        <template v-if="elementGradient">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ background: gradientCss(elementGradient) }"
-            aria-hidden="true"
-          />
-          <span class="text-highlighted">{{ t('picker.gradient') }}</span>
-          <span
-            v-for="(color, i) in gradientStopsShown(elementGradient)"
-            :key="`egrad-${i}`"
-            class="flex items-center gap-1"
-          >
-            <span
-              class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-              :style="{ backgroundColor: color }"
-              aria-hidden="true"
-            />
-            <code class="text-highlighted">{{ color }}</code>
-          </span>
-          <code v-if="gradientStopsMore(elementGradient)" class="text-highlighted">
-            +{{ gradientStopsMore(elementGradient) }}
-          </code>
+      <PickedElementSection :info="selected" />
+      <template v-if="isChildPaginated">
+        <template v-for="(child, i) in pagedChildren" :key="`child-${childPage}-${i}`">
+          <USeparator class="my-2" />
+          <PickedElementSection :info="child" child />
         </template>
-        <span v-if="elementColor" class="flex items-center gap-1">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: elementColor }"
-            aria-hidden="true"
+        <div class="flex justify-center mt-4">
+          <UPagination
+            v-model:page="childPage"
+            :total="children.length"
+            :items-per-page="CHILD_PAGE_SIZE"
+            :sibling-count="0"
+            show-edges
+            size="sm"
           />
-          <code class="text-highlighted">{{ elementColor }}</code>
-        </span>
-      </div>
-      <div v-if="hasBackground" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.background') }}:</span>
-        <code v-if="background?.media" class="text-highlighted">{{ backgroundMediaLabel }}</code>
-        <span v-if="background?.blur" class="text-highlighted">{{ t('picker.blur') }}</span>
-        <template v-if="background?.gradient">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ background: gradientCss(background.gradient) }"
-            aria-hidden="true"
-          />
-          <span class="text-highlighted">{{ t('picker.gradient') }}</span>
-          <span
-            v-for="(color, i) in gradientStopsShown(background.gradient)"
-            :key="`grad-${i}`"
-            class="flex items-center gap-1"
-          >
-            <span
-              class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-              :style="{ backgroundColor: color }"
-              aria-hidden="true"
-            />
-            <code class="text-highlighted">{{ color }}</code>
-          </span>
-          <code v-if="gradientStopsMore(background.gradient)" class="text-highlighted">
-            +{{ gradientStopsMore(background.gradient) }}
-          </code>
+        </div>
+      </template>
+      <template v-else>
+        <template v-for="(child, i) in children" :key="`child-${i}`">
+          <USeparator class="my-2" />
+          <PickedElementSection :info="child" child />
         </template>
-        <span v-if="background?.color" class="flex items-center gap-1">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: background.color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ background.color }}</code>
-        </span>
-      </div>
-      <div v-if="borderColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.border') }}:</span>
-        <span
-          v-for="(color, i) in borderColors"
-          :key="`border-${i}`"
-          class="flex items-center gap-1"
-        >
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
-      </div>
-      <div v-if="ringColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.ring') }}:</span>
-        <span v-for="(color, i) in ringColors" :key="`ring-${i}`" class="flex items-center gap-1">
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
-      </div>
-      <div v-if="boxShadowColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.boxShadow') }}:</span>
-        <span
-          v-for="(color, i) in boxShadowColors"
-          :key="`shadow-${i}`"
-          class="flex items-center gap-1"
-        >
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
-      </div>
-      <div v-if="outlineColor" class="flex items-center gap-1">
-        <span class="label-title">{{ t('picker.outline') }}:</span>
-        <span
-          class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: outlineColor }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ outlineColor }}</code>
-      </div>
+      </template>
     </div>
   </div>
 </template>

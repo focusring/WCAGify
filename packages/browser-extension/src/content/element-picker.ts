@@ -1,10 +1,5 @@
 import { getUniqueSelector } from './unique-selector'
-import { getBorderColors, getElementOwnColor, getIconColors, getTextColors } from './picker/color'
-import { getElementGradient } from './picker/gradient'
-import { getBackgroundInfo } from './picker/background'
-import { getMediaInfo } from './picker/media'
-import { getAriaRole, isAccessibilityHidden } from './picker/role'
-import { getOutlineColor, getShadowColors } from './picker/shadow'
+import { collectChildSections, collectElementInfo } from './picker/collect'
 import { getPickTarget, resetInteractiveStyledCache } from './picker/pick-target'
 
 const OVERLAY_ID = 'wcagify-picker-overlay'
@@ -179,25 +174,12 @@ function handleClick(e: MouseEvent) {
 
   if (!currentTarget) return
 
-  const selector = getUniqueSelector(currentTarget)
-  const shadowColors = getShadowColors(currentTarget)
   chrome.runtime.sendMessage({
     type: 'element-picked',
-    selector,
     url: document.URL,
     pageTitle: document.title,
-    role: getAriaRole(currentTarget),
-    ariaHidden: isAccessibilityHidden(currentTarget),
-    textColors: getTextColors(currentTarget),
-    iconColors: getIconColors(currentTarget),
-    elementColor: getElementOwnColor(currentTarget),
-    elementGradient: getElementGradient(currentTarget),
-    background: getBackgroundInfo(currentTarget),
-    borderColors: getBorderColors(currentTarget),
-    ringColors: shadowColors.ring,
-    boxShadowColors: shadowColors.boxShadow,
-    outlineColor: getOutlineColor(currentTarget),
-    media: getMediaInfo(currentTarget)
+    selected: collectElementInfo(currentTarget),
+    children: collectChildSections(currentTarget)
   })
   cleanup()
 }

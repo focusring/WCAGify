@@ -36,6 +36,7 @@ export default {
     page: 'Pagina:',
     role: 'Rol',
     ariaHidden: 'verborgen voor toegankelijkheidsboom',
+    disabled: 'uitgeschakeld',
     text: 'Tekst',
     icon: 'Pictogram',
     element: 'Element',
