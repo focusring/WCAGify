@@ -142,7 +142,7 @@
   }
 
   /* Disable the screen flex layout so content reflows as block in PDF
-   * and use the full page width — `max-w-prose` would otherwise leave
+   * and use the full page width `max-w-prose` would otherwise leave
    * the right half empty. Targets the three wrapping divs the report
    * page mounts inside (UContainer → page flex wrapper → max-w-prose). */
   main > div,
@@ -390,7 +390,7 @@
     font-weight: 600;
   }
 
-  /* Hide collapsible chevron in PDF — content is always expanded */
+  /* Hide collapsible chevron in PDF content is always expanded */
   article[id^='issue-'] > button .iconify[class*='chevron-down'] {
     display: none !important;
   }
@@ -441,7 +441,7 @@
     margin-right: 4pt;
   }
 
-  /* Footer links: drop the trailing "(url)" — keeps the line compact */
+  /* Footer links: drop the trailing "(url)" keeps the line compact */
   article[id^='issue-'] dl a[href^='http']::after {
     content: none !important;
   }
@@ -455,7 +455,7 @@
     display: none !important;
   }
 
-  /* Status / level / sample badges — use subtle backgrounds for visual distinction */
+  /* Status / level / sample badges use subtle backgrounds for visual distinction */
   [data-slot='base'][class*='bg-error'] {
     background: #fee2e2 !important;
     color: #991b1b !important;
@@ -503,7 +503,7 @@
     display: none !important;
   }
 
-  /* Results indicator row — force flex so the md: breakpoint doesn't need to fire */
+  /* Results indicator row force flex so the md: breakpoint doesn't need to fire */
   .results-indicators {
     display: flex !important;
     flex-wrap: wrap;

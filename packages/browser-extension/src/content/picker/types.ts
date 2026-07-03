@@ -24,8 +24,8 @@ export interface BackgroundInfo {
   blur: boolean // a blur() in filter / backdrop-filter
 }
 
-// The full set of detected values for one element. Produced for the picked element and for each surfaced nested child,
-// so both render through the same section component. Colors are raw (rgb/rgba) here; the popup converts them to hex.
+// The full set of detected values for one element. Produced for the picked element and for each surfaced nested child, so both render through the same section component.
+// Colors are raw (rgb/rgba) here; the popup converts them to hex.
 export interface ElementInfo {
   selector: string
   role: string // computed ARIA role (display role for children), '' when none

@@ -84,8 +84,7 @@ const ARIA_ROLES = new Set([
   'treeitem'
 ])
 
-// First valid token of the explicit `role` attribute (it's a space-separated fallback list; unknown tokens are
-// skipped). '' when there is no role attribute or none of its tokens are real roles.
+// First valid token of the explicit `role` attribute (it's a space-separated fallback list; unknown tokens are skipped). '' when there is no role attribute or none of its tokens are real roles.
 function explicitRole(el: Element): string {
   const attr = el.getAttribute('role')
   if (!attr) return ''
@@ -136,14 +135,13 @@ function inputRole(input: HTMLInputElement): string {
   }
 }
 
-// header/footer map to banner/contentinfo only at the top level — scoped inside sectioning content they have no role.
+// header/footer map to banner/contentinfo only at the top level scoped inside sectioning content they have no role.
 function isScopedToSectioning(el: Element): boolean {
   return !!el.parentElement?.closest('article, aside, main, nav, section')
 }
 
-// Implicit ARIA role from the HTML-ARIA mapping. Covers the common, mostly non-contextual cases plus a few cheap
-// context checks (a[href], input/select type, header/footer scoping, li/section/form). Best-effort: deep contextual
-// rules (td/th in tables, li ancestry beyond the parent) are approximated. '' when the element has no semantic role.
+// Implicit ARIA role from the HTML-ARIA mapping. Covers the common, mostly non-contextual cases plus a few cheap context checks (a[href], input/select type, header/footer scoping, li/section/form).
+// Best-effort: deep contextual rules (td/th in tables, li ancestry beyond the parent) are approximated. '' when the element has no semantic role.
 function implicitRole(el: Element): string {
   const tag = el.localName
   switch (tag) {
@@ -240,8 +238,7 @@ function implicitRole(el: Element): string {
   }
 }
 
-// Presentational-roles conflict resolution: an explicit presentation/none role is ignored when the element is
-// focusable or carries global ARIA state/properties, so it falls back to its implicit role.
+// Presentational-roles conflict resolution: an explicit presentation/none role is ignored when the element is focusable or carries global ARIA state/properties, so it falls back to its implicit role.
 function hasPresentationalConflict(el: Element): boolean {
   if ((el instanceof HTMLElement || el instanceof SVGElement) && el.tabIndex >= 0) return true
   for (const attr of el.attributes) {
@@ -262,8 +259,8 @@ export function getAriaRole(el: Element): string {
   return resolved === 'generic' ? '' : resolved
 }
 
-// aria-hidden="true" or inert removes the element (and its subtree) from the accessibility tree. Reported as a flag so
-// the panel can warn that a role, if present, isn't actually exposed to assistive tech.
+// aria-hidden="true" or inert removes the element (and its subtree) from the accessibility tree.
+// Reported as a flag so the panel can warn that a role, if present, isn't actually exposed to assistive tech.
 export function isAccessibilityHidden(el: Element): boolean {
   return !!el.closest('[aria-hidden="true"], [inert]')
 }

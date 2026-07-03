@@ -11,11 +11,9 @@ function getColorCtx(): CanvasRenderingContext2D | null {
   return colorCtx
 }
 
-// getComputedStyle emits colors almost exclusively as rgb()/rgba(), so a direct numeric parse resolves the common case
-// without the canvas getImageData readback below. Covers legacy comma syntax and modern space/slash syntax with integer
-// channels and a numeric-or-percentage alpha; returns null (→ canvas) for hex, named, hsl, oklch, color(), percentage
-// channels and anything malformed. Channels stay exact here, so semi-transparent colors avoid the small
-// premultiplied-rounding drift the canvas path introduces.
+// getComputedStyle emits colors almost exclusively as rgb()/rgba(), so a direct numeric parse handles the common case without the canvas readback below.
+// Covers comma and space/slash syntax with integer channels and numeric/percentage alpha; returns null (→ canvas) for hex, named, hsl, oklch, color(), percentage channels, or anything malformed.
+// Exact channels here also spare semi-transparent colors the canvas path's premultiplied-rounding drift.
 const RGB_FUNC = /^rgba?\(([^)]+)\)$/i
 function fastParseRgb(color: string): Rgba | null {
   const m = RGB_FUNC.exec(color.trim())
@@ -28,7 +26,7 @@ function fastParseRgb(color: string): Rgba | null {
   const rgb: number[] = []
   for (let i = 0; i < 3; i++) {
     const channel = parts[i]!
-    if (channel.includes('%')) return null // percentage channels are rare — defer to canvas
+    if (channel.includes('%')) return null // percentage channels are rare defer to canvas
     const n = Number(channel)
     if (!Number.isFinite(n)) return null
     rgb.push(Math.max(0, Math.min(255, Math.round(n))))
@@ -44,8 +42,7 @@ function fastParseRgb(color: string): Rgba | null {
 }
 
 // Resolve a CSS color string to rgba, or null for non-color tokens (e.g. "45deg", "to right" from a gradient).
-// Tries the rgb()/rgba() fast path first; otherwise resolves via canvas fillStyle, which keeps its previous value on an
-// unparseable input — two sentinels distinguish that from a real color.
+// Tries the rgb() fast path, else canvas fillStyle which keeps its previous value on bad input; two sentinels detect that.
 export function tryParseColor(color: string): Rgba | null {
   if (!color || color === 'none') return null
   const fast = fastParseRgb(color)
@@ -97,14 +94,14 @@ export function hasCssMask(style: CSSStyleDeclaration): boolean {
   return mask !== '' && mask !== 'none'
 }
 
-// background-clip: text (or -webkit-) — the background paints the element's text glyphs, not a surface.
+// background-clip: text (or -webkit-) the background paints the element's text glyphs, not a surface.
 export function hasTextClip(style: CSSStyleDeclaration): boolean {
   const clip =
     style.getPropertyValue('background-clip') || style.getPropertyValue('-webkit-background-clip')
   return clip.includes('text')
 }
 
-// Fraction of el's box covered by child's box — distinguishes a full surface from a small icon/text span.
+// Fraction of el's box covered by child's box distinguishes a full surface from a small icon/text span.
 function boxCoverage(child: Element, elRect: DOMRect): number {
   const c = child.getBoundingClientRect()
   const w = Math.min(elRect.right, c.right) - Math.max(elRect.left, c.left)
@@ -113,8 +110,7 @@ function boxCoverage(child: Element, elRect: DOMRect): number {
   return (w * h) / (elRect.width * elRect.height)
 }
 
-// For a transparent wrapper (e.g. <a> around a styled <button>), runs extract on the first descendant covering ≥90%
-// of el's box — document order yields the outermost filling surface first. Skips CSS-mask icons.
+// For a transparent wrapper (e.g. <a> around a styled <button>), runs extract on the first descendant covering ≥90% of el's box document order yields the outermost filling surface first. Skips CSS-mask icons.
 export function findFillingDescendant<T>(
   el: Element,
   extract: (childStyle: CSSStyleDeclaration) => T | null
@@ -131,10 +127,9 @@ export function findFillingDescendant<T>(
   return null
 }
 
-// One document-order pass over el and its descendants that reads each element's computed style once, so the icon-mask
-// and clip-text-fill detectors don't each walk the subtree separately. Collects the background-color of every CSS-mask
-// element (icon paint) and the background-image of every background-clip:text element (text fill — the caller resolves
-// these to a gradient). el is visited first, reusing elStyle.
+// One document-order pass over el + descendants, reading each computed style once so the icon-mask and clip-text-fill
+// detectors don't each walk the subtree. Collects background-color of every CSS-mask element (icon paint) and
+// background-image of every background-clip:text element (text fill; caller resolves to a gradient). el visited first.
 export interface DescendantScan {
   maskBackgroundColors: string[]
   clipTextBackgroundImages: string[]
@@ -158,15 +153,14 @@ export function scanDescendants(
 
 export const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'
 
-// The reference a <use>/gradient/<image> carries via href, falling back to legacy xlink:href. Raw value ('#id',
-// 'sprite.svg#id', a data:/http URL…); '' when neither attribute is present. Callers strip the leading '#' as needed.
+// The reference a <use>/gradient/<image> carries via href, falling back to legacy xlink:href.
+// Raw value ('#id', 'sprite.svg#id', a URL…), '' when absent. Callers strip the leading '#' as needed.
 export function getSvgHref(el: Element): string {
   return el.getAttribute('href') || el.getAttribute('xlink:href') || ''
 }
 
-// The SVG roots to inspect for el's paint: el itself when it's an SVG element, plus any descendant <svg>. With
-// excludeImage, an <image> root is skipped — it embeds a raster (reported by getMediaInfo), not styleable shapes, so
-// its default-black computed fill would otherwise surface as a spurious icon color.
+// SVG roots to inspect for el's paint: el itself if it's an SVG element, plus any descendant <svg>.
+// With excludeImage, an <image> root is skipped it embeds a raster (see getMediaInfo), so its default-black fill isn't read as an icon color.
 export function collectSvgRoots(el: Element, options?: { excludeImage?: boolean }): SVGElement[] {
   const svgs: SVGElement[] = []
   if (el instanceof SVGElement && !(options?.excludeImage && el instanceof SVGImageElement)) {

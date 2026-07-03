@@ -19,8 +19,8 @@ function getFillingDescendantBgLayer(el: Element): Rgba | null {
   })
 }
 
-// The element's own background, or for a transparent wrapper the descendant that paints its surface. CSS-mask icons
-// and background-clip:text return '' — their background paints the icon/text, not a surface (clip:text gradients go to getElementGradient).
+// The element's own background, or for a transparent wrapper the descendant that paints its surface.
+// CSS-mask icons and background-clip:text return '' their background paints the icon/text, not a surface (clip:text gradients go to getElementGradient).
 export function getElementOwnColor(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el)
@@ -94,7 +94,7 @@ export function getTextColors(el: Element): string[] {
     if (parent) addVisibleColor(colors, getComputedStyle(parent).color)
   }
 
-  // Form fields don't expose value/placeholder as DOM text nodes — check explicitly.
+  // Form fields don't expose value/placeholder as DOM text nodes check explicitly.
   const fields: Element[] = []
   if (el.matches(FIELD_SELECTOR)) fields.push(el)
   for (const f of el.querySelectorAll(FIELD_SELECTOR)) fields.push(f)
@@ -124,8 +124,7 @@ function useSymbolId(use: Element): string {
   return href.startsWith('#') ? href.slice(1) : ''
 }
 
-// A <use> paints the symbol's shapes in a cloned shadow tree getComputedStyle(use) can't see (its own fill reads as initial black), so resolve the symbol's shapes from raw paint attributes:
-// literal colors as-is, currentColor/unset (the sprite norm) as the `color` inherited at the <use> site — also the fallback for an external/missing symbol.
+// A <use> paints the symbol's shapes in a cloned shadow tree getComputedStyle(use) can't see (its own fill reads as initial black), so resolve the symbol's shapes from raw paint attributes: literal colors as-is, currentColor/unset (the sprite norm) as the `color` inherited at the <use> site also the fallback for an external/missing symbol.
 function getUseColors(use: Element): string[] {
   const inherited = getComputedStyle(use).color // what the symbol's currentColor fills resolve to here
   const symbol = (() => {
@@ -155,7 +154,7 @@ function getUseColors(use: Element): string[] {
 }
 
 // Every visible fill/stroke color across an SVG's shape descendants, so multi-color icons surface all their colors (computed style already includes paint inherited from <svg>/<g>).
-// Falls back to the root's own paint when no shape yields a color — covers icons whose color sits on the <svg> root, e.g. Lucide stroke="currentColor".
+// Falls back to the root's own paint when no shape yields a color covers icons whose color sits on the <svg> root, e.g. Lucide stroke="currentColor".
 function getSvgColors(svg: SVGElement): string[] {
   const colors = new Set<string>()
   for (const shape of svg.querySelectorAll(SVG_SHAPE_SELECTOR)) {
@@ -184,8 +183,8 @@ function getSvgColors(svg: SVGElement): string[] {
   return [...colors]
 }
 
-// Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon). The mask
-// colors (el + descendants, so icons inside a picked button/link surface) come from the shared scanDescendants pass.
+// Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon).
+// The mask colors (el + descendants, so icons inside a picked button/link surface) come from the shared scanDescendants pass.
 export function getIconColors(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el),
@@ -202,9 +201,8 @@ export function getIconColors(
   return [...colors]
 }
 
-// Visible border colors from one computed style (an element's own or a pseudo-element's) into `colors`. A side counts
-// when width > 0, style is not none/hidden, and alpha > 0. Reads computed values, so CSS variables and the full
-// cascade are already resolved (e.g. Framer's `border-color: var(--border-color)` → its token/fallback color).
+// Visible border colors from one computed style (element's own or a pseudo-element's) into `colors`.
+// A side counts when width > 0, style is not none/hidden, alpha > 0. Computed values, so CSS variables are resolved (e.g. Framer's `border-color: var(--border-color)`).
 function collectBorderColors(style: CSSStyleDeclaration, colors: Set<string>): void {
   const sides = ['top', 'right', 'bottom', 'left'] as const
   for (const side of sides) {
@@ -217,9 +215,8 @@ function collectBorderColors(style: CSSStyleDeclaration, colors: Set<string>): v
   }
 }
 
-// Unique visible border colors on el and its ::before/::after pseudo-elements. Page builders like Framer paint the
-// "border" on a generated ::after (position:absolute; inset:0; border-color: var(--border-color)) rather than on the
-// element itself, so a border DevTools shows would be missed if we only read the element's own computed style.
+// Unique visible border colors on el and its ::before/::after pseudo-elements.
+// Page builders like Framer paint the "border" on a generated ::after (absolute; inset:0) rather than the element itself, so reading only el's own style would miss a border DevTools shows.
 export function getBorderColors(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el)

@@ -30,13 +30,20 @@ const backgroundMediaLabel = computed(() => {
   return m.format ? `${type} ${m.format}` : `${type} (${t('picker.unknown')})`
 })
 
-// Gradient stops are truncated to the first two with a "+N" indicator, keeping the row short for many-stop gradients.
-const gradientStopsShown = (g?: GradientInfo | null) => g?.colors.slice(0, 2) ?? []
-const gradientStopsMore = (g?: GradientInfo | null) => Math.max((g?.colors.length ?? 0) - 2, 0)
+// Easier gradient type from the detected CSS function name: "conic", "linear", "repeating linear", …
+const gradientTypeLabel = (g?: GradientInfo | null) => g?.type.replace('-', ' ') ?? ''
+
+// Stop colors show as swatches, capped at the first GRADIENT_STOPS_SHOWN; the rest of the same gradient's stops are summarised as "+N".
+// A cap of 3 keeps the row readable while showing every stop of common 2- and 3-stop gradients, so "+N" only appears at 4+ stops.
+const GRADIENT_STOPS_SHOWN = 3
+const gradientStopsShown = (g?: GradientInfo | null) =>
+  g?.colors.slice(0, GRADIENT_STOPS_SHOWN) ?? []
+const gradientStopsMore = (g?: GradientInfo | null) =>
+  Math.max((g?.colors.length ?? 0) - GRADIENT_STOPS_SHOWN, 0)
 // A preview swatch rendered with the actual gradient (synthesised direction, since stops carry no angle/position).
 const gradientCss = (g?: GradientInfo | null) => {
   if (!g) return ''
-  const direction = g.type === 'linear' ? '90deg, ' : ''
+  const direction = g.type.endsWith('linear') ? '90deg, ' : ''
   return `${g.type}-gradient(${direction}${g.colors.join(', ')})`
 }
 </script>
@@ -98,7 +105,9 @@ const gradientCss = (g?: GradientInfo | null) => {
           :style="{ background: gradientCss(info.elementGradient) }"
           aria-hidden="true"
         />
-        <span class="text-highlighted">{{ t('picker.gradient') }}</span>
+        <span class="text-highlighted">
+          {{ t('picker.gradient') }} {{ gradientTypeLabel(info.elementGradient) }}
+        </span>
         <span
           v-for="(color, i) in gradientStopsShown(info.elementGradient)"
           :key="`egrad-${i}`"
@@ -188,7 +197,9 @@ const gradientCss = (g?: GradientInfo | null) => {
           :style="{ background: gradientCss(info.background.gradient) }"
           aria-hidden="true"
         />
-        <span class="text-highlighted">{{ t('picker.gradient') }}</span>
+        <span class="text-highlighted">
+          {{ t('picker.gradient') }} {{ gradientTypeLabel(info.background.gradient) }}
+        </span>
         <span
           v-for="(color, i) in gradientStopsShown(info.background.gradient)"
           :key="`grad-${i}`"

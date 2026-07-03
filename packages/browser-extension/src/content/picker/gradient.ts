@@ -29,12 +29,13 @@ function extractColorFromStop(stop: string): string {
   return stop.split(/\s+/)[0]!
 }
 
-// Matches any CSS gradient function (linear/radial/conic + repeating-* variants) anywhere in a value — unanchored,
-// so it's found even when layered after other background-image values like url(...).
-const GRADIENT_FUNC = /(?:repeating-)?(linear|radial|conic)-gradient\(/i
+// Matches any CSS gradient function (linear/radial/conic + repeating-* variants) anywhere in a value unanchored, so it's
+// found even when layered after other background-image values like url(...). Capture group 1 is the full type name
+// ("conic", "repeating-linear", …) so the display can label the specific gradient kind.
+const GRADIENT_FUNC = /((?:repeating-)?(?:linear|radial|conic))-gradient\(/i
 
-// First CSS gradient in a value → its type and the raw content between its parentheses (balanced, so nested
-// rgb()/calc() survive). Handles comma-separated background-image layers. null when there is no gradient.
+// First CSS gradient in a value → its type and the raw content between its parentheses (balanced, so nested rgb()/calc() survive).
+// Handles comma-separated background-image layers. null when there is no gradient.
 function extractGradient(value: string): { type: string; body: string } | null {
   const m = GRADIENT_FUNC.exec(value)
   if (!m) return null
@@ -128,10 +129,8 @@ function getFillingDescendantGradient(el: Element): GradientInfo | null {
   return findFillingDescendant(el, (childStyle) => parseGradient(childStyle.backgroundImage))
 }
 
-// A gradient on the element's own appearance, not the surface behind it: a text fill (background-clip: text), an SVG
-// fill/stroke gradient reference, or its own (or a filling descendant's) background-image gradient. The clip-text
-// candidates (el + descendants, document order) come from the shared scanDescendants pass; the first that resolves to
-// a gradient wins.
+// A gradient on the element's own appearance, not the surface behind it: a text fill (background-clip: text), an SVG fill/stroke gradient reference, or its own (or a filling descendant's) background-image gradient.
+// Clip-text candidates (el + descendants) come from the shared scanDescendants pass; first to resolve wins.
 export function getElementGradient(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el),

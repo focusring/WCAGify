@@ -25,7 +25,8 @@ function hasBlur(style: CSSStyleDeclaration): boolean {
   return /\bblur\(/i.test(style.filter) || /\bblur\(/i.test(backdrop)
 }
 
-// CSS background-image can't reference a <video>; "background videos" are absolutely/fixed-positioned <video>s layered behind content. Heuristic: a positioned <video> that doesn't contain el, covers el's centre, and is at least as large as el. Best-effort — won't catch every layering technique.
+// CSS background-image can't reference a <video>; "background videos" are absolutely/fixed-positioned <video>s layered behind content.
+// Heuristic: a positioned <video> that doesn't contain el, covers el's centre, and is at least as large as el. Best-effort won't catch every layering technique.
 function findBackgroundVideo(el: Element): MediaInfo | null {
   const r = el.getBoundingClientRect()
   if (r.width === 0 || r.height === 0) return null
@@ -43,9 +44,8 @@ function findBackgroundVideo(el: Element): MediaInfo | null {
   return null
 }
 
-// First solid (non-transparent) background-color walking from `start` upward to <html> (inclusive), skipping CSS-mask
-// elements (their background paints an icon, not a surface). null when everything up the chain is transparent. Shared
-// canonical walker for "the effective surface an element sits on" (see collect.ts) and getBackgroundInfo's color rule.
+// First solid (non-transparent) background-color from `start` up to <html> (inclusive), skipping CSS-mask elements (background paints an icon, not a surface).
+// null when all transparent. Shared "surface an element sits on" walker.
 export function firstSolidBackgroundColor(start: Element | null): Rgba | null {
   for (let current = start; current; current = current.parentElement) {
     const style = getComputedStyle(current)
@@ -58,8 +58,7 @@ export function firstSolidBackgroundColor(start: Element | null): Rgba | null {
   return null
 }
 
-// Structured description of the first visible background behind el. Walks parent → <html>, recording the top most background image/gradient and the first solid color behind it, then stops (that color backs everything below).
-// Falls back to a layered background <video> when there's no CSS image/gradient. Skips CSS-mask elements.
+// Structured description of the first visible background behind el: walks parent → <html>, recording the topmost background image/gradient and first solid color behind it (then stops), or a layered <video>. Skips CSS-mask elements.
 export function getBackgroundInfo(
   el: Element,
   elStyle: CSSStyleDeclaration = getComputedStyle(el)

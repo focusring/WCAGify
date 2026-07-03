@@ -18,7 +18,7 @@ import {
 
 const PROJECT_NAME = 'pdf-test'
 
-// PDF generation is delegated to an external WeasyPrint service — the same one
+// PDF generation is delegated to an external WeasyPrint service the same one
 // production uses (the Railway URL baked into packages/wcagify/nuxt.config.ts,
 // overridable via NUXT_WEASYPRINT_URL). These render tests therefore exercise the
 // real renderer end to end; a pre-flight probe + warm-up + retry absorb the
@@ -27,7 +27,7 @@ const DEFAULT_WEASYPRINT_URL = 'https://magnificent-encouragement-production.up.
 const WEASYPRINT_URL = process.env.NUXT_WEASYPRINT_URL ?? DEFAULT_WEASYPRINT_URL
 const isCI = Boolean(process.env.CI)
 
-// PDF/UA accessibility is validated with Horn (https://horn.report) — focusring's
+// PDF/UA accessibility is validated with Horn (https://horn.report) focusring's
 // own Matterhorn-Protocol checker. CI installs the `horn` CLI before the e2e job;
 // locally the a11y test skips unless the binary is on PATH (or HORN_BIN points at
 // it). To run it locally: HORN_BIN=/path/to/horn pnpm test:e2e
@@ -74,7 +74,7 @@ async function warmUpWeasyprint(url: string): Promise<void> {
       signal: AbortSignal.timeout(60_000)
     })
   } catch {
-    // Best-effort — if the warm-up itself fails, the real tests will surface it.
+    // Best-effort if the warm-up itself fails, the real tests will surface it.
   }
 }
 
@@ -90,7 +90,7 @@ function assertLooksLikePdf(bytes: Uint8Array): void {
   // Trailer: a complete PDF ends with the '%%EOF' marker (allow trailing whitespace).
   const tail = buf.subarray(Math.max(0, buf.length - 1024)).toString('latin1')
   expect(tail).toContain('%%EOF')
-  // A real rendered report is many KB — guard against an empty/placeholder body.
+  // A real rendered report is many KB guard against an empty/placeholder body.
   expect(buf.length).toBeGreaterThan(1000)
 }
 
@@ -171,8 +171,7 @@ describe('PDF E2E', () => {
     prevWeasyEnv = process.env.NUXT_WEASYPRINT_URL
     process.env.NUXT_WEASYPRINT_URL = WEASYPRINT_URL
 
-    // A production build (not `nuxt dev`) is required — WeasyPrint cannot render
-    // the dev server's unminified CSS. See startPreviewServer.
+    // A production build (not `nuxt dev`) is required. WeasyPrint cannot render the dev server's unminified CSS. See startPreviewServer.
     const server = await startPreviewServer(projectPath, 3105)
     devServerProcess = server.process
     baseUrl = server.url
@@ -234,8 +233,7 @@ describe('PDF E2E', () => {
           await page.goto(`${baseUrl}/reports/${reportSlug}`, { waitUntil: 'networkidle' })
           await page.waitForSelector('#executive-summary', { timeout: 30_000 })
 
-          // Register the download listener BEFORE clicking — the event can fire
-          // before click() resolves.
+          // Register the download listener BEFORE clicking the event can fire before click() resolves.
           const [download] = await Promise.all([
             page.waitForEvent('download', { timeout: 90_000 }),
             page.getByRole('button', { name: 'Download PDF' }).click()

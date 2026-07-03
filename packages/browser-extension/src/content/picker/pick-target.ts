@@ -1,6 +1,6 @@
 import { hasCssMask, splitOuterCommas } from './css-utils'
 
-// True if el has its own text/media/mask, or wraps an icon. <a>/<button> are excluded from the descendant check — they're interactive targets, not icon containers.
+// True if el has its own text/media/mask, or wraps an icon. <a>/<button> are excluded from the descendant check they're interactive targets, not icon containers.
 const MEDIA_SELECTOR = 'img, svg, i, picture, canvas, video, audio'
 function hasOwnVisibleContent(el: Element): boolean {
   if (el.matches(MEDIA_SELECTOR)) return true
@@ -93,7 +93,8 @@ function hasInteractiveStyling(el: Element): boolean {
   return interactiveStyledCache.has(el)
 }
 
-// Resolve a picker hit to its "interactive unit". Keep content-bearing hits (text/icon). Otherwise prefer the outermost <a>/<button>/custom-element with hover/focus styling; fall back to the outermost <a>/<button>, optionally promoted one level to a custom-element wrapper.
+// Resolve a picker hit to its "interactive unit". Keep content-bearing hits (text/icon).
+// Otherwise prefer the outermost <a>/<button>/custom-element with hover/focus styling; fall back to the outermost <a>/<button>, optionally promoted one level to a custom-element wrapper.
 export function getPickTarget(el: Element): Element {
   if (hasOwnVisibleContent(el)) return el
 

@@ -117,7 +117,7 @@ onUnmounted(() => {
 })
 
 async function pickElement() {
-  // Side panel lives in the same window — find the active page tab directly
+  // Side panel lives in the same window find the active page tab directly
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
   const tab = tabs.find(
     (item) => item.url && !item.url.startsWith('chrome') && !item.url.startsWith('extension')

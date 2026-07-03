@@ -8,8 +8,7 @@ interface ShadowLayer {
   spread: number
 }
 
-// One computed box-shadow layer → its color and four radii (px). Computed form is color, then offset-x/y, blur,
-// spread, with an optional `inset`. Returns null if no color resolves.
+// One computed box-shadow layer → its color and four radii (px). Computed form is color, then offset-x/y, blur, spread, with an optional `inset`. Returns null if no color resolves.
 function parseShadowLayer(layer: string): ShadowLayer | null {
   const body = layer.replace(/\binset\b/i, '').trim()
   const colorMatch =
@@ -31,13 +30,13 @@ function parseShadowLayer(layer: string): ShadowLayer | null {
   }
 }
 
-// Ring geometry: no offset, no blur, positive spread (`0 0 0 Npx color`) — how Tailwind ring/ring-offset utilities and native focus rings render. Drop shadows offset and/or blur.
+// Ring geometry: no offset, no blur, positive spread (`0 0 0 Npx color`) how Tailwind ring/ring-offset utilities and native focus rings render. Drop shadows offset and/or blur.
 function isRingGeometry(s: ShadowLayer): boolean {
   return s.offsetX === 0 && s.offsetY === 0 && s.blur === 0 && s.spread > 0
 }
 
-// Splits computed box-shadow into ring layers and drop-shadow layers. A layer is a ring by its geometry, or when its
-// color matches --tw-ring-color (catches borderline-geometry Tailwind rings). Both dedupe by color and skip transparent placeholders (Tailwind composes box-shadow from `0 0 #0000` sentinels).
+// Splits computed box-shadow into ring layers and drop-shadow layers. A layer is a ring by its geometry, or when its color matches --tw-ring-color (catches borderline-geometry Tailwind rings).
+// Both dedupe by color and skip transparent placeholders (Tailwind composes box-shadow from `0 0 #0000` sentinels).
 export function getShadowColors(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el)
