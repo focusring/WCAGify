@@ -57,6 +57,8 @@ const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 const selectedTabId = ref<number | undefined>()
 const childPage = ref(1)
+// Whether the selected element has a meaningful parent to step up to. Computed content-side (needs the live DOM to cross shadow/iframe boundaries) and sent with each element-picked message.
+const hasParent = ref(false)
 
 const selector = computed(() => selected.value?.selector ?? '')
 // Stacking every child section gets unreadable past a handful, so beyond this many they're paginated in groups.
@@ -76,14 +78,17 @@ function onMessage(message: {
   pageTitle?: string
   selected?: ElementInfo
   children?: ElementInfo[]
+  hasParent?: boolean
 }) {
   if (message.type === 'element-picked') {
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
     selected.value = message.selected ? mapColors(message.selected) : null
     children.value = (message.children ?? []).map(mapColors)
+    hasParent.value = message.hasParent ?? false
     childPage.value = 1
-    selectedTabId.value = pickerTabId.value
+    // On a fresh pick pickerTabId holds the source tab; on a parent step it's undefined, so keep the tab the current selection came from (the "select parent" button messages that same tab).
+    selectedTabId.value = pickerTabId.value ?? selectedTabId.value
     picking.value = false
     pickerTabId.value = undefined
   }
@@ -100,6 +105,13 @@ function cancelPicker() {
     chrome.tabs.sendMessage(pickerTabId.value, { type: 'cancel-picker' }).catch(() => {})
     pickerTabId.value = undefined
   }
+}
+
+// Asks the content script to step the selection up to the parent and re-run detection.
+// The result returns as an element-picked message, replacing the panel's values in place.
+function selectParent() {
+  if (selectedTabId.value === undefined) return
+  chrome.tabs.sendMessage(selectedTabId.value, { type: 'select-parent' }).catch(() => {})
 }
 
 function onKeyDown(e: KeyboardEvent) {
@@ -131,6 +143,7 @@ async function pickElement() {
   pageTitle.value = ''
   selected.value = null
   children.value = []
+  hasParent.value = false
 
   chrome.tabs.sendMessage(tab.id, { type: 'start-picker' }).catch(() => {
     picking.value = false
@@ -151,9 +164,21 @@ async function pickElement() {
     />
 
     <div v-if="selected" class="space-y-1 rounded bg-muted p-2 text-sm">
-      <div>
-        <span class="label-title">{{ t('picker.selector') }}</span>
-        <code class="ml-1 break-all text-highlighted">{{ selector }}</code>
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <span class="label-title">{{ t('picker.selector') }}</span>
+          <code class="ml-1 break-all text-highlighted">{{ selector }}</code>
+        </div>
+        <UButton
+          @click="selectParent"
+          :disabled="!hasParent"
+          icon="i-lucide-arrow-up"
+          size="xs"
+          color="neutral"
+          variant="outline"
+          :label="t('picker.selectParent')"
+          :ui="{ base: 'shrink-0' }"
+        />
       </div>
       <div>
         <span class="label-title">{{ t('picker.url') }}</span>

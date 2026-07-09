@@ -31,6 +31,7 @@ export default {
   picker: {
     pickElement: 'Element selecteren',
     picking: 'Selecteren... (klik op een element op de pagina)',
+    selectParent: 'Bovenliggend',
     selector: 'Selector:',
     url: 'URL:',
     page: 'Pagina:',

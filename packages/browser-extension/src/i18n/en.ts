@@ -31,6 +31,7 @@ export default {
   picker: {
     pickElement: 'Pick Element',
     picking: 'Picking... (click an element on the page)',
+    selectParent: 'Parent',
     selector: 'Selector:',
     url: 'URL:',
     page: 'Page:',

@@ -1,5 +1,6 @@
 import { getUniqueSelector } from './unique-selector'
 import { collectChildSections, collectElementInfo } from './picker/collect'
+import { getNavigableParent } from './picker/navigate'
 import { getPickTarget, recoverSkippedTarget } from './picker/pick-target'
 
 const OVERLAY_ID = 'wcagify-picker-overlay'
@@ -21,6 +22,8 @@ let infoPanel: HTMLElement | undefined = undefined
 let currentTarget: Element | undefined = undefined
 let pendingMove: { x: number; y: number } | undefined = undefined
 let moveRaf = 0
+// The last element sent to the panel. Persists after the overlay is torn down (not cleared by cleanup()) so the "select parent" button can keep walking up from it.
+let selectedElement: Element | undefined = undefined
 
 function injectStyles() {
   if (document.getElementById('wcagify-picker-styles')) return
@@ -159,8 +162,7 @@ function handleMouseMove(e: MouseEvent) {
   if (!moveRaf) moveRaf = requestAnimationFrame(processMove)
 }
 
-// Resolve at most once per animation frame off the latest cursor position: mousemove fires far
-// faster than needed, and each resolve runs a hit test plus a bounded subtree scan.
+// Resolve at most once per animation frame off the latest cursor position mousemove fires faster than needed, and each resolve runs a hit test plus a bounded subtree scan.
 function processMove() {
   moveRaf = 0
   if (!activeOverlay || !pendingMove) return
@@ -180,13 +182,26 @@ function processMove() {
     return
   }
 
-  // Recover a pointer-events:none control (e.g. a disabled button) the hit test skipped, then
-  // resolve to its interactive unit.
+  // Recover a pointer-events:none control (e.g. a disabled button) the hit test skipped, then resolve to its interactive unit.
   const resolved = getPickTarget(recoverSkippedTarget(hit, x, y))
   currentTarget = resolved
   highlightElement(resolved)
   const selector = getUniqueSelector(resolved)
   updateInfoPanel(Array.isArray(selector) ? selector.join(' > ') : selector)
+}
+
+// Runs the full detection suite on el and pushes results to the panel. Shared by picking and the "select parent" button (same code path).
+// hasParent tells the panel whether the button can move up another level.
+function sendElementPicked(el: Element) {
+  selectedElement = el
+  chrome.runtime.sendMessage({
+    type: 'element-picked',
+    url: document.URL,
+    pageTitle: document.title,
+    selected: collectElementInfo(el),
+    children: collectChildSections(el),
+    hasParent: getNavigableParent(el) !== null
+  })
 }
 
 function handleClick(e: MouseEvent) {
@@ -195,14 +210,17 @@ function handleClick(e: MouseEvent) {
 
   if (!currentTarget) return
 
-  chrome.runtime.sendMessage({
-    type: 'element-picked',
-    url: document.URL,
-    pageTitle: document.title,
-    selected: collectElementInfo(currentTarget),
-    children: collectChildSections(currentTarget)
-  })
+  sendElementPicked(currentTarget)
   cleanup()
+}
+
+// Moves the selection up one level (parentElement, or across a shadow/iframe boundary) and re-runs detection on the parent, as if the user had picked it directly.
+// No-op when there's nowhere to go.
+function selectParent() {
+  if (!selectedElement) return
+  const parent = getNavigableParent(selectedElement)
+  if (!parent) return
+  sendElementPicked(parent)
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -241,5 +259,8 @@ chrome.runtime.onMessage.addListener((message: { type: string }) => {
   }
   if (message.type === 'cancel-picker') {
     cleanup()
+  }
+  if (message.type === 'select-parent') {
+    selectParent()
   }
 })
