@@ -50,6 +50,33 @@ describe('getPickTarget', () => {
     const inner = document.getElementById('inner')!
     expect(getPickTarget(inner)).toBe(inner)
   })
+
+  it('promotes an <input> to its wrapper when a sibling holds an <svg> icon adornment', () => {
+    document.body.innerHTML =
+      '<div id="wrap"><input id="field" /><span id="icon"><svg></svg></span></div>'
+    const field = document.getElementById('field')!
+    expect(getPickTarget(field)).toBe(document.getElementById('wrap'))
+  })
+
+  it('promotes an <input> to its wrapper when a sibling holds a CSS-mask icon (Iconify/Lucide)', () => {
+    document.body.innerHTML =
+      '<div id="wrap"><input id="field" /><span id="icon" style="mask-image:url(#i)"></span></div>'
+    const field = document.getElementById('field')!
+    expect(getPickTarget(field)).toBe(document.getElementById('wrap'))
+  })
+
+  it('does not promote a plain <input> with no icon sibling', () => {
+    document.body.innerHTML = '<div id="wrap"><input id="field" /></div>'
+    const field = document.getElementById('field')!
+    expect(getPickTarget(field)).toBe(field)
+  })
+
+  it('does not promote an <input> when the icon sibling is a separately-selectable button', () => {
+    document.body.innerHTML =
+      '<form id="form"><input id="field" /><button id="btn"><svg></svg></button></form>'
+    const field = document.getElementById('field')!
+    expect(getPickTarget(field)).toBe(field)
+  })
 })
 
 describe('recoverSkippedTarget', () => {
