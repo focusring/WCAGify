@@ -1,6 +1,6 @@
 import { getUniqueSelector } from './unique-selector'
 import { collectChildSections, collectElementInfo } from './picker/collect'
-import { getPickTarget, resetInteractiveStyledCache } from './picker/pick-target'
+import { getPickTarget, recoverSkippedTarget } from './picker/pick-target'
 
 const OVERLAY_ID = 'wcagify-picker-overlay'
 const PANEL_ID = 'wcagify-picker-panel'
@@ -19,6 +19,8 @@ let pickerLocale: 'en' | 'nl' = 'en'
 let activeOverlay: HTMLElement | undefined = undefined
 let infoPanel: HTMLElement | undefined = undefined
 let currentTarget: Element | undefined = undefined
+let pendingMove: { x: number; y: number } | undefined = undefined
+let moveRaf = 0
 
 function injectStyles() {
   if (document.getElementById('wcagify-picker-styles')) return
@@ -137,6 +139,11 @@ function clearHighlight() {
 
 function cleanup() {
   clearHighlight()
+  if (moveRaf) {
+    cancelAnimationFrame(moveRaf)
+    moveRaf = 0
+  }
+  pendingMove = undefined
   activeOverlay?.removeEventListener('mousemove', handleMouseMove)
   activeOverlay?.removeEventListener('click', handleClick)
   activeOverlay?.remove()
@@ -148,24 +155,38 @@ function cleanup() {
 }
 
 function handleMouseMove(e: MouseEvent) {
-  if (!activeOverlay) return
+  pendingMove = { x: e.clientX, y: e.clientY }
+  if (!moveRaf) moveRaf = requestAnimationFrame(processMove)
+}
+
+// Resolve at most once per animation frame off the latest cursor position: mousemove fires far
+// faster than needed, and each resolve runs a hit test plus a bounded subtree scan.
+function processMove() {
+  moveRaf = 0
+  if (!activeOverlay || !pendingMove) return
+  const { x, y } = pendingMove
+
   activeOverlay.style.pointerEvents = 'none'
-  const target = document.elementFromPoint(e.clientX, e.clientY)
+  const hit = document.elementFromPoint(x, y)
   activeOverlay.style.pointerEvents = 'auto'
 
   if (
-    target &&
-    target.id !== OVERLAY_ID &&
-    target.id !== PANEL_ID &&
-    !target.closest(`#${PANEL_ID}`) &&
-    !target.classList.contains('wcagify-highlight')
+    !hit ||
+    hit.id === OVERLAY_ID ||
+    hit.id === PANEL_ID ||
+    hit.closest(`#${PANEL_ID}`) ||
+    hit.classList.contains('wcagify-highlight')
   ) {
-    const resolved = getPickTarget(target)
-    currentTarget = resolved
-    highlightElement(resolved)
-    const selector = getUniqueSelector(resolved)
-    updateInfoPanel(Array.isArray(selector) ? selector.join(' > ') : selector)
+    return
   }
+
+  // Recover a pointer-events:none control (e.g. a disabled button) the hit test skipped, then
+  // resolve to its interactive unit.
+  const resolved = getPickTarget(recoverSkippedTarget(hit, x, y))
+  currentTarget = resolved
+  highlightElement(resolved)
+  const selector = getUniqueSelector(resolved)
+  updateInfoPanel(Array.isArray(selector) ? selector.join(' > ') : selector)
 }
 
 function handleClick(e: MouseEvent) {
@@ -193,7 +214,6 @@ function handleKeyDown(e: KeyboardEvent) {
 
 async function startPicker() {
   cleanup()
-  resetInteractiveStyledCache()
   injectStyles()
 
   try {
