@@ -33,16 +33,16 @@ catalogs:
     '@nuxt/a11y': 1.0.0-alpha.1
     '@nuxt/content': ^3.14.0
     '@nuxt/icon': ^2.2.3
-    '@nuxt/kit': ^4.4.7
+    '@nuxt/kit': ^4.4.8
     '@nuxt/ui': ^4.8.1
     '@nuxtjs/i18n': ^10.4.0
     '@vueuse/core': ^14.3.0
-    nuxt: ^4.4.7
+    nuxt: ^4.4.8
     nuxt-studio: ^1.7.0
     tailwindcss: ^4.3.0
     zod: ^4.4.3
   dev:
-    '@nuxt/schema': ^4.4.7
+    '@nuxt/schema': ^4.4.8
     '@types/ejs': ^3.1.5
     '@types/node': ^24.13.0
     '@vitest/coverage-v8': ^4.1.8
