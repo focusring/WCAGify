@@ -66,11 +66,57 @@ catalogs:
 
 linkWorkspacePackages: true
 
+# @nuxt/ui declares its Tiptap packages as ^3 peers; pnpm auto-installed them
+# at 3.26.0 (stale lockfile resolutions) while the catalog pins core/vue-3 to
+# ^3.27.4. Tiptap packages exact-pin their peers to their own version, so a
+# mixed tree breaks peer resolution and duplicates @tiptap/pm. Keep the whole
+# tree on one version, and keep this range in sync with the catalog.
+# (Enumerated because pnpm ignores wildcard override names like '@tiptap/*'.)
+overrides:
+  '@tiptap/extension-blockquote': ^3.27.4
+  '@tiptap/extension-bold': ^3.27.4
+  '@tiptap/extension-bullet-list': ^3.27.4
+  '@tiptap/extension-code': ^3.27.4
+  '@tiptap/extension-code-block': ^3.27.4
+  '@tiptap/extension-collaboration': ^3.27.4
+  '@tiptap/extension-document': ^3.27.4
+  '@tiptap/extension-drag-handle': ^3.27.4
+  '@tiptap/extension-drag-handle-vue-3': ^3.27.4
+  '@tiptap/extension-dropcursor': ^3.27.4
+  '@tiptap/extension-gapcursor': ^3.27.4
+  '@tiptap/extension-hard-break': ^3.27.4
+  '@tiptap/extension-heading': ^3.27.4
+  '@tiptap/extension-horizontal-rule': ^3.27.4
+  '@tiptap/extension-image': ^3.27.4
+  '@tiptap/extension-italic': ^3.27.4
+  '@tiptap/extension-link': ^3.27.4
+  '@tiptap/extension-list': ^3.27.4
+  '@tiptap/extension-list-item': ^3.27.4
+  '@tiptap/extension-list-keymap': ^3.27.4
+  '@tiptap/extension-mention': ^3.27.4
+  '@tiptap/extension-node-range': ^3.27.4
+  '@tiptap/extension-ordered-list': ^3.27.4
+  '@tiptap/extension-paragraph': ^3.27.4
+  '@tiptap/extension-placeholder': ^3.27.4
+  '@tiptap/extension-strike': ^3.27.4
+  '@tiptap/extension-text': ^3.27.4
+  '@tiptap/extension-underline': ^3.27.4
+  '@tiptap/extensions': ^3.27.4
+  '@tiptap/markdown': ^3.27.4
+  '@tiptap/pm': ^3.27.4
+  '@tiptap/starter-kit': ^3.27.4
+  '@tiptap/suggestion': ^3.27.4
+
 shellEmulator: true
 
 trustPolicy: no-downgrade
 
 trustPolicyExclude:
   - chokidar
+  # rollup@2.80.0 is an exact pin of @crxjs/vite-plugin >=2.7; it is an
+  # official maintainer backport (v2.80.0 tag in rollup/rollup, backports-2
+  # dist-tag) published manually without provenance, which trips the
+  # date-based check. Verified legitimate 2026-07-14.
+  - rollup
   - semver
   - undici-types

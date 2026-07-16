@@ -43,6 +43,10 @@ async function downloadPdf() {
 
 const shareOpen = ref(false)
 
+function openShare() {
+  shareOpen.value = true
+}
+
 const reportContentRef = ref<{ visiblePrinciples: Set<string> }>()
 const visiblePrinciples = computed(
   () => reportContentRef.value?.visiblePrinciples ?? new Set<string>()
@@ -58,7 +62,7 @@ const visiblePrinciples = computed(
             :label="$t('share.share')"
             icon="i-lucide-share-2"
             variant="outline"
-            @click="shareOpen = true"
+            @click="openShare"
           />
           <UButton
             :label="$t('report.downloadPdf')"

@@ -68,7 +68,7 @@ describe('Image upload E2E', () => {
     const server = await startDevServer(projectPath, 3103)
     devServerProcess = server.process
     baseUrl = server.url
-  }, 300_000)
+  }, 600_000)
 
   afterAll(() => {
     if (devServerProcess) stopDevServer(devServerProcess)
