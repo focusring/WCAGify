@@ -191,7 +191,9 @@ describe('PDF E2E', () => {
 
     // Warm the service now so the first real render isn't paying a cold start.
     if (weasyReachable) await warmUpWeasyprint(WEASYPRINT_URL)
-  }, 600_000)
+    // Timeout: scaffold + install (up to 300s) + production build (up to
+    // 1500s locally, possibly retried) + server start.
+  }, 1_800_000)
 
   afterAll(async () => {
     await browser?.close()

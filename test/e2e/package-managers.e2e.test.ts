@@ -5,10 +5,10 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import {
   cleanupProject,
-  getTmpDir,
   installDependencies,
   packWcagify,
   patchPackageJsonForLocalWcagify,
+  scaffoldProject,
   startDevServer,
   stopDevServer
 } from './setup/test-utils.js'
@@ -46,7 +46,7 @@ function installWithManager(manager: string, projectPath: string): void {
       execSync('npm install --legacy-peer-deps', {
         cwd: projectPath,
         stdio: 'pipe',
-        timeout: 120_000,
+        timeout: 300_000,
         env: envBase
       })
       return
@@ -56,28 +56,12 @@ function installWithManager(manager: string, projectPath: string): void {
       execSync('bun install', {
         cwd: projectPath,
         stdio: 'pipe',
-        timeout: 120_000,
+        timeout: 300_000,
         env: envBase
       })
       return
     }
   }
-}
-
-function scaffoldProject(projectName: string): string {
-  const tmpDir = getTmpDir()
-  const projectPath = join(tmpDir, projectName)
-  const cliBinary = join(tmpDir, '..', 'packages/create-wcagify/dist/cli.js')
-
-  cleanupProject(projectName)
-
-  execSync(`node "${cliBinary}" create ${projectName} --no-git --no-install`, {
-    cwd: tmpDir,
-    stdio: 'pipe',
-    env: { ...process.env, NO_COLOR: '1' }
-  })
-
-  return projectPath
 }
 
 // Yarn v1 is excluded: corepack intercepts it when a parent directory has
@@ -111,6 +95,8 @@ describe('Package Manager Smoke Tests', () => {
         expect(existsSync(join(projectPath, 'content.config.ts'))).toBe(true)
       })
 
+      // Timeout: the install alone may take up to 300s under parallel suite
+      // load; the global 120s testTimeout would kill it first.
       it(`installs dependencies with ${manager}`, () => {
         patchPackageJsonForLocalWcagify(projectPath, tarballPath)
         installWithManager(manager, projectPath)
@@ -118,7 +104,7 @@ describe('Package Manager Smoke Tests', () => {
         expect(existsSync(join(projectPath, 'node_modules'))).toBe(true)
         expect(existsSync(join(projectPath, 'node_modules', 'nuxt'))).toBe(true)
         expect(existsSync(join(projectPath, 'node_modules', '@focusring', 'wcagify'))).toBe(true)
-      })
+      }, 360_000)
     })
   }
 
@@ -152,6 +138,6 @@ describe('Package Manager Smoke Tests', () => {
       } finally {
         stopDevServer(serverProcess)
       }
-    })
+    }, 600_000)
   })
 })

@@ -49,8 +49,7 @@ useSeoMeta({
       <pre
         class="mt-4 rounded-lg bg-elevated border border-default p-3 text-sm text-left font-mono"
       >
-WCAGIFY_ADMIN_SECRET=your-secret-here</pre
-      >
+WCAGIFY_ADMIN_SECRET=your-secret-here</pre>
     </div>
 
     <!-- Login form -->

@@ -45,7 +45,9 @@ describe('Share E2E', () => {
     baseUrl = server.url
 
     browser = await chromium.launch()
-  }, 600_000)
+    // Timeout: scaffold + install (up to 300s) + production build (up to
+    // 1500s locally, possibly retried) + server start.
+  }, 1_800_000)
 
   afterAll(async () => {
     await browser?.close()
