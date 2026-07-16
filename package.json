@@ -44,7 +44,7 @@
       "oxlint --no-error-on-unmatched-pattern",
       "oxfmt"
     ],
-    "*.{json,yaml,yml,md,css}": [
+    "*.{json,md,css}": [
       "oxfmt"
     ]
   },
