@@ -55,7 +55,7 @@ catalogs:
     oxfmt: ^0.59.0
     oxlint: ^1.74.0
     playwright: ^1.61.1
-    tsdown: ^0.22.7
+    tsdown: ^0.22.8
     typescript: ^6.0.3
     unpdf: ^1.6.2
     vitest: ^4.1.10
