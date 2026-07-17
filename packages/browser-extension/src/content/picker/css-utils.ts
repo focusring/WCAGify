@@ -1,5 +1,27 @@
 import type { Rgba } from './types'
 
+// Realm-safe element type checks. An iframe's document is a different realm, so `el instanceof HTMLImageElement`
+// is false for an <img> inside a same-origin frame — the same reason navigate.ts matches roots by nodeType.
+// Namespace + localName hold across realms, so detectors use these now that the picker reaches into frame content.
+const HTML_NS = 'http://www.w3.org/1999/xhtml'
+const SVG_NS = 'http://www.w3.org/2000/svg'
+
+export function isHtmlElement(el: Element): boolean {
+  return el.namespaceURI === HTML_NS
+}
+
+export function isHtmlTag(el: Element, tag: string): boolean {
+  return el.namespaceURI === HTML_NS && el.localName === tag
+}
+
+export function isSvgElement(el: Element): boolean {
+  return el.namespaceURI === SVG_NS
+}
+
+export function isSvgTag(el: Element, tag: string): boolean {
+  return el.namespaceURI === SVG_NS && el.localName === tag
+}
+
 // Shared 1×1 canvas context for resolving CSS color strings to rgba; reused to avoid per-parse allocation.
 let colorCtx: CanvasRenderingContext2D | null | undefined = undefined
 function getColorCtx(): CanvasRenderingContext2D | null {
@@ -163,8 +185,8 @@ export function getSvgHref(el: Element): string {
 // With excludeImage, an <image> root is skipped it embeds a raster (see getMediaInfo), so its default-black fill isn't read as an icon color.
 export function collectSvgRoots(el: Element, options?: { excludeImage?: boolean }): SVGElement[] {
   const svgs: SVGElement[] = []
-  if (el instanceof SVGElement && !(options?.excludeImage && el instanceof SVGImageElement)) {
-    svgs.push(el)
+  if (isSvgElement(el) && !(options?.excludeImage && isSvgTag(el, 'image'))) {
+    svgs.push(el as SVGElement)
   }
   for (const svg of el.querySelectorAll('svg')) svgs.push(svg)
   return svgs

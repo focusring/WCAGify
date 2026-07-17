@@ -52,6 +52,11 @@ export default {
     image: 'Afbeelding',
     video: 'Video',
     gif: 'GIF',
+    iframe: 'iframe',
+    iframeEmpty: 'leeg',
+    iframeCrossOrigin: 'cross-origin',
+    iframeInaccessible: 'ontoegankelijk',
+    hasHoverStyles: 'heeft hover-stijlen',
     unknown: 'onbekend',
     hoverHint: 'Beweeg over een element...',
     clickHint: 'Klik om te selecteren · Esc om te annuleren'

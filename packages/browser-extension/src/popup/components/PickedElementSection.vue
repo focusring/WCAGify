@@ -6,9 +6,24 @@ import type { ElementInfo, GradientInfo } from '../../content/picker/types'
 const props = defineProps<{ info: ElementInfo; child?: boolean }>()
 const { t } = useI18n()
 
+// How many identical children this section stands for (collectChildSections merges them); 1 when unmerged.
+const mergedCount = computed(() => props.info.count ?? 1)
+
+// Parenthetical suffix explaining why an iframe's inner content isn't detected. '' for a detected frame ('content').
+const iframeStateLabel = (state: string): string => {
+  if (state === 'empty') return t('picker.iframeEmpty')
+  if (state === 'cross-origin') return t('picker.iframeCrossOrigin')
+  if (state === 'inaccessible') return t('picker.iframeInaccessible')
+  return ''
+}
+
 const mediaLabel = computed(() => {
   const m = props.info.media
   if (!m) return ''
+  if (m.kind === 'iframe') {
+    const state = m.iframeState ? iframeStateLabel(m.iframeState) : ''
+    return state ? `${t('picker.iframe')} (${state})` : t('picker.iframe')
+  }
   const kind = t(m.kind === 'image' ? 'picker.image' : 'picker.video')
   return m.format ? `${kind} .${m.format}` : `${kind} (${t('picker.unknown')})`
 })
@@ -51,7 +66,10 @@ const gradientCss = (g?: GradientInfo | null) => {
 <template>
   <div class="space-y-1">
     <div v-if="child && (info.label || info.selector)" class="space-y-0.5">
-      <div v-if="info.label" class="font-medium text-highlighted">{{ info.label }}</div>
+      <div v-if="info.label || mergedCount > 1" class="font-medium text-highlighted">
+        {{ info.label }}
+        <span v-if="mergedCount > 1" class="text-toned">×{{ mergedCount }}</span>
+      </div>
       <code class="block break-all text-toned">{{ info.selector }}</code>
     </div>
     <div v-if="info.role || info.ariaHidden || info.disabled">
@@ -225,5 +243,6 @@ const gradientCss = (g?: GradientInfo | null) => {
         <code class="text-highlighted">{{ info.background.color }}</code>
       </span>
     </div>
+    <div v-if="info.hasHoverStyles" class="text-toned">{{ t('picker.hasHoverStyles') }}</div>
   </div>
 </template>

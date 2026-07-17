@@ -7,6 +7,7 @@ import {
   getSvgHref,
   hasCssMask,
   hasTextClip,
+  isHtmlTag,
   scanDescendants,
   tryParseColor
 } from './css-utils'
@@ -57,21 +58,23 @@ function addVisibleColor(set: Set<string>, color: string): void {
 }
 
 function isVisibleTextField(field: Element): boolean {
-  if (field instanceof HTMLInputElement) return !NON_TEXT_INPUT_TYPES.has(field.type)
-  return field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement
+  if (isHtmlTag(field, 'input')) {
+    return !NON_TEXT_INPUT_TYPES.has((field as HTMLInputElement).type)
+  }
+  return isHtmlTag(field, 'textarea') || isHtmlTag(field, 'select')
 }
 
 function hasFieldValue(field: Element): boolean {
-  if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-    return field.value.length > 0
+  if (isHtmlTag(field, 'input') || isHtmlTag(field, 'textarea')) {
+    return (field as HTMLInputElement | HTMLTextAreaElement).value.length > 0
   }
-  if (field instanceof HTMLSelectElement) return field.selectedOptions.length > 0
+  if (isHtmlTag(field, 'select')) return (field as HTMLSelectElement).selectedOptions.length > 0
   return false
 }
 
 function getFieldPlaceholder(field: Element): string {
-  if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-    return field.placeholder
+  if (isHtmlTag(field, 'input') || isHtmlTag(field, 'textarea')) {
+    return (field as HTMLInputElement | HTMLTextAreaElement).placeholder
   }
   return ''
 }

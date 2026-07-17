@@ -12,9 +12,17 @@ export interface GradientInfo {
   colors: string[]
 }
 
+// How reachable an <iframe>'s inner content is (see probeIframe):
+//   • content      — same-origin document with rendered content; detection runs on it
+//   • empty        — same-origin document whose body has no content yet (e.g. an about:blank ad slot before its script fills it)
+//   • cross-origin — the same-origin policy blocks all access to the inner document
+//   • inaccessible — reachable in principle but no usable document (detached / mid-navigation)
+export type IframeState = 'content' | 'empty' | 'cross-origin' | 'inaccessible'
+
 export interface MediaInfo {
-  kind: 'image' | 'video'
-  format: string // extension/format, '' when undeterminable
+  kind: 'image' | 'video' | 'iframe'
+  format: string // extension/format, '' when undeterminable (always '' for iframe)
+  iframeState?: IframeState // set only when kind === 'iframe'
 }
 
 export interface BackgroundInfo {
@@ -32,6 +40,8 @@ export interface ElementInfo {
   ariaHidden: boolean // removed from the a11y tree (aria-hidden / inert)
   disabled: boolean // :disabled form control or aria-disabled
   label: string // accessible-name/text snippet, for distinguishing same-role children
+  hasHoverStyles: boolean // a :hover rule in the element's own document styles it (values not captured — getComputedStyle reads the current state only)
+  count?: number // >1 when identical child sections were merged into this one (e.g. "Button ×3"); unset on the selected element
   textColors: string[]
   iconColors: string[]
   elementColor: string

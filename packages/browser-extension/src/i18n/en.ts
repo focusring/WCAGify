@@ -52,6 +52,11 @@ export default {
     image: 'Image',
     video: 'Video',
     gif: 'GIF',
+    iframe: 'iframe',
+    iframeEmpty: 'empty',
+    iframeCrossOrigin: 'cross-origin',
+    iframeInaccessible: 'inaccessible',
+    hasHoverStyles: 'has hover styles',
     unknown: 'unknown',
     hoverHint: 'Hover over an element...',
     clickHint: 'Click to select · Esc to cancel'

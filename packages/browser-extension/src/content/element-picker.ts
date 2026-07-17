@@ -1,5 +1,6 @@
 import { getUniqueSelector } from './unique-selector'
 import { collectChildSections, collectElementInfo } from './picker/collect'
+import { resetHoverStylesCache } from './picker/hover'
 import { getNavigableParent } from './picker/navigate'
 import { getPickTarget, recoverSkippedTarget } from './picker/pick-target'
 
@@ -194,6 +195,8 @@ function processMove() {
 // hasParent tells the panel whether the button can move up another level.
 function sendElementPicked(el: Element) {
   selectedElement = el
+  // Fresh stylesheet scan per collection run (a re-pick sees styles injected since), cached across the selected element + all child sections within it.
+  resetHoverStylesCache()
   chrome.runtime.sendMessage({
     type: 'element-picked',
     url: document.URL,

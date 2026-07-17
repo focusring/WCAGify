@@ -1,3 +1,5 @@
+import { isHtmlElement, isSvgElement } from './css-utils'
+
 // WAI-ARIA 1.2 roles (abstract roles excluded). Used to validate an explicit role token before trusting it.
 const ARIA_ROLES = new Set([
   'alert',
@@ -240,7 +242,8 @@ function implicitRole(el: Element): string {
 
 // Presentational-roles conflict resolution: an explicit presentation/none role is ignored when the element is focusable or carries global ARIA state/properties, so it falls back to its implicit role.
 function hasPresentationalConflict(el: Element): boolean {
-  if ((el instanceof HTMLElement || el instanceof SVGElement) && el.tabIndex >= 0) return true
+  // tabIndex lives on HTMLElement/SVGElement; matched by namespace so it also holds for frame content (see css-utils).
+  if ((isHtmlElement(el) || isSvgElement(el)) && (el as HTMLElement).tabIndex >= 0) return true
   for (const attr of el.attributes) {
     if (attr.name.startsWith('aria-') && attr.name !== 'aria-hidden') return true
   }
