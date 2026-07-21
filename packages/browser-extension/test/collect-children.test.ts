@@ -22,7 +22,7 @@ describe('collectChildSections on an iframe', () => {
 
   it('surfaces interactive elements found inside a same-origin iframe', () => {
     const iframe = iframeWith('<div><button>Learn More</button><a href="/x">Visit site</a></div>')
-    const sections = collectChildSections(iframe)
+    const { sections } = collectChildSections(iframe)
     expect(sections.map((s) => s.role)).toEqual(['button', 'link'])
     expect(sections[0]!.label).toBe('Learn More')
     expect(sections[1]!.label).toBe('Visit site')
@@ -32,7 +32,7 @@ describe('collectChildSections on an iframe', () => {
     const iframe = iframeWith(
       '<button class="dot">•</button><button class="dot">•</button><button class="dot">•</button><a href="/x">Site</a>'
     )
-    const sections = collectChildSections(iframe)
+    const { sections } = collectChildSections(iframe)
     expect(sections).toHaveLength(2)
     expect(sections[0]!.role).toBe('button')
     expect(sections[0]!.count).toBe(3)
@@ -42,7 +42,7 @@ describe('collectChildSections on an iframe', () => {
 
   it('keeps children with different labels separate even when styled identically', () => {
     const iframe = iframeWith('<button>Learn More</button><button>Sign Up</button>')
-    const sections = collectChildSections(iframe)
+    const { sections } = collectChildSections(iframe)
     expect(sections).toHaveLength(2)
     expect(sections.map((s) => s.label)).toEqual(['Learn More', 'Sign Up'])
   })
@@ -51,13 +51,13 @@ describe('collectChildSections on an iframe', () => {
     const iframe = iframeWith('<button>Outer</button><iframe></iframe>')
     const nested = iframe.contentDocument!.querySelector('iframe')!
     nested.contentDocument!.body.innerHTML = '<button>Inner</button>'
-    const sections = collectChildSections(iframe)
+    const { sections } = collectChildSections(iframe)
     expect(sections.map((s) => s.label)).toEqual(['Outer'])
   })
 
   it('surfaces disabled controls inside the iframe with their disabled flag', () => {
     const iframe = iframeWith('<button disabled>Buy now</button>')
-    const sections = collectChildSections(iframe)
+    const { sections } = collectChildSections(iframe)
     expect(sections).toHaveLength(1)
     expect(sections[0]!.disabled).toBe(true)
   })
@@ -67,7 +67,7 @@ describe('collectChildSections on an iframe', () => {
       '<button class="cta">Learn More</button><button class="mute">x</button>',
       '<style>.cta:hover { background: navy }</style>'
     )
-    const sections = collectChildSections(iframe)
+    const { sections } = collectChildSections(iframe)
     expect(sections.map((s) => [s.label, s.hasHoverStyles])).toEqual([
       ['Learn More', true],
       ['x', false]
@@ -76,7 +76,7 @@ describe('collectChildSections on an iframe', () => {
 
   it('returns no sections for an empty iframe', () => {
     const iframe = iframeWith('')
-    expect(collectChildSections(iframe)).toEqual([])
+    expect(collectChildSections(iframe)).toEqual({ sections: [], elements: [] })
   })
 })
 
@@ -93,8 +93,35 @@ describe('collectChildSections dedup on regular elements', () => {
       <span role="img" aria-label="star">★</span>
       <span role="img" aria-label="star">★</span>
     </div>`
-    const sections = collectChildSections(document.getElementById('host')!)
+    const { sections } = collectChildSections(document.getElementById('host')!)
     expect(sections).toHaveLength(1)
     expect(sections[0]!.count).toBe(3)
+  })
+
+  // The "select child" buttons address a child by its index in the sections array, so the two arrays must line up.
+  it('pairs every section with its source element, at the same index', () => {
+    document.body.innerHTML = `<div id="host">
+      <span role="img" aria-label="star">★</span>
+      <span role="img" aria-label="star">★</span>
+      <button>Buy now</button>
+    </div>`
+    const host = document.getElementById('host')!
+    const { sections, elements } = collectChildSections(host)
+    expect(sections).toHaveLength(2)
+    // A merged ×N group resolves to its first occurrence — the one whose selector the section displays.
+    expect(elements).toEqual([host.querySelector('[role="img"]'), host.querySelector('button')])
+    expect(sections[0]!.count).toBe(2)
+  })
+
+  it('pairs sections with elements inside a same-origin iframe', () => {
+    document.body.innerHTML = '<iframe></iframe>'
+    const iframe = document.querySelector('iframe')!
+    iframe.contentDocument!.body.innerHTML = '<button>Learn More</button><a href="/x">Site</a>'
+    const { sections, elements } = collectChildSections(iframe)
+    expect(sections.map((s) => s.role)).toEqual(['button', 'link'])
+    expect(elements).toEqual([
+      iframe.contentDocument!.querySelector('button'),
+      iframe.contentDocument!.querySelector('a')
+    ])
   })
 })

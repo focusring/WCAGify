@@ -32,6 +32,7 @@ export default {
     pickElement: 'Pick Element',
     picking: 'Picking... (click an element on the page)',
     selectParent: 'Parent',
+    selectChild: 'Select',
     selector: 'Selector:',
     url: 'URL:',
     page: 'Page:',

@@ -57,7 +57,8 @@ const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 const selectedTabId = ref<number | undefined>()
 const childPage = ref(1)
-// Whether the selected element has a meaningful parent to step up to. Computed content-side (needs the live DOM to cross shadow/iframe boundaries) and sent with each element-picked message.
+// Whether the selection has a parent to step up to. Computed content-side (needs the live DOM to cross shadow/iframe
+// boundaries) and sent with each element-picked message.
 const hasParent = ref(false)
 
 const selector = computed(() => selected.value?.selector ?? '')
@@ -70,7 +71,7 @@ const pagedChildren = computed(() => {
   return children.value.slice(start, start + CHILD_PAGE_SIZE)
 })
 
-// Long-lived port to the page tab; its disconnect on panel close is what the content script uses to tear down any active or persisted highlight overlay.
+// Long-lived port to the page tab; its disconnect on panel close is the content script's teardown signal.
 let pickerPort: chrome.runtime.Port | undefined = undefined
 let pickerPortTabId: number | undefined = undefined
 
@@ -106,7 +107,8 @@ function onMessage(message: {
     children.value = (message.children ?? []).map(mapColors)
     hasParent.value = message.hasParent ?? false
     childPage.value = 1
-    // On a fresh pick pickerTabId holds the source tab; on a parent step it's undefined, so keep the tab the current selection came from (the "select parent" button messages that same tab).
+    // On a fresh pick pickerTabId holds the source tab; on a parent step it's undefined, so keep the tab the current
+    // selection came from (the navigation buttons message that same tab).
     selectedTabId.value = pickerTabId.value ?? selectedTabId.value
     picking.value = false
     pickerTabId.value = undefined
@@ -133,6 +135,13 @@ function selectParent() {
   chrome.tabs.sendMessage(selectedTabId.value, { type: 'select-parent' }).catch(() => {})
 }
 
+// Mirror of selectParent: steps down into a child section by its index in the children list the content script sent
+// (paginated views pass the index into the full list, not the page).
+function selectChild(index: number) {
+  if (selectedTabId.value === undefined) return
+  chrome.tabs.sendMessage(selectedTabId.value, { type: 'select-child', index }).catch(() => {})
+}
+
 function onKeyDown(e: KeyboardEvent) {
   if (e.key === 'Escape') cancelPicker()
 }
@@ -143,7 +152,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   cancelPicker()
-  // Disconnecting the port triggers the content script's teardown, removing any persisted highlight that outlived the picking session.
+  // Disconnecting the port triggers teardown, removing any highlight that outlived the picking session.
   pickerPort?.disconnect()
   pickerPort = undefined
   pickerPortTabId = undefined
@@ -216,7 +225,11 @@ async function pickElement() {
       <template v-if="isChildPaginated">
         <template v-for="(child, i) in pagedChildren" :key="`child-${childPage}-${i}`">
           <USeparator class="my-2" />
-          <PickedElementSection :info="child" child />
+          <PickedElementSection
+            :info="child"
+            child
+            @select="selectChild((childPage - 1) * CHILD_PAGE_SIZE + i)"
+          />
         </template>
         <div class="flex justify-center mt-4">
           <UPagination
@@ -232,7 +245,7 @@ async function pickElement() {
       <template v-else>
         <template v-for="(child, i) in children" :key="`child-${i}`">
           <USeparator class="my-2" />
-          <PickedElementSection :info="child" child />
+          <PickedElementSection :info="child" child @select="selectChild(i)" />
         </template>
       </template>
     </div>

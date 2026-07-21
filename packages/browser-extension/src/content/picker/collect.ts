@@ -35,16 +35,14 @@ const SURFACEABLE_ROLES = new Set([
   'meter'
 ])
 
-// Bounds the panel length for pathological subtrees (e.g. a toolbar with dozens of controls). Counts unique sections — duplicates merge into a ×N count and don't consume slots.
+// Caps panel length. Counts unique sections only duplicates merge into a ×N count without consuming a slot.
 const MAX_CHILD_SECTIONS = 20
 
-// Bounds detection compute now that duplicates don't count toward MAX_CHILD_SECTIONS: at most this many children run the full detector suite per scan.
+// Caps detection compute, since duplicates don't consume section slots: at most this many children run the detectors.
 const MAX_CHILD_DETECTIONS = 100
 
-// The role to surface for a descendant, or '' to skip it. Reuses getAriaRole, with one SVG special case:
-//   • An SVG <image> embeds a raster (like <img>) → surface as media 'img'.
-//   • A plain inline <svg> is an icon, not media skipped (getAriaRole returns ''); its colors show in the parent's
-//     Icon row. An explicit role="img" still surfaces.
+// The role to surface for a descendant, or '' to skip it. Reuses getAriaRole, plus one SVG case: an <image> embeds a raster → 'img'; a plain inline <svg> is an icon,
+// so it's skipped (its colors show in the parent's Icon row), though an explicit role="img" still surfaces.
 function surfaceableRole(el: Element): string {
   if (isSvgTag(el, 'image')) return 'img'
   const role = getAriaRole(el)
@@ -71,8 +69,8 @@ function isDisabled(el: Element): boolean {
   return el.getAttribute('aria-disabled') === 'true'
 }
 
-// Runs every detector on one element. `role` defaults to the element's own computed role but can be overridden (the child scan passes the surfaceable role so e.g. an <svg> is labelled img).
-// An <iframe> renders a separate document, handled specially so detection reaches the content inside it (see collectIframeInfo).
+// Runs every detector on one element. `role` defaults to the element's computed role but can be overridden (the child scan passes the surfaceable role, so e.g. an <svg> is labelled img).
+// <iframe> is special-cased, see collectIframeInfo.
 export function collectElementInfo(el: Element, role: string = getAriaRole(el)): ElementInfo {
   if (isHtmlTag(el, 'iframe')) return collectIframeInfo(el as HTMLIFrameElement, role)
   return buildElementInfo(el, role)
@@ -103,12 +101,9 @@ function buildElementInfo(el: Element, role: string): ElementInfo {
   }
 }
 
-// An <iframe> hosts its own document that the host page can't style-inspect through the frame boundary.
-// For a reachable same-origin document with content, we run the full detection suite on that inner
-// content (its real colors/text/background) and present it under the iframe's own identity — selector,
-// aria-hidden and disabled stay the frame's. Empty/cross-origin/inaccessible frames only report why no
-// inner values are available (via the media row); detection then falls back to the frame element itself,
-// whose own box (border/background) is host-side and safe to read.
+// An <iframe> hosts its own document the host page can't style-inspect across the boundary.
+// For a reachable same-origin frame with content, run the full suite on the inner content and present it under the iframe's identity (selector, aria-hidden and disabled stay the frame's).
+// Empty/cross-origin/inaccessible frames report why via the media row and fall back to the frame element, whose own box is host-side and safe to read.
 function collectIframeInfo(iframe: HTMLIFrameElement, role: string): ElementInfo {
   const probe = probeIframe(iframe)
   if (probe.state === 'content' && probe.innerRoot) {
@@ -136,13 +131,8 @@ function collectIframeInfo(iframe: HTMLIFrameElement, role: string): ElementInfo
   return info
 }
 
-// The effective surface the selected element visually sits on: its own background, or the nearest ancestor's when transparent (first solid color from el upward, inclusive).
-function effectiveBackgroundColor(el: Element): Rgba | null {
-  return firstSolidBackgroundColor(el)
-}
-
-// Drops a child's solid background color when it matches the surface the selected element already sits on, so child sections don't repeat the component's background (gradients/media/blur kept).
-// Compared as resolved rgba, so #fff / white / rgb(255,255,255) all match.
+// Drops a child's solid background when it matches the surface the selected element already sits on, so child sections don't repeat the component's background (gradients/media/blur kept).
+// Compared as resolved rgba, so #fff / white match.
 function dedupeChildBackground(info: ElementInfo, reference: Rgba | null): void {
   const bg = info.background
   if (bg.gradient || bg.media || !bg.color) return
@@ -150,33 +140,39 @@ function dedupeChildBackground(info: ElementInfo, reference: Rgba | null): void 
   if (!c || c.a === 0 || (reference && sameColor(c, reference))) bg.color = ''
 }
 
-// The subtree to surface nested sections from: an iframe's inner content document when reachable — its
-// descendants are otherwise invisible to the picker — else the element itself. null for an iframe whose
-// content can't be read (empty/cross-origin/inaccessible), so it contributes no child sections.
+// The subtree to surface sections from: an iframe's inner document when reachable (its descendants are otherwise invisible to the picker), else the element itself.
+// null for an unreadable iframe, which contributes no sections.
 function childScanRoot(el: Element): Element | null {
   if (isHtmlTag(el, 'iframe')) return probeIframe(el as HTMLIFrameElement).innerRoot
   return el
 }
 
-// Identity of a section's detected values: everything except the per-element selector and the merge count.
-// Two children with the same key are visually and semantically interchangeable in the panel.
+// Identity of a section's detected values (all but selector and count): same key ⇒ interchangeable in the panel.
 function sectionKey(info: ElementInfo): string {
   const { selector: _selector, count: _count, ...values } = info
   return JSON.stringify(values)
 }
 
-// Surfaceable descendants of el, in document order, capped. Excludes el itself (it's the selected section).
-// Includes disabled/aria-hidden elements on purpose surfacing the otherwise-unreachable ones is the point of this feature.
-// Children with identical detected values (role, label, colors, …) merge into one section with a ×N count,
-// so a row of identical widgets (pagination dots, star icons) doesn't flood the panel.
-export function collectChildSections(el: Element): ElementInfo[] {
+// Sections plus the source element behind each (parallel arrays, same order) so the panel can navigate into a child by index.
+// Selectors can't serve as that address: shadow-DOM paths are per-boundary, and an iframe child's selector resolves only inside that frame.
+// For a merged ×N group the element is the first occurrence.
+export interface ChildSections {
+  sections: ElementInfo[]
+  elements: Element[]
+}
+
+// Surfaceable descendants of el in document order, capped; excludes el itself.
+// Includes disabled/aria-hidden elements on purpose surfacing the otherwise-unreachable ones is the point.
+// Children with identical detected values merge into one ×N section, so rows of identical widgets (pagination dots, star icons) don't flood the panel.
+export function collectChildSections(el: Element): ChildSections {
   const root = childScanRoot(el)
-  if (!root) return []
-  const reference = effectiveBackgroundColor(root)
+  if (!root) return { sections: [], elements: [] }
+  const reference = firstSolidBackgroundColor(root)
   const sections = new Map<string, ElementInfo>()
+  const elements = new Map<string, Element>()
   let detections = 0
   for (const child of root.querySelectorAll('*')) {
-    // One level deep only: when root is an iframe's inner document, a nested iframe's content stays unscanned (querySelectorAll doesn't cross documents), and the frame itself isn't a section.
+    // One level deep: querySelectorAll doesn't cross documents, so a nested iframe's content stays unscanned.
     if (isHtmlTag(child, 'iframe')) continue
     const role = surfaceableRole(child)
     if (!role) continue
@@ -188,10 +184,14 @@ export function collectChildSections(el: Element): ElementInfo[] {
       const existing = sections.get(key)
       // At the section cap, duplicates of listed sections still bump their count; new uniques are dropped.
       if (existing) existing.count = (existing.count ?? 1) + 1
-      else if (sections.size < MAX_CHILD_SECTIONS) sections.set(key, info)
+      else if (sections.size < MAX_CHILD_SECTIONS) {
+        sections.set(key, info)
+        elements.set(key, child)
+      }
     } catch {
       continue // a child in a cross-document (iframe) subtree that resisted inspection
     }
   }
-  return [...sections.values()]
+  // Both maps take the same keys in the same order, so the two arrays stay index-aligned.
+  return { sections: [...sections.values()], elements: [...elements.values()] }
 }

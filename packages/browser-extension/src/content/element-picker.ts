@@ -25,6 +25,8 @@ let pendingMove: { x: number; y: number } | undefined = undefined
 let moveRaf = 0
 // The last element sent to the panel. Persists after the overlay is torn down (not cleared by cleanup()) so the "select parent" button can keep walking up from it.
 let selectedElement: Element | undefined = undefined
+// Source elements of the last-sent child sections, index-aligned, for the "select child" buttons. Persists likewise.
+let childElements: Element[] = []
 let highlightEl: HTMLElement | undefined = undefined
 let highlightTarget: Element | undefined = undefined
 let repositionRaf = 0
@@ -139,7 +141,28 @@ function highlightElement(el: Element) {
   startTracking()
 }
 
-// Track the target's live viewport rect so the overlay stays glued on scroll/resize, hiding when off-screen (reappears when scrolled back).
+// Offset from the target's own viewport to the top document's, walking out through same-origin frames.
+// A child section can live in an iframe (rect relative to that frame) while the overlay is positioned in the top document without this shift the outline lands wrong.
+// Zero for a top-document target. Frame borders count via clientLeft/clientTop.
+function frameOffset(el: Element): { x: number; y: number } {
+  let x = 0
+  let y = 0
+  try {
+    let win = el.ownerDocument.defaultView
+    while (win?.frameElement) {
+      const frame = win.frameElement
+      const rect = frame.getBoundingClientRect()
+      x += rect.left + frame.clientLeft
+      y += rect.top + frame.clientTop
+      win = frame.ownerDocument.defaultView
+    }
+  } catch {
+    /* Cross-origin ancestor: nothing better available than the unshifted rect */
+  }
+  return { x, y }
+}
+
+// Track the target's live rect so the overlay stays glued on scroll/resize, hiding when off-screen.
 function positionHighlight() {
   if (!highlightEl || !highlightTarget) return
 
@@ -149,11 +172,14 @@ function positionHighlight() {
   }
 
   const rect = highlightTarget.getBoundingClientRect()
+  const offset = frameOffset(highlightTarget)
+  const top = rect.top + offset.y
+  const left = rect.left + offset.x
   const offScreen =
-    rect.bottom <= 0 ||
-    rect.right <= 0 ||
-    rect.top >= window.innerHeight ||
-    rect.left >= window.innerWidth
+    top + rect.height <= 0 ||
+    left + rect.width <= 0 ||
+    top >= window.innerHeight ||
+    left >= window.innerWidth
 
   if (offScreen) {
     highlightEl.style.display = 'none'
@@ -162,8 +188,8 @@ function positionHighlight() {
 
   Object.assign(highlightEl.style, {
     display: 'block',
-    top: `${rect.top}px`,
-    left: `${rect.left}px`,
+    top: `${top}px`,
+    left: `${left}px`,
     width: `${rect.width}px`,
     height: `${rect.height}px`
   })
@@ -253,14 +279,20 @@ function processMove() {
 // hasParent tells the panel whether the button can move up another level.
 function sendElementPicked(el: Element) {
   selectedElement = el
+  // The overlay tracks whatever the panel is showing, so navigating (e.g. "select parent") moves it too not just hover/click.
+  highlightElement(el)
+  highlightEl?.classList.add('wcagify-highlight--selected')
   // Fresh stylesheet scan per collection run (a re-pick sees styles injected since), cached across the selected element + all child sections within it.
   resetHoverStylesCache()
+  const children = collectChildSections(el)
+  // Kept so the panel can name a child by its index in the list it just received.
+  childElements = children.elements
   chrome.runtime.sendMessage({
     type: 'element-picked',
     url: document.URL,
     pageTitle: document.title,
     selected: collectElementInfo(el),
-    children: collectChildSections(el),
+    children: children.sections,
     hasParent: getNavigableParent(el) !== null
   })
 }
@@ -272,7 +304,6 @@ function handleClick(e: MouseEvent) {
   if (!currentTarget) return
 
   sendElementPicked(currentTarget)
-  highlightEl?.classList.add('wcagify-highlight--selected')
   cleanup(true)
 }
 
@@ -283,6 +314,14 @@ function selectParent() {
   const parent = getNavigableParent(selectedElement)
   if (!parent) return
   sendElementPicked(parent)
+}
+
+// Moves the selection down into a child section the panel is showing, by its index in the list last sent the only way to reach children hover can't land on (pointer-events: none, covered by an overlay, inside a frame).
+// Ignores an index the page has since invalidated (re-render between send and click).
+function selectChild(index: number) {
+  const child = childElements[index]
+  if (!child?.isConnected) return
+  sendElementPicked(child)
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -315,7 +354,7 @@ async function startPicker() {
   document.addEventListener('keydown', handleKeyDown)
 }
 
-chrome.runtime.onMessage.addListener((message: { type: string }) => {
+chrome.runtime.onMessage.addListener((message: { type: string; index?: number }) => {
   if (message.type === 'start-picker') {
     startPicker()
   }
@@ -325,9 +364,12 @@ chrome.runtime.onMessage.addListener((message: { type: string }) => {
   if (message.type === 'select-parent') {
     selectParent()
   }
+  if (message.type === 'select-child' && typeof message.index === 'number') {
+    selectChild(message.index)
+  }
 })
 
-// The side panel holds an open port while the picker/highlight is alive; its disconnect on panel close reliably tears everything down, including a persisted highlight.
+// The side panel holds an open port while the picker/highlight is alive; its disconnect on close tears everything down.
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== 'wcagify-picker') return
   port.onDisconnect.addListener(() => cleanup())

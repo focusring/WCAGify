@@ -4,6 +4,8 @@ import { useI18n } from '../../composables/useI18n'
 import type { ElementInfo, GradientInfo } from '../../content/picker/types'
 
 const props = defineProps<{ info: ElementInfo; child?: boolean }>()
+// Asks the panel to make this child the new selected element; the parent owns the index, so no payload here.
+const emit = defineEmits<{ select: [] }>()
 const { t } = useI18n()
 
 // How many identical children this section stands for (collectChildSections merges them); 1 when unmerged.
@@ -65,12 +67,23 @@ const gradientCss = (g?: GradientInfo | null) => {
 
 <template>
   <div class="space-y-1">
-    <div v-if="child && (info.label || info.selector)" class="space-y-0.5">
-      <div v-if="info.label || mergedCount > 1" class="font-medium text-highlighted">
-        {{ info.label }}
-        <span v-if="mergedCount > 1" class="text-toned">×{{ mergedCount }}</span>
+    <div v-if="child" class="flex items-start justify-between gap-2">
+      <div class="min-w-0 space-y-0.5">
+        <div v-if="info.label || mergedCount > 1" class="font-medium text-highlighted">
+          {{ info.label }}
+          <span v-if="mergedCount > 1" class="text-toned">×{{ mergedCount }}</span>
+        </div>
+        <code class="block break-all text-toned">{{ info.selector }}</code>
       </div>
-      <code class="block break-all text-toned">{{ info.selector }}</code>
+      <UButton
+        @click="emit('select')"
+        icon="i-lucide-arrow-down"
+        size="xs"
+        color="neutral"
+        variant="outline"
+        :label="t('picker.selectChild')"
+        :ui="{ base: 'shrink-0' }"
+      />
     </div>
     <div v-if="info.role || info.ariaHidden || info.disabled">
       <span class="label-title">{{ t('picker.role') }}:</span>
