@@ -11,60 +11,101 @@ allowBuilds:
 
 catalog:
   '@nuxt/fonts': ^0.14.0
-  '@nuxt/ui': ^4.8.1
-  '@tiptap/core': ^3.25.0
-  '@tiptap/vue-3': ^3.25.0
-  nanoid: ^5.1.11
-  sharp: ^0.34.5
+  '@nuxt/ui': ^4.9.0
+  '@tiptap/core': ^3.27.4
+  '@tiptap/vue-3': ^3.27.4
+  nanoid: ^6.0.0
+  sharp: ^0.35.3
   zod: ^4.4.3
 
 catalogMode: prefer
 
 catalogs:
   cli:
-    '@clack/prompts': ^1.5.1
+    '@clack/prompts': ^1.7.0
     commander: ^15.0.0
     ejs: ^6.0.1
     picocolors: ^1.1.1
   core:
-    '@iconify-json/lucide': ^1.2.111
-    '@iconify-json/simple-icons': ^1.2.85
-    '@libsql/client': ^0.17.3
+    '@iconify-json/lucide': ^1.2.117
+    '@iconify-json/simple-icons': ^1.2.90
+    '@libsql/client': ^0.17.4
     '@nuxt/a11y': 1.0.0-alpha.1
-    '@nuxt/content': ^3.14.0
-    '@nuxt/icon': ^2.2.3
-    '@nuxt/kit': ^4.4.7
-    '@nuxt/ui': ^4.8.1
-    '@nuxtjs/i18n': ^10.4.0
+    '@nuxt/content': ^3.15.0
+    '@nuxt/icon': ^2.3.1
+    '@nuxt/kit': ^4.4.8
+    '@nuxt/ui': ^4.9.0
+    '@nuxtjs/i18n': ^10.4.1
     '@vueuse/core': ^14.3.0
-    nuxt: ^4.4.7
+    nuxt: ^4.4.8
     nuxt-studio: ^1.7.0
-    tailwindcss: ^4.3.0
+    tailwindcss: ^4.3.2
     zod: ^4.4.3
   dev:
-    '@nuxt/schema': ^4.4.7
+    '@nuxt/schema': ^4.4.8
     '@types/ejs': ^3.1.5
-    '@types/node': ^24.13.0
-    '@vitest/coverage-v8': ^4.1.8
+    '@types/node': ^24.13.3
+    '@vitest/coverage-v8': ^4.1.10
     bumpp: ^11.1.0
     changelogen: ^0.6.2
     changelogithub: ^14.0.0
     husky: ^9.1.7
-    knip: ^6.15.0
-    lint-staged: ^17.0.7
-    oxfmt: ^0.53.0
-    oxlint: ^1.68.0
-    playwright: ^1.60.0
-    tsdown: ^0.22.2
+    knip: ^6.26.0
+    lint-staged: ^17.0.8
+    oxfmt: ^0.59.0
+    oxlint: ^1.74.0
+    playwright: ^1.61.1
+    tsdown: ^0.22.8
     typescript: ^6.0.3
     unpdf: ^1.6.2
-    vitest: ^4.1.8
-    vue-tsc: ^3.3.3
+    vitest: ^4.1.10
+    vue-tsc: ^3.3.7
   docs:
-    '@tailwindcss/vite': ^4.3.0
-    vitepress: 2.0.0-alpha.17
+    '@tailwindcss/vite': ^4.3.2
+    vitepress: 2.0.0-alpha.18
 
 linkWorkspacePackages: true
+
+# @nuxt/ui declares its Tiptap packages as ^3 peers; pnpm auto-installed them
+# at 3.26.0 (stale lockfile resolutions) while the catalog pins core/vue-3 to
+# ^3.27.4. Tiptap packages exact-pin their peers to their own version, so a
+# mixed tree breaks peer resolution and duplicates @tiptap/pm. Keep the whole
+# tree on one version, and keep this range in sync with the catalog.
+# (Enumerated because pnpm ignores wildcard override names like '@tiptap/*'.)
+overrides:
+  '@tiptap/extension-blockquote': ^3.27.4
+  '@tiptap/extension-bold': ^3.27.4
+  '@tiptap/extension-bullet-list': ^3.27.4
+  '@tiptap/extension-code': ^3.27.4
+  '@tiptap/extension-code-block': ^3.27.4
+  '@tiptap/extension-collaboration': ^3.27.4
+  '@tiptap/extension-document': ^3.27.4
+  '@tiptap/extension-drag-handle': ^3.27.4
+  '@tiptap/extension-drag-handle-vue-3': ^3.27.4
+  '@tiptap/extension-dropcursor': ^3.27.4
+  '@tiptap/extension-gapcursor': ^3.27.4
+  '@tiptap/extension-hard-break': ^3.27.4
+  '@tiptap/extension-heading': ^3.27.4
+  '@tiptap/extension-horizontal-rule': ^3.27.4
+  '@tiptap/extension-image': ^3.27.4
+  '@tiptap/extension-italic': ^3.27.4
+  '@tiptap/extension-link': ^3.27.4
+  '@tiptap/extension-list': ^3.27.4
+  '@tiptap/extension-list-item': ^3.27.4
+  '@tiptap/extension-list-keymap': ^3.27.4
+  '@tiptap/extension-mention': ^3.27.4
+  '@tiptap/extension-node-range': ^3.27.4
+  '@tiptap/extension-ordered-list': ^3.27.4
+  '@tiptap/extension-paragraph': ^3.27.4
+  '@tiptap/extension-placeholder': ^3.27.4
+  '@tiptap/extension-strike': ^3.27.4
+  '@tiptap/extension-text': ^3.27.4
+  '@tiptap/extension-underline': ^3.27.4
+  '@tiptap/extensions': ^3.27.4
+  '@tiptap/markdown': ^3.27.4
+  '@tiptap/pm': ^3.27.4
+  '@tiptap/starter-kit': ^3.27.4
+  '@tiptap/suggestion': ^3.27.4
 
 shellEmulator: true
 
@@ -72,5 +113,10 @@ trustPolicy: no-downgrade
 
 trustPolicyExclude:
   - chokidar
+  # rollup@2.80.0 is an exact pin of @crxjs/vite-plugin >=2.7; it is an
+  # official maintainer backport (v2.80.0 tag in rollup/rollup, backports-2
+  # dist-tag) published manually without provenance, which trips the
+  # date-based check. Verified legitimate 2026-07-14.
+  - rollup
   - semver
   - undici-types

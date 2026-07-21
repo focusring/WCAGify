@@ -2,10 +2,10 @@ import { ref, watch } from 'vue'
 
 type ColorMode = 'system' | 'light' | 'dark'
 
-const COLOR_MODES: readonly ColorMode[] = ['system', 'light', 'dark']
+const COLOR_MODES: ColorMode[] = ['system', 'light', 'dark']
 
 function isColorMode(value: unknown): value is ColorMode {
-  return typeof value === 'string' && (COLOR_MODES as readonly string[]).includes(value)
+  return COLOR_MODES.includes(value as ColorMode)
 }
 
 const preference = ref<ColorMode>('system')
@@ -40,9 +40,8 @@ function initColorMode(): Promise<void> {
 }
 
 function cycle() {
-  const modes: ColorMode[] = ['system', 'light', 'dark']
-  const idx = modes.indexOf(preference.value)
-  preference.value = modes[(idx + 1) % modes.length]!
+  const idx = COLOR_MODES.indexOf(preference.value)
+  preference.value = COLOR_MODES[(idx + 1) % COLOR_MODES.length]!
 }
 
 export function useColorMode() {

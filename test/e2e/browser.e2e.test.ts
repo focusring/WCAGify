@@ -32,9 +32,28 @@ describe('Browser E2E', () => {
     devServerProcess = server.process
     baseUrl = server.url
 
+    // Warm the report detail route (best effort): the dev server compiles
+    // pages on demand, and the first request to this (heavy) route can take
+    // well over a minute on Windows. Without this, the click-navigation test
+    // pays that cost against its own much shorter timeout. The server may
+    // reset connections while compiling under parallel suite load, so a
+    // failed warm-up must not fail the suite.
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await fetch(`${baseUrl}/reports/example`)
+        break
+      } catch {
+        // retry; tests still run (just slower) if warming never succeeds
+      }
+    }
+
     browser = await chromium.launch()
     page = await browser.newPage({ viewport: { width: 1400, height: 900 } })
-  }, 300_000)
+    // Dev-server responses can stall while sibling suites run production
+    // builds; Playwright's default 30s is not enough headroom then.
+    page.setDefaultTimeout(60_000)
+    page.setDefaultNavigationTimeout(60_000)
+  }, 600_000)
 
   afterAll(async () => {
     await page?.close()
@@ -76,7 +95,10 @@ describe('Browser E2E', () => {
 
       const reportLink = await page.waitForSelector('table a')
       await reportLink.click()
-      await page.waitForSelector('#executive-summary', { timeout: 30_000 })
+      // First visit compiles the report page on demand in the dev server;
+      // under parallel suite load (pdf/share production builds) 30s was
+      // not enough on Windows.
+      await page.waitForSelector('#executive-summary', { timeout: 90_000 })
     })
 
     it('navigated to report URL', () => {

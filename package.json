@@ -44,12 +44,12 @@
       "oxlint --no-error-on-unmatched-pattern",
       "oxfmt"
     ],
-    "*.{json,yaml,yml,md,css}": [
+    "*.{json,md,css}": [
       "oxfmt"
     ]
   },
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.5.2"
+  "packageManager": "pnpm@11.13.0"
 }

@@ -119,7 +119,9 @@ export default {
       label: 'Description',
       description:
         'Provide a detailed description of the issue, including what the problem is, where it occurs, and any relevant context. This information will help developers understand and fix the issue.',
-      placeholder: "Write, type '/' for commands..."
+      placeholder: "Write, type '/' for commands...",
+      error: 'Please enter a description for the issue.',
+      clear: 'Clear Description'
     },
     submitIssue: {
       label: 'Submit Issue',

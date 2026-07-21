@@ -92,7 +92,7 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-default" />
+    <hr class="my-12 border-accented" />
 
     <section id="scorecard" class="scroll-mt-20">
       <h2 class="flex items-center gap-2">
@@ -108,7 +108,7 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-default" />
+    <hr class="my-12 border-accented" />
 
     <section id="about" class="scroll-mt-20">
       <h2 class="flex items-center gap-2">
@@ -122,32 +122,28 @@ defineExpose({ visiblePrinciples })
       </div>
     </section>
 
-    <hr class="my-12 border-default" />
+    <hr class="my-12 border-accented" />
 
     <section id="scope" class="scroll-mt-20">
       <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-target" class="size-6 shrink-0" />
         {{ t('report.scope') }}
       </h2>
-      <div class="mt-4">
-        <ReportScope :report="report" />
-      </div>
+      <ReportScope :report="report" class="mt-4" />
     </section>
 
-    <hr class="my-12 border-default" />
+    <hr class="my-12 border-accented" />
 
     <section id="sample" class="scroll-mt-20">
       <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-layers" class="size-6 shrink-0" />
         {{ t('report.representativeSample') }}
       </h2>
-      <div class="mt-4">
-        <ReportSample :report="report" />
-      </div>
+      <ReportSample :report="report" class="mt-4" />
     </section>
 
     <template v-if="issuesByPrinciple.length">
-      <hr class="my-12 border-default" />
+      <hr class="my-12 border-accented" />
 
       <section id="issues" class="min-h-screen scroll-mt-20">
         <h2 class="flex items-center gap-2">
@@ -212,7 +208,7 @@ defineExpose({ visiblePrinciples })
     </template>
 
     <template v-if="reportTips.length">
-      <hr class="my-12 border-default" />
+      <hr class="my-12 border-accented" />
 
       <section id="tips">
         <h2>

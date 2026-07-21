@@ -8,7 +8,7 @@ import {
   packWcagify,
   patchPackageJsonForLocalWcagify,
   scaffoldProject,
-  startDevServer,
+  startPreviewServer,
   stopDevServer
 } from './setup/test-utils.js'
 
@@ -24,7 +24,7 @@ interface ShareResponse {
 
 describe('Share E2E', () => {
   let browser: Browser
-  let devServerProcess: ChildProcess
+  let serverProcess: ChildProcess
   let baseUrl: string
 
   beforeAll(async () => {
@@ -34,16 +34,24 @@ describe('Share E2E', () => {
     patchPackageJsonForLocalWcagify(projectPath, tarball)
     installDependencies(projectPath)
 
-    const server = await startDevServer(projectPath, 3102)
-    devServerProcess = server.process
+    // Run against a production build + Nitro node server rather than `nuxt dev`.
+    // The password flow is driven through the real form, which only works once the
+    // page hydrates. Under `nuxt dev` the page's client chunks compile on demand,
+    // so hydration is slow and wildly variable (tens of seconds, sometimes minutes
+    // on a loaded CI runner) and the form submit can't be timed reliably. A
+    // prebuilt app hydrates deterministically in well under a second.
+    const server = await startPreviewServer(projectPath, 3102)
+    serverProcess = server.process
     baseUrl = server.url
 
     browser = await chromium.launch()
-  }, 300_000)
+    // Timeout: scaffold + install (up to 300s) + production build (up to
+    // 1500s locally, possibly retried) + server start.
+  }, 1_800_000)
 
   afterAll(async () => {
     await browser?.close()
-    if (devServerProcess) stopDevServer(devServerProcess)
+    if (serverProcess) stopDevServer(serverProcess)
   })
 
   describe('share without password', () => {
@@ -115,7 +123,7 @@ describe('Share E2E', () => {
       context = await browser.newContext()
       page = await context.newPage()
 
-      await page.goto(`${baseUrl}/share/${share.token}`, { waitUntil: 'networkidle' })
+      await page.goto(`${baseUrl}/share/${share.token}`)
       await page.waitForSelector('input[type="password"]', { timeout: 30_000 })
 
       expect(await page.$('input[type="password"]')).toBeTruthy()
@@ -123,25 +131,21 @@ describe('Share E2E', () => {
     })
 
     it('rejects wrong password', async () => {
-      const input = await page.waitForSelector('input[type="password"]')
-      await input.fill('wrong-password')
-
+      await page.fill('input[type="password"]', 'wrong-password')
       await page.click('button[type="submit"]')
-      await page.waitForSelector('[role="alert"]', { timeout: 10_000 })
 
+      await page.waitForSelector('[role="alert"]', { timeout: 15_000 })
       const alert = await page.textContent('[role="alert"]')
       expect(alert).toBeTruthy()
       expect(await page.$('#executive-summary')).toBeFalsy()
     })
 
     it('unlocks with correct password', async () => {
-      const input = await page.waitForSelector('input[type="password"]')
-      await input.fill('')
-      await input.fill(password)
-
+      await page.fill('input[type="password"]', '')
+      await page.fill('input[type="password"]', password)
       await page.click('button[type="submit"]')
-      await page.waitForSelector('#executive-summary', { timeout: 30_000 })
 
+      await page.waitForSelector('#executive-summary', { timeout: 30_000 })
       expect(await page.$('#executive-summary')).toBeTruthy()
       expect(await page.$('#scorecard')).toBeTruthy()
       expect(await page.$('#issues')).toBeTruthy()

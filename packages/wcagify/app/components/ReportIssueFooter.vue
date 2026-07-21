@@ -35,6 +35,7 @@ const issueType = computed(() => (props.issue as any).type as string | undefined
         <UBadge
           :label="t(`report.severityLevel.${issue.severity.toLowerCase()}`)"
           :color="getSeverityColor(issue.severity)"
+          variant="subtle"
           class="shrink-0"
         />
       </div>

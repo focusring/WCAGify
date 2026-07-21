@@ -3,7 +3,7 @@
   "workspaces": {
     ".": {
       "ignoreDependencies": ["changelogen", "lint-staged"],
-      "ignoreBinaries": ["test/robot/scripts/run.sh", "test/robot/scripts/setup.sh"]
+      "ignoreBinaries": ["taskkill", "test/robot/scripts/run.sh", "test/robot/scripts/setup.sh"]
     },
     "packages/wcagify": {
       "entry": [

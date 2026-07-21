@@ -38,14 +38,14 @@ const issueId = `issue-${sanitizedPath}`
         <UBadge
           v-if="samplePage"
           :label="samplePage.title"
-          variant="solid"
           color="neutral"
+          variant="subtle"
           class="shrink-0 ring-1 text-highlighted bg-white ring-black dark:bg-black dark:ring-slate-300"
         />
         <UBadge
           :label="t('report.scStatus.failed')"
-          variant="solid"
           color="error"
+          variant="subtle"
           icon="i-lucide-x"
           class="shrink-0 ring-1 text-black bg-error-400 ring-black dark:ring-error-400"
         />
