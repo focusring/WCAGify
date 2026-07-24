@@ -1,7 +1,6 @@
 import type { Rgba } from './types'
 
-// Realm-safe element type checks. An iframe's document is a different realm, so `el instanceof HTMLImageElement`
-// is false for an <img> inside a same-origin frame — the same reason navigate.ts matches roots by nodeType.
+// Realm-safe element type checks. An iframe's document is a different realm, so `el instanceof HTMLImageElement` is false for an <img> in a same-origin frame (why navigate.ts matches roots by nodeType).
 // Namespace + localName hold across realms, so detectors use these now that the picker reaches into frame content.
 const HTML_NS = 'http://www.w3.org/1999/xhtml'
 const SVG_NS = 'http://www.w3.org/2000/svg'
@@ -149,28 +148,48 @@ export function findFillingDescendant<T>(
   return null
 }
 
-// One document-order pass over el + descendants, reading each computed style once so the icon-mask and clip-text-fill
-// detectors don't each walk the subtree. Collects background-color of every CSS-mask element (icon paint) and
-// background-image of every background-clip:text element (text fill; caller resolves to a gradient). el visited first.
+// Whether a value on `node` counts as `root`'s own: no element from `node` up to (excluding) `root` is a boundary.
+// Callers pass the "gets its own child section" test — such a section already reports the value, so an ancestor
+// repeating it is duplication. Walks parentElement (stops at a shadow root), matching the passes that feed it.
+export function isOwnScope(
+  node: Element,
+  root: Element,
+  isBoundary: (el: Element) => boolean
+): boolean {
+  for (let p: Element | null = node; p && p !== root; p = p.parentElement) {
+    if (isBoundary(p)) return false
+  }
+  return true
+}
+
+// One document-order pass over el + descendants, reading each computed style once so the icon-mask and clip-text-fill detectors don't each walk the subtree.
+// Collects background-color of every CSS-mask element (icon paint) and background-image of every background-clip:text element (text fill; caller resolves to a gradient).
+// el visited first. `isBoundary` splits the mask colors into el's own subset (see isOwnScope); with no predicate every color is own.
 export interface DescendantScan {
   maskBackgroundColors: string[]
+  ownMaskBackgroundColors: string[] // The subset not sitting under a surfaced child
   clipTextBackgroundImages: string[]
 }
 
 export function scanDescendants(
   el: Element,
-  elStyle: CSSStyleDeclaration = getComputedStyle(el)
+  elStyle: CSSStyleDeclaration = getComputedStyle(el),
+  isBoundary: (child: Element) => boolean = () => false
 ): DescendantScan {
   const maskBackgroundColors: string[] = []
+  const ownMaskBackgroundColors: string[] = []
   const clipTextBackgroundImages: string[] = []
   let isRoot = true
   for (const node of [el, ...el.querySelectorAll('*')]) {
     const style = isRoot ? elStyle : getComputedStyle(node)
     isRoot = false
-    if (hasCssMask(style)) maskBackgroundColors.push(style.backgroundColor)
+    if (hasCssMask(style)) {
+      maskBackgroundColors.push(style.backgroundColor)
+      if (isOwnScope(node, el, isBoundary)) ownMaskBackgroundColors.push(style.backgroundColor)
+    }
     if (hasTextClip(style)) clipTextBackgroundImages.push(style.backgroundImage)
   }
-  return { maskBackgroundColors, clipTextBackgroundImages }
+  return { maskBackgroundColors, ownMaskBackgroundColors, clipTextBackgroundImages }
 }
 
 export const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'

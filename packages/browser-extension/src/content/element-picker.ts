@@ -30,6 +30,10 @@ let childElements: Element[] = []
 let highlightEl: HTMLElement | undefined = undefined
 let highlightTarget: Element | undefined = undefined
 let repositionRaf = 0
+// Whether the outline currently shows a hover preview of a navigation target rather than the committed selection.
+let previewing = false
+// Whether an outline was on screen when the preview started, so leaving the button restores the page to exactly that.
+let hadHighlightBeforePreview = false
 
 function injectStyles() {
   if (document.getElementById('wcagify-picker-styles')) return
@@ -279,6 +283,8 @@ function processMove() {
 // hasParent tells the panel whether the button can move up another level.
 function sendElementPicked(el: Element) {
   selectedElement = el
+  // Navigating commits the selection, so any preview in flight is over without this, the mouseleave that follows a button click would try to restore the outline it just moved.
+  previewing = false
   // The overlay tracks whatever the panel is showing, so navigating (e.g. "select parent") moves it too not just hover/click.
   highlightElement(el)
   highlightEl?.classList.add('wcagify-highlight--selected')
@@ -324,6 +330,30 @@ function selectChild(index: number) {
   sendElementPicked(child)
 }
 
+// Outlines where a navigation button would take the user, while they hover or focus it, without committing the selection.
+// Deliberately left in the base (solid) style: solid already means "transient hover" here, against the dotted outline of the committed selection.
+// Declines while the picker overlay is live, since its own hover outline owns the page then, and for an element with no box to draw.
+function previewOutline(el: Element | undefined) {
+  if (activeOverlay || !el?.isConnected) return
+  const rect = el.getBoundingClientRect()
+  if (!rect.width && !rect.height) return
+  if (!previewing) hadHighlightBeforePreview = highlightEl !== undefined
+  previewing = true
+  highlightElement(el)
+}
+
+// Ends a preview, putting the outline back on the committed selection or removing it, if none was showing to begin with.
+function restoreOutline() {
+  if (!previewing) return
+  previewing = false
+  if (!hadHighlightBeforePreview || !selectedElement?.isConnected) {
+    clearHighlight()
+    return
+  }
+  highlightElement(selectedElement)
+  highlightEl?.classList.add('wcagify-highlight--selected')
+}
+
 function handleKeyDown(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     cleanup()
@@ -366,6 +396,16 @@ chrome.runtime.onMessage.addListener((message: { type: string; index?: number })
   }
   if (message.type === 'select-child' && typeof message.index === 'number') {
     selectChild(message.index)
+  }
+  // Preview the same targets the select-* messages would navigate to, so what's outlined is exactly what a click would select.
+  if (message.type === 'preview-parent') {
+    previewOutline(selectedElement ? (getNavigableParent(selectedElement) ?? undefined) : undefined)
+  }
+  if (message.type === 'preview-child' && typeof message.index === 'number') {
+    previewOutline(childElements[message.index])
+  }
+  if (message.type === 'preview-end') {
+    restoreOutline()
   }
 })
 

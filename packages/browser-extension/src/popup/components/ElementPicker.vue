@@ -128,19 +128,28 @@ function cancelPicker() {
   }
 }
 
+// Every navigation and preview command goes to the tab the current selection came from, and is dropped if that tab is gone.
+function sendToPage(message: { type: string; index?: number }) {
+  if (selectedTabId.value === undefined) return
+  chrome.tabs.sendMessage(selectedTabId.value, message).catch(() => {})
+}
+
 // Asks the content script to step the selection up to the parent and re-run detection.
 // The result returns as an element-picked message, replacing the panel's values in place.
-function selectParent() {
-  if (selectedTabId.value === undefined) return
-  chrome.tabs.sendMessage(selectedTabId.value, { type: 'select-parent' }).catch(() => {})
-}
+const selectParent = () => sendToPage({ type: 'select-parent' })
 
 // Mirror of selectParent: steps down into a child section by its index in the children list the content script sent
 // (paginated views pass the index into the full list, not the page).
-function selectChild(index: number) {
-  if (selectedTabId.value === undefined) return
-  chrome.tabs.sendMessage(selectedTabId.value, { type: 'select-child', index }).catch(() => {})
-}
+const selectChild = (index: number) => sendToPage({ type: 'select-child', index })
+
+// Outlines the element a navigation button would select, for as long as it's hovered or focused, so the target is visible before committing.
+// Keyboard users get the same preview on focus, which is the only way to see the target without a pointer.
+const previewParent = () => sendToPage({ type: 'preview-parent' })
+const previewChild = (index: number) => sendToPage({ type: 'preview-child', index })
+const endPreview = () => sendToPage({ type: 'preview-end' })
+
+// Index into the full children list for a section rendered on the current page.
+const childIndex = (i: number) => (childPage.value - 1) * CHILD_PAGE_SIZE + i
 
 function onKeyDown(e: KeyboardEvent) {
   if (e.key === 'Escape') cancelPicker()
@@ -204,13 +213,16 @@ async function pickElement() {
         </div>
         <UButton
           @click="selectParent"
+          @mouseenter="previewParent"
+          @mouseleave="endPreview"
+          @focus="previewParent"
+          @blur="endPreview"
           :disabled="!hasParent"
           icon="i-lucide-arrow-up"
-          size="xs"
           color="neutral"
           variant="outline"
           :label="t('picker.selectParent')"
-          :ui="{ base: 'shrink-0' }"
+          :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1', leadingIcon: 'size-4.5' }"
         />
       </div>
       <div>
@@ -228,7 +240,9 @@ async function pickElement() {
           <PickedElementSection
             :info="child"
             child
-            @select="selectChild((childPage - 1) * CHILD_PAGE_SIZE + i)"
+            @select="selectChild(childIndex(i))"
+            @preview="previewChild(childIndex(i))"
+            @preview-end="endPreview"
           />
         </template>
         <div class="flex justify-center mt-4">
@@ -245,7 +259,13 @@ async function pickElement() {
       <template v-else>
         <template v-for="(child, i) in children" :key="`child-${i}`">
           <USeparator class="my-2" />
-          <PickedElementSection :info="child" child @select="selectChild(i)" />
+          <PickedElementSection
+            :info="child"
+            child
+            @select="selectChild(i)"
+            @preview="previewChild(i)"
+            @preview-end="endPreview"
+          />
         </template>
       </template>
     </div>

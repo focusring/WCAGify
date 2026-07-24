@@ -58,6 +58,8 @@ export default {
     iframeCrossOrigin: 'cross-origin',
     iframeInaccessible: 'ontoegankelijk',
     hasHoverStyles: 'heeft hover-stijlen',
+    copyColor: 'Kopieer kleur',
+    copied: 'Gekopieerd',
     unknown: 'onbekend',
     hoverHint: 'Beweeg over een element...',
     clickHint: 'Klik om te selecteren · Esc om te annuleren'

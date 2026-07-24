@@ -60,6 +60,10 @@ function elementLabel(el: Element): string {
   return named.length > 40 ? `${named.slice(0, 40)}…` : named
 }
 
+// Boundary of an element's own scope: a descendant surfaced as its own section reports its text/icon colors there, so
+// the ancestor must not repeat them. Same test the child scan runs, so the two can't disagree on what a section owns.
+const isSurfacedChild = (el: Element): boolean => surfaceableRole(el) !== ''
+
 function isDisabled(el: Element): boolean {
   try {
     if (el.matches(':disabled')) return true
@@ -78,7 +82,7 @@ export function collectElementInfo(el: Element, role: string = getAriaRole(el)):
 
 function buildElementInfo(el: Element, role: string): ElementInfo {
   const style = getComputedStyle(el)
-  const scan = scanDescendants(el, style)
+  const scan = scanDescendants(el, style, isSurfacedChild)
   const shadow = getShadowColors(el, style)
   const sel = getUniqueSelector(el)
   return {
@@ -88,8 +92,8 @@ function buildElementInfo(el: Element, role: string): ElementInfo {
     disabled: isDisabled(el),
     label: elementLabel(el),
     hasHoverStyles: hasHoverStyles(el),
-    textColors: getTextColors(el),
-    iconColors: getIconColors(el, style, scan.maskBackgroundColors),
+    textColors: getTextColors(el, isSurfacedChild),
+    iconColors: getIconColors(el, style, scan, isSurfacedChild),
     elementColor: getElementOwnColor(el, style),
     elementGradient: getElementGradient(el, style, scan.clipTextBackgroundImages),
     background: getBackgroundInfo(el, style),

@@ -58,6 +58,8 @@ export default {
     iframeCrossOrigin: 'cross-origin',
     iframeInaccessible: 'inaccessible',
     hasHoverStyles: 'has hover styles',
+    copyColor: 'Copy color',
+    copied: 'Copied',
     unknown: 'unknown',
     hoverHint: 'Hover over an element...',
     clickHint: 'Click to select · Esc to cancel'

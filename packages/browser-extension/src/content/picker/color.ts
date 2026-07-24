@@ -1,4 +1,5 @@
 import type { Rgba } from './types'
+import type { DescendantScan } from './css-utils'
 import {
   SVG_SHAPE_SELECTOR,
   collectSvgRoots,
@@ -8,6 +9,7 @@ import {
   hasCssMask,
   hasTextClip,
   isHtmlTag,
+  isOwnScope,
   scanDescendants,
   tryParseColor
 } from './css-utils'
@@ -80,8 +82,19 @@ function getFieldPlaceholder(field: Element): string {
 }
 
 // Unique computed `color` values for visible text inside el: text nodes, input/textarea values, and ::placeholder when empty.
-export function getTextColors(el: Element): string[] {
-  const colors = new Set<string>()
+// `isBoundary` marks descendants surfaced as their own section; their text is reported there, so it stays out of el's
+// row. A wrapper whose text all belongs to such children falls back to the whole subtree — a color visible on the page
+// must stay reachable even when its section is capped, merged or on another page.
+export function getTextColors(
+  el: Element,
+  isBoundary: (child: Element) => boolean = () => false
+): string[] {
+  const own = new Set<string>()
+  const all = new Set<string>()
+  const add = (source: Element, color: string): void => {
+    addVisibleColor(all, color)
+    if (isOwnScope(source, el, isBoundary)) addVisibleColor(own, color)
+  }
 
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
     acceptNode: (node) => {
@@ -94,7 +107,7 @@ export function getTextColors(el: Element): string[] {
   })
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const parent = node.parentElement
-    if (parent) addVisibleColor(colors, getComputedStyle(parent).color)
+    if (parent) add(parent, getComputedStyle(parent).color)
   }
 
   // Form fields don't expose value/placeholder as DOM text nodes check explicitly.
@@ -104,13 +117,13 @@ export function getTextColors(el: Element): string[] {
   for (const field of fields) {
     if (!isVisibleTextField(field)) continue
     if (hasFieldValue(field)) {
-      addVisibleColor(colors, getComputedStyle(field).color)
+      add(field, getComputedStyle(field).color)
     } else if (getFieldPlaceholder(field)) {
-      addVisibleColor(colors, getComputedStyle(field, '::placeholder').color)
+      add(field, getComputedStyle(field, '::placeholder').color)
     }
   }
 
-  return [...colors]
+  return own.size > 0 ? [...own] : [...all]
 }
 
 // Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.
@@ -187,21 +200,29 @@ function getSvgColors(svg: SVGElement): string[] {
 }
 
 // Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon).
-// The mask colors (el + descendants, so icons inside a picked button/link surface) come from the shared scanDescendants pass.
+// Mask colors (el + descendants, so icons inside a picked button/link surface) come from the shared scanDescendants pass, already split by scope; `isBoundary` splits the SVG roots the same way, so pass the predicate the scan used or the two halves disagree.
+// Same own-with-fallback rule as getTextColors.
 export function getIconColors(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el),
-  maskBackgroundColors: string[] = scanDescendants(el, style).maskBackgroundColors
+  scan: DescendantScan = scanDescendants(el, style),
+  isBoundary: (child: Element) => boolean = () => false
 ): string[] {
-  const colors = new Set<string>()
+  const own = new Set<string>()
+  const all = new Set<string>()
 
   for (const svg of collectSvgRoots(el, { excludeImage: true })) {
-    for (const c of getSvgColors(svg)) addVisibleColor(colors, c)
+    const ownScope = isOwnScope(svg, el, isBoundary)
+    for (const c of getSvgColors(svg)) {
+      addVisibleColor(all, c)
+      if (ownScope) addVisibleColor(own, c)
+    }
   }
 
-  for (const c of maskBackgroundColors) addVisibleColor(colors, c)
+  for (const c of scan.maskBackgroundColors) addVisibleColor(all, c)
+  for (const c of scan.ownMaskBackgroundColors) addVisibleColor(own, c)
 
-  return [...colors]
+  return own.size > 0 ? [...own] : [...all]
 }
 
 // Visible border colors from one computed style (element's own or a pseudo-element's) into `colors`.

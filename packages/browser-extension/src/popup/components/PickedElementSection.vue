@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from '../../composables/useI18n'
+import ColorSwatch from './ColorSwatch.vue'
 import type { ElementInfo, GradientInfo } from '../../content/picker/types'
 
 const props = defineProps<{ info: ElementInfo; child?: boolean }>()
-// Asks the panel to make this child the new selected element; the parent owns the index, so no payload here.
-const emit = defineEmits<{ select: [] }>()
+// Navigation intents for this child section; the panel owns the index, so none of them carry a payload.
+// A preview/preview-end pair brackets a hover or focus of the button, outlining the target on the page without selecting it.
+const emit = defineEmits<{ select: []; preview: []; 'preview-end': [] }>()
 const { t } = useI18n()
 
 // How many identical children this section stands for (collectChildSections merges them); 1 when unmerged.
@@ -77,12 +79,15 @@ const gradientCss = (g?: GradientInfo | null) => {
       </div>
       <UButton
         @click="emit('select')"
+        @mouseenter="emit('preview')"
+        @mouseleave="emit('preview-end')"
+        @focus="emit('preview')"
+        @blur="emit('preview-end')"
         icon="i-lucide-arrow-down"
-        size="xs"
         color="neutral"
         variant="outline"
         :label="t('picker.selectChild')"
-        :ui="{ base: 'shrink-0' }"
+        :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1', leadingIcon: 'size-4.5' }"
       />
     </div>
     <div v-if="info.role || info.ariaHidden || info.disabled">
@@ -97,33 +102,11 @@ const gradientCss = (g?: GradientInfo | null) => {
     </div>
     <div v-if="info.textColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="label-title">{{ t('picker.text') }}:</span>
-      <span
-        v-for="(color, i) in info.textColors"
-        :key="`text-${i}`"
-        class="flex items-center gap-1"
-      >
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
-      </span>
+      <ColorSwatch v-for="(color, i) in info.textColors" :key="`text-${i}`" :color="color" />
     </div>
     <div v-if="info.iconColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="label-title">{{ t('picker.icon') }}:</span>
-      <span
-        v-for="(color, i) in info.iconColors"
-        :key="`icon-${i}`"
-        class="flex items-center gap-1"
-      >
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
-      </span>
+      <ColorSwatch v-for="(color, i) in info.iconColors" :key="`icon-${i}`" :color="color" />
     </div>
     <div
       v-if="info.elementColor || info.elementGradient"
@@ -131,130 +114,56 @@ const gradientCss = (g?: GradientInfo | null) => {
     >
       <span class="label-title">{{ t('picker.element') }}:</span>
       <template v-if="info.elementGradient">
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ background: gradientCss(info.elementGradient) }"
-          aria-hidden="true"
-        />
+        <ColorSwatch :color="gradientCss(info.elementGradient)" decorative />
         <span class="text-highlighted">
           {{ t('picker.gradient') }} {{ gradientTypeLabel(info.elementGradient) }}
         </span>
-        <span
+        <ColorSwatch
           v-for="(color, i) in gradientStopsShown(info.elementGradient)"
           :key="`egrad-${i}`"
-          class="flex items-center gap-1"
-        >
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
+          :color="color"
+        />
         <code v-if="gradientStopsMore(info.elementGradient)" class="text-highlighted">
           +{{ gradientStopsMore(info.elementGradient) }}
         </code>
       </template>
-      <span v-if="info.elementColor" class="flex items-center gap-1">
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: info.elementColor }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ info.elementColor }}</code>
-      </span>
+      <ColorSwatch v-if="info.elementColor" :color="info.elementColor" />
     </div>
     <div v-if="info.borderColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="label-title">{{ t('picker.border') }}:</span>
-      <span
-        v-for="(color, i) in info.borderColors"
-        :key="`border-${i}`"
-        class="flex items-center gap-1"
-      >
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
-      </span>
+      <ColorSwatch v-for="(color, i) in info.borderColors" :key="`border-${i}`" :color="color" />
     </div>
     <div v-if="info.ringColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="label-title">{{ t('picker.ring') }}:</span>
-      <span
-        v-for="(color, i) in info.ringColors"
-        :key="`ring-${i}`"
-        class="flex items-center gap-1"
-      >
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
-      </span>
+      <ColorSwatch v-for="(color, i) in info.ringColors" :key="`ring-${i}`" :color="color" />
     </div>
     <div v-if="info.boxShadowColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="label-title">{{ t('picker.boxShadow') }}:</span>
-      <span
-        v-for="(color, i) in info.boxShadowColors"
-        :key="`shadow-${i}`"
-        class="flex items-center gap-1"
-      >
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ color }}</code>
-      </span>
+      <ColorSwatch v-for="(color, i) in info.boxShadowColors" :key="`shadow-${i}`" :color="color" />
     </div>
     <div v-if="info.outlineColor" class="flex items-center gap-1">
       <span class="label-title">{{ t('picker.outline') }}:</span>
-      <span
-        class="ml-1 inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-        :style="{ backgroundColor: info.outlineColor }"
-        aria-hidden="true"
-      />
-      <code class="text-highlighted">{{ info.outlineColor }}</code>
+      <ColorSwatch :color="info.outlineColor" />
     </div>
     <div v-if="hasBackground" class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="label-title">{{ t('picker.background') }}:</span>
       <code v-if="info.background.media" class="text-highlighted">{{ backgroundMediaLabel }}</code>
       <span v-if="info.background.blur" class="text-highlighted">{{ t('picker.blur') }}</span>
       <template v-if="info.background.gradient">
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ background: gradientCss(info.background.gradient) }"
-          aria-hidden="true"
-        />
+        <ColorSwatch :color="gradientCss(info.background.gradient)" decorative />
         <span class="text-highlighted">
           {{ t('picker.gradient') }} {{ gradientTypeLabel(info.background.gradient) }}
         </span>
-        <span
+        <ColorSwatch
           v-for="(color, i) in gradientStopsShown(info.background.gradient)"
           :key="`grad-${i}`"
-          class="flex items-center gap-1"
-        >
-          <span
-            class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-            :style="{ backgroundColor: color }"
-            aria-hidden="true"
-          />
-          <code class="text-highlighted">{{ color }}</code>
-        </span>
+          :color="color"
+        />
         <code v-if="gradientStopsMore(info.background.gradient)" class="text-highlighted">
           +{{ gradientStopsMore(info.background.gradient) }}
         </code>
       </template>
-      <span v-if="info.background.color" class="flex items-center gap-1">
-        <span
-          class="inline-block size-3.5 rounded-sm border border-gray-300 dark:border-gray-600 shrink-0"
-          :style="{ backgroundColor: info.background.color }"
-          aria-hidden="true"
-        />
-        <code class="text-highlighted">{{ info.background.color }}</code>
-      </span>
+      <ColorSwatch v-if="info.background.color" :color="info.background.color" />
     </div>
     <div v-if="info.hasHoverStyles" class="text-toned">{{ t('picker.hasHoverStyles') }}</div>
   </div>
