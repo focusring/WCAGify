@@ -15,6 +15,10 @@ const props = defineProps<{
 
 const model = defineModel<string>({ default: '' })
 
+function clear() {
+  model.value = ''
+}
+
 const { locale, t } = useI18n()
 
 const levelInScope = computed(() => {
@@ -164,9 +168,9 @@ watch(isOpen, async (open, _, onCleanup) => {
       :aria-label="t('form.sc.clear')"
       :ui="{ base: 'absolute end-8 top-1/2 -translate-y-1/2' }"
       @pointerdown.stop
-      @click.stop="model = ''"
-      @keydown.enter.stop="model = ''"
-      @keydown.space.prevent.stop="model = ''"
+      @click.stop="clear"
+      @keydown.enter.stop="clear"
+      @keydown.space.prevent.stop="clear"
     />
   </div>
 </template>

@@ -14,6 +14,10 @@ const { t } = useI18n()
 const { reports, reportSlug, scanStatus } = useSettings()
 
 const currentView = ref<'main' | 'settings'>('main')
+
+function openSettings() {
+  currentView.value = 'settings'
+}
 </script>
 
 <template>
@@ -27,7 +31,7 @@ const currentView = ref<'main' | 'settings'>('main')
         <h1>WCAGify</h1>
 
         <UButton
-          @click="currentView = 'settings'"
+          @click="openSettings"
           :label="t('settings.title').toLowerCase()"
           icon="i-lucide-settings"
           size="lg"
@@ -123,7 +127,7 @@ const currentView = ref<'main' | 'settings'>('main')
               <USkeleton class="h-3.5 w-24 rounded-md" />
               <USkeleton class="h-9 w-full rounded-md" />
             </div>
-            <div class="flex gap-3 w-full">
+            <div class="flex sm:flex-row flex-col gap-3 w-full">
               <div v-for="n in 2" :key="n" class="w-full space-y-2.5">
                 <USkeleton class="h-3.5 w-24 rounded-md" />
                 <USkeleton class="h-9 w-full rounded-md" />

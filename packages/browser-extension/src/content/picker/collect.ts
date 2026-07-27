@@ -49,13 +49,43 @@ function surfaceableRole(el: Element): string {
   return SURFACEABLE_ROLES.has(role) ? role : ''
 }
 
-// A short label to distinguish same-role children: accessible name (aria-label/title/alt) or trimmed text content.
+// Concatenated text of the elements referenced by aria-labelledby. '' when the attribute is absent or resolves to nothing.
+// Resolved within the element's own document (id refs don't cross documents); shadow-scoped refs are best-effort missed.
+function labelledByText(el: Element): string {
+  const ids = el.getAttribute('aria-labelledby')?.trim()
+  if (!ids) return ''
+  const doc = el.ownerDocument
+  const parts: string[] = []
+  for (const id of ids.split(/\s+/)) {
+    const text = doc?.getElementById(id)?.textContent?.replace(/\s+/g, ' ').trim()
+    if (text) parts.push(text)
+  }
+  return parts.join(' ')
+}
+
+// Text of the <label>(s) tied to a form control — both `<label for>` and a wrapping `<label>` — via the element's own `labels` list.
+// '' for elements that aren't labelable (no `labels`). Plain property access, so it stays realm-safe for iframe-hosted controls.
+function associatedLabelText(el: Element): string {
+  const labels = (el as HTMLInputElement).labels
+  if (!labels || labels.length === 0) return ''
+  return [...labels]
+    .map((label) => label.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+    .filter(Boolean)
+    .join(' ')
+}
+
+// A short label to distinguish same-role children, resolved roughly in accessible-name precedence:
+// aria-label → aria-labelledby → associated <label> → title → alt → text content → placeholder (last resort, for inputs with no real name).
+// '' when none apply, which the panel surfaces as "(no accessible name)".
 function elementLabel(el: Element): string {
   const named =
     el.getAttribute('aria-label')?.trim() ||
+    labelledByText(el) ||
+    associatedLabelText(el) ||
     el.getAttribute('title')?.trim() ||
     el.getAttribute('alt')?.trim() ||
     el.textContent?.replace(/\s+/g, ' ').trim() ||
+    el.getAttribute('placeholder')?.trim() ||
     ''
   return named.length > 40 ? `${named.slice(0, 40)}…` : named
 }

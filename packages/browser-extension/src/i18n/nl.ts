@@ -31,6 +31,12 @@ export default {
   picker: {
     pickElement: 'Element selecteren',
     picking: 'Selecteren... (klik op een element op de pagina)',
+    reset: 'Selectie wissen',
+    history: 'Geschiedenis',
+    historyTitle: 'Recent gecontroleerd',
+    historyClear: 'Wissen',
+    historySnapshot:
+      'Opgeslagen momentopname — eerder vastgelegd en niet gekoppeld aan de live pagina.',
     selectParent: 'Bovenliggend',
     selectChild: 'Selecteren',
     selector: 'Selector:',
@@ -38,6 +44,8 @@ export default {
     page: 'Pagina:',
     role: 'Rol',
     ariaHidden: 'verborgen voor toegankelijkheidsboom',
+    ariaHiddenShort: 'verborgen',
+    noName: '(geen toegankelijke naam)',
     disabled: 'uitgeschakeld',
     text: 'Tekst',
     icon: 'Pictogram',
@@ -110,7 +118,8 @@ export default {
     },
     description: {
       label: 'Beschrijving',
-      description: 'Optionele context, stappen om te reproduceren of verwacht gedrag',
+      description:
+        'Geef een gedetailleerde beschrijving van het probleem: wat het probleem is, waar het zich voordoet en eventuele relevante context. Deze informatie helpt ontwikkelaars het probleem te begrijpen en op te lossen.',
       placeholder: "Schrijf, typ '/' voor commando's...",
       error: 'Voer een beschrijving in voor het probleem.',
       clear: 'Beschrijving wissen'
@@ -153,7 +162,12 @@ export default {
     horizontalRule: 'Horizontale lijn',
     style: 'Stijl',
     paragraph: 'Paragraaf',
-    insert: 'Invoegen'
+    insert: 'Invoegen',
+    imageUpload: {
+      label: 'Upload een afbeelding',
+      description: 'PNG, JPG, GIF of WebP (max. 2MB)',
+      failed: 'Uploaden mislukt'
+    }
   },
   setup: {
     title: 'Welkom bij WCAGify',

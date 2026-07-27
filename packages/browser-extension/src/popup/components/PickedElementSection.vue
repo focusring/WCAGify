@@ -4,7 +4,8 @@ import { useI18n } from '../../composables/useI18n'
 import ColorSwatch from './ColorSwatch.vue'
 import type { ElementInfo, GradientInfo } from '../../content/picker/types'
 
-const props = defineProps<{ info: ElementInfo; child?: boolean }>()
+// snapshot marks a section restored from history: the values are frozen and no live element backs them, so stepping into a child is disabled rather than silently doing nothing.
+const props = defineProps<{ info: ElementInfo; child?: boolean; snapshot?: boolean }>()
 // Navigation intents for this child section; the panel owns the index, so none of them carry a payload.
 // A preview/preview-end pair brackets a hover or focus of the button, outlining the target on the page without selecting it.
 const emit = defineEmits<{ select: []; preview: []; 'preview-end': [] }>()
@@ -71,9 +72,35 @@ const gradientCss = (g?: GradientInfo | null) => {
   <div class="space-y-1">
     <div v-if="child" class="flex items-start justify-between gap-2">
       <div class="min-w-0 space-y-0.5">
-        <div v-if="info.label || mergedCount > 1" class="font-medium text-highlighted">
-          {{ info.label }}
+        <div
+          v-if="info.label || mergedCount > 1 || info.role || info.ariaHidden || info.disabled"
+          class="flex flex-wrap items-center gap-x-1.5 gap-y-1"
+        >
+          <span v-if="info.label" class="font-medium text-highlighted">{{ info.label }}</span>
+          <span v-else class="font-medium italic text-toned">{{ t('picker.noName') }}</span>
           <span v-if="mergedCount > 1" class="text-toned">×{{ mergedCount }}</span>
+          <UBadge
+            v-if="info.role"
+            :label="info.role"
+            :title="t('picker.role')"
+            variant="outline"
+            size="lg"
+          />
+          <UBadge
+            v-if="info.ariaHidden"
+            color="neutral"
+            variant="subtle"
+            size="sm"
+            :title="t('picker.ariaHidden')"
+            :label="t('picker.ariaHiddenShort')"
+          />
+          <UBadge
+            v-if="info.disabled"
+            color="neutral"
+            variant="subtle"
+            size="sm"
+            :label="t('picker.disabled')"
+          />
         </div>
         <code class="block break-all text-toned">{{ info.selector }}</code>
       </div>
@@ -83,6 +110,7 @@ const gradientCss = (g?: GradientInfo | null) => {
         @mouseleave="emit('preview-end')"
         @focus="emit('preview')"
         @blur="emit('preview-end')"
+        :disabled="snapshot"
         icon="i-lucide-arrow-down"
         color="neutral"
         variant="outline"
@@ -90,7 +118,7 @@ const gradientCss = (g?: GradientInfo | null) => {
         :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1', leadingIcon: 'size-4.5' }"
       />
     </div>
-    <div v-if="info.role || info.ariaHidden || info.disabled">
+    <div v-if="!child && (info.role || info.ariaHidden || info.disabled)">
       <span class="label-title">{{ t('picker.role') }}:</span>
       <code v-if="info.role" class="ml-1 text-highlighted">{{ info.role }}</code>
       <span v-if="info.ariaHidden" class="ml-1 text-toned">({{ t('picker.ariaHidden') }})</span>

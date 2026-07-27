@@ -31,6 +31,11 @@ export default {
   picker: {
     pickElement: 'Pick Element',
     picking: 'Picking... (click an element on the page)',
+    reset: 'Reset selection',
+    history: 'History',
+    historyTitle: 'Recently checked',
+    historyClear: 'Clear',
+    historySnapshot: 'Saved snapshot — captured earlier and not linked to the live page.',
     selectParent: 'Parent',
     selectChild: 'Select',
     selector: 'Selector:',
@@ -38,6 +43,8 @@ export default {
     page: 'Page:',
     role: 'Role',
     ariaHidden: 'hidden from accessibility tree',
+    ariaHiddenShort: 'hidden',
+    noName: '(no accessible name)',
     disabled: 'disabled',
     text: 'Text',
     icon: 'Icon',
@@ -154,7 +161,12 @@ export default {
     horizontalRule: 'Horizontal Rule',
     style: 'Style',
     paragraph: 'Paragraph',
-    insert: 'Insert'
+    insert: 'Insert',
+    imageUpload: {
+      label: 'Upload an image',
+      description: 'PNG, JPG, GIF or WebP (max. 2MB)',
+      failed: 'Upload failed'
+    }
   },
   setup: {
     title: 'Welcome to WCAGify',
