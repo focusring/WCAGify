@@ -30,9 +30,14 @@ export default {
   },
   picker: {
     pickElement: 'Element selecteren',
+    pickElementTip:
+      'Gebruik Element selecteren om het element of onderdeel te kiezen dat je wilt inspecteren.',
     picking: 'Selecteren... (klik op een element op de pagina)',
     reset: 'Selectie wissen',
+    resetTip:
+      'Wist de huidige selectie en de markering op de pagina. De geschiedenis blijft behouden.',
     history: 'Geschiedenis',
+    historyTip: 'Toon eerder geselecteerde elementen en open er opnieuw een.',
     historyTitle: 'Recent gecontroleerd',
     historyClear: 'Wissen',
     historySnapshot:
@@ -77,8 +82,6 @@ export default {
     clear: 'Wissen',
     descBtnOpen: 'Meer informatie tonen voor',
     descBtnClose: 'Informatie verbergen voor',
-    descExpanded: 'Extra informatie uitgeklapt',
-    descCollapsed: 'Extra informatie ingeklapt',
     samplePage: {
       label: 'Voorbeeldpagina',
       placeholder: 'Selecteer een pagina',

@@ -22,7 +22,6 @@ function toHex(color: string): string {
   return '#' + [r, g, b, a].map((v) => v.toString(16).padStart(2, '0')).join('')
 }
 
-// Convert every color field of a detected element to hex for display, leaving structure/labels untouched.
 function mapColors(info: ElementInfo): ElementInfo {
   return {
     ...info,
@@ -57,12 +56,10 @@ const picking = ref(false)
 const pickerTabId = ref<number | undefined>()
 const selectedTabId = ref<number | undefined>()
 const childPage = ref(1)
-// Whether the selection has a parent to step up to. Computed content-side (needs the live DOM to cross shadow/iframe
-// boundaries) and sent with each element-picked message.
+// Computed content-side (needs live DOM to cross shadow/iframe boundaries), sent with each element-picked message.
 const hasParent = ref(false)
 
-// One completed pick, kept whole so the panel can re-render it later without touching the page. ElementInfo is pure
-// data, so storing and restoring is free.
+// One completed pick, kept whole so the panel can re-render it later without touching the page.
 interface HistoryEntry {
   id: string
   pageUrl: string
@@ -76,10 +73,9 @@ const HISTORY_KEY = 'pickHistory'
 
 const history = ref<HistoryEntry[]>([])
 const showHistory = ref(false)
-// The entry currently on screen, whether it got there by picking or by restoring drives aria-current in the list.
+// Entry currently on screen (picked or restored); drives aria-current in the list.
 const activeEntryId = ref<string | undefined>()
-// True while the panel shows a restored entry rather than a live selection. The values are frozen at pick time and
-// nothing on the page is highlighted, so every navigation control is inert (see restoreHistoryEntry).
+// True when showing a restored entry: values are frozen, nothing on the page is highlighted, so nav controls go inert.
 const viewingSnapshot = ref(false)
 
 const pickButton = ref<{ $el?: HTMLElement }>()
@@ -130,8 +126,7 @@ function onMessage(message: {
     children.value = (message.children ?? []).map(mapColors)
     hasParent.value = message.hasParent ?? false
     childPage.value = 1
-    // On a fresh pick pickerTabId holds the source tab; on a parent step it's undefined, so keep the tab the current
-    // selection came from (the navigation buttons message that same tab).
+    // Fresh pick: pickerTabId holds the source tab. Parent step: it's undefined, so keep the existing tab.
     selectedTabId.value = pickerTabId.value ?? selectedTabId.value
     picking.value = false
     pickerTabId.value = undefined
@@ -153,16 +148,14 @@ function cancelPicker() {
   }
 }
 
-// Tells whichever tab currently owns the live selection to tear down its overlay and highlight. The port stays
-// connected and is reused on the next pick.
+// Tears down the page's overlay/highlight; the port itself stays connected for reuse.
 function clearPageSelection() {
   const tabId = pickerTabId.value ?? selectedTabId.value
   if (tabId === undefined) return
   chrome.tabs.sendMessage(tabId, { type: 'cancel-picker' }).catch(() => {})
 }
 
-// Clears the panel back to its pre-pick state: aborts a pick in progress and drops a committed selection or restored snapshot.
-// History deliberately survives, it's the one thing reset is not meant to throw away.
+// Clears the panel to its pre-pick state. History deliberately survives reset.
 function resetPicker() {
   clearPageSelection()
   picking.value = false
@@ -180,16 +173,12 @@ function resetPicker() {
 }
 
 function persistHistory() {
-  // Round-tripped through JSON to strip Vue's reactive proxies. structuredClone is not an option here: it throws
-  // DataCloneError on a Proxy, and entries hold proxies (they're read back out of refs). ElementInfo is JSON-safe
-  // by construction, so nothing is lost in the trip.
-  // eslint-disable-next-line unicorn/prefer-structured-clone
+  // Round-tripped through JSON to strip Vue's reactive proxies; structuredClone throws DataCloneError on them. eslint-disable-next-line unicorn/prefer-structured-clone.
   const plain = JSON.parse(JSON.stringify(history.value)) as HistoryEntry[]
   chrome.storage.local.set({ [HISTORY_KEY]: plain }).catch(() => {})
 }
 
-// Files the pick the panel just received. Re-picking an element already in the list refreshes it in place at the top
-// instead of stacking a near-duplicate; the same selector on a different page stays a separate entry.
+// Re-picking an element already in history refreshes it in place instead of adding a duplicate.
 function recordHistory() {
   const info = selected.value
   if (!info) return
@@ -210,9 +199,7 @@ function recordHistory() {
   persistHistory()
 }
 
-// Re-renders the panel from a stored snapshot. Nothing is re-selected on the page — the stored selector is a display
-// string, not a resolvable address, and the page may have changed since. So selectedTabId is cleared (navigation and
-// preview messages then drop in sendToPage) and hasParent is forced false to disable the parent button.
+// Re-renders from a stored snapshot; nothing is re-selected on the page (the selector may no longer resolve there).
 function restoreHistoryEntry(entry: HistoryEntry) {
   clearPageSelection()
   picking.value = false
@@ -241,38 +228,32 @@ function clearHistory() {
   focusPickButton()
 }
 
-// Reset and clear-history both remove themselves from the DOM as they act, so focus would fall to <body>. Move it to
-// the pick button, the one control that's always rendered.
+// Reset/clear-history remove themselves from the DOM, which would drop focus to <body>; move it to the pick button instead.
 function focusPickButton() {
   void nextTick().then(() => pickButton.value?.$el?.focus())
 }
 
-// List label for an entry: its accessible name if it has one, else the role, else the bare selector.
 function entryLabel(entry: HistoryEntry): string {
   return entry.selected.label || entry.selected.role || entry.selected.selector
 }
 
-// Every navigation and preview command goes to the tab the current selection came from, and is dropped if that tab is gone.
+// Routes to the tab the current selection came from; silently dropped if that tab is gone.
 function sendToPage(message: { type: string; index?: number }) {
   if (selectedTabId.value === undefined) return
   chrome.tabs.sendMessage(selectedTabId.value, message).catch(() => {})
 }
 
-// Asks the content script to step the selection up to the parent and re-run detection.
-// The result returns as an element-picked message, replacing the panel's values in place.
+// Steps the selection up to the parent; result comes back as an element-picked message.
 const selectParent = () => sendToPage({ type: 'select-parent' })
 
-// Mirror of selectParent: steps down into a child section by its index in the children list the content script sent
-// (paginated views pass the index into the full list, not the page).
+// Mirror of selectParent; index is into the full children list, not the current page.
 const selectChild = (index: number) => sendToPage({ type: 'select-child', index })
 
-// Outlines the element a navigation button would select, for as long as it's hovered or focused, so the target is visible before committing.
-// Keyboard users get the same preview on focus, which is the only way to see the target without a pointer.
+// Outlines the target while a nav button is hovered/focused, so it's visible before committing (focus covers keyboard users).
 const previewParent = () => sendToPage({ type: 'preview-parent' })
 const previewChild = (index: number) => sendToPage({ type: 'preview-child', index })
 const endPreview = () => sendToPage({ type: 'preview-end' })
 
-// Index into the full children list for a section rendered on the current page.
 const childIndex = (i: number) => (childPage.value - 1) * CHILD_PAGE_SIZE + i
 
 function onKeyDown(e: KeyboardEvent) {
@@ -282,8 +263,7 @@ function onKeyDown(e: KeyboardEvent) {
 onMounted(() => {
   chrome.runtime.onMessage.addListener(onMessage)
   globalThis.addEventListener('keydown', onKeyDown)
-  // History outlives the panel, the side panel closes constantly, and a list that emptied itself each time would be useless.
-  // Only the list is restored; the panel still opens with nothing selected.
+  // History outlives the panel (side panel closes constantly); only the list is restored, not a live selection.
   chrome.storage.local
     .get([HISTORY_KEY])
     .then((result) => {
@@ -294,7 +274,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   cancelPicker()
-  // Disconnecting the port triggers teardown, removing any highlight that outlived the picking session.
+  // Disconnecting the port triggers teardown of any highlight left on the page.
   pickerPort?.disconnect()
   pickerPort = undefined
   pickerPortTabId = undefined
@@ -303,7 +283,7 @@ onUnmounted(() => {
 })
 
 async function pickElement() {
-  // Side panel lives in the same window find the active page tab directly
+  // Side panel lives in the same window; find the active page tab directly.
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
   const tab = tabs.find(
     (item) => item.url && !item.url.startsWith('chrome') && !item.url.startsWith('extension')
@@ -328,45 +308,52 @@ async function pickElement() {
 
 <template>
   <div class="space-y-2">
+    <!-- Picker Controls -->
     <div class="flex flex-row gap-2">
-      <UButton
-        ref="pickButton"
-        @click="pickElement"
-        :disabled="picking"
-        variant="outline"
-        icon="i-lucide-square-mouse-pointer"
-        size="xl"
-        :ui="{ leadingIcon: 'size-5', base: 'w-full justify-center' }"
-        :label="picking ? t('picker.picking') : t('picker.pickElement')"
-      />
+      <!-- Pick Element Button -->
+      <UTooltip :text="t('picker.pickElementTip')">
+        <UButton
+          ref="pickButton"
+          @click="pickElement"
+          :disabled="picking"
+          variant="outline"
+          icon="i-lucide-square-mouse-pointer"
+          size="xl"
+          :ui="{ leadingIcon: 'size-5', base: 'w-full justify-center' }"
+          :label="picking ? t('picker.picking') : t('picker.pickElement')"
+        />
+      </UTooltip>
 
-      <UButton
-        v-if="selected"
-        @click="resetPicker"
-        :aria-label="t('picker.reset')"
-        :title="t('picker.reset')"
-        color="error"
-        variant="outline"
-        icon="i-lucide-x"
-        size="xl"
-        :ui="{ leadingIcon: 'size-5', base: 'shrink-0 p-2.5' }"
-      />
+      <!-- Reset Button -->
+      <UTooltip v-if="selected" :text="t('picker.resetTip')">
+        <UButton
+          @click="resetPicker"
+          :aria-label="t('picker.reset')"
+          color="error"
+          variant="outline"
+          icon="i-lucide-x"
+          size="xl"
+          :ui="{ leadingIcon: 'size-5', base: 'shrink-0 p-2.5' }"
+        />
+      </UTooltip>
 
-      <UButton
-        v-if="history.length"
-        @click="toggleHistory"
-        :aria-expanded="showHistory"
-        aria-controls="picker-history"
-        :aria-label="t('picker.history')"
-        :title="t('picker.history')"
-        color="neutral"
-        variant="outline"
-        icon="i-lucide:history"
-        size="xl"
-        :ui="{ leadingIcon: 'size-5', base: 'shrink-0 p-2.5' }"
-      />
+      <!-- History Button -->
+      <UTooltip v-if="history.length" :text="t('picker.historyTip')">
+        <UButton
+          @click="toggleHistory"
+          :aria-expanded="showHistory"
+          aria-controls="picker-history"
+          :aria-label="t('picker.history')"
+          color="neutral"
+          variant="outline"
+          icon="i-lucide:history"
+          size="xl"
+          :ui="{ leadingIcon: 'size-5', base: 'shrink-0 p-2.5' }"
+        />
+      </UTooltip>
     </div>
 
+    <!-- History Panel -->
     <Transition name="collapsible">
       <div v-show="showHistory" id="picker-history" class="grid">
         <div class="overflow-hidden min-h-0">
@@ -376,8 +363,8 @@ async function pickElement() {
               <UButton
                 @click="clearHistory"
                 color="neutral"
-                variant="ghost"
-                size="xs"
+                variant="outline"
+                :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1' }"
                 :label="t('picker.historyClear')"
               />
             </div>
@@ -408,12 +395,10 @@ async function pickElement() {
       </div>
     </Transition>
 
+    <!-- Selected Element Info -->
     <div v-if="selected" class="space-y-1 rounded bg-muted p-2 text-sm">
-      <div class="flex items-start justify-between gap-2">
-        <div class="min-w-0">
-          <span class="label-title">{{ t('picker.selector') }}</span>
-          <code class="ml-1 break-all text-highlighted">{{ selector }}</code>
-        </div>
+      <div class="flex items-center justify-between gap-2">
+        <span class="label-title">{{ t('picker.selector') }}</span>
         <UButton
           @click="selectParent"
           @mouseenter="previewParent"
@@ -428,10 +413,23 @@ async function pickElement() {
           :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1', leadingIcon: 'size-4.5' }"
         />
       </div>
+
+      <!-- Element Selector -->
+      <UTooltip :text="selector">
+        <code
+          tabindex="0"
+          class="block truncate rounded-md px-2.5 py-2 text-xs bg-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >{{ selector }}</code
+        >
+      </UTooltip>
+
+      <!-- Page URL -->
       <div>
         <span class="label-title">{{ t('picker.url') }}</span>
         <span class="ml-1 break-all text-highlighted">{{ pageUrl }}</span>
       </div>
+
+      <!-- Page Title -->
       <div>
         <span class="label-title">{{ t('picker.page') }}</span>
         <span class="ml-1 text-highlighted">{{ pageTitle }}</span>

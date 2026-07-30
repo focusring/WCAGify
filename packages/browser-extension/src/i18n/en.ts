@@ -30,9 +30,12 @@ export default {
   },
   picker: {
     pickElement: 'Pick Element',
+    pickElementTip: 'Use Pick Element to select the element or component you want to inspect.',
     picking: 'Picking... (click an element on the page)',
     reset: 'Reset selection',
+    resetTip: 'Clears the current selection and its highlight on the page. History is kept.',
     history: 'History',
+    historyTip: 'Show the elements you picked earlier and open one again.',
     historyTitle: 'Recently checked',
     historyClear: 'Clear',
     historySnapshot: 'Saved snapshot — captured earlier and not linked to the live page.',
@@ -76,8 +79,6 @@ export default {
     clear: 'Clear',
     descBtnOpen: 'Show more information for',
     descBtnClose: 'Hide information for',
-    descExpanded: 'Additional information expanded',
-    descCollapsed: 'Additional information collapsed',
     samplePage: {
       label: 'Sample Page',
       placeholder: 'Select a page',

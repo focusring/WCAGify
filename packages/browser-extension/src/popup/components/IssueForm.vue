@@ -37,23 +37,16 @@ function clearTitle() {
   titleTouched.value = true
 }
 
-function useDescToggle(getDesc: () => string) {
-  const open = ref(false)
-  const liveText = ref('')
-  function toggle() {
-    open.value = !open.value
-    liveText.value = open.value ? `${t('form.descExpanded')} ${getDesc()}` : t('form.descCollapsed')
-  }
-  return { open, liveText, toggle }
-}
-
-const info = reactive({
-  sample: useDescToggle(() => t('form.samplePage.description')),
-  title: useDescToggle(() => t('form.issueTitle.description')),
-  sc: useDescToggle(() => t('form.sc.description')),
-  severity: useDescToggle(() => t('form.severity.description')),
-  type: useDescToggle(() => t('form.type.description')),
-  body: useDescToggle(() => t('form.description.description'))
+// Every field hint is a popover, not an inline collapsible, so none of them need a live region.
+// Opening one moves focus into the popover's role="dialog" content, which announces the text.
+// Only the open state is tracked, so each toggle can say whether it opens or closes.
+const infoOpen = reactive({
+  sample: false,
+  title: false,
+  sc: false,
+  severity: false,
+  type: false,
+  body: false
 })
 
 const selectedReport = computed(() => props.reports.find((r) => r.slug === reportSlug.value))
@@ -182,33 +175,27 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UButton
-          :aria-label="`${info.sample.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.samplePage.label')}`"
-          :aria-expanded="info.sample.open"
-          aria-controls="issue-sample-more-desc"
-          icon="i-lucide-info"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          @click="info.sample.toggle"
-        />
+        <UPopover v-model:open="infoOpen.sample" :content="{ sideOffset: 4, collisionPadding: 16 }">
+          <UButton
+            :aria-label="`${infoOpen.sample ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.samplePage.label')}`"
+            icon="i-lucide-info"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+          />
+          <template #content>
+            <p
+              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
+            >
+              {{ t('form.samplePage.description') }}
+            </p>
+          </template>
+        </UPopover>
       </template>
 
       <span id="issue-sample-desc" class="sr-only">
         {{ t('form.samplePage.description') }}
       </span>
-
-      <div aria-live="polite" aria-atomic="true" class="sr-only">
-        {{ info.sample.liveText }}
-      </div>
-
-      <Transition name="collapsible">
-        <div v-show="info.sample.open" id="issue-sample-more-desc" class="grid">
-          <p class="label-hint overflow-hidden min-h-0 mb-1">
-            {{ t('form.samplePage.description') }}
-          </p>
-        </div>
-      </Transition>
 
       <ClearableSelect
         id="issue-sample"
@@ -234,33 +221,27 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UButton
-          :aria-label="`${info.title.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.issueTitle.label')}`"
-          :aria-expanded="info.title.open"
-          aria-controls="issue-title-more-desc"
-          icon="i-lucide-info"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          @click="info.title.toggle"
-        />
+        <UPopover v-model:open="infoOpen.title" :content="{ sideOffset: 4, collisionPadding: 16 }">
+          <UButton
+            :aria-label="`${infoOpen.title ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.issueTitle.label')}`"
+            icon="i-lucide-info"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+          />
+          <template #content>
+            <p
+              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
+            >
+              {{ t('form.issueTitle.description') }}
+            </p>
+          </template>
+        </UPopover>
       </template>
 
       <span id="issue-title-desc" class="sr-only">
         {{ t('form.issueTitle.description') }}
       </span>
-
-      <div aria-live="polite" aria-atomic="true" class="sr-only">
-        {{ info.title.liveText }}
-      </div>
-
-      <Transition name="collapsible">
-        <div v-show="info.title.open" id="issue-title-more-desc" class="grid">
-          <p class="label-hint overflow-hidden min-h-0 mb-1">
-            {{ t('form.issueTitle.description') }}
-          </p>
-        </div>
-      </Transition>
 
       <div class="relative w-full">
         <UInput
@@ -307,33 +288,27 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UButton
-          :aria-label="`${info.sc.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.sc.label')}`"
-          :aria-expanded="info.sc.open"
-          aria-controls="issue-sc-more-desc"
-          icon="i-lucide-info"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          @click="info.sc.toggle"
-        />
+        <UPopover v-model:open="infoOpen.sc" :content="{ sideOffset: 4, collisionPadding: 16 }">
+          <UButton
+            :aria-label="`${infoOpen.sc ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.sc.label')}`"
+            icon="i-lucide-info"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+          />
+          <template #content>
+            <p
+              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
+            >
+              {{ t('form.sc.description') }}
+            </p>
+          </template>
+        </UPopover>
       </template>
 
       <span id="issue-sc-desc" class="sr-only">
         {{ t('form.sc.description') }}
       </span>
-
-      <div aria-live="polite" aria-atomic="true" class="sr-only">
-        {{ info.sc.liveText }}
-      </div>
-
-      <Transition name="collapsible">
-        <div v-show="info.sc.open" id="issue-sc-more-desc" class="grid">
-          <p class="label-hint overflow-hidden min-h-0 mb-1">
-            {{ t('form.sc.description') }}
-          </p>
-        </div>
-      </Transition>
 
       <ScCombobox
         id="issue-sc"
@@ -359,33 +334,30 @@ async function submit() {
         class="w-full"
       >
         <template #hint>
-          <UButton
-            :aria-label="`${info.severity.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.severity.label')}`"
-            :aria-expanded="info.severity.open"
-            aria-controls="issue-severity-more-desc"
-            icon="i-lucide-info"
-            size="xs"
-            color="neutral"
-            variant="ghost"
-            @click="info.severity.toggle"
-          />
+          <UPopover
+            v-model:open="infoOpen.severity"
+            :content="{ sideOffset: 4, collisionPadding: 16 }"
+          >
+            <UButton
+              :aria-label="`${infoOpen.severity ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.severity.label')}`"
+              icon="i-lucide-info"
+              size="xs"
+              color="neutral"
+              variant="ghost"
+            />
+            <template #content>
+              <p
+                class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
+              >
+                {{ t('form.severity.description') }}
+              </p>
+            </template>
+          </UPopover>
         </template>
 
         <span id="issue-severity-desc" class="sr-only">
           {{ t('form.severity.description') }}
         </span>
-
-        <div aria-live="polite" aria-atomic="true" class="sr-only">
-          {{ info.severity.liveText }}
-        </div>
-
-        <Transition name="collapsible">
-          <div v-show="info.severity.open" id="issue-severity-more-desc" class="grid">
-            <p class="label-hint overflow-hidden min-h-0 mb-1">
-              {{ t('form.severity.description') }}
-            </p>
-          </div>
-        </Transition>
 
         <ClearableSelect
           id="issue-severity"
@@ -409,33 +381,27 @@ async function submit() {
         class="w-full"
       >
         <template #hint>
-          <UButton
-            :aria-label="`${info.type.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.type.label')}`"
-            :aria-expanded="info.type.open"
-            aria-controls="issue-type-more-desc"
-            icon="i-lucide-info"
-            size="xs"
-            color="neutral"
-            variant="ghost"
-            @click="info.type.toggle"
-          />
+          <UPopover v-model:open="infoOpen.type" :content="{ sideOffset: 4, collisionPadding: 16 }">
+            <UButton
+              :aria-label="`${infoOpen.type ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.type.label')}`"
+              icon="i-lucide-info"
+              size="xs"
+              color="neutral"
+              variant="ghost"
+            />
+            <template #content>
+              <p
+                class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
+              >
+                {{ t('form.type.description') }}
+              </p>
+            </template>
+          </UPopover>
         </template>
 
         <span id="issue-type-desc" class="sr-only">
           {{ t('form.type.description') }}
         </span>
-
-        <div aria-live="polite" aria-atomic="true" class="sr-only">
-          {{ info.type.liveText }}
-        </div>
-
-        <Transition name="collapsible">
-          <div v-show="info.type.open" id="issue-type-more-desc" class="grid">
-            <p class="label-hint overflow-hidden min-h-0 mb-1">
-              {{ t('form.type.description') }}
-            </p>
-          </div>
-        </Transition>
 
         <ClearableSelect
           id="issue-type"
@@ -461,33 +427,27 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UButton
-          :aria-label="`${info.body.open ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.description.label')}`"
-          :aria-expanded="info.body.open"
-          aria-controls="issue-description-more-desc"
-          icon="i-lucide-info"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          @click="info.body.toggle"
-        />
+        <UPopover v-model:open="infoOpen.body" :content="{ sideOffset: 4, collisionPadding: 16 }">
+          <UButton
+            :aria-label="`${infoOpen.body ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.description.label')}`"
+            icon="i-lucide-info"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+          />
+          <template #content>
+            <p
+              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
+            >
+              {{ t('form.description.description') }}
+            </p>
+          </template>
+        </UPopover>
       </template>
 
       <span id="issue-description-desc" class="sr-only">
         {{ t('form.description.description') }}
       </span>
-
-      <div aria-live="polite" aria-atomic="true" class="sr-only">
-        {{ info.body.liveText }}
-      </div>
-
-      <Transition name="collapsible">
-        <div v-show="info.body.open" id="issue-description-more-desc" class="grid">
-          <p class="label-hint overflow-hidden min-h-0 mb-1">
-            {{ t('form.description.description') }}
-          </p>
-        </div>
-      </Transition>
 
       <RichTextEditor
         v-model="description"
