@@ -11,9 +11,9 @@ allowBuilds:
 
 catalog:
   '@nuxt/fonts': ^0.14.0
-  '@nuxt/ui': ^4.9.0
-  '@tiptap/core': ^3.27.4
-  '@tiptap/vue-3': ^3.27.4
+  '@nuxt/ui': ^4.10.0
+  '@tiptap/core': ^3.29.2
+  '@tiptap/vue-3': ^3.29.2
   nanoid: ^6.0.0
   sharp: ^0.35.3
   zod: ^4.4.3
@@ -27,19 +27,19 @@ catalogs:
     ejs: ^6.0.1
     picocolors: ^1.1.1
   core:
-    '@iconify-json/lucide': ^1.2.117
-    '@iconify-json/simple-icons': ^1.2.90
+    '@iconify-json/lucide': ^1.2.120
+    '@iconify-json/simple-icons': ^1.2.92
     '@libsql/client': ^0.17.4
     '@nuxt/a11y': 1.0.0-alpha.1
-    '@nuxt/content': ^3.15.0
-    '@nuxt/icon': ^2.3.1
+    '@nuxt/content': ^3.15.2
+    '@nuxt/icon': ^2.4.1
     '@nuxt/kit': ^4.4.8
-    '@nuxt/ui': ^4.9.0
-    '@nuxtjs/i18n': ^10.4.1
-    '@vueuse/core': ^14.3.0
+    '@nuxt/ui': ^4.10.0
+    '@nuxtjs/i18n': ^10.6.0
+    '@vueuse/core': ^14.4.0
     nuxt: ^4.4.8
     nuxt-studio: ^1.7.0
-    tailwindcss: ^4.3.2
+    tailwindcss: ^4.3.3
     zod: ^4.4.3
   dev:
     '@nuxt/schema': ^4.4.8
@@ -50,18 +50,18 @@ catalogs:
     changelogen: ^0.6.2
     changelogithub: ^14.0.0
     husky: ^9.1.7
-    knip: ^6.26.0
-    lint-staged: ^17.0.8
-    oxfmt: ^0.59.0
-    oxlint: ^1.74.0
-    playwright: ^1.61.1
-    tsdown: ^0.22.8
+    knip: ^6.30.0
+    lint-staged: ^17.2.0
+    oxfmt: ^0.61.0
+    oxlint: ^1.76.0
+    playwright: ^1.62.1
+    tsdown: ^0.22.14
     typescript: ^6.0.3
-    unpdf: ^1.6.2
+    unpdf: ^1.8.0
     vitest: ^4.1.10
-    vue-tsc: ^3.3.7
+    vue-tsc: ^3.3.9
   docs:
-    '@tailwindcss/vite': ^4.3.2
+    '@tailwindcss/vite': ^4.3.3
     vitepress: 2.0.0-alpha.18
 
 linkWorkspacePackages: true
@@ -73,39 +73,39 @@ linkWorkspacePackages: true
 # tree on one version, and keep this range in sync with the catalog.
 # (Enumerated because pnpm ignores wildcard override names like '@tiptap/*'.)
 overrides:
-  '@tiptap/extension-blockquote': ^3.27.4
-  '@tiptap/extension-bold': ^3.27.4
-  '@tiptap/extension-bullet-list': ^3.27.4
-  '@tiptap/extension-code': ^3.27.4
-  '@tiptap/extension-code-block': ^3.27.4
-  '@tiptap/extension-collaboration': ^3.27.4
-  '@tiptap/extension-document': ^3.27.4
-  '@tiptap/extension-drag-handle': ^3.27.4
-  '@tiptap/extension-drag-handle-vue-3': ^3.27.4
-  '@tiptap/extension-dropcursor': ^3.27.4
-  '@tiptap/extension-gapcursor': ^3.27.4
-  '@tiptap/extension-hard-break': ^3.27.4
-  '@tiptap/extension-heading': ^3.27.4
-  '@tiptap/extension-horizontal-rule': ^3.27.4
-  '@tiptap/extension-image': ^3.27.4
-  '@tiptap/extension-italic': ^3.27.4
-  '@tiptap/extension-link': ^3.27.4
-  '@tiptap/extension-list': ^3.27.4
-  '@tiptap/extension-list-item': ^3.27.4
-  '@tiptap/extension-list-keymap': ^3.27.4
-  '@tiptap/extension-mention': ^3.27.4
-  '@tiptap/extension-node-range': ^3.27.4
-  '@tiptap/extension-ordered-list': ^3.27.4
-  '@tiptap/extension-paragraph': ^3.27.4
-  '@tiptap/extension-placeholder': ^3.27.4
-  '@tiptap/extension-strike': ^3.27.4
-  '@tiptap/extension-text': ^3.27.4
-  '@tiptap/extension-underline': ^3.27.4
-  '@tiptap/extensions': ^3.27.4
-  '@tiptap/markdown': ^3.27.4
-  '@tiptap/pm': ^3.27.4
-  '@tiptap/starter-kit': ^3.27.4
-  '@tiptap/suggestion': ^3.27.4
+  '@tiptap/extension-blockquote': ^3.29.2
+  '@tiptap/extension-bold': ^3.29.2
+  '@tiptap/extension-bullet-list': ^3.29.2
+  '@tiptap/extension-code': ^3.29.2
+  '@tiptap/extension-code-block': ^3.29.2
+  '@tiptap/extension-collaboration': ^3.29.2
+  '@tiptap/extension-document': ^3.29.2
+  '@tiptap/extension-drag-handle': ^3.29.2
+  '@tiptap/extension-drag-handle-vue-3': ^3.29.2
+  '@tiptap/extension-dropcursor': ^3.29.2
+  '@tiptap/extension-gapcursor': ^3.29.2
+  '@tiptap/extension-hard-break': ^3.29.2
+  '@tiptap/extension-heading': ^3.29.2
+  '@tiptap/extension-horizontal-rule': ^3.29.2
+  '@tiptap/extension-image': ^3.29.2
+  '@tiptap/extension-italic': ^3.29.2
+  '@tiptap/extension-link': ^3.29.2
+  '@tiptap/extension-list': ^3.29.2
+  '@tiptap/extension-list-item': ^3.29.2
+  '@tiptap/extension-list-keymap': ^3.29.2
+  '@tiptap/extension-mention': ^3.29.2
+  '@tiptap/extension-node-range': ^3.29.2
+  '@tiptap/extension-ordered-list': ^3.29.2
+  '@tiptap/extension-paragraph': ^3.29.2
+  '@tiptap/extension-placeholder': ^3.29.2
+  '@tiptap/extension-strike': ^3.29.2
+  '@tiptap/extension-text': ^3.29.2
+  '@tiptap/extension-underline': ^3.29.2
+  '@tiptap/extensions': ^3.29.2
+  '@tiptap/markdown': ^3.29.2
+  '@tiptap/pm': ^3.29.2
+  '@tiptap/starter-kit': ^3.29.2
+  '@tiptap/suggestion': ^3.29.2
 
 shellEmulator: true
 
