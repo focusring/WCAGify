@@ -1,4 +1,4 @@
-FROM node:24-slim
+FROM node:24.18.1-slim
 
 RUN corepack enable
 
