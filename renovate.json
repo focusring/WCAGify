@@ -9,6 +9,11 @@
       "matchDepTypes": ["pnpm.catalog.dev"],
       "automerge": true,
       "automergeType": "branch"
+    },
+    {
+      "description": "TypeScript 7 (native) drops the JS compiler API and its tsgo dts generator fails on JSON imports (rolldown/tsdown#742, oxc-project/oxc#19300). Pin to 6.x until tsdown/vue-tsc support TS7.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
     }
   ]
 }
