@@ -1,5 +1,11 @@
 import { getUniqueSelector } from '../unique-selector'
-import { getBorderColors, getElementOwnColor, getIconColors, getTextColors } from './color'
+import {
+  FIELD_SELECTOR,
+  getBorderColors,
+  getElementOwnColor,
+  getIconColors,
+  getTextColors
+} from './color'
 import { getElementGradient } from './gradient'
 import { firstSolidBackgroundColor, getBackgroundInfo } from './background'
 import { getMediaInfo } from './media'
@@ -7,7 +13,14 @@ import { iframeMedia, probeIframe } from './iframe'
 import { hasHoverStyles } from './hover'
 import { getAriaRole, isAccessibilityHidden } from './role'
 import { getOutlineColor, getShadowColors } from './shadow'
-import { isHtmlTag, isSvgTag, sameColor, scanDescendants, tryParseColor } from './css-utils'
+import {
+  boxCoverage,
+  isHtmlTag,
+  isSvgTag,
+  sameColor,
+  scanDescendants,
+  tryParseColor
+} from './css-utils'
 import type { ElementInfo, Rgba } from './types'
 
 // Roles worth surfacing as their own nested section: interactive widgets + media/indicators that carry visual values and that the picker often can't land on directly.
@@ -90,9 +103,75 @@ function elementLabel(el: Element): string {
   return named.length > 40 ? `${named.slice(0, 40)}…` : named
 }
 
+// A form control's visual widget is usually the wrapper around it, not the control itself: the leading search icon, the
+// affix, the focus ring all sit on or beside the wrapper, outside the <input>. A section anchored on the control alone
+// can't report those, so they fall through to the ancestor's rows and read as unexplained values there.
+// These constants bound the climb from the control to that wrapper.
+const MAX_WRAPPER_CLIMB = 3
+// Same threshold findFillingDescendant uses for "this covers the box": the wrapper must be essentially the control's own box.
+const WRAPPER_COVERAGE = 0.9
+
+const isFormField = (el: Element): boolean =>
+  isHtmlTag(el, 'input') || isHtmlTag(el, 'textarea') || isHtmlTag(el, 'select')
+
+// Text that belongs to `candidate` rather than to `inner` a label, a hint, a suffix. Its presence means the element is
+// a form group, not a bare adornment wrapper, and promoting to it would pull that text into the control's section.
+// A control's own value/placeholder is not a text node, so an <input> never trips this; <option> text sits inside `inner`.
+function hasTextOutside(candidate: Element, inner: Element): boolean {
+  const walker = document.createTreeWalker(candidate, NodeFilter.SHOW_TEXT)
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.textContent?.trim()) continue
+    if (!inner.contains(node)) return true
+  }
+  return false
+}
+
+// Whether `candidate` is the adornment wrapper for `inner`, i.e. safe to anchor `inner`'s section on.
+// It must not be surfaceable itself (it would get its own section), must hold no second widget (that makes it a group,
+// and the second widget's own section already reports its values), must carry no text of its own, and must be the
+// control's box. The coverage test is skipped when neither box is measurable (no layout) the structural guards stand alone.
+function isAdornmentWrapper(candidate: Element, inner: Element): boolean {
+  if (surfaceableRole(candidate) !== '') return false
+  let widgets = 0
+  for (const el of candidate.querySelectorAll('*')) {
+    if (surfaceableRole(el) !== '' && ++widgets > 1) return false
+  }
+  if (hasTextOutside(candidate, inner)) return false
+  const rect = candidate.getBoundingClientRect()
+  if (rect.width === 0 || rect.height === 0) return true
+  return boxCoverage(inner, rect) >= WRAPPER_COVERAGE
+}
+
+// The element a surfaced section is anchored to: a form control's adornment wrapper when it has one, else the element
+// itself. Never climbs past `root`, which keeps the anchor inside the subtree being inspected.
+function sectionAnchor(el: Element, root: Element): Element {
+  if (!isFormField(el)) return el
+  let anchor = el
+  for (let depth = 0; depth < MAX_WRAPPER_CLIMB; depth++) {
+    const candidate = anchor.parentElement
+    if (!candidate || !root.contains(candidate)) break
+    if (!isAdornmentWrapper(candidate, anchor)) break
+    anchor = candidate
+  }
+  return anchor
+}
+
 // Boundary of an element's own scope: a descendant surfaced as its own section reports its text/icon colors there, so
-// the ancestor must not repeat them. Same test the child scan runs, so the two can't disagree on what a section owns.
-const isSurfacedChild = (el: Element): boolean => surfaceableRole(el) !== ''
+// the ancestor must not repeat them. Built from the same anchors the child scan uses, so the two can't disagree on what
+// a section owns a control promoted to a wrapper hands its boundary to that wrapper and stops being one itself,
+// because its values are now part of the wrapper's section.
+function surfacedChildTest(el: Element): (child: Element) => boolean {
+  const wrappers = new Set<Element>()
+  const promoted = new Set<Element>()
+  for (const field of el.querySelectorAll(FIELD_SELECTOR)) {
+    if (surfaceableRole(field) === '') continue
+    const anchor = sectionAnchor(field, el)
+    if (anchor === field) continue
+    wrappers.add(anchor)
+    promoted.add(field)
+  }
+  return (child) => wrappers.has(child) || (surfaceableRole(child) !== '' && !promoted.has(child))
+}
 
 function isDisabled(el: Element): boolean {
   try {
@@ -110,20 +189,29 @@ export function collectElementInfo(el: Element, role: string = getAriaRole(el)):
   return buildElementInfo(el, role)
 }
 
+function selectorOf(el: Element): string {
+  const sel = getUniqueSelector(el)
+  return Array.isArray(sel) ? sel.join(' > ') : sel
+}
+
 function buildElementInfo(el: Element, role: string): ElementInfo {
   const style = getComputedStyle(el)
+  const isSurfacedChild = surfacedChildTest(el)
   const scan = scanDescendants(el, style, isSurfacedChild)
   const shadow = getShadowColors(el, style)
-  const sel = getUniqueSelector(el)
+  const text = getTextColors(el, isSurfacedChild)
+  const icons = getIconColors(el, style, scan, isSurfacedChild)
   return {
-    selector: Array.isArray(sel) ? sel.join(' > ') : sel,
+    selector: selectorOf(el),
     role,
     ariaHidden: isAccessibilityHidden(el),
     disabled: isDisabled(el),
     label: elementLabel(el),
     hasHoverStyles: hasHoverStyles(el),
-    textColors: getTextColors(el, isSurfacedChild),
-    iconColors: getIconColors(el, style, scan, isSurfacedChild),
+    textColors: text.colors,
+    textColorSources: text.sources,
+    iconColors: icons.colors,
+    iconColorSources: icons.sources,
     elementColor: getElementOwnColor(el, style),
     elementGradient: getElementGradient(el, style, scan.clipTextBackgroundImages),
     background: getBackgroundInfo(el, style),
@@ -143,10 +231,9 @@ function collectIframeInfo(iframe: HTMLIFrameElement, role: string): ElementInfo
   if (probe.state === 'content' && probe.innerRoot) {
     try {
       const inner = buildElementInfo(probe.innerRoot, getAriaRole(probe.innerRoot))
-      const sel = getUniqueSelector(iframe)
       return {
         ...inner,
-        selector: Array.isArray(sel) ? sel.join(' > ') : sel,
+        selector: selectorOf(iframe),
         ariaHidden: isAccessibilityHidden(iframe),
         disabled: isDisabled(iframe),
         label: elementLabel(iframe) || inner.label,
@@ -181,9 +268,31 @@ function childScanRoot(el: Element): Element | null {
   return el
 }
 
-// Identity of a section's detected values (all but selector and count): same key ⇒ interchangeable in the panel.
+// A control promoted to its adornment wrapper (see sectionAnchor): the values come from the wrapper, since that is the
+// widget as painted, while the identity stays the control's the role, accessible name and selector all name the thing
+// you would act on, not the div drawn around it.
+function collectFieldSection(control: Element, wrapper: Element, role: string): ElementInfo {
+  const info = buildElementInfo(wrapper, role)
+  return {
+    ...info,
+    selector: selectorOf(control),
+    ariaHidden: isAccessibilityHidden(control),
+    disabled: isDisabled(control),
+    label: elementLabel(control) || info.label,
+    hasHoverStyles: info.hasHoverStyles || hasHoverStyles(control)
+  }
+}
+
+// Identity of a section's detected values (all but selector, count and the presentational source labels):
+// same key ⇒ interchangeable in the panel.
 function sectionKey(info: ElementInfo): string {
-  const { selector: _selector, count: _count, ...values } = info
+  const {
+    selector: _selector,
+    count: _count,
+    textColorSources: _textSources,
+    iconColorSources: _iconSources,
+    ...values
+  } = info
   return JSON.stringify(values)
 }
 
@@ -212,7 +321,14 @@ export function collectChildSections(el: Element): ChildSections {
     if (!role) continue
     if (++detections > MAX_CHILD_DETECTIONS) break
     try {
-      const info = collectElementInfo(child, role)
+      // A form control reports the values of its adornment wrapper. When that wrapper is the scanned element itself,
+      // there is no nested section to make — the panel's own rows already carry them.
+      const anchor = sectionAnchor(child, root)
+      if (anchor === root) continue
+      const info =
+        anchor === child
+          ? collectElementInfo(child, role)
+          : collectFieldSection(child, anchor, role)
       dedupeChildBackground(info, reference)
       const key = sectionKey(info)
       const existing = sections.get(key)

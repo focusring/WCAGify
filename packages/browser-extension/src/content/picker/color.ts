@@ -39,7 +39,60 @@ export function getElementOwnColor(
 // Tags whose text content is not rendered visually (filters the text walker).
 const NON_VISIBLE_TEXT_TAGS = new Set(['script', 'style', 'noscript', 'title', 'desc'])
 
-const FIELD_SELECTOR = 'input, textarea, select'
+export const FIELD_SELECTOR = 'input, textarea, select'
+
+// Colors plus, per color and index-aligned with it, short names for the elements it was found on.
+// A design system reuses one token across unrelated elements, so a color repeating between an element and one of its
+// child sections is usually a coincidence rather than a duplicate the sources are what tells the two apart.
+export interface ColorSources {
+  colors: string[]
+  sources: string[][]
+}
+
+// color → element descriptor → how many elements of that description carried it, all in first-seen order.
+type ColorTally = Map<string, Map<string, number>>
+
+// A short, readable name for the element a color came from: its Iconify/Tailwind icon class when it has one
+// (`i-lucide:search` says far more than `span`), else the tag name. Kept short it lands in a swatch tooltip.
+const ICON_CLASS = /(?:^|\s)(i-[\w-]+[:-][\w-]+)/
+function sourceDescriptor(el: Element): string {
+  const icon = ICON_CLASS.exec(el.getAttribute('class') ?? '')
+  return icon ? icon[1]! : el.localName
+}
+
+// Records a visible color against the element carrying it; invisible (unparseable/fully transparent) colors are dropped.
+function tallyColor(tally: ColorTally, color: string, source: Element): void {
+  const parsed = tryParseColor(color)
+  if (!parsed || parsed.a === 0) return
+  let byDescriptor = tally.get(color)
+  if (!byDescriptor) {
+    byDescriptor = new Map<string, number>()
+    tally.set(color, byDescriptor)
+  }
+  const descriptor = sourceDescriptor(source)
+  byDescriptor.set(descriptor, (byDescriptor.get(descriptor) ?? 0) + 1)
+}
+
+// Caps how many descriptors one color lists, so a color used across a whole table doesn't produce an unreadable tooltip.
+const MAX_SOURCES_SHOWN = 4
+
+// ['h1', 'td ×3', '+2'] repeats collapse into a count, the tail into a remainder.
+function formatSources(byDescriptor: Map<string, number>): string[] {
+  const out: string[] = []
+  for (const [descriptor, count] of byDescriptor) {
+    if (out.length === MAX_SOURCES_SHOWN) {
+      out.push(`+${byDescriptor.size - MAX_SOURCES_SHOWN}`)
+      break
+    }
+    out.push(count > 1 ? `${descriptor} ×${count}` : descriptor)
+  }
+  return out
+}
+
+function tallyResult(tally: ColorTally): ColorSources {
+  const colors = [...tally.keys()]
+  return { colors, sources: colors.map((color) => formatSources(tally.get(color)!)) }
+}
 
 // Input types whose value is not rendered as text.
 const NON_TEXT_INPUT_TYPES = new Set([
@@ -53,11 +106,6 @@ const NON_TEXT_INPUT_TYPES = new Set([
   'reset',
   'button'
 ])
-
-function addVisibleColor(set: Set<string>, color: string): void {
-  const parsed = tryParseColor(color)
-  if (parsed && parsed.a > 0) set.add(color)
-}
 
 function isVisibleTextField(field: Element): boolean {
   if (isHtmlTag(field, 'input')) {
@@ -81,19 +129,18 @@ function getFieldPlaceholder(field: Element): string {
   return ''
 }
 
-// Unique computed `color` values for visible text inside el: text nodes, input/textarea values, and ::placeholder when empty.
-// `isBoundary` marks descendants surfaced as their own section; their text is reported there, so it stays out of el's
-// row. A wrapper whose text all belongs to such children falls back to the whole subtree — a color visible on the page
-// must stay reachable even when its section is capped, merged or on another page.
+// Unique computed `color` values for visible text el owns: text nodes, input/textarea values, and ::placeholder when empty.
+// `isBoundary` marks descendants surfaced as their own section they report their own text there, so it stays out of
+// el's row entirely. An element whose text all belongs to such children gets an empty row, not a summary of theirs:
+// every surfaced section is rendered in the panel (paginated at most), so nothing goes missing, and a value that does
+// show up here is one no child section accounts for.
 export function getTextColors(
   el: Element,
   isBoundary: (child: Element) => boolean = () => false
-): string[] {
-  const own = new Set<string>()
-  const all = new Set<string>()
+): ColorSources {
+  const own: ColorTally = new Map()
   const add = (source: Element, color: string): void => {
-    addVisibleColor(all, color)
-    if (isOwnScope(source, el, isBoundary)) addVisibleColor(own, color)
+    if (isOwnScope(source, el, isBoundary)) tallyColor(own, color, source)
   }
 
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
@@ -123,7 +170,7 @@ export function getTextColors(
     }
   }
 
-  return own.size > 0 ? [...own] : [...all]
+  return tallyResult(own)
 }
 
 // Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.
@@ -201,28 +248,23 @@ function getSvgColors(svg: SVGElement): string[] {
 
 // Unique visible icon colors: SVG fill/stroke + CSS-mask background-color (Iconify/Lucide via @nuxt/icon).
 // Mask colors (el + descendants, so icons inside a picked button/link surface) come from the shared scanDescendants pass, already split by scope; `isBoundary` splits the SVG roots the same way, so pass the predicate the scan used or the two halves disagree.
-// Same own-with-fallback rule as getTextColors.
+// Same own-scope rule as getTextColors: an icon inside a surfaced child is that child's to report.
 export function getIconColors(
   el: Element,
   style: CSSStyleDeclaration = getComputedStyle(el),
   scan: DescendantScan = scanDescendants(el, style),
   isBoundary: (child: Element) => boolean = () => false
-): string[] {
-  const own = new Set<string>()
-  const all = new Set<string>()
+): ColorSources {
+  const own: ColorTally = new Map()
 
   for (const svg of collectSvgRoots(el, { excludeImage: true })) {
-    const ownScope = isOwnScope(svg, el, isBoundary)
-    for (const c of getSvgColors(svg)) {
-      addVisibleColor(all, c)
-      if (ownScope) addVisibleColor(own, c)
-    }
+    if (!isOwnScope(svg, el, isBoundary)) continue
+    for (const c of getSvgColors(svg)) tallyColor(own, c, svg)
   }
 
-  for (const c of scan.maskBackgroundColors) addVisibleColor(all, c)
-  for (const c of scan.ownMaskBackgroundColors) addVisibleColor(own, c)
+  for (const mask of scan.ownMaskBackgroundColors) tallyColor(own, mask.color, mask.el)
 
-  return own.size > 0 ? [...own] : [...all]
+  return tallyResult(own)
 }
 
 // Visible border colors from one computed style (element's own or a pseudo-element's) into `colors`.

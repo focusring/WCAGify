@@ -131,6 +131,8 @@ function onMessage(message: {
     picking.value = false
     pickerTabId.value = undefined
     viewingSnapshot.value = false
+    // A completed pick (fresh or parent/child step) always wins the shared slot back from the history view.
+    showHistory.value = false
     recordHistory()
   }
   if (message.type === 'picker-cancelled') {
@@ -173,7 +175,7 @@ function resetPicker() {
 }
 
 function persistHistory() {
-  // Round-tripped through JSON to strip Vue's reactive proxies; structuredClone throws DataCloneError on them. eslint-disable-next-line unicorn/prefer-structured-clone.
+  // Round-tripped through JSON to strip Vue's reactive proxies; structuredClone throws DataCloneError on them. eslint-disable-next-line unicorn/prefer-structured-clone
   const plain = JSON.parse(JSON.stringify(history.value)) as HistoryEntry[]
   chrome.storage.local.set({ [HISTORY_KEY]: plain }).catch(() => {})
 }
@@ -353,125 +355,125 @@ async function pickElement() {
       </UTooltip>
     </div>
 
-    <!-- History Panel -->
-    <Transition name="collapsible">
-      <div v-show="showHistory" id="picker-history" class="grid">
-        <div class="overflow-hidden min-h-0">
-          <div class="space-y-2 rounded bg-muted p-2 text-sm">
-            <div class="flex items-center justify-between gap-2">
-              <span class="label-title">{{ t('picker.historyTitle') }}</span>
-              <UButton
-                @click="clearHistory"
-                color="neutral"
-                variant="outline"
-                :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1' }"
-                :label="t('picker.historyClear')"
-              />
-            </div>
-            <ul class="space-y-1">
-              <li v-for="entry in history" :key="entry.id">
-                <UButton
-                  @click="restoreHistoryEntry(entry)"
-                  :aria-current="entry.id === activeEntryId ? 'true' : undefined"
-                  color="neutral"
-                  variant="outline"
-                  block
-                  :ui="{ base: 'justify-start gap-2 px-2 py-1.5 text-left' }"
-                >
-                  <span class="min-w-0 flex-1">
-                    <span class="block truncate font-medium text-highlighted">
-                      {{ entryLabel(entry) }}
-                    </span>
-                    <code class="block truncate text-toned">{{ entry.selected.selector }}</code>
-                  </span>
-                  <UBadge v-if="entry.selected.role" color="neutral" variant="subtle" size="sm">
-                    {{ entry.selected.role }}
-                  </UBadge>
-                </UButton>
-              </li>
-            </ul>
-          </div>
+    <Transition name="panel-switch" mode="out-in">
+      <div
+        v-if="showHistory"
+        id="picker-history"
+        key="history"
+        class="space-y-2 rounded bg-muted p-2 text-sm"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span class="label-title">{{ t('picker.historyTitle') }}</span>
+          <UButton
+            @click="clearHistory"
+            color="neutral"
+            variant="outline"
+            :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1' }"
+            :label="t('picker.historyClear')"
+          />
         </div>
+        <ul class="space-y-1">
+          <li v-for="entry in history" :key="entry.id">
+            <UButton
+              @click="restoreHistoryEntry(entry)"
+              :aria-current="entry.id === activeEntryId ? 'true' : undefined"
+              color="neutral"
+              variant="outline"
+              block
+              :ui="{ base: 'justify-start gap-2 px-2 py-1.5 text-left' }"
+            >
+              <span class="min-w-0 flex-1">
+                <span class="block truncate font-medium text-highlighted">
+                  {{ entryLabel(entry) }}
+                </span>
+                <code class="block truncate text-toned">{{ entry.selected.selector }}</code>
+              </span>
+              <UBadge v-if="entry.selected.role" color="neutral" variant="subtle" size="sm">
+                {{ entry.selected.role }}
+              </UBadge>
+            </UButton>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Selected Element Info -->
+      <div v-else-if="selected" key="selected" class="space-y-1 rounded bg-muted p-2 text-sm">
+        <div class="flex items-center justify-between gap-2">
+          <span class="label-title">{{ t('picker.selector') }}</span>
+          <UButton
+            @click="selectParent"
+            @mouseenter="previewParent"
+            @mouseleave="endPreview"
+            @focus="previewParent"
+            @blur="endPreview"
+            :disabled="!hasParent"
+            icon="i-lucide-arrow-up"
+            color="neutral"
+            variant="outline"
+            :label="t('picker.selectParent')"
+            :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1', leadingIcon: 'size-4.5' }"
+          />
+        </div>
+
+        <!-- Element Selector -->
+        <UTooltip :text="selector">
+          <code
+            tabindex="0"
+            class="block truncate rounded-md px-2.5 py-2 text-xs bg-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >{{ selector }}</code
+          >
+        </UTooltip>
+
+        <!-- Page URL -->
+        <div>
+          <span class="label-title">{{ t('picker.url') }}</span>
+          <span class="ml-1 break-all text-highlighted">{{ pageUrl }}</span>
+        </div>
+
+        <!-- Page Title -->
+        <div>
+          <span class="label-title">{{ t('picker.page') }}</span>
+          <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
+        </div>
+        <p v-if="viewingSnapshot" class="text-toned">{{ t('picker.historySnapshot') }}</p>
+        <PickedElementSection :info="selected" />
+        <template v-if="isChildPaginated">
+          <template v-for="(child, i) in pagedChildren" :key="`child-${childPage}-${i}`">
+            <USeparator class="my-2" />
+            <PickedElementSection
+              :info="child"
+              child
+              :snapshot="viewingSnapshot"
+              @select="selectChild(childIndex(i))"
+              @preview="previewChild(childIndex(i))"
+              @preview-end="endPreview"
+            />
+          </template>
+          <div class="flex justify-center mt-4">
+            <UPagination
+              v-model:page="childPage"
+              :total="children.length"
+              :items-per-page="CHILD_PAGE_SIZE"
+              :sibling-count="0"
+              show-edges
+              size="sm"
+            />
+          </div>
+        </template>
+        <template v-else>
+          <template v-for="(child, i) in children" :key="`child-${i}`">
+            <USeparator class="my-2" />
+            <PickedElementSection
+              :info="child"
+              child
+              :snapshot="viewingSnapshot"
+              @select="selectChild(i)"
+              @preview="previewChild(i)"
+              @preview-end="endPreview"
+            />
+          </template>
+        </template>
       </div>
     </Transition>
-
-    <!-- Selected Element Info -->
-    <div v-if="selected" class="space-y-1 rounded bg-muted p-2 text-sm">
-      <div class="flex items-center justify-between gap-2">
-        <span class="label-title">{{ t('picker.selector') }}</span>
-        <UButton
-          @click="selectParent"
-          @mouseenter="previewParent"
-          @mouseleave="endPreview"
-          @focus="previewParent"
-          @blur="endPreview"
-          :disabled="!hasParent"
-          icon="i-lucide-arrow-up"
-          color="neutral"
-          variant="outline"
-          :label="t('picker.selectParent')"
-          :ui="{ base: 'shrink-0 gap-1 px-1.5 py-1', leadingIcon: 'size-4.5' }"
-        />
-      </div>
-
-      <!-- Element Selector -->
-      <UTooltip :text="selector">
-        <code
-          tabindex="0"
-          class="block truncate rounded-md px-2.5 py-2 text-xs bg-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >{{ selector }}</code
-        >
-      </UTooltip>
-
-      <!-- Page URL -->
-      <div>
-        <span class="label-title">{{ t('picker.url') }}</span>
-        <span class="ml-1 break-all text-highlighted">{{ pageUrl }}</span>
-      </div>
-
-      <!-- Page Title -->
-      <div>
-        <span class="label-title">{{ t('picker.page') }}</span>
-        <span class="ml-1 text-highlighted">{{ pageTitle }}</span>
-      </div>
-      <p v-if="viewingSnapshot" class="text-toned">{{ t('picker.historySnapshot') }}</p>
-      <PickedElementSection :info="selected" />
-      <template v-if="isChildPaginated">
-        <template v-for="(child, i) in pagedChildren" :key="`child-${childPage}-${i}`">
-          <USeparator class="my-2" />
-          <PickedElementSection
-            :info="child"
-            child
-            :snapshot="viewingSnapshot"
-            @select="selectChild(childIndex(i))"
-            @preview="previewChild(childIndex(i))"
-            @preview-end="endPreview"
-          />
-        </template>
-        <div class="flex justify-center mt-4">
-          <UPagination
-            v-model:page="childPage"
-            :total="children.length"
-            :items-per-page="CHILD_PAGE_SIZE"
-            :sibling-count="0"
-            show-edges
-            size="sm"
-          />
-        </div>
-      </template>
-      <template v-else>
-        <template v-for="(child, i) in children" :key="`child-${i}`">
-          <USeparator class="my-2" />
-          <PickedElementSection
-            :info="child"
-            child
-            :snapshot="viewingSnapshot"
-            @select="selectChild(i)"
-            @preview="previewChild(i)"
-            @preview-end="endPreview"
-          />
-        </template>
-      </template>
-    </div>
   </div>
 </template>

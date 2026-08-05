@@ -239,24 +239,14 @@ h3 {
   @apply text-shade-600 dark:text-shade-400;
 }
 
-.collapsible-enter-active {
-  display: grid !important;
-  transition: grid-template-rows 0.2s ease-out;
+.panel-switch-enter-active,
+.panel-switch-leave-active {
+  transition: opacity 0.15s ease;
 }
 
-.collapsible-leave-active {
-  display: grid !important;
-  transition: grid-template-rows 0.2s ease-in;
-}
-
-.collapsible-enter-from,
-.collapsible-leave-to {
-  grid-template-rows: 0fr;
-}
-
-.collapsible-enter-to,
-.collapsible-leave-from {
-  grid-template-rows: 1fr;
+.panel-switch-enter-from,
+.panel-switch-leave-to {
+  opacity: 0;
 }
 
 .icon-animation {

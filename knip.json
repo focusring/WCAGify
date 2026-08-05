@@ -28,7 +28,6 @@
         "@nuxtjs/i18n",
         "@vueuse/core",
         "nuxt-studio",
-        "vue",
         "nitropack",
         "h3"
       ]
@@ -47,8 +46,6 @@
       "entry": ["content.config.ts"],
       "ignoreDependencies": ["vue-tsc"]
     },
-    "docs": {
-      "ignoreDependencies": ["vue"]
-    }
+    "docs": {}
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 
 const props = defineProps<{
@@ -8,8 +8,19 @@ const props = defineProps<{
   // Renders the bare swatch without the copy button, for gradient previews.
   // Their value is a synthesised approximation (gradientCss invents the direction), so copying it would mislead.
   decorative?: boolean
+  // Short names of the elements this color was found on ('h1', 'td ×3', 'i-lucide:search'), from the detector.
+  // A design system reuses one token widely, so the same value legitimately appears on an element and inside one of its
+  // child sections naming the source is what tells a shared token apart from a duplicate.
+  sources?: string[]
 }>()
 const { t } = useI18n()
+
+const description = computed(() => {
+  const label = `${t('picker.copyColor')} ${props.color}`
+  return props.sources?.length
+    ? `${label} — ${t('picker.foundOn')} ${props.sources.join(', ')}`
+    : label
+})
 
 // The value reads "Copied" for a moment after a successful write; the timer is cancelled on unmount.
 const COPIED_RESET_MS = 1500
@@ -43,8 +54,8 @@ onBeforeUnmount(() => clearTimeout(resetTimer))
     @click="copy"
     color="neutral"
     variant="outline"
-    :aria-label="`${t('picker.copyColor')} ${color}`"
-    :title="`${t('picker.copyColor')} ${color}`"
+    :aria-label="description"
+    :title="description"
     :ui="{ base: 'gap-1.5 px-1.5 py-1 rounded-xl! min-w-23' }"
   >
     <span

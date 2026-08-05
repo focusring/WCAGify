@@ -123,7 +123,7 @@ export function hasTextClip(style: CSSStyleDeclaration): boolean {
 }
 
 // Fraction of el's box covered by child's box distinguishes a full surface from a small icon/text span.
-function boxCoverage(child: Element, elRect: DOMRect): number {
+export function boxCoverage(child: Element, elRect: DOMRect): number {
   const c = child.getBoundingClientRect()
   const w = Math.min(elRect.right, c.right) - Math.max(elRect.left, c.left)
   const h = Math.min(elRect.bottom, c.bottom) - Math.max(elRect.top, c.top)
@@ -165,9 +165,14 @@ export function isOwnScope(
 // One document-order pass over el + descendants, reading each computed style once so the icon-mask and clip-text-fill detectors don't each walk the subtree.
 // Collects background-color of every CSS-mask element (icon paint) and background-image of every background-clip:text element (text fill; caller resolves to a gradient).
 // el visited first. `isBoundary` splits the mask colors into el's own subset (see isOwnScope); with no predicate every color is own.
+// Mask entries keep the element they came from so the panel can report where a color was found.
+interface MaskColor {
+  color: string
+  el: Element
+}
+
 export interface DescendantScan {
-  maskBackgroundColors: string[]
-  ownMaskBackgroundColors: string[] // The subset not sitting under a surfaced child
+  ownMaskBackgroundColors: MaskColor[] // Only those not sitting under a surfaced child — those are that child's to report
   clipTextBackgroundImages: string[]
 }
 
@@ -176,20 +181,18 @@ export function scanDescendants(
   elStyle: CSSStyleDeclaration = getComputedStyle(el),
   isBoundary: (child: Element) => boolean = () => false
 ): DescendantScan {
-  const maskBackgroundColors: string[] = []
-  const ownMaskBackgroundColors: string[] = []
+  const ownMaskBackgroundColors: MaskColor[] = []
   const clipTextBackgroundImages: string[] = []
   let isRoot = true
   for (const node of [el, ...el.querySelectorAll('*')]) {
     const style = isRoot ? elStyle : getComputedStyle(node)
     isRoot = false
-    if (hasCssMask(style)) {
-      maskBackgroundColors.push(style.backgroundColor)
-      if (isOwnScope(node, el, isBoundary)) ownMaskBackgroundColors.push(style.backgroundColor)
+    if (hasCssMask(style) && isOwnScope(node, el, isBoundary)) {
+      ownMaskBackgroundColors.push({ color: style.backgroundColor, el: node })
     }
     if (hasTextClip(style)) clipTextBackgroundImages.push(style.backgroundImage)
   }
-  return { maskBackgroundColors, ownMaskBackgroundColors, clipTextBackgroundImages }
+  return { ownMaskBackgroundColors, clipTextBackgroundImages }
 }
 
 export const SVG_SHAPE_SELECTOR = 'path, circle, rect, ellipse, polygon, polyline, use'

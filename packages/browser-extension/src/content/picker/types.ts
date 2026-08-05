@@ -44,6 +44,11 @@ export interface ElementInfo {
   count?: number // >1 when identical child sections were merged into this one (e.g. "Button ×3"); unset on the selected element
   textColors: string[]
   iconColors: string[]
+  // Where each text/icon color was found, index-aligned with the arrays above (e.g. ['h1', 'td ×3'] for textColors[0]).
+  // Optional because history entries saved before these existed restore without them.
+  // Presentational only, so they stay out of the section merge key see sectionKey.
+  textColorSources?: string[][]
+  iconColorSources?: string[][]
   elementColor: string
   elementGradient: GradientInfo | null
   background: BackgroundInfo
