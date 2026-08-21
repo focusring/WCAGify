@@ -20,6 +20,7 @@
     "@crxjs/vite-plugin": "^2.7.1",
     "@types/chrome": "^0.2.2",
     "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.6",
     "happy-dom": "^20.10.6",
     "tailwindcss": "catalog:core",
     "typescript": "catalog:dev",

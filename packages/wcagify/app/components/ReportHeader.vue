@@ -7,16 +7,10 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { conformanceSummary } = useWcagData()
-
-const conformanceResult = computed(() => {
-  const data = conformanceSummary(
-    props.issues,
-    props.report.evaluation.targetLevel as 'A' | 'AA' | 'AAA',
-    props.report.evaluation.targetWcagVersion as '2.0' | '2.1' | '2.2'
-  )
-  return t('report.criteriaMet', { conforming: data.conforming.all, total: data.totals.all })
-})
+const conformanceResult = useConformanceResult(
+  () => props.report,
+  () => props.issues
+)
 
 const metaRows = computed(() => [
   { label: t('report.commissionedBy'), value: props.report.evaluation.commissioner },

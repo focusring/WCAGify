@@ -14,7 +14,7 @@ const issuesByPrinciple = computed(() => {
   const wcagVersion = (props.report.evaluation.targetWcagVersion ?? '2.2') as WcagVersion
   const language = (props.report.language === 'nl' ? 'nl' : 'en') as Language
   const targetLevel = (props.report.evaluation.targetLevel ?? 'AA') as Level
-  const scStatuses = (props.report as any).scStatuses as Record<string, string> | undefined
+  const { scStatuses } = props.report
   return groupIssuesByPrinciple(props.issues, targetLevel, {
     wcagVersion,
     language,

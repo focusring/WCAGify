@@ -79,7 +79,7 @@ function getGradientStops(grad: Element, depth = 0): string[] {
   if (colors.length === 0 && depth < 4) {
     const href = getSvgHref(grad)
     if (href.startsWith('#')) {
-      const ref = document.getElementById(href.slice(1))
+      const ref = grad.ownerDocument.getElementById(href.slice(1))
       if (ref) return getGradientStops(ref, depth + 1)
     }
   }
@@ -88,7 +88,7 @@ function getGradientStops(grad: Element, depth = 0): string[] {
 
 // Resolve a gradient id to its type and stop colors. null when the id is not a linear/radial gradient with stops.
 function resolveGradientById(id: string, svg: SVGElement): GradientInfo | null {
-  let grad = document.getElementById(id)
+  let grad = svg.ownerDocument.getElementById(id)
   if (!grad) {
     try {
       grad = svg.querySelector(`#${CSS.escape(id)}`)

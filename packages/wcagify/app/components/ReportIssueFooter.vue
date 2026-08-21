@@ -24,7 +24,7 @@ function getSeverityColor(severity: string): BadgeColor {
   return severityColorMap[severity.toLowerCase()] ?? 'neutral'
 }
 
-const issueType = computed(() => (props.issue as any).type as string | undefined)
+const issueType = computed(() => props.issue.type)
 </script>
 
 <template>

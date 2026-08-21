@@ -3,10 +3,20 @@ import { createSignedToken, getAdminSecret } from '../../utils/auth'
 
 const LOGIN_WINDOW_MS = 60_000
 const MAX_ATTEMPTS = 5
+const MAX_TRACKED_IPS = 10_000
 const attempts = new Map<string, { count: number; resetAt: number }>()
+
+// Bounds memory from IPs that hit once and never return: swept lazily, only once the map has grown large enough for it to matter, rather than on every request.
+function pruneExpired(now: number): void {
+  for (const [ip, entry] of attempts) {
+    if (now > entry.resetAt) attempts.delete(ip)
+  }
+}
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now()
+  if (attempts.size > MAX_TRACKED_IPS) pruneExpired(now)
+
   const entry = attempts.get(ip)
 
   if (!entry || now > entry.resetAt) {

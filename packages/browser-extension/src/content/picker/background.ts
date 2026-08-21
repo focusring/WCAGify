@@ -32,7 +32,7 @@ function findBackgroundVideo(el: Element): MediaInfo | null {
   if (r.width === 0 || r.height === 0) return null
   const cx = r.left + r.width / 2
   const cy = r.top + r.height / 2
-  for (const video of document.querySelectorAll('video')) {
+  for (const video of el.ownerDocument.querySelectorAll('video')) {
     if (video.contains(el) || el.contains(video)) continue
     const pos = getComputedStyle(video).position
     if (pos !== 'absolute' && pos !== 'fixed') continue

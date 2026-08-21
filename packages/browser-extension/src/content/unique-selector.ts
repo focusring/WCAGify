@@ -262,7 +262,7 @@ function generateSelector(
         : similar.filter((item) => item.matches(selector))
 
     current = current.parentElement
-  } while (similar.length > 1 && current && current.nodeType !== 11)
+  } while (similar.length > 1 && current)
 
   if (similar.length === 1) {
     return selector

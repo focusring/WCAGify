@@ -135,4 +135,110 @@ describe('prepareForPdf', () => {
     expect(result).not.toContain('print:hidden')
     expect(result).toContain('<p>visible</p>')
   })
+
+  // flattenLinks: strips decorative icon spans and unwraps label spans inside <a>, so the PDF
+  // /Link struct binds directly to the text instead of a nested /Span (PDF/UA-1 28-003).
+  describe('flattenLinks', () => {
+    it('drops an aria-hidden icon span and unwraps a label span', async () => {
+      const html =
+        '<html><head></head><body><a href="/x"><span data-slot="label">Visit site</span><span aria-hidden="true"><svg></svg></span></a></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain('<a href="/x">Visit site</a>')
+      expect(result).not.toContain('aria-hidden')
+      expect(result).not.toContain('<span')
+    })
+
+    it('fully unwraps doubly-nested label spans', async () => {
+      const html =
+        '<html><head></head><body><a href="/x"><span><span>Nested</span> text</span></a></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain('<a href="/x">Nested text</a>')
+      expect(result).not.toContain('<span')
+    })
+
+    it('leaves link attributes untouched', async () => {
+      const html =
+        '<html><head></head><body><a href="/x" target="_blank" rel="noopener">Plain</a></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain('<a href="/x" target="_blank" rel="noopener">Plain</a>')
+    })
+  })
+
+  // expandIssueCollapsibles: forces collapsed issue <article>s open so their content is present
+  // (not display:none) when WeasyPrint paginates the PDF, scoped to id="issue-*" articles only.
+  describe('expandIssueCollapsibles', () => {
+    it('opens a closed issue article and un-hides its content panel', async () => {
+      const html =
+        '<html><head></head><body><article id="issue-1" data-state="closed" aria-expanded="false"><div data-slot="content" hidden>Details</div></article></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain('id="issue-1" data-state="open" aria-expanded="true"')
+      expect(result).toContain('<div data-slot="content">Details</div>')
+    })
+
+    it('leaves non-issue articles untouched', async () => {
+      const html =
+        '<html><head></head><body><article data-state="closed">Unrelated</article></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain('<article data-state="closed">Unrelated</article>')
+    })
+  })
+
+  // flattenDefinitionLists: rewrites <dl> so <dt>/<dd> are direct children (WeasyPrint otherwise
+  // emits an invalid /Div under /L per PDF/UA-1), wrapping any stray inline content after a <dt>.
+  describe('flattenDefinitionLists', () => {
+    it('unwraps grid-layout divs around dt/dd pairs', async () => {
+      const html =
+        '<html><head></head><body><dl><div><dt>Severity</dt><dd>High</dd></div><div><dt>Type</dt><dd>Technical</dd></div></dl></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain(
+        '<dl><dt>Severity</dt><dd>High</dd><dt>Type</dt><dd>Technical</dd></dl>'
+      )
+    })
+
+    it('fully unwraps doubly-nested divs', async () => {
+      const html =
+        '<html><head></head><body><dl><div><div><dt>A</dt><dd>B</dd></div></div></dl></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain('<dl><dt>A</dt><dd>B</dd></dl>')
+    })
+
+    it('wraps stray content after a dt (badge/link) in a dd instead of leaving it a bare dl child', async () => {
+      const html =
+        '<html><head></head><body><dl><dt>Status</dt><a href="/x">Link</a></dl></body></html>'
+      vi.mocked(fetch).mockResolvedValue(new Response(''))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toMatch(/<dt>Status<\/dt><dd>[^]*<a href="\/x">Link<\/a>[^]*<\/dd>/)
+    })
+  })
+
+  // inlinePropertyDefaults: WeasyPrint can't resolve var(--tw-border-spacing-x) against an unset
+  // @property, so its initial-value is promoted to :root and the border-spacing-* rule is dropped.
+  describe('inlinePropertyDefaults', () => {
+    it('promotes @property initial-value to :root and drops the border-spacing rule', async () => {
+      const html =
+        '<html><head><link rel="stylesheet" href="/style.css"></head><body></body></html>'
+      const css = `@property --tw-border-spacing-x {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0;
+}
+.border-spacing-4 {
+  border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
+}
+table { width: 100%; }`
+      vi.mocked(fetch).mockResolvedValue(new Response(css))
+      const result = await prepareForPdf(html, 'http://localhost:3000')
+      expect(result).toContain(':root { --tw-border-spacing-x: 0; }')
+      expect(result).not.toContain('@property')
+      expect(result).not.toContain('.border-spacing-4')
+      expect(result).toContain('table { width: 100%; }')
+    })
+  })
 })

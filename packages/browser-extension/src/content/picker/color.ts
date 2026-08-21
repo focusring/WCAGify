@@ -192,7 +192,7 @@ function getUseColors(use: Element): string[] {
   const inherited = getComputedStyle(use).color // what the symbol's currentColor fills resolve to here
   const symbol = (() => {
     const id = useSymbolId(use)
-    return id ? document.getElementById(id) : null
+    return id ? use.ownerDocument.getElementById(id) : null
   })()
   if (!symbol) return svgPaintColor(inherited, '1') ? [inherited] : []
 

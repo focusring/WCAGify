@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch, nextTick } from 'vue'
+import { computed, ref } from 'vue'
 import type { WcagVersion, WcagLevel } from '../../data/wcag-criteria'
 import { WCAG_CRITERIA } from '../../data/wcag-criteria'
 import { useI18n } from '../../composables/useI18n'
+import { useSelectMenuDialogPatch } from '../../composables/useSelectMenuDialogPatch'
 
 const props = defineProps<{
   id: string
@@ -52,31 +53,7 @@ function levelLabel(level: WcagLevel) {
 
 const isOpen = ref(false)
 const wrapperRef = ref<HTMLElement>()
-
-function onTabKeydown(e: KeyboardEvent) {
-  if (e.key === 'Tab') isOpen.value = false
-}
-
-watch(isOpen, async (open, _, onCleanup) => {
-  if (open) {
-    document.addEventListener('keydown', onTabKeydown)
-    onCleanup(() => document.removeEventListener('keydown', onTabKeydown))
-    await nextTick()
-    const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
-    if (focusScope) {
-      focusScope.setAttribute('role', 'dialog')
-      focusScope.setAttribute('aria-modal', 'true')
-    }
-  } else {
-    document.removeEventListener('keydown', onTabKeydown)
-    await nextTick()
-    const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
-    if (focusScope) {
-      focusScope.removeAttribute('role')
-      focusScope.removeAttribute('aria-modal')
-    }
-  }
-})
+useSelectMenuDialogPatch(wrapperRef, isOpen)
 </script>
 
 <template>

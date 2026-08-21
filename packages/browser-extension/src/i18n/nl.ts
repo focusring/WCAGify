@@ -19,7 +19,6 @@ export default {
     scanning: 'Zoeken naar WCAGify-instanties...',
     selectInstance: 'WCAGify-instantie',
     enterManually: 'URL handmatig invoeren',
-    change: 'Wijzigen',
     rescan: 'Opnieuw scannen',
     autoConnected: 'Automatisch verbonden met een gevonden draaiende WCAGify-instantie.',
     connectionSuccess: 'Succesvol verbonden met WCAGify.',
@@ -41,7 +40,7 @@ export default {
     historyTitle: 'Recent gecontroleerd',
     historyClear: 'Wissen',
     historySnapshot:
-      'Opgeslagen momentopname — eerder vastgelegd en niet gekoppeld aan de live pagina.',
+      'Opgeslagen momentopname - eerder vastgelegd en niet gekoppeld aan de live pagina.',
     selectParent: 'Bovenliggend',
     selectChild: 'Selecteer',
     selector: 'Selector:',
@@ -76,7 +75,9 @@ export default {
     copied: 'Gekopieerd',
     unknown: 'onbekend',
     hoverHint: 'Beweeg over een element...',
-    clickHint: 'Klik om te selecteren · Esc om te annuleren'
+    clickHint: 'Klik om te selecteren · Esc om te annuleren',
+    noPageTab:
+      'Geen paginatab gevonden om uit te selecteren. Ga naar een gewoon browsertabblad en probeer het opnieuw.'
   },
   form: {
     required: 'verplicht',
@@ -191,10 +192,7 @@ export default {
     colorMode: 'Kleurmodus',
     languageLabel: 'Taal',
     general: 'Algemeen',
-    wcagifyUrl: 'WCAGify URL',
     clear: 'WCAGify URL wissen',
-    save: 'Opslaan',
-    saved: 'Opgeslagen',
     accentColor: 'Accentkleur',
     backgroundShade: 'Achtergrondtint',
     license: 'is uitgebracht onder de MIT-licentie.',

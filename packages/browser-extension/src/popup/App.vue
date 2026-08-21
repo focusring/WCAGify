@@ -11,7 +11,7 @@ import SettingsPage from './components/SettingsPage.vue'
 
 const picker = ref<InstanceType<typeof ElementPicker>>()
 const { t } = useI18n()
-const { reports, reportSlug, scanStatus } = useSettings()
+const { reports, scanStatus } = useSettings()
 
 const currentView = ref<'main' | 'settings'>('main')
 

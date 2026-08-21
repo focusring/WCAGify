@@ -2,6 +2,7 @@
 import { computed, ref, onMounted, nextTick, useTemplateRef } from 'vue'
 import { useColorMode } from '../../composables/useColorMode'
 import { useI18n } from '../../composables/useI18n'
+import { useSelectMenuDialogPatch } from '../../composables/useSelectMenuDialogPatch'
 import { ACCENT_COLORS, NEUTRAL_COLORS, useSettings } from '../../composables/useSettings'
 import type { AccentColor, NeutralColor } from '../../composables/useSettings'
 import { localeLabels } from '../../i18n'
@@ -41,6 +42,10 @@ const colorModeLabel = computed(() => {
 
 const locales = Object.entries(localeLabels) as [Locale, string][]
 const localeItems = computed(() => locales.map(([value, label]) => ({ value, label })))
+
+const localeMenuOpen = ref(false)
+const localeMenuWrapperRef = ref<HTMLElement>()
+useSelectMenuDialogPatch(localeMenuWrapperRef, localeMenuOpen)
 
 const ACCENT_HEX: Record<AccentColor, string> = {
   green: '#22c55e',
@@ -128,21 +133,25 @@ function setNeutralColor(val: string | undefined) {
           :ui="{ label: 'label-title' }"
           class="flex flex-row items-center justify-between"
         >
-          <USelectMenu
-            v-model="locale"
-            value-key="value"
-            :items="localeItems"
-            :search-input="false"
-            :aria-label="t('language')"
-            :ui="{
-              trailingIcon: 'icon-animation text-toned',
-              content: 'z-50',
-              item: 'cursor-pointer selectable-focus',
-              base: 'bg-default min-w-32'
-            }"
-            variant="subtle"
-            size="lg"
-          />
+          <div ref="localeMenuWrapperRef">
+            <USelectMenu
+              v-model="locale"
+              :open="localeMenuOpen"
+              @update:open="localeMenuOpen = $event"
+              value-key="value"
+              :items="localeItems"
+              :search-input="false"
+              :aria-label="t('language')"
+              :ui="{
+                trailingIcon: 'icon-animation text-toned',
+                content: 'z-50',
+                item: 'cursor-pointer selectable-focus',
+                base: 'bg-default min-w-32'
+              }"
+              variant="subtle"
+              size="lg"
+            />
+          </div>
         </UFormField>
       </section>
 

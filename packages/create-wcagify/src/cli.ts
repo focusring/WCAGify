@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import { Command } from 'commander'
 import { create } from './create.js'
 import type { CreateOptions } from './create.js'
@@ -22,10 +23,15 @@ program
     await create({ ...options, name })
   })
 
-run().catch((error) => {
-  console.error(error)
-  process.exit(1)
-})
+// Only run when this file is the invoked entry point (the `create-wcagify` bin).
+// Merely importing it (e.g. via index.js's `runCli` re-export) must not trigger the CLI.
+const isMainModule = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
+if (isMainModule) {
+  run().catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
+}
 
 export async function run(): Promise<void> {
   await program.parseAsync()

@@ -79,6 +79,7 @@ const activeEntryId = ref<string | undefined>()
 const viewingSnapshot = ref(false)
 
 const pickButton = ref<{ $el?: HTMLElement }>()
+const pickError = ref(false)
 
 const selector = computed(() => selected.value?.selector ?? '')
 // Stacking every child section gets unreadable past a handful, so beyond this many they're paginated in groups.
@@ -111,14 +112,23 @@ function connectPickerPort(tabId: number) {
   })
 }
 
-function onMessage(message: {
-  type: string
-  url?: string
-  pageTitle?: string
-  selected?: ElementInfo
-  children?: ElementInfo[]
-  hasParent?: boolean
-}) {
+function onMessage(
+  message: {
+    type: string
+    url?: string
+    pageTitle?: string
+    selected?: ElementInfo
+    children?: ElementInfo[]
+    hasParent?: boolean
+  },
+  sender: chrome.runtime.MessageSender
+) {
+  // Broadcasts reach every extension view (each window can host its own side panel), so only apply
+  // messages from the tab this panel is picking on or already showing.
+  const senderTabId = sender.tab?.id
+  if (senderTabId === undefined) return
+  if (senderTabId !== pickerTabId.value && senderTabId !== selectedTabId.value) return
+
   if (message.type === 'element-picked') {
     pageUrl.value = message.url ?? ''
     pageTitle.value = message.pageTitle ?? ''
@@ -175,7 +185,8 @@ function resetPicker() {
 }
 
 function persistHistory() {
-  // Round-tripped through JSON to strip Vue's reactive proxies; structuredClone throws DataCloneError on them. eslint-disable-next-line unicorn/prefer-structured-clone
+  // Round-tripped through JSON to strip Vue's reactive proxies; structuredClone throws DataCloneError on them.
+  // eslint-disable-next-line unicorn/prefer-structured-clone
   const plain = JSON.parse(JSON.stringify(history.value)) as HistoryEntry[]
   chrome.storage.local.set({ [HISTORY_KEY]: plain }).catch(() => {})
 }
@@ -285,12 +296,16 @@ onUnmounted(() => {
 })
 
 async function pickElement() {
+  pickError.value = false
   // Side panel lives in the same window; find the active page tab directly.
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
   const tab = tabs.find(
     (item) => item.url && !item.url.startsWith('chrome') && !item.url.startsWith('extension')
   )
-  if (!tab?.id) return
+  if (!tab?.id) {
+    pickError.value = true
+    return
+  }
 
   connectPickerPort(tab.id)
   pickerTabId.value = tab.id
@@ -354,6 +369,14 @@ async function pickElement() {
         />
       </UTooltip>
     </div>
+
+    <UAlert
+      v-if="pickError"
+      color="error"
+      variant="subtle"
+      icon="i-lucide-triangle-alert"
+      :description="t('picker.noPageTab')"
+    />
 
     <Transition name="panel-switch" mode="out-in">
       <div

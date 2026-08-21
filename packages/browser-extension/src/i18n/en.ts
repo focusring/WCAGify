@@ -19,7 +19,6 @@ export default {
     scanning: 'Scanning for WCAGify instances...',
     selectInstance: 'WCAGify Instance',
     enterManually: 'Enter URL manually',
-    change: 'Change',
     rescan: 'Scan again',
     autoConnected: 'Automatically connected to a detected running WCAGify instance.',
     connectionSuccess: 'Successfully connected to WCAGify.',
@@ -73,7 +72,8 @@ export default {
     copied: 'Copied',
     unknown: 'unknown',
     hoverHint: 'Hover over an element...',
-    clickHint: 'Click to select · Esc to cancel'
+    clickHint: 'Click to select · Esc to cancel',
+    noPageTab: 'No page tab found to pick from. Switch to a regular browser tab and try again.'
   },
   form: {
     required: 'required',
@@ -188,10 +188,7 @@ export default {
     colorMode: 'Theme',
     languageLabel: 'Language',
     general: 'General',
-    wcagifyUrl: 'WCAGify URL',
     clear: 'Clear WCAGify URL',
-    save: 'Save',
-    saved: 'Saved',
     accentColor: 'Accent Color',
     backgroundShade: 'Background Shade',
     license: 'is released under the MIT License.',

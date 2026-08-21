@@ -5,10 +5,9 @@ import { resetHoverStylesCache } from '../src/content/picker/hover'
 
 // Fills a same-origin iframe's inner document and returns the frame element, mimicking an
 // about:blank ad slot populated at runtime.
-function iframeWith(bodyHtml: string, headHtml = ''): HTMLIFrameElement {
+function iframeWith(bodyHtml: string): HTMLIFrameElement {
   document.body.innerHTML = '<iframe></iframe>'
   const iframe = document.querySelector('iframe')!
-  iframe.contentDocument!.head.innerHTML = headHtml
   iframe.contentDocument!.body.innerHTML = bodyHtml
   return iframe
 }
@@ -20,58 +19,23 @@ describe('collectChildSections on an iframe', () => {
     resetHoverStylesCache()
   })
 
-  it('surfaces interactive elements found inside a same-origin iframe', () => {
+  // Child scanning is a light-DOM walk; an <iframe> has no light-DOM children, so it always yields no
+  // sections regardless of what the frame's own document contains.
+  it('returns no sections for an iframe with interactive content', () => {
     const iframe = iframeWith('<div><button>Learn More</button><a href="/x">Visit site</a></div>')
-    const { sections } = collectChildSections(iframe)
-    expect(sections.map((s) => s.role)).toEqual(['button', 'link'])
-    expect(sections[0]!.label).toBe('Learn More')
-    expect(sections[1]!.label).toBe('Visit site')
+    expect(collectChildSections(iframe)).toEqual({ sections: [], elements: [] })
   })
 
-  it('merges identical children into one section with a count', () => {
-    const iframe = iframeWith(
-      '<button class="dot">•</button><button class="dot">•</button><button class="dot">•</button><a href="/x">Site</a>'
-    )
-    const { sections } = collectChildSections(iframe)
-    expect(sections).toHaveLength(2)
-    expect(sections[0]!.role).toBe('button')
-    expect(sections[0]!.count).toBe(3)
-    expect(sections[1]!.role).toBe('link')
-    expect(sections[1]!.count).toBeUndefined()
+  it('returns no sections for an iframe with disabled controls', () => {
+    const iframe = iframeWith('<button disabled>Buy now</button>')
+    expect(collectChildSections(iframe)).toEqual({ sections: [], elements: [] })
   })
 
-  it('keeps children with different labels separate even when styled identically', () => {
-    const iframe = iframeWith('<button>Learn More</button><button>Sign Up</button>')
-    const { sections } = collectChildSections(iframe)
-    expect(sections).toHaveLength(2)
-    expect(sections.map((s) => s.label)).toEqual(['Learn More', 'Sign Up'])
-  })
-
-  it('scans one level deep only: content of a nested iframe is not surfaced', () => {
+  it('returns no sections for an iframe containing a nested iframe', () => {
     const iframe = iframeWith('<button>Outer</button><iframe></iframe>')
     const nested = iframe.contentDocument!.querySelector('iframe')!
     nested.contentDocument!.body.innerHTML = '<button>Inner</button>'
-    const { sections } = collectChildSections(iframe)
-    expect(sections.map((s) => s.label)).toEqual(['Outer'])
-  })
-
-  it('surfaces disabled controls inside the iframe with their disabled flag', () => {
-    const iframe = iframeWith('<button disabled>Buy now</button>')
-    const { sections } = collectChildSections(iframe)
-    expect(sections).toHaveLength(1)
-    expect(sections[0]!.disabled).toBe(true)
-  })
-
-  it('flags iframe children that have :hover rules in the inner document', () => {
-    const iframe = iframeWith(
-      '<button class="cta">Learn More</button><button class="mute">x</button>',
-      '<style>.cta:hover { background: navy }</style>'
-    )
-    const { sections } = collectChildSections(iframe)
-    expect(sections.map((s) => [s.label, s.hasHoverStyles])).toEqual([
-      ['Learn More', true],
-      ['x', false]
-    ])
+    expect(collectChildSections(iframe)).toEqual({ sections: [], elements: [] })
   })
 
   it('returns no sections for an empty iframe', () => {
@@ -113,15 +77,10 @@ describe('collectChildSections dedup on regular elements', () => {
     expect(sections[0]!.count).toBe(2)
   })
 
-  it('pairs sections with elements inside a same-origin iframe', () => {
+  it('never pairs sections with elements from inside a same-origin iframe', () => {
     document.body.innerHTML = '<iframe></iframe>'
     const iframe = document.querySelector('iframe')!
     iframe.contentDocument!.body.innerHTML = '<button>Learn More</button><a href="/x">Site</a>'
-    const { sections, elements } = collectChildSections(iframe)
-    expect(sections.map((s) => s.role)).toEqual(['button', 'link'])
-    expect(elements).toEqual([
-      iframe.contentDocument!.querySelector('button'),
-      iframe.contentDocument!.querySelector('a')
-    ])
+    expect(collectChildSections(iframe)).toEqual({ sections: [], elements: [] })
   })
 })

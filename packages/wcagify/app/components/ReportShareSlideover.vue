@@ -11,7 +11,7 @@ const { t, locale } = useI18n()
 
 const adminSecret = ref('')
 const adminError = ref(false)
-const adminAuthenticated = ref(false)
+const { login: adminLogin, isAuthenticated: adminAuthenticated } = useAdminAuth()
 
 const {
   data: shares,
@@ -28,11 +28,7 @@ const needsAdminLogin = computed(() => error.value?.statusCode === 401 && !admin
 async function loginAdmin() {
   adminError.value = false
   try {
-    await $fetch('/api/admin/login', {
-      method: 'POST',
-      body: { secret: adminSecret.value }
-    })
-    adminAuthenticated.value = true
+    await adminLogin(adminSecret.value)
     adminSecret.value = ''
     await refresh()
   } catch {

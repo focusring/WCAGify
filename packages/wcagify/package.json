@@ -89,6 +89,7 @@
     "@vitest/coverage-v8": "catalog:dev",
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
-    "vitest": "catalog:dev"
+    "vitest": "catalog:dev",
+    "vue": "^3.5.39"
   }
 }

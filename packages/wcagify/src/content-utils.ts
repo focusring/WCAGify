@@ -33,13 +33,13 @@ function buildIssueFrontmatter(data: {
 }): string {
   const lines = ['---', `title: ${escapeYamlValue(data.title)}`, `sc: ${escapeYamlValue(data.sc)}`]
   if (data.severity !== undefined) {
-    lines.push(`severity: ${data.severity}`)
+    lines.push(`severity: ${escapeYamlValue(data.severity)}`)
   }
   if (data.type !== undefined) {
-    lines.push(`type: ${data.type}`)
+    lines.push(`type: ${escapeYamlValue(data.type)}`)
   }
   if (data.difficulty !== undefined) {
-    lines.push(`difficulty: ${data.difficulty}`)
+    lines.push(`difficulty: ${escapeYamlValue(data.difficulty)}`)
   }
   lines.push(`sample: ${escapeYamlValue(data.sample)}`, '---')
   return lines.join('\n')

@@ -1,36 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from '../../composables/useI18n'
+import { useSelectMenuDialogPatch } from '../../composables/useSelectMenuDialogPatch'
 
 const model = defineModel<string | undefined>()
 
 const isOpen = ref(false)
 const wrapperRef = ref<HTMLElement>()
-
-function onTabKeydown(e: KeyboardEvent) {
-  if (e.key === 'Tab') isOpen.value = false
-}
-
-watch(isOpen, async (open, _, onCleanup) => {
-  if (open) {
-    document.addEventListener('keydown', onTabKeydown)
-    onCleanup(() => document.removeEventListener('keydown', onTabKeydown))
-    await nextTick()
-    const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
-    if (focusScope) {
-      focusScope.setAttribute('role', 'dialog')
-      focusScope.setAttribute('aria-modal', 'true')
-    }
-  } else {
-    document.removeEventListener('keydown', onTabKeydown)
-    await nextTick()
-    const focusScope = wrapperRef.value?.querySelector<HTMLElement>('[data-slot="focusScope"]')
-    if (focusScope) {
-      focusScope.removeAttribute('role')
-      focusScope.removeAttribute('aria-modal')
-    }
-  }
-})
+useSelectMenuDialogPatch(wrapperRef, isOpen)
 
 const props = withDefaults(
   defineProps<{
