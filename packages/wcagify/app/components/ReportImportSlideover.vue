@@ -102,35 +102,48 @@ watch(open, (isOpen) => {
   if (isOpen) reset()
 })
 
+/**
+ * Every file selection gets a request id. Only the latest one may apply its
+ * preview, so a slow response for an earlier file can never be paired with
+ * the text of a later one.
+ */
+let previewRequest = 0
+
 async function onFileChange(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
+  const request = ++previewRequest
+  busy.value = true
   error.value = ''
   preview.value = undefined
   skipped.value = new Set()
   fileName.value = file.name
-  document.value = await file.text()
-  await loadPreview()
+  document.value = ''
+  const text = await file.text()
+  if (request !== previewRequest) return
+  document.value = text
+  await loadPreview(text, request)
 }
 
-async function loadPreview() {
-  busy.value = true
+async function loadPreview(text: string, request: number) {
   try {
     const summary = await $fetch<ImportSummary>('/api/earl/import', {
       method: 'POST',
-      body: { earl: document.value, dryRun: true }
+      body: { earl: text, dryRun: true }
     })
+    if (request !== previewRequest) return
     preview.value = summary
     slug.value = summary.slug || toSlug(summary.title)
   } catch (fetchError: unknown) {
+    if (request !== previewRequest) return
     error.value =
       (fetchError as { statusMessage?: string; data?: { statusMessage?: string } }).data
         ?.statusMessage ??
       (fetchError as { statusMessage?: string }).statusMessage ??
       t('import.error')
   } finally {
-    busy.value = false
+    if (request === previewRequest) busy.value = false
   }
 }
 
@@ -173,16 +186,25 @@ async function runImport() {
   >
     <template #body>
       <div class="space-y-6">
-        <UFormField :label="$t('import.file')" :help="$t('import.fileHelp')" name="earl-file">
-          <input
-            id="earl-file"
-            type="file"
-            accept=".json,.jsonld,application/json,application/ld+json"
-            class="block w-full text-sm text-default file:mr-3 file:rounded-md file:border-0 file:bg-elevated file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-highlighted hover:file:bg-accented"
-            :disabled="busy"
-            @change="onFileChange"
-          />
-        </UFormField>
+        <div>
+          <label for="earl-file" class="block text-sm font-medium text-default">
+            {{ $t('import.file') }}
+          </label>
+          <div class="mt-1">
+            <input
+              id="earl-file"
+              aria-describedby="earl-file-help"
+              type="file"
+              accept=".json,.jsonld,application/json,application/ld+json"
+              class="block w-full text-sm text-default file:mr-3 file:rounded-md file:border-0 file:bg-elevated file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-highlighted hover:file:bg-accented"
+              :disabled="busy"
+              @change="onFileChange"
+            />
+          </div>
+          <p id="earl-file-help" class="mt-1 text-sm text-muted">
+            {{ $t('import.fileHelp') }}
+          </p>
+        </div>
 
         <p v-if="error" role="alert" class="text-sm text-error">
           {{ error }}

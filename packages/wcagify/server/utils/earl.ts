@@ -28,6 +28,9 @@ async function loadEarlExport(event: H3Event, reportPath: string) {
 }
 
 function sendEarlExport(event: H3Event, earl: object, filename: string): string {
+  // Exports can be password protected through share links.
+  // No browser cache may serve one without the unlock cookie being checked again.
+  setHeader(event, 'Cache-Control', 'no-store')
   setHeader(event, 'Content-Type', 'application/ld+json; charset=utf-8')
   setHeader(event, 'Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`)
   return JSON.stringify(earl, undefined, 2)

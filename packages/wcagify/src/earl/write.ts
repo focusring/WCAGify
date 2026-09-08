@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml'
 import { toSlug, buildIssueFrontmatter } from '../content-utils'
@@ -89,7 +89,7 @@ async function writeIssues(
   const { reportDir, relativeDir, result } = target
   const used = new Set<string>()
   for (const issue of issues) {
-    const base = toSlug(issue.title) || `issue-${issue.sc.replace(/\./g, '-')}`
+    const base = toSlug(issue.title) || toSlug(`issue-${issue.sc}`) || 'issue'
     let filename = `${base}.md`
     let counter = 2
     while (used.has(filename) || (await exists(join(reportDir, filename)))) {
@@ -180,32 +180,56 @@ async function writeImportedReport(
     if (await exists(reportDir)) {
       throw new Error(`A report with slug "${slug}" already exists. Use merge mode to add to it.`)
     }
-    await mkdir(reportDir, { recursive: true })
-    await writeFile(
-      indexPath,
-      toMarkdown(reportFrontmatter(imported.report), imported.report.summary),
-      'utf8'
+    // Stage the whole report next to its final location, then move it into place.
+    // A failure part-way then leaves nothing behind.
+    const stagingDir = join(
+      contentDir,
+      'reports',
+      `.${slug}.importing-${process.pid}-${Date.now()}`
     )
-    result.created.push(`${relativeDir}/index.md`)
-  } else {
-    if (!(await exists(indexPath))) {
-      throw new Error(`Report "${slug}" was not found. Use create mode to create it.`)
+    await mkdir(stagingDir, { recursive: true })
+    try {
+      await writeFile(
+        join(stagingDir, 'index.md'),
+        toMarkdown(reportFrontmatter(imported.report), imported.report.summary),
+        'utf8'
+      )
+      result.created.push(`${relativeDir}/index.md`)
+      await writeIssues(imported.issues, { reportDir: stagingDir, relativeDir, result })
+      await rename(stagingDir, reportDir)
+    } catch (error) {
+      await rm(stagingDir, { recursive: true, force: true })
+      throw error
     }
-    const source = await readFile(indexPath, 'utf8')
-    const match = FRONTMATTER_RE.exec(source)
-    if (!match) {
-      throw new Error(`Report "${slug}" has no frontmatter to merge into.`)
-    }
-    const existing = (parseYaml(match[1]!) ?? {}) as Record<string, unknown>
+    return result
+  }
+
+  if (!(await exists(indexPath))) {
+    throw new Error(`Report "${slug}" was not found. Use create mode to create it.`)
+  }
+  const source = await readFile(indexPath, 'utf8')
+  const match = FRONTMATTER_RE.exec(source)
+  if (!match) {
+    throw new Error(`Report "${slug}" has no frontmatter to merge into.`)
+  }
+  const existing = (parseYaml(match[1]!) ?? {}) as Record<string, unknown>
+
+  // Merge: add the issue files first and update index.md last.
+  // A failure then rolls back to the untouched report.
+  try {
+    await writeIssues(imported.issues, { reportDir, relativeDir, result })
     await writeFile(
       indexPath,
       toMarkdown(mergeFrontmatter(existing, imported), match[2] ?? ''),
       'utf8'
     )
     result.updated.push(`${relativeDir}/index.md`)
+  } catch (error) {
+    await Promise.all(
+      result.created.map((file) => unlink(join(contentDir, file)).catch(() => undefined))
+    )
+    throw error
   }
-
-  await writeIssues(imported.issues, { reportDir, relativeDir, result })
   return result
 }
 

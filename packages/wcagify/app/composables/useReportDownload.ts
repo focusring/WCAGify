@@ -6,6 +6,9 @@ export function useReportDownload() {
   const downloading = ref<string>()
 
   async function download(url: string, filename: string, format: string) {
+    // One download at a time.
+    // Otherwise a second click during a pending request re-enables both buttons early.
+    if (downloading.value) return
     downloading.value = format
     try {
       const response = await $fetch<Blob>(url, { responseType: 'blob' })

@@ -55,6 +55,14 @@ so it can be loaded into that tool and processed by anything that understands EA
             "description": "The homepage of the website",
             "source": "https://example.com",
             "tested": true
+          },
+          {
+            "type": ["TestSubject", "WebPage"],
+            "id": "_:sample-page-2",
+            "title": "Contact page",
+            "description": "Page with contact form",
+            "source": "https://example.com/contact",
+            "tested": true
           }
         ]
       },
@@ -169,7 +177,7 @@ any context works. It reads:
 
 Tests that cannot be mapped to a criterion are skipped and listed as warnings.
 
-All findings are imported by default, and every channel lets you hand-pick: the dialog shows the
+All findings that map to a criterion are imported by default, and every channel lets you hand-pick: the dialog shows the
 findings with checkboxes, the CLI lists them in `--dry-run --json` and takes `--skip-issues`, and
 the API returns an `issueList` on a dry run and accepts `skipIssues` with the indices to leave out.
 A criterion whose findings are all left out has no recorded outcome and stays not tested.

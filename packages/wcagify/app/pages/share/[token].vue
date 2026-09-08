@@ -126,12 +126,14 @@ function downloadEarl() {
         icon="i-lucide-file-json"
         variant="outline"
         :loading="downloading === 'earl'"
+        :disabled="!!downloading && downloading !== 'earl'"
         @click="downloadEarl"
       />
       <UButton
         :label="t('report.downloadPdf')"
         icon="i-lucide-download"
         :loading="downloading === 'pdf'"
+        :disabled="!!downloading && downloading !== 'pdf'"
         @click="downloadPdf"
       />
     </template>

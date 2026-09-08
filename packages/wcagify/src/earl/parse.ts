@@ -569,7 +569,7 @@ async function parseEarlReport(
     .at(-1)
   const explicitVersion = literal(evaluation, `${WCAGIFY}wcagVersion`)
   const targetWcagVersion: WcagVersion =
-    explicitVersion && explicitVersion in scToSlug
+    explicitVersion && Object.hasOwn(scToSlug, explicitVersion)
       ? (explicitVersion as WcagVersion)
       : ([...versionsSeen].toSorted().at(-1) ?? '2.2')
   const targetLevel = levelFromIri(iris(scopeNode, `${WCAGEM}step1b`)[0]) ?? 'AA'

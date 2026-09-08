@@ -1,4 +1,4 @@
-import { execSync, type ChildProcess } from 'node:child_process'
+import { execFileSync, type ChildProcess } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -338,10 +338,10 @@ describe('EARL export and import E2E', () => {
   describe('wcagify-import-earl CLI', () => {
     let exportFile: string
 
-    function runImportCli(args: string): { stdout: string; stderr: string; exitCode: number } {
+    function runImportCli(...args: string[]): { stdout: string; stderr: string; exitCode: number } {
       const script = join(projectPath, 'node_modules/@focusring/wcagify/dist/cli/import-earl.js')
       try {
-        const stdout = execSync(`node "${script}" ${args}`, {
+        const stdout = execFileSync('node', [script, ...args], {
           cwd: projectPath,
           encoding: 'utf-8',
           timeout: 60_000,
@@ -371,7 +371,7 @@ describe('EARL export and import E2E', () => {
     })
 
     it('prints a dry-run summary as JSON', () => {
-      const result = runImportCli(`"${exportFile}" --dry-run --json`)
+      const result = runImportCli(exportFile, '--dry-run', '--json')
       expect(result.exitCode).toBe(0)
       const summary = JSON.parse(result.stdout) as ImportResponse
       expect(summary).toMatchObject({ ok: true, dryRun: true, issues: 2, passed: 38 })
@@ -379,7 +379,7 @@ describe('EARL export and import E2E', () => {
     })
 
     it('creates a report from a file', () => {
-      const result = runImportCli(`"${exportFile}" --slug cli-import`)
+      const result = runImportCli(exportFile, '--slug', 'cli-import')
       expect(result.exitCode).toBe(0)
       expect(result.stdout).toContain('Created report at content/reports/cli-import')
       expect(result.stdout).toContain('2 issue(s) written')
@@ -387,7 +387,7 @@ describe('EARL export and import E2E', () => {
     })
 
     it('fails with a JSON error when the slug exists', () => {
-      const result = runImportCli(`"${exportFile}" --slug cli-import --json`)
+      const result = runImportCli(exportFile, '--slug', 'cli-import', '--json')
       expect(result.exitCode).toBe(1)
       expect(JSON.parse(result.stdout)).toMatchObject({ ok: false })
       expect((JSON.parse(result.stdout) as { error: string }).error).toContain('already exists')
@@ -395,7 +395,7 @@ describe('EARL export and import E2E', () => {
 
     it('merges into an existing report', () => {
       const axeFile = join(FIXTURES_DIR, 'axe.json')
-      const result = runImportCli(`"${axeFile}" --slug cli-import --merge --json`)
+      const result = runImportCli(axeFile, '--slug', 'cli-import', '--merge', '--json')
       expect(result.exitCode).toBe(0)
       const summary = JSON.parse(result.stdout) as ImportResponse
       expect(summary).toMatchObject({ ok: true, mode: 'merge', issuesWritten: 4 })
@@ -403,11 +403,18 @@ describe('EARL export and import E2E', () => {
     })
 
     it('lists issues in the dry run and honours --skip-issues', () => {
-      const dry = runImportCli(`"${exportFile}" --dry-run --json`)
+      const dry = runImportCli(exportFile, '--dry-run', '--json')
       const list = (JSON.parse(dry.stdout) as ImportResponse).issueList!
       expect(list.map((issue) => issue.sc)).toEqual(['2.1.1', '2.4.7'])
 
-      const result = runImportCli(`"${exportFile}" --slug cli-picked --skip-issues 1 --json`)
+      const result = runImportCli(
+        exportFile,
+        '--slug',
+        'cli-picked',
+        '--skip-issues',
+        '1',
+        '--json'
+      )
       expect(result.exitCode).toBe(0)
       expect(JSON.parse(result.stdout)).toMatchObject({
         ok: true,
@@ -423,12 +430,19 @@ describe('EARL export and import E2E', () => {
         )
       ).toBe(false)
 
-      const invalid = runImportCli(`"${exportFile}" --slug cli-picked-2 --skip-issues 9 --json`)
+      const invalid = runImportCli(
+        exportFile,
+        '--slug',
+        'cli-picked-2',
+        '--skip-issues',
+        '9',
+        '--json'
+      )
       expect(invalid.exitCode).toBe(1)
     })
 
     it('fails for a missing file', () => {
-      const result = runImportCli('"/does/not/exist.jsonld"')
+      const result = runImportCli('/does/not/exist.jsonld')
       expect(result.exitCode).toBe(1)
       expect(result.stderr).toContain('Could not read')
     })
