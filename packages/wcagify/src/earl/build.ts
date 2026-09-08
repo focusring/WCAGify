@@ -293,6 +293,7 @@ function buildEarlReport(
     type: 'Evaluation',
     id: evaluationId,
     lang: report.language ?? 'en',
+    language: report.language ?? 'en',
     publisher: options.version
       ? `https://github.com/focusring/WCAGify/releases/tag/v${options.version}`
       : 'https://github.com/focusring/WCAGify',

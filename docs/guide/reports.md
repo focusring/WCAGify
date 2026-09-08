@@ -108,8 +108,9 @@ all remaining criteria as not tested.
 ## EARL Export
 
 Reports can also be downloaded as machine-readable EARL (JSON-LD), the format recommended by
-WCAG-EM Step 5.5 and used by the W3C WCAG-EM Report Tool. See the
-[EARL export reference](/reference/earl).
+WCAG-EM Step 5.5 and used by the W3C WCAG-EM Report Tool. EARL documents from other tools can be
+imported as reports through the UI, the `wcagify-import-earl` CLI or `POST /api/earl/import`. See
+the [EARL reference](/reference/earl).
 
 ## PDF Export
 

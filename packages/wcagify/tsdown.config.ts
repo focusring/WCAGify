@@ -5,10 +5,12 @@ export default defineConfig({
     'src/index.ts',
     'src/pdf/index.ts',
     'src/earl/index.ts',
+    'src/earl/import.ts',
     'src/module.ts',
     'src/config.ts',
     'src/content.ts',
-    'src/cli/new-report.ts'
+    'src/cli/new-report.ts',
+    'src/cli/import-earl.ts'
   ],
   format: 'esm',
   dts: true,

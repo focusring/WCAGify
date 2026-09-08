@@ -1,4 +1,4 @@
-# EARL export
+# EARL export and import
 
 Every report can be downloaded as a machine-readable EARL report, as recommended in
 [WCAG-EM 2.0 Step 5.5](https://www.w3.org/TR/wcag-em-2/#step5e). EARL is the
@@ -150,6 +150,85 @@ namespace (`https://github.com/focusring/WCAGify/blob/main/docs/reference/earl.m
 | `wcagVersion` | WCAG version the report was evaluated against                                |
 | `scorecard`   | Counts of criteria met, failed, not tested and the total at the target level |
 
+## Importing EARL
+
+EARL documents from WCAGify, the W3C WCAG-EM Report Tool, or automated testing tools that emit
+EARL (axe-core, for example) can be imported as a report. The importer expands the JSON-LD, so
+any context works. It reads:
+
+- the WCAG-EM evaluation metadata when present (title, evaluator, commissioner, date, scope,
+  conformance target, baseline, additional requirements, technologies, sample set);
+- every `earl:Assertion`, mapping its `earl:test` to a success criterion through a WCAG 2.0, 2.1
+  or 2.2 specification anchor, a quickref or Understanding URL, or a test case that is
+  `dct:isPartOf` such a criterion (the axe-core convention);
+- outcomes per criterion: `earl:failed` assertions become issues, `earl:passed` and
+  `earl:inapplicable` outcomes become `scStatuses.passed` and `scStatuses.not-present`, while
+  `earl:cantTell` and `earl:untested` leave the criterion not tested;
+- subjects: web pages become samples, identified by their source URL, and findings against the
+  product as a whole go to a synthetic `product` sample.
+
+Tests that cannot be mapped to a criterion are skipped and listed as warnings.
+
+Two modes are available:
+
+| Mode     | Effect                                                                                               |
+| -------- | ---------------------------------------------------------------------------------------------------- |
+| `create` | Creates `content/reports/{slug}/index.md` and one markdown file per issue. Fails if the slug exists. |
+| `merge`  | Adds issues and recorded outcomes to an existing report and adds samples that new issues refer to.   |
+
+In `merge` mode a criterion that gains issues loses any recorded pass, so the scorecard stays
+consistent.
+
+### UI
+
+Use **Import EARL** on the reports overview. The file is parsed first and a preview shows the
+title, WCAG version, number of samples, issues and recorded outcomes, and any warnings. Then choose
+a new slug or an existing report to merge into.
+
+### CLI
+
+```bash
+# Create a new report from an export
+wcagify-import-earl audit.jsonld --slug my-audit
+
+# Merge axe-core results into an existing report, machine-readable output
+wcagify-import-earl axe-results.json --slug my-audit --merge --json
+
+# Check what would happen without writing
+wcagify-import-earl audit.jsonld --dry-run --json
+```
+
+Options: `--slug`, `--merge`, `--content-dir` (default `content`), `--language en|nl`, `--dry-run`,
+`--json`. Projects scaffolded with `create-wcagify` expose it as `pnpm earl:import`.
+
+### API
+
+`POST /api/earl/import` with an admin session. The body is JSON:
+
+```json
+{
+  "earl": { "...": "the EARL document, or a JSON string" },
+  "slug": "my-audit",
+  "mode": "create",
+  "language": "en",
+  "dryRun": false
+}
+```
+
+`slug` defaults to a slug of the evaluation title, `mode` to `create`. With `dryRun: true` nothing
+is written and the response contains the summary only. The response lists the slug, title, WCAG
+version, counts, warnings and the files created or updated.
+
+```bash
+curl -X POST https://audit.example/api/earl/import \
+  -H 'content-type: application/json' \
+  -b 'wcagify-admin=...' \
+  -d "{\"earl\": $(cat audit.jsonld), \"slug\": \"my-audit\"}"
+```
+
+This is the intended path for agents and integrations: export from another tool, post the EARL
+document, read the summary. `GET /api/earl/{slug}` returns the report again as EARL.
+
 ## Programmatic use
 
 ```ts
@@ -163,3 +242,13 @@ const earl = buildEarlReport(report, issues, {
 
 `report` and `issues` are the report and issue documents as stored by Nuxt Content. Markdown bodies
 are converted to plain text for the EARL descriptions.
+
+```ts
+import { parseEarlReport, writeImportedReport } from '@focusring/wcagify/earl/import'
+
+const imported = await parseEarlReport(document)
+await writeImportedReport(imported, { contentDir: 'content', slug: 'my-audit', mode: 'merge' })
+```
+
+`parseEarlReport` returns the report frontmatter, the issues, warnings and statistics without
+touching the file system. `writeImportedReport` writes them as content files.

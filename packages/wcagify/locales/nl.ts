@@ -121,6 +121,26 @@ export default {
     downloadEarl: 'Download EARL',
     searchReports: 'Zoek rapporten...'
   },
+  import: {
+    title: 'EARL importeren',
+    description:
+      'Importeer een EARL-evaluatie (JSON-LD) uit WCAGify, de W3C WCAG-EM Report Tool of een geautomatiseerde testtool als rapport.',
+    file: 'EARL-bestand',
+    fileHelp:
+      'Een .json- of .jsonld-bestand. Het bestand wordt gecontroleerd voordat er iets wordt weggeschreven.',
+    warnings: 'Waarschuwingen',
+    mode: 'Importeren als',
+    modeCreate: 'Nieuw rapport',
+    modeMerge: 'Toevoegen aan een bestaand rapport',
+    slug: 'Rapport-slug',
+    slugHelp: 'Mapnaam onder content/reports. Kleine letters, cijfers en koppeltekens.',
+    slugInvalid: 'Gebruik alleen kleine letters, cijfers en koppeltekens.',
+    mergeInto: 'Bestaand rapport',
+    cancel: 'Annuleren',
+    import: 'Importeren',
+    success: '{count} bevinding(en) geïmporteerd',
+    error: 'Het importeren is mislukt. Controleer het bestand en probeer het opnieuw.'
+  },
   share: {
     share: 'Delen',
     shareReport: 'Rapport delen',

@@ -46,7 +46,7 @@ export default defineConfig({
           text: 'Reference',
           items: [
             { text: 'Configuration', link: '/reference/configuration' },
-            { text: 'EARL export', link: '/reference/earl' }
+            { text: 'EARL export and import', link: '/reference/earl' }
           ]
         }
       ],

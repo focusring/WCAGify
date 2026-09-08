@@ -118,6 +118,25 @@ export default {
     downloadEarl: 'Download EARL',
     searchReports: 'Search reports...'
   },
+  import: {
+    title: 'Import EARL',
+    description:
+      'Import an EARL (JSON-LD) evaluation from WCAGify, the W3C WCAG-EM Report Tool or an automated testing tool as a report.',
+    file: 'EARL file',
+    fileHelp: 'A .json or .jsonld file. The file is checked before anything is written.',
+    warnings: 'Warnings',
+    mode: 'Import as',
+    modeCreate: 'New report',
+    modeMerge: 'Add to an existing report',
+    slug: 'Report slug',
+    slugHelp: 'Directory name under content/reports. Lowercase letters, numbers and hyphens.',
+    slugInvalid: 'Use only lowercase letters, numbers and hyphens.',
+    mergeInto: 'Existing report',
+    cancel: 'Cancel',
+    import: 'Import',
+    success: 'Imported {count} issue(s)',
+    error: 'The import failed. Check the file and try again.'
+  },
   share: {
     share: 'Share',
     shareReport: 'Share report',

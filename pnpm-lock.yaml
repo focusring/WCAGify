@@ -86,6 +86,9 @@ catalogs:
     sharp:
       specifier: ^0.35.3
       version: 0.35.3
+    yaml:
+      specifier: ^2.9.0
+      version: 2.9.0
     zod:
       specifier: ^4.4.3
       version: 4.4.3
@@ -196,10 +199,10 @@ importers:
         version: 12.2.0
       changelogen:
         specifier: catalog:dev
-        version: 0.6.2(magicast@0.5.3)
+        version: 0.6.2
       changelogithub:
         specifier: catalog:dev
-        version: 15.0.4(magicast@0.5.3)
+        version: 15.0.4
       husky:
         specifier: catalog:dev
         version: 9.1.7
@@ -349,6 +352,9 @@ importers:
       '@vueuse/core':
         specifier: catalog:core
         version: 14.4.0(vue@3.5.40(typescript@6.0.3))
+      jsonld:
+        specifier: 'catalog:'
+        version: 9.0.0
       nanoid:
         specifier: 'catalog:'
         version: 6.0.0
@@ -361,6 +367,9 @@ importers:
       tailwindcss:
         specifier: catalog:core
         version: 4.3.3
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.0
       zod:
         specifier: catalog:core
         version: 4.4.3
@@ -377,9 +386,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: catalog:dev
         version: 4.1.10(vitest@4.1.10)
-      jsonld:
-        specifier: 'catalog:'
-        version: 9.0.0
       tsdown:
         specifier: catalog:dev
         version: 0.22.14(@volar/typescript@2.4.28)(oxc-resolver@11.24.2)(typescript@6.0.3)(vue-tsc@3.3.9(typescript@6.0.3))
@@ -12908,7 +12914,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@24.13.3)(esbuild@0.28.0)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
+      vitest: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))
 
   '@vitest/expect@4.1.10':
     dependencies:
@@ -13572,7 +13578,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  changelogen@0.6.2(magicast@0.5.3):
+  changelogen@0.6.2:
     dependencies:
       c12: 3.3.4(magicast@0.5.3)
       confbox: 0.2.4
@@ -13590,7 +13596,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  changelogithub@15.0.4(magicast@0.5.3):
+  changelogithub@15.0.4:
     dependencies:
       ansis: 4.3.1
       c12: 3.3.4(magicast@0.5.3)

@@ -46,6 +46,7 @@ function buildEarlContext(wcagVersion: WcagVersion): Record<string, unknown> {
 
     title: 'dct:title',
     summary: 'dct:summary',
+    language: 'dct:language',
     description: 'dct:description',
     creator: { '@id': 'dct:creator', '@type': '@id' },
     publisher: { '@id': 'dct:publisher', '@type': '@id' },

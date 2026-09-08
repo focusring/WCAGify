@@ -73,6 +73,7 @@ describe('buildEarlReport', () => {
     expect(evaluation.id).toBe('https://audit.example/reports/example')
     expect(evaluation.publisher).toBe('https://github.com/focusring/WCAGify/releases/tag/v1.2.3')
     expect(evaluation.lang).toBe('en')
+    expect(evaluation.language).toBe('en')
     expect(evaluation.title).toBe(report.title)
     expect(evaluation.summary).toBe('Executive summary.')
     expect(evaluation.date).toBe('2026-01-15')
