@@ -38,11 +38,12 @@ const mergeSlug = ref('')
 const busy = ref(false)
 const error = ref('')
 
+// Titles are not unique, an imported copy keeps its title, so the label includes the slug.
 const existingReports = computed(() =>
-  props.reports.map((report) => ({
-    label: report.title,
-    value: report.path?.replace('/reports/', '') ?? ''
-  }))
+  props.reports.map((report) => {
+    const value = report.path?.replace('/reports/', '') ?? ''
+    return { label: `${report.title} (${value})`, value }
+  })
 )
 
 const modeItems = computed(() => [
