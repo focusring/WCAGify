@@ -70,8 +70,8 @@ describe('generateReportMarkdown', () => {
     expect(md).toContain('targetLevel: AA')
   })
 
-  it('sets targetWcagVersion to 2.1', () => {
+  it('sets targetWcagVersion to 2.2', () => {
     const md = generateReportMarkdown('test')
-    expect(md).toContain("targetWcagVersion: '2.1'")
+    expect(md).toContain("targetWcagVersion: '2.2'")
   })
 })

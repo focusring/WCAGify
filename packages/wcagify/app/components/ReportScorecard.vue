@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { IssuesCollectionItem } from '@nuxt/content'
+import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 
 const props = defineProps<{
   issues: IssuesCollectionItem[]
   targetLevel: string
   wcagVersion: string
+  scStatuses?: ReportsCollectionItem['scStatuses']
 }>()
 
 const { t } = useI18n()
 const { scorecardByLevel, PRINCIPLES } = useWcagData()
 
 const data = computed(() =>
-  scorecardByLevel(
-    props.issues,
-    props.targetLevel as 'A' | 'AA' | 'AAA',
-    props.wcagVersion as '2.0' | '2.1' | '2.2'
-  )
+  scorecardByLevel(props.issues, props.targetLevel as 'A' | 'AA' | 'AAA', {
+    wcagVersion: props.wcagVersion as '2.0' | '2.1' | '2.2',
+    scStatuses: props.scStatuses
+  })
 )
 
 const showTotalColumn = computed(() => data.value.levels.length > 1)
@@ -118,5 +118,8 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
         </tr>
       </tfoot>
     </table>
+    <p v-if="data.total.notTested.all > 0" class="text-sm text-toned">
+      {{ t('report.scorecardNotTestedNote', { count: data.total.notTested.all }) }}
+    </p>
   </div>
 </template>

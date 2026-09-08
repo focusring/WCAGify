@@ -24,7 +24,7 @@ export default {
     resultsPerPrinciple: 'Resultaten per principe',
     aboutThisReport: 'Over dit rapport',
     aboutThisReportText:
-      'Dit rapport beschrijft de resultaten van een toegankelijkheidsonderzoek uitgevoerd volgens de Web Content Accessibility Guidelines (WCAG). Het onderzoek is uitgevoerd op basis van de WCAG-EM methodologie (Website Accessibility Conformance Evaluation Methodology).\n\nDe gevonden problemen zijn beoordeeld op ernst en moeilijkheidsgraad. Bij elk probleem is een aanbeveling opgenomen om het probleem op te lossen.',
+      'Dit rapport beschrijft de resultaten van een toegankelijkheidsonderzoek uitgevoerd volgens de Web Content Accessibility Guidelines (WCAG). Het onderzoek is uitgevoerd volgens de WCAG Evaluation Methodology (WCAG-EM), waarin de reikwijdte wordt bepaald, het product wordt verkend, een representatieve steekproef wordt geselecteerd, die steekproef wordt beoordeeld en de bevindingen worden gerapporteerd.\n\nIn de scores in dit rapport telt een succescriterium als voldaan wanneer het is vastgelegd als goedgekeurd of als niet aanwezig in de onderzochte content. Een criterium met een of meer bevindingen telt als afgekeurd. Een criterium zonder vastgelegde uitkomst telt als niet getoetst en telt niet mee als voldaan. Een score op basis van een steekproef is geen WCAG-conformiteitsclaim voor het hele product.\n\nDe gevonden problemen zijn beoordeeld op ernst en moeilijkheidsgraad. Bij elk probleem is een aanbeveling opgenomen om het probleem op te lossen.',
     scope: 'Reikwijdte',
     scopeItems: 'Onderdelen in reikwijdte',
     notInScope: 'Buiten reikwijdte',
@@ -33,7 +33,11 @@ export default {
       'De volgende combinaties van besturingssystemen, browsers en hulptechnologieën zijn gebruikt om de toegankelijkheid te beoordelen.',
     technologiesUsed: 'Gebruikte technologieën',
     technologiesExplanation:
-      'De volgende webtechnologieën worden gebruikt door de onderzochte website.',
+      'Het onderzochte product is afhankelijk van de volgende technologieën.',
+    evaluatedProduct: 'Onderzocht product',
+    additionalRequirements: 'Aanvullende onderzoekseisen',
+    additionalRequirementsExplanation:
+      'Eisen die de onderzoeker en de opdrachtgever hebben afgesproken naast wat nodig is om conformiteit met WCAG te beoordelen.',
     sample: 'Steekproef',
     representativeSample: 'Representatieve steekproef',
     issues: 'Problemen',
@@ -82,7 +86,7 @@ export default {
       passed: 'Goedgekeurd',
       failed: 'Afgekeurd',
       'not-present': 'Niet aanwezig',
-      'not-tested': 'Niet Getoetst'
+      'not-tested': 'Niet getoetst'
     },
     wcagPrinciple: 'WCAG Principe',
     principle: 'Principe',
@@ -90,6 +94,9 @@ export default {
     total: 'Totaal',
     conformanceLevel: 'Conformiteitsniveau: {level} — {conforming} van {total} criteria voldaan',
     criteriaMet: '{conforming} van {total} criteria voldaan',
+    criteriaNotTested: '{count} niet getoetst',
+    scorecardNotTestedNote:
+      '{count} criteria hebben geen vastgelegde uitkomst. Ze tellen als niet getoetst en tellen niet mee als voldaan.',
     scoreFormat: '{conforming} / {total}',
     emptyFilter: {
       passed: {
@@ -98,7 +105,7 @@ export default {
           'Geen van de beoordeelde criteria is als goedgekeurd aangemerkt in dit rapport.'
       },
       failed: {
-        title: 'Geen criteria gemarkeerd als niet aanwezig gevonden',
+        title: 'Geen afgekeurde criteria gevonden',
         description: 'Geen van de beoordeelde criteria is als afgekeurd aangemerkt. Goed werk!'
       },
       'not-present': {

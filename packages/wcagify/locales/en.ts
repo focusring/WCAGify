@@ -24,7 +24,7 @@ export default {
     resultsPerPrinciple: 'Results per principle',
     aboutThisReport: 'About this report',
     aboutThisReportText:
-      'This report describes the results of an accessibility evaluation conducted according to the Web Content Accessibility Guidelines (WCAG). The evaluation was performed using the WCAG-EM methodology (Website Accessibility Conformance Evaluation Methodology).\n\nThe identified issues have been assessed for severity and difficulty. Each issue includes a recommendation for resolving the problem.',
+      'This report describes the results of an accessibility evaluation conducted according to the Web Content Accessibility Guidelines (WCAG). The evaluation was performed using the WCAG Evaluation Methodology (WCAG-EM), which defines the evaluation scope, explores the product, selects a representative sample set, evaluates that sample set and reports the findings.\n\nThe scores in this report count a success criterion as met when it was recorded as passed or as not present in the evaluated content. A criterion with one or more issues counts as failed. A criterion without a recorded outcome counts as not tested and is not counted as met. A score based on a sample set does not constitute a WCAG conformance claim for the entire product.\n\nThe identified issues have been assessed for severity and difficulty. Each issue includes a recommendation for resolving the problem.',
     scope: 'Scope',
     scopeItems: 'Scope items',
     notInScope: 'Not in scope',
@@ -32,9 +32,13 @@ export default {
     accessibilitySupportExplanation:
       'The following combinations of operating systems, browsers, and assistive technologies were used to assess accessibility.',
     technologiesUsed: 'Technologies used',
-    technologiesExplanation: 'The following web technologies are used by the website under review.',
+    technologiesExplanation: 'The following technologies are relied upon by the evaluated product.',
+    evaluatedProduct: 'Evaluated product',
+    additionalRequirements: 'Additional evaluation requirements',
+    additionalRequirementsExplanation:
+      'Requirements agreed between the evaluator and the commissioner beyond what is needed to evaluate conformance with WCAG.',
     sample: 'Sample',
-    representativeSample: 'Representative sample',
+    representativeSample: 'Representative sample set',
     issues: 'Issues',
     results: 'Results',
     tips: 'Tips',
@@ -88,6 +92,9 @@ export default {
     total: 'Total',
     conformanceLevel: 'Conformance level: {level} — {conforming} of {total} criteria met',
     criteriaMet: '{conforming} of {total} criteria met',
+    criteriaNotTested: '{count} not tested',
+    scorecardNotTestedNote:
+      '{count} criteria have no recorded outcome. They count as not tested and are not counted as met.',
     scoreFormat: '{conforming} / {total}',
     emptyFilter: {
       passed: {
