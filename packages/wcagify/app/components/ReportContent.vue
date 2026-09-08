@@ -14,11 +14,10 @@ const issuesByPrinciple = computed(() => {
   const wcagVersion = (props.report.evaluation.targetWcagVersion ?? '2.2') as WcagVersion
   const language = (props.report.language === 'nl' ? 'nl' : 'en') as Language
   const targetLevel = (props.report.evaluation.targetLevel ?? 'AA') as Level
-  const scStatuses = (props.report as any).scStatuses as Record<string, string> | undefined
   return groupIssuesByPrinciple(props.issues, targetLevel, {
     wcagVersion,
     language,
-    scStatuses: scStatuses ?? {}
+    scStatuses: props.report.scStatuses
   })
 })
 
@@ -104,6 +103,7 @@ defineExpose({ visiblePrinciples })
           :issues="issues"
           :target-level="report.evaluation.targetLevel"
           :wcag-version="report.evaluation.targetWcagVersion"
+          :sc-statuses="report.scStatuses"
         />
       </div>
     </section>

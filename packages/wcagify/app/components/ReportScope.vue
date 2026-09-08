@@ -10,6 +10,15 @@ const { t } = useI18n()
 
 <template>
   <div class="space-y-6">
+    <div v-if="report.evaluation.target">
+      <h3>
+        {{ t('report.evaluatedProduct') }}
+      </h3>
+      <p class="mt-2 text-sm text-default">
+        {{ report.evaluation.target }}
+      </p>
+    </div>
+
     <div>
       <h3>
         {{ t('report.scopeItems') }}
@@ -30,6 +39,18 @@ const { t } = useI18n()
           {{ item }}
         </li>
       </ul>
+    </div>
+
+    <div v-if="report.evaluation.specialRequirements">
+      <h3>
+        {{ t('report.additionalRequirements') }}
+      </h3>
+      <p class="mt-2 text-sm text-toned">
+        {{ t('report.additionalRequirementsExplanation') }}
+      </p>
+      <p class="mt-3 text-sm text-default">
+        {{ report.evaluation.specialRequirements }}
+      </p>
     </div>
 
     <div>

@@ -12,17 +12,20 @@ An issue file contains frontmatter with metadata and a markdown body describing 
 ---
 title: Focus style missing on interactive elements
 sc: 2.4.7
-severity: high
-difficulty: low
+severity: High
+difficulty: Low
+sample: page-1
 ---
 ```
 
-| Field        | Description                                     |
-| ------------ | ----------------------------------------------- |
-| `title`      | Short description of the accessibility finding  |
-| `sc`         | WCAG success criterion reference (e.g. `2.4.7`) |
-| `severity`   | Impact level: `low`, `medium`, `high`           |
-| `difficulty` | Effort to fix: `low`, `medium`, `high`          |
+| Field        | Description                                             |
+| ------------ | ------------------------------------------------------- |
+| `title`      | Short description of the accessibility finding          |
+| `sc`         | WCAG success criterion reference (e.g. `2.4.7`)         |
+| `severity`   | Impact level: `Low`, `Medium`, `High`                   |
+| `difficulty` | Effort to fix: `Low`, `Medium`, `High`                  |
+| `type`       | Cause: `Content`, `Design`, `Technical`                 |
+| `sample`     | `id` of the sample in the report the issue was found on |
 
 ### Issue Body
 
@@ -39,8 +42,9 @@ The markdown body should include:
 ---
 title: Images missing alternative text
 sc: 1.1.1
-severity: high
-difficulty: low
+severity: High
+difficulty: Low
+sample: page-1
 ---
 
 Several images on the homepage lack `alt` attributes. Screen reader
