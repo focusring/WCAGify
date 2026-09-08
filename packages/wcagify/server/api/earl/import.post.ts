@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { parseEarlReport, writeImportedReport } from '@focusring/wcagify/earl/import'
+import {
+  parseEarlReport,
+  listImportedIssues,
+  selectImportedIssues,
+  writeImportedReport
+} from '@focusring/wcagify/earl/import'
 import { toSlug } from '@focusring/wcagify'
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -14,7 +19,9 @@ const bodySchema = z.object({
   mode: z.enum(['create', 'merge']).default('create'),
   language: z.enum(['en', 'nl']).optional(),
   /** Parse and summarise only; nothing is written. */
-  dryRun: z.boolean().default(false)
+  dryRun: z.boolean().default(false),
+  /** Indices (from the dry-run `issueList`) of issues to leave out. */
+  skipIssues: z.array(z.number().int().nonnegative()).default([])
 })
 
 export default defineEventHandler(async (event) => {
@@ -25,7 +32,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: parsed.error.issues.map((issue) => issue.message).join(', ')
     })
   }
-  const { earl, mode, language, dryRun } = parsed.data
+  const { earl, mode, language, dryRun, skipIssues } = parsed.data
 
   let document: unknown = earl
   if (typeof earl === 'string') {
@@ -36,13 +43,15 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const imported = await parseEarlReport(document, { language }).catch((error: Error) => {
+  const parsedImport = await parseEarlReport(document, { language }).catch((error: Error) => {
     throw createError({
       statusCode: 400,
       statusMessage: `Could not read EARL document: ${error.message}`
     })
   })
 
+  const issueList = listImportedIssues(parsedImport)
+  const imported = selectImportedIssues(parsedImport, skipIssues)
   const slug = parsed.data.slug ?? toSlug(imported.report.title)
   if (!SLUG_PATTERN.test(slug)) {
     throw createError({
@@ -59,13 +68,14 @@ export default defineEventHandler(async (event) => {
     targetLevel: imported.report.evaluation.targetLevel,
     samples: imported.report.sample.length,
     issues: imported.issues.length,
+    issuesSkipped: issueList.length - imported.issues.length,
     passed: imported.report.scStatuses.passed.length,
     notPresent: imported.report.scStatuses['not-present'].length,
     warnings: imported.warnings
   }
 
   if (dryRun) {
-    return { ok: true, dryRun: true, ...summary }
+    return { ok: true, dryRun: true, ...summary, issueList }
   }
 
   const { dir: contentDir } = resolveSecurePath(['content'], slug)

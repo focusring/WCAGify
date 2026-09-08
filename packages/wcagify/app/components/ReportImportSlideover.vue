@@ -15,6 +15,18 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const toast = useToast()
 
+interface IssueSummary {
+  index: number
+  title: string
+  sc: string
+  scName: string
+  sample: string
+  sampleTitle: string
+  sampleUrl: string
+  severity?: string
+  type?: string
+}
+
 interface ImportSummary {
   slug: string
   title: string
@@ -25,6 +37,7 @@ interface ImportSummary {
   passed: number
   notPresent: number
   warnings: string[]
+  issueList?: IssueSummary[]
   reportDir?: string
   issuesWritten?: number
 }
@@ -37,6 +50,26 @@ const mode = ref<'create' | 'merge'>('create')
 const mergeSlug = ref('')
 const busy = ref(false)
 const error = ref('')
+/** Indices of previewed issues the user chose not to import. */
+const skipped = ref(new Set<number>())
+
+const issueList = computed(() => preview.value?.issueList ?? [])
+const selectedCount = computed(() => issueList.value.length - skipped.value.size)
+
+function isSelected(index: number) {
+  return !skipped.value.has(index)
+}
+
+function setSelected(index: number, selected: boolean) {
+  const next = new Set(skipped.value)
+  if (selected) next.delete(index)
+  else next.add(index)
+  skipped.value = next
+}
+
+function selectAll(selected: boolean) {
+  skipped.value = selected ? new Set() : new Set(issueList.value.map((issue) => issue.index))
+}
 
 // Titles are not unique, an imported copy keeps its title, so the label includes the slug.
 const existingReports = computed(() =>
@@ -58,6 +91,7 @@ function reset() {
   fileName.value = ''
   document.value = ''
   preview.value = undefined
+  skipped.value = new Set()
   slug.value = ''
   mode.value = 'create'
   mergeSlug.value = existingReports.value[0]?.value ?? ''
@@ -74,6 +108,7 @@ async function onFileChange(event: Event) {
   if (!file) return
   error.value = ''
   preview.value = undefined
+  skipped.value = new Set()
   fileName.value = file.name
   document.value = await file.text()
   await loadPreview()
@@ -106,7 +141,12 @@ async function runImport() {
   try {
     const result = await $fetch<ImportSummary>('/api/earl/import', {
       method: 'POST',
-      body: { earl: document.value, slug: targetSlug.value, mode: mode.value }
+      body: {
+        earl: document.value,
+        slug: targetSlug.value,
+        mode: mode.value,
+        skipIssues: [...skipped.value]
+      }
     })
     toast.add({
       title: t('import.success', { count: result.issuesWritten ?? result.issues }),
@@ -159,12 +199,51 @@ async function runImport() {
             <dt class="text-toned">{{ $t('report.sample') }}</dt>
             <dd class="text-highlighted">{{ preview.samples }}</dd>
             <dt class="text-toned">{{ $t('report.issues') }}</dt>
-            <dd class="text-highlighted">{{ preview.issues }}</dd>
+            <dd class="text-highlighted">
+              {{
+                $t('import.issuesSelected', { selected: selectedCount, total: issueList.length })
+              }}
+            </dd>
             <dt class="text-toned">{{ $t('report.scStatus.passed') }}</dt>
             <dd class="text-highlighted">{{ preview.passed }}</dd>
             <dt class="text-toned">{{ $t('report.scStatus.not-present') }}</dt>
             <dd class="text-highlighted">{{ preview.notPresent }}</dd>
           </dl>
+
+          <fieldset v-if="issueList.length" class="rounded-lg border border-default p-4">
+            <legend class="px-1 text-sm font-medium text-highlighted">
+              {{ $t('import.issuesToImport') }}
+            </legend>
+            <p class="text-sm text-toned">{{ $t('import.issuesHelp') }}</p>
+            <div class="mt-2 flex gap-2">
+              <UButton
+                :label="$t('import.selectAll')"
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                :disabled="skipped.size === 0"
+                @click="selectAll(true)"
+              />
+              <UButton
+                :label="$t('import.selectNone')"
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                :disabled="selectedCount === 0"
+                @click="selectAll(false)"
+              />
+            </div>
+            <ul class="mt-3 max-h-72 space-y-2 overflow-y-auto pr-1">
+              <li v-for="issue in issueList" :key="issue.index">
+                <UCheckbox
+                  :model-value="isSelected(issue.index)"
+                  :label="issue.title"
+                  :description="`${issue.scName} · ${issue.sampleTitle}`"
+                  @update:model-value="(value) => setSelected(issue.index, value === true)"
+                />
+              </li>
+            </ul>
+          </fieldset>
 
           <div
             v-if="preview.warnings.length"

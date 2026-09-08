@@ -76,6 +76,20 @@ interface EarlImport {
   }
 }
 
+/** One importable issue, as shown to a person or agent choosing what to import. */
+interface ImportedIssueSummary {
+  /** Position in `EarlImport.issues`; stable for the same document. */
+  index: number
+  title: string
+  sc: string
+  scName: string
+  sample: string
+  sampleTitle: string
+  sampleUrl: string
+  severity?: string
+  type?: string
+}
+
 interface ParseEarlOptions {
   /** Language of the report to create. Defaults to the document language, else `en`. */
   language?: 'en' | 'nl'
@@ -627,5 +641,51 @@ async function parseEarlReport(
   }
 }
 
-export { parseEarlReport, criterionFromIri, outcomeStatus }
-export type { EarlImport, ImportedReport, ImportedIssue, ParseEarlOptions }
+/**
+ * Lists the issues of an import with the criterion and sample names, so a
+ * person or an agent can decide which ones to import.
+ */
+function listImportedIssues(imported: EarlImport): ImportedIssueSummary[] {
+  const { targetWcagVersion } = imported.report.evaluation
+  const pages = new Map(imported.report.sample.map((page) => [page.id, page]))
+  return imported.issues.map((issue, index) => {
+    const page = pages.get(issue.sample)
+    const summary: ImportedIssueSummary = {
+      index,
+      title: issue.title,
+      sc: issue.sc,
+      scName: scName(issue.sc, targetWcagVersion, imported.report.language),
+      sample: issue.sample,
+      sampleTitle: page?.title ?? issue.sample,
+      sampleUrl: page?.url ?? ''
+    }
+    if (issue.severity) summary.severity = issue.severity
+    if (issue.type) summary.type = issue.type
+    return summary
+  })
+}
+
+/**
+ * Returns a copy of an import without the issues at the given indices (as
+ * listed by `listImportedIssues`). Criteria that lose all their issues end
+ * up without a recorded outcome, so they count as not tested.
+ */
+function selectImportedIssues(imported: EarlImport, skipIndices: Iterable<number>): EarlImport {
+  const skip = new Set(skipIndices)
+  const issues = imported.issues.filter((_, index) => !skip.has(index))
+  const skipped = imported.issues.length - issues.length
+  const warnings =
+    skipped > 0
+      ? [...imported.warnings, `${skipped} issue(s) were left out on request.`]
+      : imported.warnings
+  return { ...imported, issues, warnings }
+}
+
+export {
+  parseEarlReport,
+  listImportedIssues,
+  selectImportedIssues,
+  criterionFromIri,
+  outcomeStatus
+}
+export type { EarlImport, ImportedReport, ImportedIssue, ImportedIssueSummary, ParseEarlOptions }

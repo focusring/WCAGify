@@ -169,6 +169,11 @@ any context works. It reads:
 
 Tests that cannot be mapped to a criterion are skipped and listed as warnings.
 
+All findings are imported by default, and every channel lets you hand-pick: the dialog shows the
+findings with checkboxes, the CLI lists them in `--dry-run --json` and takes `--skip-issues`, and
+the API returns an `issueList` on a dry run and accepts `skipIssues` with the indices to leave out.
+A criterion whose findings are all left out has no recorded outcome and stays not tested.
+
 Two modes are available:
 
 | Mode     | Effect                                                                                               |
@@ -194,12 +199,15 @@ wcagify-import-earl audit.jsonld --slug my-audit
 # Merge axe-core results into an existing report, machine-readable output
 wcagify-import-earl axe-results.json --slug my-audit --merge --json
 
-# Check what would happen without writing
+# Check what would happen without writing; lists every finding with its index
 wcagify-import-earl audit.jsonld --dry-run --json
+
+# Import everything except findings 2 and 5
+wcagify-import-earl axe-results.json --slug my-audit --merge --skip-issues 2,5
 ```
 
 Options: `--slug`, `--merge`, `--content-dir` (default `content`), `--language en|nl`, `--dry-run`,
-`--json`. Projects scaffolded with `create-wcagify` expose it as `pnpm earl:import`.
+`--skip-issues`, `--json`. Projects scaffolded with `create-wcagify` expose it as `pnpm earl:import`.
 
 ### API
 
@@ -211,12 +219,14 @@ Options: `--slug`, `--merge`, `--content-dir` (default `content`), `--language e
   "slug": "my-audit",
   "mode": "create",
   "language": "en",
-  "dryRun": false
+  "dryRun": false,
+  "skipIssues": [2, 5]
 }
 ```
 
 `slug` defaults to a slug of the evaluation title, `mode` to `create`. With `dryRun: true` nothing
-is written and the response contains the summary only. The response lists the slug, title, WCAG
+is written and the response contains the summary plus `issueList`, every finding with its `index`,
+title, criterion and sample; pass the indices to leave out as `skipIssues` on the real import. The response lists the slug, title, WCAG
 version, counts, warnings and the files created or updated.
 
 ```bash

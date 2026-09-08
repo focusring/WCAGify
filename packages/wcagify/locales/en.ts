@@ -134,6 +134,12 @@ export default {
     mergeInto: 'Existing report',
     cancel: 'Cancel',
     import: 'Import',
+    issuesToImport: 'Issues to import',
+    issuesHelp:
+      'All findings are imported unless you deselect them. Deselected findings are left out; their criteria stay not tested.',
+    issuesSelected: '{selected} of {total} selected',
+    selectAll: 'Select all',
+    selectNone: 'Deselect all',
     success: 'Imported {count} issue(s)',
     error: 'The import failed. Check the file and try again.'
   },

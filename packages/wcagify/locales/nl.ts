@@ -138,6 +138,12 @@ export default {
     mergeInto: 'Bestaand rapport',
     cancel: 'Annuleren',
     import: 'Importeren',
+    issuesToImport: 'Te importeren bevindingen',
+    issuesHelp:
+      'Alle bevindingen worden geïmporteerd tenzij je ze uitvinkt. Uitgevinkte bevindingen blijven weg; hun criteria blijven niet getoetst.',
+    issuesSelected: '{selected} van {total} geselecteerd',
+    selectAll: 'Alles selecteren',
+    selectNone: 'Alles deselecteren',
     success: '{count} bevinding(en) geïmporteerd',
     error: 'Het importeren is mislukt. Controleer het bestand en probeer het opnieuw.'
   },

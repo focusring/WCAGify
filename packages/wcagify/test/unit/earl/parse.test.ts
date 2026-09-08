@@ -1,7 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, it, expect } from 'vitest'
-import { parseEarlReport, criterionFromIri, outcomeStatus } from '../../../src/earl/parse'
+import {
+  parseEarlReport,
+  listImportedIssues,
+  selectImportedIssues,
+  criterionFromIri,
+  outcomeStatus
+} from '../../../src/earl/parse'
 import { buildEarlReport } from '../../../src/earl/build'
 
 const fixturesDir = join(__dirname, '../../fixtures/earl')
@@ -291,5 +297,46 @@ describe('parseEarlReport', () => {
       'No WCAG-EM evaluation metadata found; report details use placeholders.'
     ])
     expect(imported.issues).toEqual([])
+  })
+})
+
+describe('listImportedIssues and selectImportedIssues', () => {
+  it('lists issues with criterion and sample names, in a stable order', async () => {
+    const imported = await parseEarlReport(fixture('axe.json'))
+    const list = listImportedIssues(imported)
+    expect(list.map((issue) => issue.index)).toEqual([0, 1, 2, 3])
+    expect(list[1]).toEqual({
+      index: 1,
+      title: 'aria-roles',
+      sc: '4.1.2',
+      scName: '4.1.2: Name, Role, Value',
+      sample: 'website-name-org',
+      sampleTitle: 'https://website-name.org',
+      sampleUrl: 'https://website-name.org'
+    })
+  })
+
+  it('includes severity and type when present', async () => {
+    const imported = await parseEarlReport(fixture('wcagify-example.jsonld'))
+    const list = listImportedIssues(imported)
+    expect(list[1]).toMatchObject({ sc: '2.4.7', severity: 'Medium', sampleTitle: 'Homepage' })
+  })
+
+  it('leaves out the chosen issues and says so in a warning', async () => {
+    const imported = await parseEarlReport(fixture('axe.json'))
+    const selected = selectImportedIssues(imported, [1, 3])
+    expect(selected.issues.map((issue) => issue.title)).toEqual([
+      'aria-required-children',
+      'button-name'
+    ])
+    expect(selected.warnings).toContain('2 issue(s) were left out on request.')
+    expect(imported.issues).toHaveLength(4)
+  })
+
+  it('returns the import unchanged when nothing is skipped', async () => {
+    const imported = await parseEarlReport(fixture('axe.json'))
+    const selected = selectImportedIssues(imported, [])
+    expect(selected.issues).toEqual(imported.issues)
+    expect(selected.warnings).toEqual(imported.warnings)
   })
 })

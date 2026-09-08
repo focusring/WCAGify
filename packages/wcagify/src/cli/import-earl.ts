@@ -2,7 +2,7 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { parseArgs } from 'node:util'
-import { parseEarlReport } from '../earl/parse'
+import { parseEarlReport, listImportedIssues, selectImportedIssues } from '../earl/parse'
 import { writeImportedReport } from '../earl/write'
 import { toSlug } from '../content-utils'
 
@@ -15,7 +15,9 @@ Options:
   --merge               Merge issues and outcomes into an existing report instead of creating one.
   --content-dir <dir>   Content directory (default: content).
   --language <en|nl>    Language of the created report (default: from the document, else en).
-  --dry-run             Parse and report what would be written without writing.
+  --dry-run             Parse and report what would be written without writing. With --json the
+                        output lists every issue with its index, for use with --skip-issues.
+  --skip-issues <list>  Comma-separated indices of issues to leave out (see --dry-run --json).
   --json                Print the result as JSON (for scripts and agents).
   --help                Show this help.
 
@@ -40,6 +42,7 @@ const { positionals, values } = parseArgs({
     'content-dir': { type: 'string', default: 'content' },
     language: { type: 'string' },
     'dry-run': { type: 'boolean', default: false },
+    'skip-issues': { type: 'string' },
     json: { type: 'boolean', default: false },
     help: { type: 'boolean', default: false }
   }
@@ -70,7 +73,19 @@ try {
 }
 
 try {
-  const imported = await parseEarlReport(document, { language })
+  const parsedImport = await parseEarlReport(document, { language })
+  const issueList = listImportedIssues(parsedImport)
+  const skipIssues = (values['skip-issues'] ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map(Number)
+  if (
+    skipIssues.some((index) => !Number.isInteger(index) || index < 0 || index >= issueList.length)
+  ) {
+    fail(`Invalid --skip-issues. Use indices between 0 and ${issueList.length - 1}.`, asJson)
+  }
+  const imported = selectImportedIssues(parsedImport, skipIssues)
   const slug = values.slug ?? toSlug(imported.report.title)
   const summary = {
     slug,
@@ -79,6 +94,7 @@ try {
     targetLevel: imported.report.evaluation.targetLevel,
     samples: imported.report.sample.length,
     issues: imported.issues.length,
+    issuesSkipped: issueList.length - imported.issues.length,
     passed: imported.report.scStatuses.passed.length,
     notPresent: imported.report.scStatuses['not-present'].length,
     warnings: imported.warnings
@@ -86,12 +102,15 @@ try {
 
   if (values['dry-run']) {
     if (asJson) {
-      console.log(JSON.stringify({ ok: true, dryRun: true, ...summary }, undefined, 2))
+      console.log(JSON.stringify({ ok: true, dryRun: true, ...summary, issueList }, undefined, 2))
     } else {
       console.log(`Would ${values.merge ? 'merge into' : 'create'} report "${slug}":`)
       console.log(
         `  ${summary.issues} issue(s), ${summary.passed} passed, ${summary.notPresent} not present, ${summary.samples} sample(s)`
       )
+      for (const issue of issueList) {
+        console.log(`  [${issue.index}] ${issue.sc} ${issue.title} (${issue.sampleTitle})`)
+      }
       for (const warning of imported.warnings) console.log(`  warning: ${warning}`)
     }
     process.exit(0)

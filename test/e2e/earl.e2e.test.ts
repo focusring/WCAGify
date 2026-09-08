@@ -58,6 +58,8 @@ interface ImportResponse {
   passed: number
   notPresent: number
   warnings: string[]
+  issueList?: { index: number; title: string; sc: string; sampleTitle: string }[]
+  issuesSkipped?: number
   created?: string[]
   updated?: string[]
   issuesWritten?: number
@@ -228,6 +230,32 @@ describe('EARL export and import E2E', () => {
         warnings: []
       })
       expect(existsSync(join(projectPath, 'content/reports/wcag-audit-earl-test'))).toBe(false)
+      expect(summary.issueList?.map((issue) => [issue.index, issue.sc, issue.sampleTitle])).toEqual(
+        [
+          [0, '2.1.1', 'Contact page'],
+          [1, '2.4.7', 'Homepage']
+        ]
+      )
+    })
+
+    it('leaves out deselected issues', async () => {
+      const response = await postImport(baseUrl, {
+        earl: exportOfExample,
+        slug: 'hand-picked',
+        skipIssues: [0]
+      })
+      expect(response.status).toBe(200)
+      const result = (await response.json()) as ImportResponse
+      expect(result.issuesWritten).toBe(1)
+      expect(result.issuesSkipped).toBe(1)
+      expect(result.warnings).toContain('1 issue(s) were left out on request.')
+      const reportDir = join(projectPath, 'content/reports/hand-picked')
+      expect(existsSync(join(reportDir, 'focus-style-missing-on-interactive-elements.md'))).toBe(
+        true
+      )
+      expect(
+        existsSync(join(reportDir, 'not-all-functionality-is-reachable-with-the-keyboard.md'))
+      ).toBe(false)
     })
 
     it('round-trips an export into a new report', async () => {
@@ -374,6 +402,31 @@ describe('EARL export and import E2E', () => {
       expect(existsSync(join(projectPath, 'content/reports/cli-import/aria-roles.md'))).toBe(true)
     })
 
+    it('lists issues in the dry run and honours --skip-issues', () => {
+      const dry = runImportCli(`"${exportFile}" --dry-run --json`)
+      const list = (JSON.parse(dry.stdout) as ImportResponse).issueList!
+      expect(list.map((issue) => issue.sc)).toEqual(['2.1.1', '2.4.7'])
+
+      const result = runImportCli(`"${exportFile}" --slug cli-picked --skip-issues 1 --json`)
+      expect(result.exitCode).toBe(0)
+      expect(JSON.parse(result.stdout)).toMatchObject({
+        ok: true,
+        issuesWritten: 1,
+        issuesSkipped: 1
+      })
+      expect(
+        existsSync(
+          join(
+            projectPath,
+            'content/reports/cli-picked/focus-style-missing-on-interactive-elements.md'
+          )
+        )
+      ).toBe(false)
+
+      const invalid = runImportCli(`"${exportFile}" --slug cli-picked-2 --skip-issues 9 --json`)
+      expect(invalid.exitCode).toBe(1)
+    })
+
     it('fails for a missing file', () => {
       const result = runImportCli('"/does/not/exist.jsonld"')
       expect(result.exitCode).toBe(1)
@@ -462,6 +515,10 @@ describe('EARL export and import E2E', () => {
       const dialog = page.getByRole('dialog')
       await dialog.getByText('WCAG 2.0 AA').waitFor()
 
+      // Hand-pick: leave one of the four findings out.
+      await dialog.getByRole('checkbox', { name: 'button-name' }).uncheck()
+      await dialog.getByText('3 of 4 selected').waitFor()
+
       await dialog.getByRole('radio', { name: 'Add to an existing report' }).check()
       // Several reports carry the same title by now (round-trip imports keep
       // it), so the option is picked by its slug suffix.
@@ -473,7 +530,8 @@ describe('EARL export and import E2E', () => {
 
       const reportDir = join(projectPath, 'content/reports', REPORT_SLUG)
       expect(existsSync(join(reportDir, 'aria-roles.md'))).toBe(true)
-      expect(existsSync(join(reportDir, 'button-name.md'))).toBe(true)
+      expect(existsSync(join(reportDir, 'definition-list.md'))).toBe(true)
+      expect(existsSync(join(reportDir, 'button-name.md'))).toBe(false)
     })
   })
 })
