@@ -75,25 +75,15 @@ async function submitPassword() {
   }
 }
 
-const isGeneratingPdf = ref(false)
+const { downloading, download } = useReportDownload()
+const reportTitle = computed(() => report.value?.title ?? 'report')
 
-async function downloadPdf() {
-  isGeneratingPdf.value = true
-  try {
-    const response = await $fetch<Blob>(`/api/share/${token}/pdf`, {
-      responseType: 'blob'
-    })
-    const url = URL.createObjectURL(response)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${report.value?.title ?? 'report'}.pdf`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  } finally {
-    isGeneratingPdf.value = false
-  }
+function downloadPdf() {
+  return download(`/api/share/${token}/pdf`, `${reportTitle.value}.pdf`, 'pdf')
+}
+
+function downloadEarl() {
+  return download(`/api/share/${token}/jsonld`, `${reportTitle.value}-earl.jsonld`, 'earl')
 }
 </script>
 
@@ -132,9 +122,16 @@ async function downloadPdf() {
   <ReportContent v-else-if="report" :report="report" :issues="issues">
     <template #actions>
       <UButton
+        :label="t('report.downloadEarl')"
+        icon="i-lucide-file-json"
+        variant="outline"
+        :loading="downloading === 'earl'"
+        @click="downloadEarl"
+      />
+      <UButton
         :label="t('report.downloadPdf')"
         icon="i-lucide-download"
-        :loading="isGeneratingPdf"
+        :loading="downloading === 'pdf'"
         @click="downloadPdf"
       />
     </template>

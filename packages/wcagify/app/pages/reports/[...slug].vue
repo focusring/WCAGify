@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const route = useRoute()
 
-const reportPath = computed(() => `/reports/${(route.params.slug as string[]).join('/')}`)
+const reportSlug = computed(() => (route.params.slug as string[]).join('/'))
+const reportPath = computed(() => `/reports/${reportSlug.value}`)
 
 const { data: report } = await useAsyncData(`report-${reportPath.value}`, () =>
   queryCollection('reports').path(reportPath.value).first()
@@ -20,25 +21,15 @@ const { data: issues } = await useAsyncData(`issues-${reportPath.value}`, () =>
   queryCollection('issues').where('path', 'LIKE', `${reportPath.value}/%`).all()
 )
 
-const isGeneratingPdf = ref(false)
+const { downloading, download } = useReportDownload()
+const reportTitle = computed(() => report.value?.title ?? 'report')
 
-async function downloadPdf() {
-  isGeneratingPdf.value = true
-  try {
-    const response = await $fetch<Blob>(`/api${reportPath.value}.pdf`, {
-      responseType: 'blob'
-    })
-    const url = URL.createObjectURL(response)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${report.value?.title ?? 'report'}.pdf`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  } finally {
-    isGeneratingPdf.value = false
-  }
+function downloadPdf() {
+  return download(`/api${reportPath.value}.pdf`, `${reportTitle.value}.pdf`, 'pdf')
+}
+
+function downloadEarl() {
+  return download(`/api/earl/${reportSlug.value}`, `${reportTitle.value}-earl.jsonld`, 'earl')
 }
 
 const shareOpen = ref(false)
@@ -65,18 +56,21 @@ const visiblePrinciples = computed(
             @click="openShare"
           />
           <UButton
+            :label="$t('report.downloadEarl')"
+            icon="i-lucide-file-json"
+            variant="outline"
+            :loading="downloading === 'earl'"
+            @click="downloadEarl"
+          />
+          <UButton
             :label="$t('report.downloadPdf')"
             icon="i-lucide-download"
-            :loading="isGeneratingPdf"
+            :loading="downloading === 'pdf'"
             @click="downloadPdf"
           />
         </template>
       </ReportContent>
-      <ReportShareSlideover
-        v-if="shareOpen"
-        v-model:open="shareOpen"
-        :report-slug="(route.params.slug as string[]).join('/')"
-      />
+      <ReportShareSlideover v-if="shareOpen" v-model:open="shareOpen" :report-slug="reportSlug" />
     </div>
 
     <ReportAside

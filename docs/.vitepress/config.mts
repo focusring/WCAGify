@@ -44,7 +44,10 @@ export default defineConfig({
       '/reference/': [
         {
           text: 'Reference',
-          items: [{ text: 'Configuration', link: '/reference/configuration' }]
+          items: [
+            { text: 'Configuration', link: '/reference/configuration' },
+            { text: 'EARL export', link: '/reference/earl' }
+          ]
         }
       ],
       '/legal/': [

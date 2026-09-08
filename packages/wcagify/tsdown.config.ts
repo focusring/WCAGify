@@ -4,6 +4,7 @@ export default defineConfig({
   entry: [
     'src/index.ts',
     'src/pdf/index.ts',
+    'src/earl/index.ts',
     'src/module.ts',
     'src/config.ts',
     'src/content.ts',

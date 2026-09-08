@@ -1,7 +1,7 @@
 {
   "name": "@focusring/wcagify",
   "version": "0.5.1",
-  "description": "WCAG accessibility audit tool — Nuxt layer with report generation and PDF export",
+  "description": "WCAG accessibility audit tool — Nuxt layer with report generation, PDF export and EARL export",
   "keywords": [
     "a11y",
     "accessibility",
@@ -53,6 +53,11 @@
       "import": "./dist/pdf/index.js",
       "default": "./src/pdf/index.ts"
     },
+    "./earl": {
+      "types": "./dist/earl/index.d.ts",
+      "import": "./dist/earl/index.js",
+      "default": "./src/earl/index.ts"
+    },
     "./locales/en": "./locales/en.ts",
     "./locales/nl": "./locales/nl.ts",
     "./print.css": "./print.css",
@@ -85,8 +90,10 @@
   },
   "devDependencies": {
     "@nuxt/schema": "catalog:dev",
+    "@types/jsonld": "catalog:",
     "@types/node": "catalog:dev",
     "@vitest/coverage-v8": "catalog:dev",
+    "jsonld": "catalog:",
     "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:dev"

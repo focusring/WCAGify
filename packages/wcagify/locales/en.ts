@@ -115,6 +115,7 @@ export default {
       }
     },
     downloadPdf: 'Download PDF',
+    downloadEarl: 'Download EARL',
     searchReports: 'Search reports...'
   },
   share: {

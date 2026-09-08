@@ -105,6 +105,12 @@ has a recorded outcome:
 Record an outcome for every criterion you evaluated. A report that only lists issues shows
 all remaining criteria as not tested.
 
+## EARL Export
+
+Reports can also be downloaded as machine-readable EARL (JSON-LD), the format recommended by
+WCAG-EM Step 5.5 and used by the W3C WCAG-EM Report Tool. See the
+[EARL export reference](/reference/earl).
+
 ## PDF Export
 
 Reports can be exported as accessible PDFs with:

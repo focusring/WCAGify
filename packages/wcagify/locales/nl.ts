@@ -118,6 +118,7 @@ export default {
       }
     },
     downloadPdf: 'Download PDF',
+    downloadEarl: 'Download EARL',
     searchReports: 'Zoek rapporten...'
   },
   share: {
