@@ -107,6 +107,13 @@ describe('scStatusesSchema', () => {
   it('rejects non-list values', () => {
     expect(() => scStatusesSchema.parse({ passed: '1.1.1' })).toThrow()
   })
+
+  it('keeps a legacy map keyed by criterion instead of stripping it', () => {
+    expect(scStatusesSchema.parse({ '1.1.1': 'passed', '1.2.1': 'not-present' })).toEqual({
+      '1.1.1': 'passed',
+      '1.2.1': 'not-present'
+    })
+  })
 })
 
 describe('reportSchema', () => {

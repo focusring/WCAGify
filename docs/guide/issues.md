@@ -24,7 +24,7 @@ sample: page-1
 | `sc`         | WCAG success criterion reference (e.g. `2.4.7`)         |
 | `severity`   | Impact level: `Low`, `Medium`, `High`                   |
 | `difficulty` | Effort to fix: `Low`, `Medium`, `High`                  |
-| `type`       | Cause: `Content`, `Design`, `Technical`                 |
+| `type`       | Cause: `Content`, `Design`, `Technical` or `Unknown`    |
 | `sample`     | `id` of the sample in the report the issue was found on |
 
 ### Issue Body

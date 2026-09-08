@@ -21,9 +21,11 @@ const samplePageSchema = z.object({
  * Recorded outcomes for success criteria without issues, as lists of
  * criterion numbers. Lists are used instead of a map keyed by criterion
  * because Nuxt Content unflattens dotted keys such as `1.1.1` into nested
- * objects.
+ * objects. The object is loose so that a legacy map keyed by criterion
+ * (`{ '1.1.1': 'passed' }`) survives parsing and reaches
+ * `normalizeScStatuses`, which accepts both shapes.
  */
-const scStatusesSchema = z.object({
+const scStatusesSchema = z.looseObject({
   passed: z.array(z.string()).optional(),
   'not-present': z.array(z.string()).optional()
 })

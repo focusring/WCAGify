@@ -34,7 +34,7 @@ Language settings are configured through `@nuxtjs/i18n`:
 
 Translation files live in the core layer at `packages/wcagify/locales/`:
 
-```
+```text
 packages/wcagify/locales/
 ├── en.ts
 └── nl.ts

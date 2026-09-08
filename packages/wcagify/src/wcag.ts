@@ -87,10 +87,16 @@ function resolveScStatus(sc: string, hasIssues: boolean, scStatuses: ScStatusMap
   return 'not-tested'
 }
 
+/** Zeroed counts per principle plus a total. */
 function emptyCounts(): PrincipleCounts & { all: number } {
   return { all: 0, perceivable: 0, operable: 0, understandable: 0, robust: 0 }
 }
 
+/**
+ * Counts, per principle and in total, how many success criteria at the
+ * target level are met, failed and not tested. A criterion is met only when
+ * it has no issues and a recorded `passed` or `not-present` outcome.
+ */
 function scorecard(
   issues: { sc: string }[],
   targetLevel: Level,
@@ -135,6 +141,7 @@ function scorecard(
   return { conforming, failed, notTested, totals }
 }
 
+/** Scorecard plus whether every criterion at the target level is met. */
 function conformanceSummary(
   issues: { sc: string }[],
   targetLevel: Level,
@@ -149,6 +156,7 @@ function conformanceSummary(
 
 const SCORECARD_KEYS = ['conforming', 'failed', 'notTested', 'totals'] as const
 
+/** Difference of two scorecards, used to isolate one conformance level. */
 function subtractScorecard(a: Scorecard, b: Scorecard): Scorecard {
   const result = {} as Scorecard
   for (const key of SCORECARD_KEYS) {
@@ -163,6 +171,11 @@ function subtractScorecard(a: Scorecard, b: Scorecard): Scorecard {
 
 const levelHierarchy: Level[] = ['A', 'AA', 'AAA']
 
+/**
+ * Scorecards per conformance level up to the target level (A, then AA, then
+ * AAA), each counting only the criteria of that level, plus the cumulative
+ * total for the target level.
+ */
 function scorecardByLevel(
   issues: { sc: string }[],
   targetLevel: Level,

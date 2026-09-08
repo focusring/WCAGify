@@ -4,15 +4,13 @@ import type { ReportsCollectionItem } from '@nuxt/content'
 defineProps<{
   report: ReportsCollectionItem
 }>()
-
-const { t } = useI18n()
 </script>
 
 <template>
   <div class="space-y-6">
     <div v-if="report.evaluation.target">
       <h3>
-        {{ t('report.evaluatedProduct') }}
+        {{ $t('report.evaluatedProduct') }}
       </h3>
       <p class="mt-2 text-sm text-default">
         {{ report.evaluation.target }}
@@ -21,7 +19,7 @@ const { t } = useI18n()
 
     <div>
       <h3>
-        {{ t('report.scopeItems') }}
+        {{ $t('report.scopeItems') }}
       </h3>
       <ul class="mt-2 list-disc list-inside space-y-1 text-sm text-default">
         <li v-for="item in report.scope" :key="item">
@@ -32,7 +30,7 @@ const { t } = useI18n()
 
     <div v-if="report.outOfScope?.length">
       <h3>
-        {{ t('report.notInScope') }}
+        {{ $t('report.notInScope') }}
       </h3>
       <ul class="mt-2 list-disc list-inside space-y-1 text-sm text-default">
         <li v-for="item in report.outOfScope" :key="item">
@@ -43,10 +41,10 @@ const { t } = useI18n()
 
     <div v-if="report.evaluation.specialRequirements">
       <h3>
-        {{ t('report.additionalRequirements') }}
+        {{ $t('report.additionalRequirements') }}
       </h3>
       <p class="mt-2 text-sm text-toned">
-        {{ t('report.additionalRequirementsExplanation') }}
+        {{ $t('report.additionalRequirementsExplanation') }}
       </p>
       <p class="mt-3 text-sm text-default">
         {{ report.evaluation.specialRequirements }}
@@ -55,10 +53,10 @@ const { t } = useI18n()
 
     <div>
       <h3>
-        {{ t('report.accessibilitySupport') }}
+        {{ $t('report.accessibilitySupport') }}
       </h3>
       <p class="mt-2 text-sm text-toned">
-        {{ t('report.accessibilitySupportExplanation') }}
+        {{ $t('report.accessibilitySupportExplanation') }}
       </p>
       <ul class="mt-3 list-disc list-inside space-y-1 text-sm text-default">
         <li v-for="item in report.baseline" :key="item">
@@ -69,10 +67,10 @@ const { t } = useI18n()
 
     <div>
       <h3>
-        {{ t('report.technologiesUsed') }}
+        {{ $t('report.technologiesUsed') }}
       </h3>
       <p class="mt-2 text-sm text-toned">
-        {{ t('report.technologiesExplanation') }}
+        {{ $t('report.technologiesExplanation') }}
       </p>
       <ul class="mt-3 list-disc list-inside space-y-1 text-sm text-default">
         <li v-for="item in report.technologies" :key="item">

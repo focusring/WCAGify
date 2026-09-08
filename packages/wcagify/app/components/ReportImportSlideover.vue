@@ -126,10 +126,14 @@ async function runImport() {
 </script>
 
 <template>
-  <USlideover v-model:open="open" :title="t('import.title')" :description="t('import.description')">
+  <USlideover
+    v-model:open="open"
+    :title="$t('import.title')"
+    :description="$t('import.description')"
+  >
     <template #body>
       <div class="space-y-6">
-        <UFormField :label="t('import.file')" :help="t('import.fileHelp')" name="earl-file">
+        <UFormField :label="$t('import.file')" :help="$t('import.fileHelp')" name="earl-file">
           <input
             id="earl-file"
             type="file"
@@ -146,19 +150,19 @@ async function runImport() {
 
         <template v-if="preview">
           <dl class="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border border-default p-4 text-sm">
-            <dt class="text-toned">{{ t('report.title') }}</dt>
+            <dt class="text-toned">{{ $t('report.title') }}</dt>
             <dd class="text-highlighted">{{ preview.title }}</dd>
-            <dt class="text-toned">{{ t('report.wcagVersion') }}</dt>
+            <dt class="text-toned">{{ $t('report.wcagVersion') }}</dt>
             <dd class="text-highlighted">
               WCAG {{ preview.wcagVersion }} {{ preview.targetLevel }}
             </dd>
-            <dt class="text-toned">{{ t('report.sample') }}</dt>
+            <dt class="text-toned">{{ $t('report.sample') }}</dt>
             <dd class="text-highlighted">{{ preview.samples }}</dd>
-            <dt class="text-toned">{{ t('report.issues') }}</dt>
+            <dt class="text-toned">{{ $t('report.issues') }}</dt>
             <dd class="text-highlighted">{{ preview.issues }}</dd>
-            <dt class="text-toned">{{ t('report.scStatus.passed') }}</dt>
+            <dt class="text-toned">{{ $t('report.scStatus.passed') }}</dt>
             <dd class="text-highlighted">{{ preview.passed }}</dd>
-            <dt class="text-toned">{{ t('report.scStatus.not-present') }}</dt>
+            <dt class="text-toned">{{ $t('report.scStatus.not-present') }}</dt>
             <dd class="text-highlighted">{{ preview.notPresent }}</dd>
           </dl>
 
@@ -166,27 +170,27 @@ async function runImport() {
             v-if="preview.warnings.length"
             class="rounded-lg border border-warning/50 bg-warning/10 p-4"
           >
-            <h3 class="text-sm font-medium text-highlighted">{{ t('import.warnings') }}</h3>
+            <h3 class="text-sm font-medium text-highlighted">{{ $t('import.warnings') }}</h3>
             <ul class="mt-2 list-disc list-inside space-y-1 text-sm text-toned">
               <li v-for="warning in preview.warnings" :key="warning">{{ warning }}</li>
             </ul>
           </div>
 
-          <UFormField :label="t('import.mode')" name="mode">
+          <UFormField :label="$t('import.mode')" name="mode">
             <URadioGroup v-model="mode" :items="modeItems" />
           </UFormField>
 
           <UFormField
             v-if="mode === 'create'"
-            :label="t('import.slug')"
-            :help="t('import.slugHelp')"
-            :error="slug && !slugValid ? t('import.slugInvalid') : undefined"
+            :label="$t('import.slug')"
+            :help="$t('import.slugHelp')"
+            :error="slug && !slugValid ? $t('import.slugInvalid') : undefined"
             name="slug"
           >
             <UInput v-model="slug" class="w-full" />
           </UFormField>
 
-          <UFormField v-else :label="t('import.mergeInto')" name="merge-slug">
+          <UFormField v-else :label="$t('import.mergeInto')" name="merge-slug">
             <USelect v-model="mergeSlug" :items="existingReports" class="w-full" />
           </UFormField>
         </template>
@@ -196,13 +200,13 @@ async function runImport() {
     <template #footer>
       <div class="flex w-full justify-end gap-2">
         <UButton
-          :label="t('import.cancel')"
+          :label="$t('import.cancel')"
           variant="ghost"
           color="neutral"
           @click="open = false"
         />
         <UButton
-          :label="t('import.import')"
+          :label="$t('import.import')"
           icon="i-lucide-upload"
           :loading="busy"
           :disabled="!preview || !slugValid"

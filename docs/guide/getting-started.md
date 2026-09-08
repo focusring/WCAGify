@@ -41,7 +41,7 @@ pnpm preview
 
 ## Project Structure
 
-```
+```text
 wcagify/
 ├── app/              # Vue app (pages, components, assets)
 ├── content/          # Markdown content files

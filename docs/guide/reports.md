@@ -26,7 +26,7 @@ Reports follow a defined section order:
 
 Create a new directory under `content/reports/` with a descriptive slug:
 
-```
+```text
 content/reports/my-audit/
 ├── index.md
 ├── missing-alt-text.md
