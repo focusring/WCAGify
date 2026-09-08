@@ -4,8 +4,8 @@ const evaluationSchema = z.object({
   evaluator: z.string(),
   commissioner: z.string(),
   target: z.string(),
-  targetLevel: z.string(),
-  targetWcagVersion: z.string(),
+  targetLevel: z.enum(['A', 'AA', 'AAA']),
+  targetWcagVersion: z.enum(['2.0', '2.1', '2.2']),
   date: z.string(),
   specialRequirements: z.string()
 })
@@ -17,7 +17,18 @@ const samplePageSchema = z.object({
   description: z.string()
 })
 
-const scStatusSchema = z.enum(['passed', 'not-present'])
+/**
+ * Recorded outcomes for success criteria without issues, as lists of
+ * criterion numbers. Lists are used instead of a map keyed by criterion
+ * because Nuxt Content unflattens dotted keys such as `1.1.1` into nested
+ * objects. The object is loose so that a legacy map keyed by criterion
+ * (`{ '1.1.1': 'passed' }`) survives parsing and reaches
+ * `normalizeScStatuses`, which accepts both shapes.
+ */
+const scStatusesSchema = z.looseObject({
+  passed: z.array(z.string()).optional(),
+  'not-present': z.array(z.string()).optional()
+})
 
 const reportSchema = z.object({
   language: z.enum(['nl', 'en']),
@@ -27,7 +38,7 @@ const reportSchema = z.object({
   baseline: z.array(z.string()),
   technologies: z.array(z.string()),
   sample: z.array(samplePageSchema),
-  scStatuses: z.record(z.string(), scStatusSchema).optional()
+  scStatuses: scStatusesSchema.optional()
 })
 
 const issueSchema = z.object({
@@ -38,4 +49,4 @@ const issueSchema = z.object({
   sample: z.string()
 })
 
-export { evaluationSchema, samplePageSchema, reportSchema, issueSchema }
+export { evaluationSchema, samplePageSchema, scStatusesSchema, reportSchema, issueSchema }

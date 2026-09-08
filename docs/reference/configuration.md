@@ -26,18 +26,18 @@ Content collections are defined in `content.config.ts`. WCAGify uses three colle
 
 Language settings are configured through `@nuxtjs/i18n`:
 
-| Setting   | Value                         |
-| --------- | ----------------------------- |
-| Default   | `nl` (Dutch, no prefix)       |
-| Secondary | `en` (English, `/en/` prefix) |
-| Strategy  | `prefix_except_default`       |
+| Setting   | Value          |
+| --------- | -------------- |
+| Default   | `en` (English) |
+| Secondary | `nl` (Dutch)   |
+| Strategy  | `no_prefix`    |
 
-Translation files live in `i18n/locales/`:
+Translation files live in the core layer at `packages/wcagify/locales/`:
 
-```
-i18n/locales/
-├── nl.json
-└── en.json
+```text
+packages/wcagify/locales/
+├── en.ts
+└── nl.ts
 ```
 
 ## Linting and Formatting

@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import type { IssuesCollectionItem } from '@nuxt/content'
+import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 
 const props = defineProps<{
   issues: IssuesCollectionItem[]
   targetLevel: string
   wcagVersion: string
+  scStatuses?: ReportsCollectionItem['scStatuses']
 }>()
 
-const { t } = useI18n()
 const { scorecardByLevel, PRINCIPLES } = useWcagData()
 
 const data = computed(() =>
-  scorecardByLevel(
-    props.issues,
-    props.targetLevel as 'A' | 'AA' | 'AAA',
-    props.wcagVersion as '2.0' | '2.1' | '2.2'
-  )
+  scorecardByLevel(props.issues, props.targetLevel as 'A' | 'AA' | 'AAA', {
+    wcagVersion: props.wcagVersion as '2.0' | '2.1' | '2.2',
+    scStatuses: props.scStatuses
+  })
 )
 
 const showTotalColumn = computed(() => data.value.levels.length > 1)
@@ -25,7 +24,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
   <div class="space-y-4">
     <p class="text-lg font-medium text-highlighted">
       {{
-        t('report.conformanceLevel', {
+        $t('report.conformanceLevel', {
           level: targetLevel,
           conforming: data.total.conforming.all,
           total: data.total.totals.all
@@ -35,13 +34,13 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
     <table class="w-full border-separate border-spacing-0 text-sm text-left">
       <caption class="sr-only">
         {{
-          t('report.resultsPerPrinciple')
+          $t('report.resultsPerPrinciple')
         }}
       </caption>
       <thead>
         <tr>
           <th scope="col" class="border-b border-muted py-2 pr-4 font-medium text-toned">
-            {{ t('report.wcagPrinciple') }}
+            {{ $t('report.wcagPrinciple') }}
           </th>
           <th
             v-for="level in data.levels"
@@ -56,14 +55,14 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
             scope="col"
             class="border-b border-muted py-2 text-center font-medium text-toned"
           >
-            {{ t('report.total') }}
+            {{ $t('report.total') }}
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="principle in PRINCIPLES" :key="principle">
           <th scope="row" class="border-b border-muted py-2 pr-4 font-medium text-highlighted">
-            {{ t(`report.principles.${principle}`) }}
+            {{ $t(`report.principles.${principle}`) }}
           </th>
           <td
             v-for="level in data.levels"
@@ -71,7 +70,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
             class="border-b border-muted py-2 pr-4 text-center text-default"
           >
             {{
-              t('report.scoreFormat', {
+              $t('report.scoreFormat', {
                 conforming: data.perLevel.get(level)!.conforming[principle],
                 total: data.perLevel.get(level)!.totals[principle]
               })
@@ -79,7 +78,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
           </td>
           <td v-if="showTotalColumn" class="border-b border-muted py-2 text-center text-default">
             {{
-              t('report.scoreFormat', {
+              $t('report.scoreFormat', {
                 conforming: data.total.conforming[principle],
                 total: data.total.totals[principle]
               })
@@ -90,7 +89,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
       <tfoot>
         <tr>
           <th scope="row" class="border-b border-muted py-2 pr-4 font-medium text-highlighted">
-            {{ t('report.total') }}
+            {{ $t('report.total') }}
           </th>
           <td
             v-for="level in data.levels"
@@ -98,7 +97,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
             class="border-b border-muted py-2 pr-4 text-center font-medium text-highlighted"
           >
             {{
-              t('report.scoreFormat', {
+              $t('report.scoreFormat', {
                 conforming: data.perLevel.get(level)!.conforming.all,
                 total: data.perLevel.get(level)!.totals.all
               })
@@ -109,7 +108,7 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
             class="border-b border-muted py-2 text-center font-medium text-highlighted"
           >
             {{
-              t('report.scoreFormat', {
+              $t('report.scoreFormat', {
                 conforming: data.total.conforming.all,
                 total: data.total.totals.all
               })
@@ -118,5 +117,8 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
         </tr>
       </tfoot>
     </table>
+    <p v-if="data.total.notTested.all > 0" class="text-sm text-toned">
+      {{ $t('report.scorecardNotTestedNote', { count: data.total.notTested.all }) }}
+    </p>
   </div>
 </template>

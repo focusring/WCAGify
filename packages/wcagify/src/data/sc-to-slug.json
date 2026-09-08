@@ -513,7 +513,7 @@
       "2.5.2": { "slug": "pointer-cancellation", "name": "Pointer Cancellation", "level": "A" },
       "2.5.3": { "slug": "label-in-name", "name": "Label in Name", "level": "A" },
       "2.5.4": { "slug": "motion-actuation", "name": "Motion Actuation", "level": "A" },
-      "2.5.5": { "slug": "target-size-enhanced", "name": "Target Size (Enhanced)", "level": "AAA" },
+      "2.5.5": { "slug": "target-size", "name": "Target Size", "level": "AAA" },
       "2.5.6": {
         "slug": "concurrent-input-mechanisms",
         "name": "Concurrent Input Mechanisms",
@@ -682,8 +682,8 @@
       "2.5.3": { "slug": "label-in-name", "name": "Label in naam", "level": "A" },
       "2.5.4": { "slug": "motion-actuation", "name": "Bewegingsactivering", "level": "A" },
       "2.5.5": {
-        "slug": "target-size-enhanced",
-        "name": "Grootte van het aanwijsgebied (uitgebreid)",
+        "slug": "target-size",
+        "name": "Grootte van het aanwijsgebied",
         "level": "AAA"
       },
       "2.5.6": {

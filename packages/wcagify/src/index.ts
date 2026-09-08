@@ -4,10 +4,18 @@ export {
   scorecard,
   conformanceSummary,
   scorecardByLevel,
+  normalizeScStatuses,
+  resolveScStatus,
   PRINCIPLES,
   guidelineName
 } from './wcag'
-export { reportSchema, issueSchema, evaluationSchema, samplePageSchema } from './schemas'
+export {
+  reportSchema,
+  issueSchema,
+  evaluationSchema,
+  samplePageSchema,
+  scStatusesSchema
+} from './schemas'
 export {
   filterIssues,
   sortIssuesBySc,
@@ -29,7 +37,11 @@ export type {
   SamplePage,
   IssueGroup,
   ScStatus,
+  ScStatusMap,
+  ScStatusLists,
+  ScStatuses,
   ScGroup,
   GuidelineGroup,
   PrincipleGroup
 } from './types'
+export type { ScorecardOptions } from './wcag'

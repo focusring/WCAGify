@@ -1,7 +1,7 @@
 {
   "name": "@focusring/wcagify",
   "version": "0.5.1",
-  "description": "WCAG accessibility audit tool — Nuxt layer with report generation and PDF export",
+  "description": "WCAG accessibility audit tool — Nuxt layer with report generation, PDF export and EARL export",
   "keywords": [
     "a11y",
     "accessibility",
@@ -17,6 +17,7 @@
     "directory": "packages/wcagify"
   },
   "bin": {
+    "wcagify-import-earl": "./dist/cli/import-earl.js",
     "wcagify-new-report": "./dist/cli/new-report.js"
   },
   "files": [
@@ -53,6 +54,16 @@
       "import": "./dist/pdf/index.js",
       "default": "./src/pdf/index.ts"
     },
+    "./earl": {
+      "types": "./dist/earl/index.d.ts",
+      "import": "./dist/earl/index.js",
+      "default": "./src/earl/index.ts"
+    },
+    "./earl/import": {
+      "types": "./dist/earl/import.d.ts",
+      "import": "./dist/earl/import.js",
+      "default": "./src/earl/import.ts"
+    },
     "./locales/en": "./locales/en.ts",
     "./locales/nl": "./locales/nl.ts",
     "./print.css": "./print.css",
@@ -77,14 +88,17 @@
     "@nuxt/ui": "catalog:core",
     "@nuxtjs/i18n": "catalog:core",
     "@vueuse/core": "catalog:core",
+    "jsonld": "catalog:",
     "nanoid": "catalog:",
     "nuxt-studio": "catalog:core",
     "sharp": "catalog:",
     "tailwindcss": "catalog:core",
+    "yaml": "catalog:",
     "zod": "catalog:core"
   },
   "devDependencies": {
     "@nuxt/schema": "catalog:dev",
+    "@types/jsonld": "catalog:",
     "@types/node": "catalog:dev",
     "@vitest/coverage-v8": "catalog:dev",
     "tsdown": "catalog:dev",

@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { evaluationSchema, samplePageSchema, reportSchema, issueSchema } from '../../src/schemas'
+import {
+  evaluationSchema,
+  samplePageSchema,
+  scStatusesSchema,
+  reportSchema,
+  issueSchema
+} from '../../src/schemas'
 
 describe('evaluationSchema', () => {
   const valid = {
@@ -22,6 +28,27 @@ describe('evaluationSchema', () => {
 
   it('rejects non-string fields', () => {
     expect(() => evaluationSchema.parse({ ...valid, evaluator: 123 })).toThrow()
+  })
+
+  it('accepts all supported WCAG versions and levels', () => {
+    for (const targetWcagVersion of ['2.0', '2.1', '2.2']) {
+      expect(evaluationSchema.parse({ ...valid, targetWcagVersion })).toHaveProperty(
+        'targetWcagVersion',
+        targetWcagVersion
+      )
+    }
+    for (const targetLevel of ['A', 'AA', 'AAA']) {
+      expect(evaluationSchema.parse({ ...valid, targetLevel })).toHaveProperty(
+        'targetLevel',
+        targetLevel
+      )
+    }
+  })
+
+  it('rejects an unsupported WCAG version or level', () => {
+    expect(() => evaluationSchema.parse({ ...valid, targetWcagVersion: '2.3' })).toThrow()
+    expect(() => evaluationSchema.parse({ ...valid, targetWcagVersion: '3.0' })).toThrow()
+    expect(() => evaluationSchema.parse({ ...valid, targetLevel: 'AAAA' })).toThrow()
   })
 })
 
@@ -62,6 +89,30 @@ describe('issueSchema', () => {
     for (const difficulty of ['Low', 'Medium', 'High']) {
       expect(issueSchema.parse({ ...valid, difficulty })).toHaveProperty('difficulty', difficulty)
     }
+  })
+})
+
+describe('scStatusesSchema', () => {
+  it('accepts passed and not-present lists', () => {
+    expect(scStatusesSchema.parse({ passed: ['1.1.1'], 'not-present': ['1.2.1'] })).toEqual({
+      passed: ['1.1.1'],
+      'not-present': ['1.2.1']
+    })
+  })
+
+  it('accepts an empty object', () => {
+    expect(scStatusesSchema.parse({})).toEqual({})
+  })
+
+  it('rejects non-list values', () => {
+    expect(() => scStatusesSchema.parse({ passed: '1.1.1' })).toThrow()
+  })
+
+  it('keeps a legacy map keyed by criterion instead of stripping it', () => {
+    expect(scStatusesSchema.parse({ '1.1.1': 'passed', '1.2.1': 'not-present' })).toEqual({
+      '1.1.1': 'passed',
+      '1.2.1': 'not-present'
+    })
   })
 })
 
