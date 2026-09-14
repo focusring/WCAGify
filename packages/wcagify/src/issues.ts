@@ -2,13 +2,21 @@ import type {
   WcagVersion,
   Language,
   Level,
-  ScStatus,
+  ScStatuses,
   IssueGroup,
   GuidelineGroup,
   PrincipleGroup,
   Principle
 } from './types'
-import { scName, scUri, guidelineName, allScEntries, levelIncludes } from './wcag'
+import {
+  scName,
+  scUri,
+  guidelineName,
+  allScEntries,
+  levelIncludes,
+  normalizeScStatuses,
+  resolveScStatus
+} from './wcag'
 
 function filterIssues<T extends { sc: string }>(issues: T[]): T[] {
   return issues.filter((issue) => issue.sc !== 'none')
@@ -51,7 +59,7 @@ function groupIssuesBySc<T extends { sc: string }>(
 interface GroupByPrincipleOptions {
   wcagVersion?: WcagVersion
   language?: Language
-  scStatuses?: Record<string, string>
+  scStatuses?: ScStatuses
 }
 
 function groupIssuesByPrinciple<T extends { sc: string }>(
@@ -59,7 +67,8 @@ function groupIssuesByPrinciple<T extends { sc: string }>(
   targetLevel: Level,
   options: GroupByPrincipleOptions = {}
 ): PrincipleGroup<T>[] {
-  const { wcagVersion = '2.2', language = 'en', scStatuses = {} } = options
+  const { wcagVersion = '2.2', language = 'en' } = options
+  const scStatuses = normalizeScStatuses(options.scStatuses)
   const realIssues = filterIssues(issues)
   const issuesBySc = new Map<string, T[]>()
   for (const issue of realIssues) {
@@ -105,12 +114,7 @@ function groupIssuesByPrinciple<T extends { sc: string }>(
       }
 
       const scIssues = issuesBySc.get(sc) ?? []
-      let status: ScStatus = 'not-tested'
-      if (scIssues.length > 0) {
-        status = 'failed'
-      } else if (scStatuses[sc] === 'passed' || scStatuses[sc] === 'not-present') {
-        status = scStatuses[sc] as ScStatus
-      }
+      const status = resolveScStatus(sc, scIssues.length > 0, scStatuses)
 
       guideline.criteria.push({
         sc,

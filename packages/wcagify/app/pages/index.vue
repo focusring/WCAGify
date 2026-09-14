@@ -7,7 +7,16 @@ const UButton = resolveComponent('UButton')
 
 const { t, locale } = useI18n()
 
-const { data: reports } = await useAsyncData('reports', () => queryCollection('reports').all())
+const { data: reports, refresh } = await useAsyncData('reports', () =>
+  queryCollection('reports').all()
+)
+
+const importOpen = ref(false)
+
+async function onImported(slug: string) {
+  await refresh()
+  await navigateTo(`/reports/${slug}`)
+}
 
 const search = ref('')
 const view = useCookie<'grid' | 'table'>('wcagify-reports-view', { default: () => 'table' })
@@ -179,12 +188,28 @@ const columnLabels = computed<Record<string, string>>(() => ({
 
 <template>
   <div class="py-8">
-    <h1 class="text-3xl font-bold">
-      {{ t('app.reports') }}
-    </h1>
-    <p class="mt-1 text-toned">
-      {{ t('app.description') }}
-    </p>
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold">
+          {{ t('app.reports') }}
+        </h1>
+        <p class="mt-1 text-toned">
+          {{ t('app.description') }}
+        </p>
+      </div>
+      <UButton
+        :label="t('import.title')"
+        icon="i-lucide-upload"
+        variant="outline"
+        @click="importOpen = true"
+      />
+    </div>
+    <ReportImportSlideover
+      v-if="importOpen"
+      v-model:open="importOpen"
+      :reports="reports ?? []"
+      @imported="onImported"
+    />
 
     <template v-if="reports?.length">
       <div class="mt-6 rounded-lg border border-accented divide-y divide-accented">

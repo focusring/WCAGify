@@ -15,7 +15,7 @@ evaluation:
   commissioner: ''
   target: ''
   targetLevel: AA
-  targetWcagVersion: '2.1'
+  targetWcagVersion: '2.2'
   date: ${today}
   specialRequirements: None
 language: nl
@@ -31,6 +31,11 @@ technologies:
   - CSS
   - JavaScript
   - WAI-ARIA
+# List every success criterion without issues under "passed" or "not-present".
+# Criteria that appear in neither list count as not tested.
+scStatuses:
+  passed: []
+  not-present: []
 ---
 `
 }
