@@ -13,11 +13,13 @@ type SamplePage = ReportsCollectionItem['sample'][number]
 const columns = computed<TableColumn<SamplePage>[]>(() => [
   {
     accessorKey: 'title',
-    header: t('report.title')
+    header: t('report.title'),
+    meta: { class: { th: 'w-1/6', td: 'w-1/6' } }
   },
   {
     accessorKey: 'url',
-    header: t('report.url')
+    header: t('report.url'),
+    meta: { class: { th: 'w-1/3', td: 'w-1/3' } }
   },
   {
     accessorKey: 'description',
@@ -30,19 +32,19 @@ const columns = computed<TableColumn<SamplePage>[]>(() => [
   <UTable
     :data="report.sample"
     :columns="columns"
-    :ui="{ caption: 'sr-only', td: 'text-toned' }"
+    :ui="{ caption: 'sr-only', td: 'text-toned align-top whitespace-normal' }"
     :caption="t('report.representativeSample')"
   >
     <template #url-cell="{ row }">
-      <UButton
+      <ULink
         :to="row.original.url"
-        :label="row.original.url"
         target="_blank"
-        variant="link"
-        trailing-icon="i-lucide-external-link"
         :aria-label="`${row.original.title} (${t('report.externalLink')})`"
-        :ui="{ trailingIcon: 'size-4' }"
-      />
+        class="inline-flex items-start gap-1.5 text-sm font-medium text-primary hover:underline [overflow-wrap:anywhere]"
+      >
+        {{ row.original.url }}
+        <UIcon name="i-lucide-external-link" class="size-4 shrink-0 mt-0.5" />
+      </ULink>
     </template>
   </UTable>
 </template>

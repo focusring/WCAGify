@@ -46,7 +46,7 @@ const visiblePrinciples = computed(
 
 <template>
   <div class="mx-6 flex gap-20 mb-8">
-    <div v-if="report" class="mx-auto w-full max-w-prose lg:max-w-none">
+    <div v-if="report" class="mx-auto w-full min-w-0 max-w-prose lg:max-w-none">
       <ReportContent ref="reportContentRef" :report="report" :issues="issues ?? []">
         <template #actions>
           <UButton
