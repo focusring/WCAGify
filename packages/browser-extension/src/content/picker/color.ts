@@ -130,10 +130,8 @@ function getFieldPlaceholder(field: Element): string {
 }
 
 // Unique computed `color` values for visible text el owns: text nodes, input/textarea values, and ::placeholder when empty.
-// `isBoundary` marks descendants surfaced as their own section they report their own text there, so it stays out of
-// el's row entirely. An element whose text all belongs to such children gets an empty row, not a summary of theirs:
-// every surfaced section is rendered in the panel (paginated at most), so nothing goes missing, and a value that does
-// show up here is one no child section accounts for.
+// `isBoundary` marks descendants surfaced as their own section they report their own text there, so it stays out of el's row entirely. An element whose text all belongs to such children gets an empty row, not a summary of theirs:
+// every surfaced section is rendered in the panel (paginated at most), so nothing goes missing, and a value that does show up here is one no child section accounts for.
 export function getTextColors(
   el: Element,
   isBoundary: (child: Element) => boolean = () => false
@@ -153,7 +151,8 @@ export function getTextColors(
     }
   })
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    const parent = node.parentElement
+    // A slotted text node's color comes from its assigned <slot>, not parentElement (the host) — e.g. Stencil's <nes-button> slots its label into a styled <a>.
+    const parent = (node as Text).assignedSlot ?? node.parentElement
     if (parent) add(parent, getComputedStyle(parent).color)
   }
 

@@ -131,6 +131,15 @@ export function boxCoverage(child: Element, elRect: DOMRect): number {
   return (w * h) / (elRect.width * elRect.height)
 }
 
+// Descendants in flat-tree (rendered) order: a shadow host's OPEN shadow content first, then its light-DOM children. A node-tree walk (querySelectorAll) can't see into a shadow root, so it'd only find a bare, transparent host. A closed shadow root stays unreachable here too, by design.
+export function* flatDescendants(el: Element): Generator<Element> {
+  const children = el.shadowRoot ? [...el.shadowRoot.children, ...el.children] : el.children
+  for (const child of children) {
+    yield child
+    yield* flatDescendants(child)
+  }
+}
+
 // For a transparent wrapper (e.g. <a> around a styled <button>), runs extract on the first descendant covering ≥90% of el's box document order yields the outermost filling surface first. Skips CSS-mask icons.
 export function findFillingDescendant<T>(
   el: Element,
@@ -138,7 +147,7 @@ export function findFillingDescendant<T>(
 ): T | null {
   const rect = el.getBoundingClientRect()
   if (rect.width === 0 || rect.height === 0) return null
-  for (const child of el.querySelectorAll('*')) {
+  for (const child of flatDescendants(el)) {
     const childStyle = getComputedStyle(child)
     if (hasCssMask(childStyle)) continue
     if (boxCoverage(child, rect) < 0.9) continue
@@ -156,6 +165,9 @@ export function isOwnScope(
   root: Element,
   isBoundary: (el: Element) => boolean
 ): boolean {
+  // Root's own shadow content never gets a child section (collectChildSections can't cross into it), so
+  // a boundary in there must not suppress the value — the host is the only one left to report it.
+  if (node.getRootNode() !== root.getRootNode()) return true
   for (let p: Element | null = node; p && p !== root; p = p.parentElement) {
     if (isBoundary(p)) return false
   }
@@ -184,7 +196,7 @@ export function scanDescendants(
   const ownMaskBackgroundColors: MaskColor[] = []
   const clipTextBackgroundImages: string[] = []
   let isRoot = true
-  for (const node of [el, ...el.querySelectorAll('*')]) {
+  for (const node of [el, ...flatDescendants(el)]) {
     const style = isRoot ? elStyle : getComputedStyle(node)
     isRoot = false
     if (hasCssMask(style) && isOwnScope(node, el, isBoundary)) {
