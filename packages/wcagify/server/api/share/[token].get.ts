@@ -1,5 +1,6 @@
 import { queryCollection } from '@nuxt/content/server'
 import { requireShare, verifyShareUnlock } from '../../utils/share-access'
+import { rewriteUploadUrls } from '../../utils/share-uploads'
 
 export default defineEventHandler(async (event) => {
   const share = await requireShare(event)
@@ -19,5 +20,9 @@ export default defineEventHandler(async (event) => {
     .where('path', 'LIKE', `${reportPath}/%`)
     .all()
 
-  return { report, issues, token: share.token }
+  return {
+    report,
+    issues: rewriteUploadUrls(issues, share.report_slug, share.token),
+    token: share.token
+  }
 })
