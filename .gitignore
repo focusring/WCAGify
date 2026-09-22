@@ -43,4 +43,7 @@ components.d.ts
 .ralph-tui
 tasks
 
+# Evaluator notes beside a report
+.notes
+
 tmp

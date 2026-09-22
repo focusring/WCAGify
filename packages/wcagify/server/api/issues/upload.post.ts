@@ -50,10 +50,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const webpData = await sharp(fileField.data).webp({ quality: 80 }).toBuffer()
+  // `animated` keeps every frame of a GIF, so a recorded interaction stays a moving image.
+  const webpData = await sharp(fileField.data, { animated: true }).webp({ quality: 80 }).toBuffer()
 
   const filename = `${randomUUID()}.webp`
-  const { dir: uploadsDir, filepath } = resolveSecurePath(['public', 'uploads'], filename)
+  const { dir: uploadsDir, filepath } = resolveSecurePath(['uploads'], filename)
   await mkdir(uploadsDir, { recursive: true })
   await writeFile(filepath, webpData)
 

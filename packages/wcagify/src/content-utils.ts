@@ -45,4 +45,19 @@ function buildIssueFrontmatter(data: {
   return lines.join('\n')
 }
 
-export { toSlug, escapeYamlValue, buildIssueFrontmatter }
+/**
+ * Names an issue image the way the upload flow does: `<issue-slug>-<sc digits>-<8 hex>.<ext>`.
+ * The serving route only accepts `[a-z0-9-]+.\w+`, so the slug and the criterion digits are the
+ * only variable parts and the hash keeps two screenshots of one issue apart.
+ */
+function buildIssueImageName(
+  titleSlug: string,
+  sc: string,
+  extension = 'webp',
+  hash = globalThis.crypto.randomUUID().slice(0, 8)
+): string {
+  const scSlug = sc.replace(/[^0-9.]+/g, '').replace(/\./g, '-')
+  return `${titleSlug}-${scSlug}-${hash}.${extension}`
+}
+
+export { toSlug, escapeYamlValue, buildIssueFrontmatter, buildIssueImageName }

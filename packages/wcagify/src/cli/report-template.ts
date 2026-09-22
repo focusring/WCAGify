@@ -19,13 +19,13 @@ evaluation:
   date: ${today}
   specialRequirements: None
 language: nl
+scope:
+  - https://example.com
 sample:
   - title: Homepage
     id: page-1
     url: https://example.com
     description: ''
-scope:
-  - https://example.com
 technologies:
   - HTML
   - CSS

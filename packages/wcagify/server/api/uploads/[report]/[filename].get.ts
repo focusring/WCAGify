@@ -1,4 +1,3 @@
-import { readFile, access } from 'node:fs/promises'
 import { extname } from 'node:path'
 
 const EXT_MIME_MAP: Record<string, string> = {
@@ -24,15 +23,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid filename' })
   }
 
-  const { filepath } = resolveSecurePath(['public', 'uploads', report], filename)
+  /*
+   * Server assets, not the filesystem: `public/` is not on the server's disk on a
+   * serverless host, and these images must stay behind auth rather than be served
+   * statically. The patterns above already exclude traversal from the storage key.
+   */
+  const data = await useStorage('assets:uploads').getItemRaw<Uint8Array>(`${report}/${filename}`)
 
-  try {
-    await access(filepath)
-  } catch {
+  if (!data) {
     throw createError({ statusCode: 404, statusMessage: 'File not found' })
   }
 
-  const data = await readFile(filepath)
   const contentType = EXT_MIME_MAP[extname(filename).toLowerCase()] || 'application/octet-stream'
 
   setResponseHeader(event, 'Content-Type', contentType)

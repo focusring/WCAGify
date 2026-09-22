@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { toSlug, escapeYamlValue, buildIssueFrontmatter } from '../../src/content-utils'
+import {
+  toSlug,
+  escapeYamlValue,
+  buildIssueFrontmatter,
+  buildIssueImageName
+} from '../../src/content-utils'
 
 describe('toSlug', () => {
   it('converts a simple title to lowercase kebab-case', () => {
@@ -115,5 +120,28 @@ describe('buildIssueFrontmatter', () => {
   it('escapes sample with special characters', () => {
     const result = buildIssueFrontmatter({ ...base, sample: 'page #1' })
     expect(result).toContain("sample: 'page #1'")
+  })
+})
+
+describe('buildIssueImageName', () => {
+  it('joins the slug, the criterion digits and a hash with the upload extension', () => {
+    expect(buildIssueImageName('focus-style-missing', '2.4.7', 'webp', '4fd52680')).toBe(
+      'focus-style-missing-2-4-7-4fd52680.webp'
+    )
+  })
+
+  it('defaults to webp and an 8 character hash', () => {
+    expect(buildIssueImageName('no-keyboard', '2.1.1')).toMatch(
+      /^no-keyboard-2-1-1-[0-9a-f]{8}\.webp$/
+    )
+  })
+
+  it('keeps only the digits of the criterion', () => {
+    expect(buildIssueImageName('tip', 'none', 'png', 'abcdef01')).toBe('tip--abcdef01.png')
+    expect(buildIssueImageName('tip', 'SC 1.1.1', 'gif', 'abcdef01')).toBe('tip-1-1-1-abcdef01.gif')
+  })
+
+  it('produces names the upload route accepts', () => {
+    expect(buildIssueImageName('a-b', '4.1.2', 'png')).toMatch(/^[a-z0-9-]+\.\w+$/)
   })
 })

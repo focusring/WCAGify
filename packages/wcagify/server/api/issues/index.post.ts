@@ -1,8 +1,7 @@
 import { writeFile, access, rename, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
-import { issueSchema, toSlug, buildIssueFrontmatter } from '@focusring/wcagify'
+import { issueSchema, toSlug, buildIssueFrontmatter, buildIssueImageName } from '@focusring/wcagify'
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const UPLOAD_URL_RE = /\/api\/uploads\/([a-f0-9-]+\.webp)/g
@@ -12,12 +11,6 @@ const createIssueSchema = issueSchema.extend({
   title: z.string().min(1, 'Title is required'),
   description: z.string().max(100_000).optional()
 })
-
-function buildImageName(titleSlug: string, sc: string): string {
-  const scSlug = sc.replace(/[^0-9.]+/g, '').replace(/\./g, '-')
-  const shortHash = randomUUID().slice(0, 8)
-  return `${titleSlug}-${scSlug}-${shortHash}.webp`
-}
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -48,7 +41,7 @@ export default defineEventHandler(async (event) => {
   // Rename and move uploaded images from flat uploads to report folder
   let finalDescription = description || ''
   if (finalDescription) {
-    const { dir: reportUploadsDir } = resolveSecurePath(['public', 'uploads', report], '_')
+    const { dir: reportUploadsDir } = resolveSecurePath(['uploads', report], '_')
 
     await mkdir(reportUploadsDir, { recursive: true })
 
@@ -56,8 +49,8 @@ export default defineEventHandler(async (event) => {
 
     for (const match of finalDescription.matchAll(UPLOAD_URL_RE)) {
       const oldFilename = match[1]!
-      const newFilename = buildImageName(slug, sc)
-      const { filepath: oldPath } = resolveSecurePath(['public', 'uploads'], oldFilename)
+      const newFilename = buildIssueImageName(slug, sc)
+      const { filepath: oldPath } = resolveSecurePath(['uploads'], oldFilename)
       const newPath = join(reportUploadsDir, newFilename)
 
       moves.push({

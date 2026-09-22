@@ -42,9 +42,10 @@ The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends 
 - `packages/create-wcagify/` — CLI scaffolding tool (create-wcagify)
 - `playground/` — Nuxt app (@wcagify/playground), extends the wcagify layer
   - `playground/nuxt.config.ts` — uses `defineWcagifyConfig()` to extend the layer
-  - `playground/reports/` — report content files (markdown)
+  - `playground/content/reports/<slug>/` — one report per directory: `index.md` (report) plus one markdown file per issue
   - `playground/content.config.ts` — content collection definitions (uses `defineWcagifyCollections`)
 - `docs/` — VitePress documentation site (@wcagify/docs)
+- `skills/` — agent skills (`skills/<name>/SKILL.md`), one per WCAG-EM step; symlinked from `.claude/skills/` so they are active in this repo, exposed as the `wcagify` Claude Code plugin via `.claude-plugin/`, and installable elsewhere with `npx skills add focusring/WCAGify`. See `skills/README.md`.
 - `test/` — tests (e2e)
 
 ## i18n

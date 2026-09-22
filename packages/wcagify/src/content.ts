@@ -16,7 +16,7 @@ function defineWcagifyCollections() {
       type: 'page' as const,
       source: {
         include: 'reports/**/*.md',
-        exclude: ['reports/**/index.md'],
+        exclude: ['reports/**/index.md', 'reports/**/.notes/**'],
         prefix: '/reports'
       },
       schema: issueSchema

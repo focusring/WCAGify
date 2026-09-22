@@ -1,4 +1,3 @@
-import { readFile, access } from 'node:fs/promises'
 import { extname } from 'node:path'
 
 const EXT_MIME_MAP: Record<string, string> = {
@@ -9,7 +8,7 @@ const EXT_MIME_MAP: Record<string, string> = {
   '.webp': 'image/webp'
 }
 
-const SAFE_FILENAME = /^[a-f0-9-]+\.\w+$/
+const SAFE_FILENAME = /^[a-z0-9-]+\.\w+$/
 
 export default defineEventHandler(async (event) => {
   const filename = getRouterParam(event, 'filename')
@@ -17,15 +16,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid filename' })
   }
 
-  const { filepath } = resolveSecurePath(['public', 'uploads'], filename)
+  /*
+   * Freshly uploaded images, before an issue is saved and they are moved into their
+   * report folder. Read from server assets for the same reason as the report route.
+   */
+  const data = await useStorage('assets:uploads').getItemRaw<Uint8Array>(filename)
 
-  try {
-    await access(filepath)
-  } catch {
+  if (!data) {
     throw createError({ statusCode: 404, statusMessage: 'File not found' })
   }
 
-  const data = await readFile(filepath)
   const contentType = EXT_MIME_MAP[extname(filename).toLowerCase()] || 'application/octet-stream'
 
   setResponseHeader(event, 'Content-Type', contentType)

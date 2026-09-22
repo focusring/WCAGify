@@ -2,9 +2,15 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "workspaces": {
     ".": {
-      "entry": ["skills/*/scripts/*.{js,mjs}"],
+      "entry": ["skills/*/scripts/*.{js,mjs}", "skills/*/scripts/probes/*.js"],
       "ignoreDependencies": ["changelogen", "lint-staged"],
-      "ignoreBinaries": ["taskkill", "test/robot/scripts/run.sh", "test/robot/scripts/setup.sh"]
+      "ignoreBinaries": [
+        "taskkill",
+        "test/robot/scripts/run.sh",
+        "test/robot/scripts/setup.sh",
+        "agent-browser",
+        "ffmpeg"
+      ]
     },
     "packages/wcagify": {
       "entry": [
