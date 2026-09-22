@@ -41,13 +41,6 @@ const statusFilters = inject<Ref<Set<string>>>('statusFilters')
           icon="i-lucide-book-dashed"
         />
         <UBadge
-          v-else-if="criterion.status === 'not-tested'"
-          :label="t('report.scStatus.not-tested')"
-          color="warning"
-          variant="subtle"
-          icon="i-lucide-mouse-pointer-2-off"
-        />
-        <UBadge
           v-else-if="criterion.status === 'failed'"
           :label="t('report.scStatus.failed')"
           color="error"

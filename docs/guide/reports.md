@@ -72,9 +72,6 @@ sample:
     url: https://example.com
     description: The homepage of the website
 scStatuses:
-  passed:
-    - '1.1.1'
-    - '1.3.1'
   not-present:
     - '1.2.1'
 ---
@@ -90,20 +87,39 @@ scStatuses:
 | `baseline`                       | Accessibility support baseline: operating system, browser and assistive technology combinations |
 | `technologies`                   | Technologies relied upon (Step 2.4)                                                             |
 | `sample`                         | The representative sample set. Issues refer to a sample by its `id`.                            |
-| `scStatuses`                     | Outcome per success criterion without issues: `passed` or `not-present`                         |
+| `scStatuses`                     | Criteria with no matching content in the sample (see [Scoring](#scoring))                       |
 
 ### Scoring
 
-The scorecard and the conformance result count a success criterion as met only when it
-has a recorded outcome:
+Following WCAG-EM Step 4, a criterion is evaluated across the whole sample set at once and
+lands in one of three states:
 
-- A criterion with one or more issues counts as **failed**.
-- A criterion listed under `scStatuses.passed` or `scStatuses.not-present` counts as **met**.
-- A criterion without issues and without a recorded outcome counts as **not tested** and
-  is not counted as met.
+| Audit finding                                      | State                       |
+| -------------------------------------------------- | --------------------------- |
+| Meets the requirement on every sample page         | **Passed** (satisfied)      |
+| The feature does not exist anywhere in the sample  | **Not present** (satisfied) |
+| Breaks the requirement on one or more sample pages | **Failed** (not satisfied)  |
 
-Record an outcome for every criterion you evaluated. A report that only lists issues shows
-all remaining criteria as not tested.
+Two rules follow from this:
+
+- **Zero failures allowed.** One issue on one sample page fails the criterion for the
+  entire evaluation. There is no partial credit.
+- **Not present counts positively.** A criterion with no matching content anywhere in the
+  sample — captions on a product with no video, say — is deemed satisfied, and counts
+  toward conformance exactly like a pass.
+
+Passing is the default, so the only thing to author is the second case:
+
+```yaml
+scStatuses:
+  not-present:
+    - '1.2.1'
+    - '1.2.2'
+```
+
+Everything else is derived. A criterion fails when an issue records it, and passes
+otherwise. Recording an issue against a criterion overrides its `not-present` entry, since
+finding a failure proves the content is there after all.
 
 ## EARL Export
 

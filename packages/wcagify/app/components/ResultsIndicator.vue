@@ -1,5 +1,5 @@
 <script setup lang="ts">
-type Status = 'passed' | 'failed' | 'not-present' | 'not-tested'
+type Status = 'passed' | 'failed' | 'not-present'
 
 const props = defineProps<{
   status: Status
@@ -18,10 +18,6 @@ const config: Record<Status, { icon: string; class: string }> = {
   'not-present': {
     icon: 'i-lucide:book-dashed',
     class: 'bg-info'
-  },
-  'not-tested': {
-    icon: 'i-lucide:mouse-pointer-2-off',
-    class: 'bg-warning'
   }
 }
 </script>

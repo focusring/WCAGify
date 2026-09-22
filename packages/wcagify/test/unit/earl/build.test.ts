@@ -25,7 +25,7 @@ const report: EarlReportSource = {
     { id: 'page-1', title: 'Homepage', url: 'https://example.com', description: 'Home' },
     { id: 'page-2', title: 'Contact', url: 'https://example.com/contact', description: 'Form' }
   ],
-  scStatuses: { passed: ['1.1.1', '1.3.1'], 'not-present': ['1.2.1'] },
+  scStatuses: { 'not-present': ['1.2.1'] },
   body: { type: 'minimark', value: [['p', {}, 'Executive summary.']] }
 }
 
@@ -163,7 +163,7 @@ describe('buildEarlReport', () => {
     }
   })
 
-  it('maps outcomes: failed for issues, passed and inapplicable for recorded outcomes, untested otherwise', () => {
+  it('maps outcomes: failed for issues, inapplicable for not-present, passed otherwise', () => {
     const byTest = new Map(evaluation.auditResult.map((a) => [a.test, a]))
     expect(byTest.get('WCAG2:keyboard')!.result.outcome).toBe('earl:failed')
     expect(byTest.get('WCAG2:focus-visible')!.result.outcome).toBe('earl:failed')
@@ -171,7 +171,7 @@ describe('buildEarlReport', () => {
     expect(byTest.get('WCAG2:audio-only-and-video-only-prerecorded')!.result.outcome).toBe(
       'earl:inapplicable'
     )
-    expect(byTest.get('WCAG2:page-titled')!.result.outcome).toBe('earl:untested')
+    expect(byTest.get('WCAG2:page-titled')!.result.outcome).toBe('earl:passed')
   })
 
   it('turns each issue into a part of its criterion assertion against its sample', () => {
@@ -213,7 +213,7 @@ describe('buildEarlReport', () => {
   })
 
   it('includes the scorecard', () => {
-    expect(evaluation.scorecard).toEqual({ conforming: 3, failed: 2, notTested: 50, total: 55 })
+    expect(evaluation.scorecard).toEqual({ conforming: 53, failed: 2, total: 55 })
     expect(evaluation.wcagVersion).toBe('2.2')
   })
 
@@ -226,7 +226,7 @@ describe('buildEarlReport', () => {
     expect(tests).toContain('WCAG2:sign-language-prerecorded')
   })
 
-  it('marks samples as untested and uses blank ids without a base URL', () => {
+  it('uses blank ids without a base URL and passes every criterion without issues', () => {
     const minimal = buildEarlReport(
       { ...report, path: undefined, scStatuses: undefined, body: null },
       []
@@ -236,8 +236,8 @@ describe('buildEarlReport', () => {
     expect(ev.publisher).toBe('https://github.com/focusring/WCAGify')
     expect(ev.summary).toBe('Audit of Example Website.')
     const pages = (ev.structuredSample as { webpage: { tested: boolean }[] }).webpage
-    expect(pages.every((page) => page.tested === false)).toBe(true)
-    expect(ev.auditResult.every((a) => a.result.outcome === 'earl:untested')).toBe(true)
+    expect(pages.every((page) => page.tested === true)).toBe(true)
+    expect(ev.auditResult.every((a) => a.result.outcome === 'earl:passed')).toBe(true)
   })
 
   it('uses WCAG 2.0 anchors for WCAG 2.0 reports', () => {

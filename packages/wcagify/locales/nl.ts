@@ -85,8 +85,7 @@ export default {
     scStatus: {
       passed: 'Goedgekeurd',
       failed: 'Afgekeurd',
-      'not-present': 'Niet aanwezig',
-      'not-tested': 'Niet getoetst'
+      'not-present': 'Niet aanwezig'
     },
     wcagPrinciple: 'WCAG Principe',
     principle: 'Principe',
@@ -94,9 +93,6 @@ export default {
     total: 'Totaal',
     conformanceLevel: 'Conformiteitsniveau: {level} — {conforming} van {total} criteria voldaan',
     criteriaMet: '{conforming} van {total} criteria voldaan',
-    criteriaNotTested: '{count} niet getoetst',
-    scorecardNotTestedNote:
-      '{count} criteria hebben geen vastgelegde uitkomst. Ze tellen als niet getoetst en tellen niet mee als voldaan.',
     scoreFormat: '{conforming} / {total}',
     emptyFilter: {
       passed: {
@@ -111,10 +107,6 @@ export default {
       'not-present': {
         title: 'Geen niet-aanwezige criteria gevonden',
         description: 'Alle criteria zijn aanwezig in de beoordeelde content.'
-      },
-      'not-tested': {
-        title: 'Geen ongeteste criteria gevonden',
-        description: 'Alle criteria zijn getest en hebben een resultaat gekregen.'
       }
     },
     downloadPdf: 'Download PDF',

@@ -1,5 +1,5 @@
 import wcag20Ids from '../data/wcag20-ids.json'
-import type { Level, SamplePage, ScStatuses, WcagVersion } from '../types'
+import type { Level, SamplePage, ScStatus, ScStatuses, WcagVersion } from '../types'
 import {
   allScEntries,
   levelIncludes,
@@ -143,19 +143,16 @@ function criterionTestId(slug: string, wcagVersion: WcagVersion): string {
   return `WCAG2:${slug}`
 }
 
-function outcomeFor(status: ReturnType<typeof resolveScStatus>): EarlOutcome {
+function outcomeFor(status: ScStatus): EarlOutcome {
   switch (status) {
     case 'failed': {
       return 'earl:failed'
-    }
-    case 'passed': {
-      return 'earl:passed'
     }
     case 'not-present': {
       return 'earl:inapplicable'
     }
     default: {
-      return 'earl:untested'
+      return 'earl:passed'
     }
   }
 }
@@ -178,13 +175,14 @@ function siteScopeText(report: EarlReportSource): string {
   return lines.join('\n')
 }
 
-function samplePageNode(page: SamplePage, tested: boolean): EarlWebPage {
+function samplePageNode(page: SamplePage): EarlWebPage {
   const node: EarlWebPage = {
     type: ['TestSubject', 'WebPage'],
     id: sampleNodeId(page.id),
     title: page.title,
     description: page.description,
-    tested
+    // Every page in the sample set is evaluated against every criterion.
+    tested: true
   }
   if (page.url) node.source = page.url
   return node
@@ -244,7 +242,6 @@ function buildEarlReport(
   const evaluationId = baseUrl && slug ? `${baseUrl}/reports/${slug}` : '_:evaluation'
 
   const scStatuses = normalizeScStatuses(report.scStatuses)
-  const hasRecordedOutcomes = Object.keys(scStatuses).length > 0
   const realIssues = issues.filter((issue) => issue.sc !== 'none')
   const issuesBySc = new Map<string, EarlIssueSource[]>()
   for (const issue of realIssues) {
@@ -287,7 +284,10 @@ function buildEarlReport(
     }
   })
 
-  const score = scorecard(realIssues, targetLevel, { wcagVersion, scStatuses })
+  const score = scorecard(realIssues, targetLevel, {
+    wcagVersion,
+    scStatuses: report.scStatuses
+  })
 
   const evaluation: Record<string, unknown> = {
     type: 'Evaluation',
@@ -317,14 +317,13 @@ function buildEarlReport(
     reliedUponTechnology: report.technologies.map(technologyNode),
     structuredSample: {
       type: 'Sample',
-      webpage: report.sample.map((page) => samplePageNode(page, hasRecordedOutcomes))
+      webpage: report.sample.map((page) => samplePageNode(page))
     },
     randomSample: { type: 'Sample', webpage: [] },
     auditResult,
     scorecard: {
       conforming: score.conforming.all,
       failed: score.failed.all,
-      notTested: score.notTested.all,
       total: score.totals.all
     }
   }

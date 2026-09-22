@@ -80,7 +80,7 @@ describe('writeImportedReport', () => {
     const frontmatter = parseYaml(index.split('---')[1]!) as Record<string, unknown>
     expect(frontmatter.title).toBe('Imported: Example')
     expect(frontmatter.evaluation).toEqual(sampleImport().report.evaluation)
-    expect(frontmatter.scStatuses).toEqual({ passed: ['1.1.1', '1.3.1'], 'not-present': ['1.2.1'] })
+    expect(frontmatter.scStatuses).toEqual({ 'not-present': ['1.2.1'] })
     expect(frontmatter).not.toHaveProperty('outOfScope')
     expect((frontmatter.sample as unknown[]).length).toBe(2)
 
@@ -132,9 +132,6 @@ describe('writeImportedReport', () => {
         '    url: https://existing.example',
         '    description: Start',
         'scStatuses:',
-        '  passed:',
-        "    - '1.1.1'",
-        "    - '2.4.2'",
         '  not-present:',
         "    - '1.3.1'",
         '---',
@@ -163,10 +160,7 @@ describe('writeImportedReport', () => {
     const frontmatter = parseYaml(index.split('---')[1]!) as Record<string, unknown>
     expect(frontmatter.title).toBe('Existing report')
     expect(frontmatter.language).toBe('nl')
-    expect(frontmatter.scStatuses).toEqual({
-      passed: ['1.3.1', '2.4.2'],
-      'not-present': ['1.2.1']
-    })
+    expect(frontmatter.scStatuses).toEqual({ 'not-present': ['1.2.1', '1.3.1'] })
     expect((frontmatter.sample as { id: string }[]).map((page) => page.id)).toEqual([
       'home',
       'contact'
@@ -188,11 +182,19 @@ describe('writeImportedReport', () => {
 })
 
 describe('mergeFrontmatter', () => {
-  it('removes recorded passes for criteria that now have issues', () => {
+  it('keeps the existing not-present list and adds the imported one', () => {
     const merged = mergeFrontmatter(
-      { scStatuses: { passed: ['1.1.1', '2.1.1'] }, sample: [] },
+      { scStatuses: { 'not-present': ['2.4.6'] }, sample: [] },
       sampleImport()
     )
-    expect(merged.scStatuses).toEqual({ passed: ['1.3.1', '2.1.1'], 'not-present': ['1.2.1'] })
+    expect(merged.scStatuses).toEqual({ 'not-present': ['1.2.1', '2.4.6'] })
+  })
+
+  it('stops recording a criterion as not present once an issue is imported for it', () => {
+    const merged = mergeFrontmatter(
+      { scStatuses: { 'not-present': ['1.1.1'] }, sample: [] },
+      sampleImport()
+    )
+    expect(merged.scStatuses).toEqual({ 'not-present': ['1.2.1'] })
   })
 })

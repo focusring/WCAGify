@@ -93,9 +93,8 @@ describe('issueSchema', () => {
 })
 
 describe('scStatusesSchema', () => {
-  it('accepts passed and not-present lists', () => {
-    expect(scStatusesSchema.parse({ passed: ['1.1.1'], 'not-present': ['1.2.1'] })).toEqual({
-      passed: ['1.1.1'],
+  it('accepts a not-present list', () => {
+    expect(scStatusesSchema.parse({ 'not-present': ['1.2.1'] })).toEqual({
       'not-present': ['1.2.1']
     })
   })
@@ -105,14 +104,11 @@ describe('scStatusesSchema', () => {
   })
 
   it('rejects non-list values', () => {
-    expect(() => scStatusesSchema.parse({ passed: '1.1.1' })).toThrow()
+    expect(() => scStatusesSchema.parse({ 'not-present': '1.2.1' })).toThrow()
   })
 
   it('keeps a legacy map keyed by criterion instead of stripping it', () => {
-    expect(scStatusesSchema.parse({ '1.1.1': 'passed', '1.2.1': 'not-present' })).toEqual({
-      '1.1.1': 'passed',
-      '1.2.1': 'not-present'
-    })
+    expect(scStatusesSchema.parse({ '1.2.1': 'not-present' })).toEqual({ '1.2.1': 'not-present' })
   })
 })
 

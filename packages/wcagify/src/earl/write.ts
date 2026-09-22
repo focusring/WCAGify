@@ -56,10 +56,9 @@ function reportFrontmatter(report: ImportedReport): Record<string, unknown> {
     baseline: report.baseline,
     technologies: report.technologies,
     sample: report.sample,
-    scStatuses: {
-      passed: report.scStatuses.passed.toSorted(sortSc),
-      'not-present': report.scStatuses['not-present'].toSorted(sortSc)
-    }
+    // Only criteria with no matching content are recorded. Passing is the
+    // default, so an imported pass needs nothing written.
+    scStatuses: { 'not-present': report.scStatuses['not-present'].toSorted(sortSc) }
   }
 }
 
@@ -107,8 +106,8 @@ async function writeIssues(
 
 /**
  * Merges imported outcomes into the frontmatter of an existing report.
- * Criteria with imported issues lose any recorded pass; recorded outcomes
- * for other criteria are added; samples referenced by issues are added.
+ * Criteria with imported issues stop being recorded as not present, imported
+ * not-present outcomes are added, and samples referenced by issues are added.
  */
 function mergeFrontmatter(
   existing: Record<string, unknown>,
@@ -117,21 +116,15 @@ function mergeFrontmatter(
   const merged = { ...existing }
   const failed = new Set(imported.issues.map((issue) => issue.sc))
 
-  const current = (existing.scStatuses ?? {}) as { passed?: string[]; 'not-present'?: string[] }
-  const passed = new Set<string>([...(current.passed ?? []), ...imported.report.scStatuses.passed])
+  const current = (existing.scStatuses ?? {}) as { 'not-present'?: string[] }
   const notPresent = new Set<string>([
     ...(current['not-present'] ?? []),
     ...imported.report.scStatuses['not-present']
   ])
-  for (const sc of failed) {
-    passed.delete(sc)
-    notPresent.delete(sc)
-  }
-  for (const sc of passed) notPresent.delete(sc)
-  merged.scStatuses = {
-    passed: [...passed].toSorted(sortSc),
-    'not-present': [...notPresent].toSorted(sortSc)
-  }
+  // An issue found against a criterion means its content is present after all.
+  for (const sc of failed) notPresent.delete(sc)
+
+  merged.scStatuses = { 'not-present': [...notPresent].toSorted(sortSc) }
 
   const samples = Array.isArray(existing.sample) ? [...(existing.sample as { id: string }[])] : []
   const knownIds = new Set(samples.map((page) => page.id))

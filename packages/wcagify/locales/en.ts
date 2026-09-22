@@ -83,8 +83,7 @@ export default {
     scStatus: {
       passed: 'Passed',
       failed: 'Failed',
-      'not-present': 'Not present',
-      'not-tested': 'Not tested'
+      'not-present': 'Not present'
     },
     wcagPrinciple: 'WCAG Principle',
     principle: 'Principle',
@@ -92,9 +91,6 @@ export default {
     total: 'Total',
     conformanceLevel: 'Conformance level: {level} — {conforming} of {total} criteria met',
     criteriaMet: '{conforming} of {total} criteria met',
-    criteriaNotTested: '{count} not tested',
-    scorecardNotTestedNote:
-      '{count} criteria have no recorded outcome. They count as not tested and are not counted as met.',
     scoreFormat: '{conforming} / {total}',
     emptyFilter: {
       passed: {
@@ -108,10 +104,6 @@ export default {
       'not-present': {
         title: 'No criteria marked as not present found',
         description: 'All criteria are present in the evaluated content.'
-      },
-      'not-tested': {
-        title: 'No untested criteria found',
-        description: 'All criteria have been tested and assigned a result.'
       }
     },
     downloadPdf: 'Download PDF',

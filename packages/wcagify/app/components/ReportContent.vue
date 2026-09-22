@@ -23,11 +23,11 @@ const issuesByPrinciple = computed(() => {
 
 const reportTips = computed(() => filterTips(props.issues))
 
-type Status = 'passed' | 'failed' | 'not-present' | 'not-tested'
-const allStatuses: Status[] = ['passed', 'failed', 'not-present', 'not-tested']
+type Status = 'passed' | 'failed' | 'not-present'
+const allStatuses: Status[] = ['passed', 'failed', 'not-present']
 
 const statusCounts = computed(() => {
-  const counts: Record<Status, number> = { passed: 0, failed: 0, 'not-present': 0, 'not-tested': 0 }
+  const counts: Record<Status, number> = { passed: 0, failed: 0, 'not-present': 0 }
   for (const group of issuesByPrinciple.value) {
     for (const guideline of group.guidelines) {
       for (const sc of guideline.criteria) {
@@ -174,13 +174,6 @@ defineExpose({ visiblePrinciples })
             :active="activeFilters.has('not-present')"
             :filtering="isFiltering"
             @toggle="toggleFilter('not-present')"
-          />
-          <ResultsIndicator
-            status="not-tested"
-            :count="statusCounts['not-tested']"
-            :active="activeFilters.has('not-tested')"
-            :filtering="isFiltering"
-            @toggle="toggleFilter('not-tested')"
           />
         </div>
 

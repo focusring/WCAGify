@@ -11,12 +11,7 @@ import {
   resolveScStatus,
   normalizeScStatuses
 } from '../../src/wcag'
-import scToSlug from '../../src/data/sc-to-slug.json'
-
-/** Marks every criterion of a version as passed, so only issues affect the score. */
-function allPassed(version: '2.0' | '2.1' | '2.2' = '2.2'): Record<string, string> {
-  return Object.fromEntries(Object.keys(scToSlug[version].en).map((sc) => [sc, 'passed']))
-}
+import type { ScStatuses } from '../../src/types'
 
 describe('PRINCIPLES', () => {
   it('contains all four WCAG principles', () => {
@@ -69,125 +64,111 @@ describe('normalizeScStatuses', () => {
     expect(normalizeScStatuses(null)).toEqual({})
   })
 
-  it('maps the passed and not-present lists to a map keyed by criterion', () => {
-    expect(normalizeScStatuses({ passed: ['1.1.1', '1.3.1'], 'not-present': ['1.2.1'] })).toEqual({
-      '1.1.1': 'passed',
-      '1.3.1': 'passed',
-      '1.2.1': 'not-present'
+  it('maps the not-present list to a map keyed by criterion', () => {
+    expect(normalizeScStatuses({ 'not-present': ['1.2.1', '1.2.2'] })).toEqual({
+      '1.2.1': 'not-present',
+      '1.2.2': 'not-present'
     })
   })
 
   it('passes an already keyed map through', () => {
-    expect(normalizeScStatuses({ '1.1.1': 'passed', '1.2.1': 'not-present' })).toEqual({
-      '1.1.1': 'passed',
-      '1.2.1': 'not-present'
-    })
+    expect(normalizeScStatuses({ '1.2.1': 'not-present' })).toEqual({ '1.2.1': 'not-present' })
   })
 
-  it('lets a not-present list win over a passed list for the same criterion', () => {
-    expect(normalizeScStatuses({ passed: ['1.1.1'], 'not-present': ['1.1.1'] })).toEqual({
-      '1.1.1': 'not-present'
-    })
+  it('ignores recorded values other than not-present', () => {
+    expect(normalizeScStatuses({ '1.3.1': 'passed', '2.4.9': 'not-tested' })).toEqual({})
+  })
+
+  it('ignores a legacy passed list, since passing is the default', () => {
+    expect(
+      normalizeScStatuses({ passed: ['1.1.1'], 'not-present': ['1.2.1'] } as ScStatuses)
+    ).toEqual({ '1.2.1': 'not-present' })
   })
 })
 
 describe('resolveScStatus', () => {
-  it('fails a criterion with issues regardless of the recorded outcome', () => {
-    expect(resolveScStatus('1.1.1', true, { '1.1.1': 'passed' })).toBe('failed')
+  it('fails a criterion with issues, whatever was recorded', () => {
+    expect(resolveScStatus('1.1.1', true)).toBe('failed')
+    expect(resolveScStatus('1.2.1', true, { '1.2.1': 'not-present' })).toBe('failed')
   })
 
-  it('returns the recorded outcome without issues', () => {
-    expect(resolveScStatus('1.1.1', false, { '1.1.1': 'passed' })).toBe('passed')
-    expect(resolveScStatus('1.1.1', false, { '1.1.1': 'not-present' })).toBe('not-present')
+  it('returns not-present for a criterion recorded as not present', () => {
+    expect(resolveScStatus('1.2.1', false, { '1.2.1': 'not-present' })).toBe('not-present')
   })
 
-  it('treats a missing or unknown outcome as not tested', () => {
-    expect(resolveScStatus('1.1.1', false, {})).toBe('not-tested')
-    expect(resolveScStatus('1.1.1', false, { '1.1.1': 'maybe' })).toBe('not-tested')
-    expect(resolveScStatus('1.1.1', false)).toBe('not-tested')
+  it('passes every other criterion without issues', () => {
+    expect(resolveScStatus('1.1.1', false)).toBe('passed')
+    expect(resolveScStatus('1.1.1', false, {})).toBe('passed')
+    expect(resolveScStatus('1.1.1', false, { '1.1.1': 'maybe' })).toBe('passed')
   })
 })
 
 describe('scorecard', () => {
-  it('returns full conformance when every criterion is recorded as passed', () => {
-    const result = scorecard([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+  it('counts every criterion without issues as satisfied', () => {
+    const result = scorecard([], 'AA', { wcagVersion: '2.2' })
     expect(result.conforming.all).toBe(result.totals.all)
     expect(result.failed.all).toBe(0)
-    expect(result.notTested.all).toBe(0)
     expect(result.totals.all).toBeGreaterThan(0)
-  })
-
-  it('does not count criteria without a recorded outcome as met', () => {
-    const result = scorecard([], 'AA', { wcagVersion: '2.2' })
-    expect(result.conforming.all).toBe(0)
-    expect(result.notTested.all).toBe(result.totals.all)
     for (const p of PRINCIPLES) {
-      expect(result.notTested[p]).toBe(result.totals[p])
-      expect(result.conforming[p]).toBe(0)
+      expect(result.conforming[p]).toBe(result.totals[p])
     }
   })
 
-  it('counts not-present criteria as met', () => {
-    const result = scorecard([], 'AA', {
+  it('counts not-present criteria as satisfied, like passing ones', () => {
+    const withNotPresent = scorecard([], 'AA', {
       wcagVersion: '2.2',
-      scStatuses: { '1.1.1': 'not-present' }
+      scStatuses: { 'not-present': ['1.2.1', '1.2.2'] }
     })
-    expect(result.conforming.all).toBe(1)
-    expect(result.conforming.perceivable).toBe(1)
-    expect(result.notTested.all).toBe(result.totals.all - 1)
+    const without = scorecard([], 'AA', { wcagVersion: '2.2' })
+    expect(withNotPresent.conforming.all).toBe(without.conforming.all)
+    expect(withNotPresent.failed.all).toBe(0)
   })
 
   it('decreases conforming count for each failing SC', () => {
-    const full = scorecard([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+    const full = scorecard([], 'AA', { wcagVersion: '2.2' })
     const withIssues = scorecard([{ sc: '1.1.1' }, { sc: '2.4.7' }], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: allPassed()
+      wcagVersion: '2.2'
     })
     expect(withIssues.conforming.all).toBe(full.totals.all - 2)
     expect(withIssues.failed.all).toBe(2)
-    expect(withIssues.notTested.all).toBe(0)
   })
 
-  it('fails a criterion with issues even when it is recorded as passed', () => {
+  it('fails a criterion with issues even when it is recorded as not present', () => {
     const result = scorecard([{ sc: '1.1.1' }], 'AA', {
       wcagVersion: '2.2',
-      scStatuses: { '1.1.1': 'passed' }
+      scStatuses: { 'not-present': ['1.1.1'] }
     })
     expect(result.failed.perceivable).toBe(1)
-    expect(result.conforming.perceivable).toBe(0)
+    expect(result.conforming.perceivable).toBe(result.totals.perceivable - 1)
   })
 
   it('deduplicates issues with the same SC', () => {
     const result = scorecard([{ sc: '1.1.1' }, { sc: '1.1.1' }], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: allPassed()
+      wcagVersion: '2.2'
     })
-    const full = scorecard([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+    const full = scorecard([], 'AA', { wcagVersion: '2.2' })
     expect(result.conforming.all).toBe(full.totals.all - 1)
     expect(result.failed.all).toBe(1)
   })
 
   it('counts per principle correctly', () => {
     const result = scorecard([{ sc: '1.1.1' }], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: allPassed()
+      wcagVersion: '2.2'
     })
-    const full = scorecard([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+    const full = scorecard([], 'AA', { wcagVersion: '2.2' })
     expect(result.conforming.perceivable).toBe(full.totals.perceivable - 1)
     expect(result.conforming.operable).toBe(full.totals.operable)
     expect(result.conforming.understandable).toBe(full.totals.understandable)
     expect(result.conforming.robust).toBe(full.totals.robust)
   })
 
-  it('always adds up: conforming + failed + not tested equals the total', () => {
+  it('always adds up: conforming + failed equals the total', () => {
     const result = scorecard([{ sc: '1.1.1' }, { sc: '2.4.7' }], 'AA', {
       wcagVersion: '2.2',
-      scStatuses: { '1.3.1': 'passed', '1.2.1': 'not-present' }
+      scStatuses: { 'not-present': ['1.2.1'] }
     })
     for (const key of ['all', ...PRINCIPLES] as const) {
-      expect(result.conforming[key] + result.failed[key] + result.notTested[key]).toBe(
-        result.totals[key]
-      )
+      expect(result.conforming[key] + result.failed[key]).toBe(result.totals[key])
     }
   })
 
@@ -199,21 +180,15 @@ describe('scorecard', () => {
 
   it('ignores issues for SCs outside target level', () => {
     const aaaSc = '1.2.6'
-    const result = scorecard([{ sc: aaaSc }], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
-    const full = scorecard([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+    const result = scorecard([{ sc: aaaSc }], 'AA', { wcagVersion: '2.2' })
+    const full = scorecard([], 'AA', { wcagVersion: '2.2' })
     expect(result.conforming.all).toBe(full.totals.all)
     expect(result.failed.all).toBe(0)
   })
 
   it('ignores the obsolete 4.1.1 for WCAG 2.2 but not for 2.1', () => {
-    expect(
-      scorecard([{ sc: '4.1.1' }], 'A', { wcagVersion: '2.2', scStatuses: allPassed() }).failed
-        .robust
-    ).toBe(0)
-    expect(
-      scorecard([{ sc: '4.1.1' }], 'A', { wcagVersion: '2.1', scStatuses: allPassed('2.1') }).failed
-        .robust
-    ).toBe(1)
+    expect(scorecard([{ sc: '4.1.1' }], 'A', { wcagVersion: '2.2' }).failed.robust).toBe(0)
+    expect(scorecard([{ sc: '4.1.1' }], 'A', { wcagVersion: '2.1' }).failed.robust).toBe(1)
   })
 
   it('throws a clear error for an unsupported WCAG version', () => {
@@ -225,19 +200,13 @@ describe('scorecard', () => {
 
 describe('conformanceSummary', () => {
   it('reports fully conforming when all criteria passed and there are no issues', () => {
-    const result = conformanceSummary([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
-    expect(result.isFullyConforming).toBe(true)
-  })
-
-  it('does not report fully conforming when criteria were not tested', () => {
     const result = conformanceSummary([], 'AA', { wcagVersion: '2.2' })
-    expect(result.isFullyConforming).toBe(false)
+    expect(result.isFullyConforming).toBe(true)
   })
 
   it('reports not fully conforming with issues', () => {
     const result = conformanceSummary([{ sc: '1.1.1' }], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: allPassed()
+      wcagVersion: '2.2'
     })
     expect(result.isFullyConforming).toBe(false)
   })
@@ -246,7 +215,6 @@ describe('conformanceSummary', () => {
     const result = conformanceSummary([], 'AA', { wcagVersion: '2.2' })
     expect(result).toHaveProperty('conforming')
     expect(result).toHaveProperty('failed')
-    expect(result).toHaveProperty('notTested')
     expect(result).toHaveProperty('totals')
   })
 })
@@ -278,26 +246,23 @@ describe('scorecardByLevel', () => {
     }
   })
 
-  it('per-level conforming and not-tested counts sum to the combined total', () => {
-    const result = scorecardByLevel([], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: { '1.1.1': 'passed', '2.4.7': 'passed' }
+  it('per-level conforming counts sum to the combined total', () => {
+    const result = scorecardByLevel([{ sc: '1.1.1' }, { sc: '1.4.3' }], 'AA', {
+      wcagVersion: '2.2'
     })
     const aData = result.perLevel.get('A')!
     const aaData = result.perLevel.get('AA')!
 
     expect(aData.conforming.all + aaData.conforming.all).toBe(result.total.conforming.all)
-    expect(aData.notTested.all + aaData.notTested.all).toBe(result.total.notTested.all)
-    expect(aData.conforming.all).toBe(1)
-    expect(aaData.conforming.all).toBe(1)
+    expect(aData.failed.all).toBe(1)
+    expect(aaData.failed.all).toBe(1)
   })
 
   it('attributes a level-A issue only to the A column', () => {
     const result = scorecardByLevel([{ sc: '1.1.1' }], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: allPassed()
+      wcagVersion: '2.2'
     })
-    const full = scorecardByLevel([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+    const full = scorecardByLevel([], 'AA', { wcagVersion: '2.2' })
     const aData = result.perLevel.get('A')!
     const aaData = result.perLevel.get('AA')!
     const fullA = full.perLevel.get('A')!
@@ -310,10 +275,9 @@ describe('scorecardByLevel', () => {
 
   it('attributes a level-AA issue only to the AA column', () => {
     const result = scorecardByLevel([{ sc: '2.4.7' }], 'AA', {
-      wcagVersion: '2.2',
-      scStatuses: allPassed()
+      wcagVersion: '2.2'
     })
-    const full = scorecardByLevel([], 'AA', { wcagVersion: '2.2', scStatuses: allPassed() })
+    const full = scorecardByLevel([], 'AA', { wcagVersion: '2.2' })
     const aData = result.perLevel.get('A')!
     const aaData = result.perLevel.get('AA')!
     const fullA = full.perLevel.get('A')!

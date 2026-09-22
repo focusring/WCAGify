@@ -59,7 +59,7 @@ function groupIssuesBySc<T extends { sc: string }>(
 interface GroupByPrincipleOptions {
   wcagVersion?: WcagVersion
   language?: Language
-  scStatuses?: ScStatuses
+  scStatuses?: ScStatuses | null
 }
 
 function groupIssuesByPrinciple<T extends { sc: string }>(

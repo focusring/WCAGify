@@ -122,24 +122,25 @@ describe('groupIssuesByPrinciple', () => {
     expect(criterion.status).toBe('failed')
   })
 
-  it('marks criteria without issues as not-tested by default', () => {
+  it('marks criteria without issues as passed by default', () => {
     const result = groupIssuesByPrinciple([], 'AA')
     const allCriteria = result.flatMap((p) => p.guidelines.flatMap((g) => g.criteria))
-    expect(allCriteria.every((c) => c.status === 'not-tested')).toBe(true)
+    expect(allCriteria.every((c) => c.status === 'passed')).toBe(true)
   })
 
-  it('respects scStatuses for passed and not-present', () => {
-    const result = groupIssuesByPrinciple([], 'AA', {
-      scStatuses: { '1.1.1': 'passed', '2.1.1': 'not-present' }
+  it('marks listed criteria as not-present and the rest as passed', () => {
+    const result = groupIssuesByPrinciple([{ sc: '1.1.1' }], 'AA', {
+      scStatuses: { 'not-present': ['1.2.1'] }
     })
     const allCriteria = result.flatMap((p) => p.guidelines.flatMap((g) => g.criteria))
-    expect(allCriteria.find((c) => c.sc === '1.1.1')!.status).toBe('passed')
-    expect(allCriteria.find((c) => c.sc === '2.1.1')!.status).toBe('not-present')
+    expect(allCriteria.find((c) => c.sc === '1.1.1')!.status).toBe('failed')
+    expect(allCriteria.find((c) => c.sc === '1.2.1')!.status).toBe('not-present')
+    expect(allCriteria.find((c) => c.sc === '1.3.1')!.status).toBe('passed')
   })
 
   it('issues override scStatuses (failed takes precedence)', () => {
     const result = groupIssuesByPrinciple([{ sc: '1.1.1' }], 'AA', {
-      scStatuses: { '1.1.1': 'passed' }
+      scStatuses: { 'not-present': ['1.1.1'] }
     })
     const criterion = result[0]!.guidelines[0]!.criteria.find((c) => c.sc === '1.1.1')!
     expect(criterion.status).toBe('failed')

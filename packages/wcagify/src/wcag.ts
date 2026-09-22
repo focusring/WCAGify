@@ -53,38 +53,44 @@ function scName(sc: string, wcagVersion: WcagVersion = '2.2', language: Language
 
 interface ScorecardOptions {
   wcagVersion?: WcagVersion
-  /** Recorded outcomes for criteria without issues (`passed` or `not-present`). */
-  scStatuses?: ScStatuses
+  /**
+   * Criteria with no matching content in the sample. They are satisfied, so
+   * they do not change the counts; the option is kept so that callers can
+   * pass a report's `scStatuses` straight through.
+   */
+  scStatuses?: ScStatuses | null
 }
 
 /**
  * Normalizes recorded outcomes to a map keyed by success criterion number.
- * Accepts the list shape used in report frontmatter (`passed` and
- * `not-present` lists) as well as an already keyed map.
+ * Accepts the `not-present` list used in report frontmatter as well as a map
+ * keyed by criterion. Only `not-present` is meaningful: passing is the
+ * default and failing is recorded by issues, so any other recorded value is
+ * ignored.
  */
 function normalizeScStatuses(scStatuses: ScStatuses | null | undefined): ScStatusMap {
   if (!scStatuses) return {}
-  const { passed, 'not-present': notPresent, ...rest } = scStatuses as Record<string, unknown>
+  const { 'not-present': notPresent, ...rest } = scStatuses as Record<string, unknown>
   const map: ScStatusMap = {}
   for (const [sc, status] of Object.entries(rest)) {
-    if (typeof status === 'string') map[sc] = status
+    if (status === 'not-present') map[sc] = 'not-present'
   }
-  if (Array.isArray(passed)) for (const sc of passed) map[String(sc)] = 'passed'
   if (Array.isArray(notPresent)) for (const sc of notPresent) map[String(sc)] = 'not-present'
   return map
 }
 
 /**
- * Resolves the WCAG-EM outcome of a success criterion.
- * A criterion with one or more issues has failed. Without issues it takes the
- * recorded outcome (`passed` or `not-present`). Without a recorded outcome it
- * is `not-tested`, which WCAG-EM does not count as met.
+ * Resolves the WCAG-EM Step 4 outcome of a success criterion across the whole
+ * sample set.
+ *
+ * The evaluation is all or nothing: one issue on one sample page fails the
+ * criterion for the entire evaluation. A criterion with no matching content
+ * anywhere in the sample is not present, which WCAG-EM deems satisfied.
+ * Everything else passed.
  */
 function resolveScStatus(sc: string, hasIssues: boolean, scStatuses: ScStatusMap = {}): ScStatus {
   if (hasIssues) return 'failed'
-  const recorded = scStatuses[sc]
-  if (recorded === 'passed' || recorded === 'not-present') return recorded
-  return 'not-tested'
+  return scStatuses[sc] === 'not-present' ? 'not-present' : 'passed'
 }
 
 /** Zeroed counts per principle plus a total. */
@@ -94,8 +100,10 @@ function emptyCounts(): PrincipleCounts & { all: number } {
 
 /**
  * Counts, per principle and in total, how many success criteria at the
- * target level are met, failed and not tested. A criterion is met only when
- * it has no issues and a recorded `passed` or `not-present` outcome.
+ * target level are satisfied and how many failed. Following WCAG-EM Step 4 a
+ * criterion fails when any issue is recorded against it anywhere in the
+ * sample; every other criterion is satisfied, whether it passed or is not
+ * present.
  */
 function scorecard(
   issues: { sc: string }[],
@@ -103,7 +111,6 @@ function scorecard(
   options: ScorecardOptions = {}
 ): Scorecard {
   const { wcagVersion = '2.2' } = options
-  const scStatuses = normalizeScStatuses(options.scStatuses)
   const totals = totalsPerLevel[wcagVersion]?.[targetLevel] as
     | (PrincipleCounts & { all: number })
     | undefined
@@ -117,28 +124,22 @@ function scorecard(
   const includedLevels = levelIncludes[targetLevel]
 
   const failed = emptyCounts()
-  const notTested = emptyCounts()
 
   for (const [sc, entry] of Object.entries(scEntries)) {
     if (entry.obsolete && wcagVersion === '2.2') continue
     if (!includedLevels.includes(entry.level)) continue
+    if (!failedScs.has(sc)) continue
 
-    const status = resolveScStatus(sc, failedScs.has(sc), scStatuses)
-    if (status === 'failed') {
-      failed.all++
-      failed[scPrinciple(sc)]++
-    } else if (status === 'not-tested') {
-      notTested.all++
-      notTested[scPrinciple(sc)]++
-    }
+    failed.all++
+    failed[scPrinciple(sc)]++
   }
 
   const conforming = emptyCounts()
   for (const key of ['all', ...PRINCIPLES] as const) {
-    conforming[key] = totals[key] - failed[key] - notTested[key]
+    conforming[key] = totals[key] - failed[key]
   }
 
-  return { conforming, failed, notTested, totals }
+  return { conforming, failed, totals }
 }
 
 /** Scorecard plus whether every criterion at the target level is met. */
@@ -154,7 +155,7 @@ function conformanceSummary(
   }
 }
 
-const SCORECARD_KEYS = ['conforming', 'failed', 'notTested', 'totals'] as const
+const SCORECARD_KEYS = ['conforming', 'failed', 'totals'] as const
 
 /** Difference of two scorecards, used to isolate one conformance level. */
 function subtractScorecard(a: Scorecard, b: Scorecard): Scorecard {

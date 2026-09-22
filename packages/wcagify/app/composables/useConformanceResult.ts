@@ -2,9 +2,8 @@ import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 import { conformanceSummary } from '@focusring/wcagify'
 
 /**
- * Formats the WCAG-EM outcome of a report as "{met} of {total} criteria met",
- * followed by the number of criteria without a recorded outcome when there
- * are any. Criteria that were not tested are never counted as met.
+ * Formats the WCAG-EM outcome of a report as "{met} of {total} criteria met".
+ * A criterion is met when it passed or is not present in the sample.
  */
 export function useConformanceResult(
   report: MaybeRefOrGetter<ReportsCollectionItem>,
@@ -20,12 +19,12 @@ export function useConformanceResult(
     })
   })
 
-  const text = computed(() => {
-    const data = summary.value
-    const met = t('report.criteriaMet', { conforming: data.conforming.all, total: data.totals.all })
-    if (data.notTested.all === 0) return met
-    return `${met}, ${t('report.criteriaNotTested', { count: data.notTested.all })}`
-  })
+  const text = computed(() =>
+    t('report.criteriaMet', {
+      conforming: summary.value.conforming.all,
+      total: summary.value.totals.all
+    })
+  )
 
   return { summary, text }
 }

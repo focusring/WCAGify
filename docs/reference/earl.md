@@ -96,7 +96,7 @@ so it can be loaded into that tool and processed by anything that understands EA
           ]
         }
       ],
-      "scorecard": { "conforming": 53, "failed": 2, "notTested": 0, "total": 55 }
+      "scorecard": { "conforming": 53, "failed": 2, "total": 55 }
     },
     { "id": "_:evaluator", "type": "Person", "name": "Jane Evaluator" }
   ]
@@ -126,9 +126,8 @@ the report:
 | Report state                          | `earl:outcome`      |
 | ------------------------------------- | ------------------- |
 | One or more issues                    | `earl:failed`       |
-| Listed under `scStatuses.passed`      | `earl:passed`       |
 | Listed under `scStatuses.not-present` | `earl:inapplicable` |
-| No recorded outcome                   | `earl:untested`     |
+| No issues                             | `earl:passed`       |
 
 Each issue becomes a nested assertion in `hasPart`, asserted against the sample page it was found
 on (`_:sample-{id}`). Its result carries the issue title, the issue body as text, and the WCAGify
@@ -150,13 +149,13 @@ against, through the `WCAG2` prefix:
 Terms that are not part of EARL or the WCAG-EM Report Tool format live in the `wcagify`
 namespace (`https://github.com/focusring/WCAGify/blob/main/docs/reference/earl.md#`):
 
-| Term          | Meaning                                                                      |
-| ------------- | ---------------------------------------------------------------------------- |
-| `severity`    | Impact of an issue: `Low`, `Medium` or `High`                                |
-| `issueType`   | Cause of an issue: `Content`, `Design` or `Technical`                        |
-| `difficulty`  | Effort to fix an issue: `Low`, `Medium` or `High`                            |
-| `wcagVersion` | WCAG version the report was evaluated against                                |
-| `scorecard`   | Counts of criteria met, failed, not tested and the total at the target level |
+| Term          | Meaning                                                              |
+| ------------- | -------------------------------------------------------------------- |
+| `severity`    | Impact of an issue: `Low`, `Medium` or `High`                        |
+| `issueType`   | Cause of an issue: `Content`, `Design` or `Technical`                |
+| `difficulty`  | Effort to fix an issue: `Low`, `Medium` or `High`                    |
+| `wcagVersion` | WCAG version the report was evaluated against                        |
+| `scorecard`   | Counts of criteria met and failed, and the total at the target level |
 
 ## Importing EARL
 
@@ -170,8 +169,9 @@ any context works. It reads:
   or 2.2 specification anchor, a quickref or Understanding URL, or a test case that is
   `dct:isPartOf` such a criterion (the axe-core convention);
 - outcomes per criterion: `earl:failed` assertions become issues, `earl:passed` and
-  `earl:inapplicable` outcomes become `scStatuses.passed` and `scStatuses.not-present`, while
-  `earl:cantTell` and `earl:untested` leave the criterion not tested;
+  `earl:inapplicable` outcomes become `scStatuses.not-present`; `earl:passed` needs nothing
+  written because passing is the default, and `earl:cantTell` and `earl:untested` are
+  reported as warnings and leave the criterion passing;
 - subjects: web pages become samples, identified by their source URL, and findings against the
   product as a whole go to a synthetic `product` sample.
 
@@ -180,7 +180,7 @@ Tests that cannot be mapped to a criterion are skipped and listed as warnings.
 All findings that map to a criterion are imported by default, and every channel lets you hand-pick: the dialog shows the
 findings with checkboxes, the CLI lists them in `--dry-run --json` and takes `--skip-issues`, and
 the API returns an `issueList` on a dry run and accepts `skipIssues` with the indices to leave out.
-A criterion whose findings are all left out has no recorded outcome and stays not tested.
+A criterion whose findings are all left out has no issues, so it counts as passed.
 
 Two modes are available:
 

@@ -35,7 +35,7 @@ interface EarlEvaluation {
   language: string
   auditResult: EarlAssertion[]
   structuredSample: { webpage: { id: string; title: string; source?: string }[] }
-  scorecard: { conforming: number; failed: number; notTested: number; total: number }
+  scorecard: { conforming: number; failed: number; total: number }
   evaluationScope: { conformanceTarget: string }
   [key: string]: unknown
 }
@@ -155,11 +155,10 @@ describe('EARL export and import E2E', () => {
       const [evaluation] = exportOfExample['@graph']
       expect(evaluation.auditResult).toHaveLength(55)
       expect(outcomeCounts(evaluation)).toEqual({
-        'earl:passed': 38,
-        'earl:inapplicable': 15,
+        'earl:passed': 53,
         'earl:failed': 2
       })
-      expect(evaluation.scorecard).toEqual({ conforming: 53, failed: 2, notTested: 0, total: 55 })
+      expect(evaluation.scorecard).toEqual({ conforming: 53, failed: 2, total: 55 })
     })
 
     it('nests each issue under its criterion, asserted against its sample', () => {
@@ -225,8 +224,8 @@ describe('EARL export and import E2E', () => {
         targetLevel: 'AA',
         samples: 3,
         issues: 2,
-        passed: 38,
-        notPresent: 15,
+        passed: 53,
+        notPresent: 0,
         warnings: []
       })
       expect(existsSync(join(projectPath, 'content/reports/wcag-audit-earl-test'))).toBe(false)
@@ -374,7 +373,7 @@ describe('EARL export and import E2E', () => {
       const result = runImportCli(exportFile, '--dry-run', '--json')
       expect(result.exitCode).toBe(0)
       const summary = JSON.parse(result.stdout) as ImportResponse
-      expect(summary).toMatchObject({ ok: true, dryRun: true, issues: 2, passed: 38 })
+      expect(summary).toMatchObject({ ok: true, dryRun: true, issues: 2, passed: 53 })
       expect(existsSync(join(projectPath, 'content/reports/wcag-audit-earl-test'))).toBe(false)
     })
 

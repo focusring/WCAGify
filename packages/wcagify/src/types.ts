@@ -3,18 +3,31 @@ import type scToSlug from './data/sc-to-slug.json'
 type WcagVersion = keyof typeof scToSlug
 type Language = keyof (typeof scToSlug)['2.2']
 type Level = 'A' | 'AA' | 'AAA'
-type ScStatus = 'passed' | 'failed' | 'not-present' | 'not-tested'
+/**
+ * WCAG-EM Step 4 outcome of a success criterion, evaluated across the whole
+ * sample set. `passed` and `not-present` both count as satisfied.
+ */
+type ScStatus = 'passed' | 'failed' | 'not-present'
 
 /** Recorded outcome per success criterion number. */
 type ScStatusMap = Record<string, string | undefined>
 
-/** Recorded outcomes as lists of success criterion numbers, as authored in report frontmatter. */
+/**
+ * Recorded outcomes as authored in report frontmatter.
+ *
+ * Only criteria with no matching content anywhere in the sample are listed.
+ * WCAG-EM deems those satisfied. Every other criterion passes unless an issue
+ * records a failure against it, so there is nothing else to author.
+ *
+ * Lists are used instead of a map keyed by criterion because Nuxt Content
+ * unflattens dotted keys such as `1.1.1` into nested objects.
+ */
 interface ScStatusLists {
-  passed?: string[]
   'not-present'?: string[]
 }
 
 type ScStatuses = ScStatusMap | ScStatusLists
+
 type Principle = 'perceivable' | 'operable' | 'understandable' | 'robust'
 
 interface ScEntry {
@@ -32,12 +45,10 @@ interface PrincipleCounts {
 }
 
 interface Scorecard {
-  /** Criteria counted as met: recorded as passed or not present. */
+  /** Criteria counted as satisfied: passed or not present. */
   conforming: PrincipleCounts & { all: number }
   /** Criteria with one or more issues. */
   failed: PrincipleCounts & { all: number }
-  /** Criteria without a recorded outcome. Not counted as met. */
-  notTested: PrincipleCounts & { all: number }
   totals: PrincipleCounts & { all: number }
 }
 

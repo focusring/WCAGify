@@ -31,10 +31,10 @@ technologies:
   - CSS
   - JavaScript
   - WAI-ARIA
-# List every success criterion without issues under "passed" or "not-present".
-# Criteria that appear in neither list count as not tested.
 scStatuses:
-  passed: []
+  # Criteria with no matching content anywhere in the sample. WCAG-EM counts
+  # these as satisfied. Every other criterion passes unless an issue records a
+  # failure against it.
   not-present: []
 ---
 `

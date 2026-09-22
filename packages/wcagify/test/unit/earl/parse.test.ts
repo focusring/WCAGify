@@ -160,7 +160,7 @@ describe('parseEarlReport', () => {
           baseline: ['Chrome + NVDA'],
           technologies: ['HTML'],
           sample: [{ id: 'home', title: 'Home', url: 'https://rt.example', description: '' }],
-          scStatuses: { passed: ['1.1.1'] }
+          scStatuses: { 'not-present': ['1.2.1'] }
         },
         [
           {
@@ -175,7 +175,11 @@ describe('parseEarlReport', () => {
       expect(imported.report.language).toBe('nl')
       expect(imported.report.evaluation.targetLevel).toBe('A')
       expect(imported.report.evaluation.targetWcagVersion).toBe('2.1')
-      expect(imported.report.scStatuses.passed).toEqual(['1.1.1'])
+      // Every criterion without issues is exported as passed, so the import
+      // reads them all back; the failing one is not among them.
+      expect(imported.report.scStatuses.passed).toContain('1.1.1')
+      expect(imported.report.scStatuses.passed).not.toContain('2.4.1')
+      expect(imported.report.scStatuses['not-present']).toEqual(['1.2.1'])
       expect(imported.issues).toEqual([
         { title: 'Product-wide issue', sc: '2.4.1', sample: 'product', body: 'Everywhere.' }
       ])

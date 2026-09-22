@@ -117,8 +117,5 @@ const showTotalColumn = computed(() => data.value.levels.length > 1)
         </tr>
       </tfoot>
     </table>
-    <p v-if="data.total.notTested.all > 0" class="text-sm text-toned">
-      {{ $t('report.scorecardNotTestedNote', { count: data.total.notTested.all }) }}
-    </p>
   </div>
 </template>
