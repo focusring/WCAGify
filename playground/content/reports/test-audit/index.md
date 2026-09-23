@@ -178,7 +178,11 @@ scStatuses:
   # Criteria with no matching content anywhere in the sample. WCAG-EM counts
   # these as satisfied. Every other criterion passes unless an issue records a
   # failure against it.
-  not-present: []
+  not-present:
+    - 1.2.1
+    - 1.2.4
+    - 1.4.2
+    - 2.1.4
 ---
 
 This is an example report for a WCAG accessibility audit of Example Website.

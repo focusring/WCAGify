@@ -17,6 +17,8 @@ In the header row "Privé / Zakelijk / Private banking / English", the link **"E
 
 The same link in the mobile "Taal - NL" popover has the same target. A visitor who wants the English site cannot know where the link leads, and lands on a page about something else. On the payments page (page-11) the link leads to the English payments page on every load, so the target is set per page. On this article it seems to be left over from whatever the server rendered before.
 
+The same happens on other samples. On the accessibility statement (page-6) it opened "Submitting a complaint" on two loads and "Contactless payments" on a later one. On the seniors' online-banking page (page-24) it opened "Authorising someone to access your account", then "What is the maximum transfer amount". On the English home page (page-2) its counterpart "Nederlands" opened "Wijziging betaaltarieven en -voorwaarden 2025", then "Jouw plan" (Preferred Banking) and, in an earlier unit, the Dutch themes page.
+
 #### Recommendation
 
 Where a page has no English version, point "English" at the English home page (`/en/personal/index.html`) or at the English overview of the same section. Never use a target left over from another page. Give the link `lang="en"` and `hreflang="en"` as well ([G91](https://www.w3.org/WAI/WCAG22/Techniques/general/G91), [H58](https://www.w3.org/WAI/WCAG22/Techniques/html/H58)).
