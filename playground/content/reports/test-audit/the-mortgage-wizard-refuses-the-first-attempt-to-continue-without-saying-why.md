@@ -16,7 +16,7 @@ To anyone who cannot see the whole screen at once — and to anyone who simply e
 
 The inconsistency makes it harder still: the age question **does** report the error on the first press, so a user cannot learn a rule from the wizard's behaviour.
 
-Two related problems in the same error state: the field gets a red border, a red icon and red text but carries **no `aria-invalid`**, and it is not linked to its message by `aria-describedby` or `aria-errormessage`. The message sits in an `<aab-status>` element inside the component's shadow root, so the association has to be made inside `aab-input`.
+Two related problems in the same error state, on these fields and on the age field `input#age` alike (both also fail 4.1.2): the field gets a red border, a red icon and red text but carries **no `aria-invalid`**, and it is not linked to its message by `aria-describedby` or `aria-errormessage`. The message sits in an `<aab-status>` element inside the component's shadow root, so the association has to be made inside `aab-input`.
 
 #### Recommendation
 

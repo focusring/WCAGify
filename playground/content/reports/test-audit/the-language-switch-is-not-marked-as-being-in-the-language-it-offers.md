@@ -13,7 +13,7 @@ The header of every Dutch page carries a link reading **"English"**, and the Eng
 
 A Dutch speech synthesiser reading "English" as a Dutch word, or an English one reading "Nederlands", produces something a user may not recognise as the name of their own language. That matters more here than for an ordinary foreign word, because this link is how a user reaches the version of the site they can read.
 
-This is the shared header template, so it applies to every page in the audit. It was confirmed on page-2 (the English build, "Nederlands") and page-16 (the Dutch build, "English").
+This is the shared header template, so it applies to every page in the audit. It was confirmed on page-2 (the English build, "Nederlands") page-16 (the Dutch build, "English"), page-22, page-23 and page-24.
 
 #### Recommendation
 

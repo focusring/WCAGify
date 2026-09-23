@@ -14,7 +14,7 @@ It is **the last stop of 73**. Pressing Tab there focuses it — `:focus-visible
 
 A sighted keyboard user sees the focus outline disappear from the page with no indication of where it went, presses Tab again expecting to move on, and instead leaves the document. There is no way to tell from the screen that a control was focused, let alone what it does.
 
-The button was found in the tab order on page-1, page-2, page-6, page-7, page-8, page-11, page-13, page-14, page-19, page-21, page-22, page-24, page-25, page-26, page-27, page-29 and page-30 — it is injected into every CMS-rendered page.
+The button was found in the tab order on page-1, page-2, page-5 to page-9, page-11, page-13, page-14, page-16 to page-19, page-21 to page-27 and page-29 to page-31 — it is injected into every CMS-rendered page.
 
 #### Recommendation
 

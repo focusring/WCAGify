@@ -13,7 +13,7 @@ The illustration in the **"Alledaagse bankzaken regelen?"** promo inside the "Ap
 
 The image is decorative: the promo's heading and link already say everything it conveys. Giving it the alt text "icoon" describes the file rather than the content, so a screen-reader user is interrupted by a word that adds nothing and suggests they have missed something.
 
-This is in the shared header mega-menu, so it appears on every page in the audit. It was seen on page-1, page-8 and page-16.
+This is in the shared header mega-menu, so it appears on every page in the audit. It was seen on page-1, page-6, page-7, page-8, page-16, page-23 and page-24.
 
 #### Recommendation
 

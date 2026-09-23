@@ -12,7 +12,7 @@ The mortgage-rate tool embedded on this page sets the rates in its table with tw
 
 A screen-reader user tabbing through the filters hears "Button" twice and cannot tell what either one chooses. The `aria-label` also overrides the button's text, so the chosen value ("Budget Hypotheek", "A") is not exposed while the list is closed. The visible labels do not help, because their `for` points at the `aab-select` host element, which a label cannot name. Speech-input users cannot say "Kies een hypotheeksoort" or "Energielabel" to reach the controls either, since neither word is in the name (this also fails 2.5.3).
 
-With a list open, the arrow keys move a visible highlight, but `aria-activedescendant` is set on the list (`ul tabindex="-1"`), which never has focus, instead of on the focused button. Nobody is told which option the highlight is on until Enter commits it. The same `aab-select` leaves the active option unexposed in the mortgage wizard's "Wat is uw werksituatie?" chooser (page-31).
+With a list open, the arrow keys move a visible highlight, but `aria-activedescendant` is set on the list (`ul tabindex="-1"`), which never has focus, instead of on the focused button. Nobody is told which option the highlight is on until Enter commits it. The same `aab-select` leaves the active option unexposed in the mortgage wizard's "Wat is uw werksituatie?" chooser (page-31), whose button has no `aria-controls` either.
 
 #### Recommendation
 

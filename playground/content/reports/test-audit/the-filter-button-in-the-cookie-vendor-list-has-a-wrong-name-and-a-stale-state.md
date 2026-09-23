@@ -16,7 +16,7 @@ In the cookie vendor list ("Leverancierslijst"), the round **funnel button** (`b
 - **Its name describes a different function.** The button is named "Bekijk lijst van cookies Leverancierslijst" ("View list of used cookies Vendors List" on the English pages), and its SVG `<title>` says the same. Screen-reader users hear a button that shows a cookie list, not one that filters the vendors. When the list is opened from the first tab, the name reads "Filter Leverancierslijst" instead, so the same button changes its name depending on the route.
 - **Its state does not follow the popover.** `aria-expanded` turns `true` when the popover opens but stays `true` after it is closed with Escape or with the popover's own "Annuleren" button. Assistive technology then reports an open popover that is no longer there. Focus is also lost on close; that is part of the filed issue on focus return from the cookie settings.
 
-This is the OneTrust consent component, available on every page. The name was recorded on page-2, page-7, page-9, page-10, page-13 and page-24. The stale state was reproduced on page-10 by both routes.
+This is the OneTrust consent component, available on every page. The name was recorded on page-2, page-7, page-9, page-10, page-13, page-24 and page-26. The stale state was reproduced on page-10 by both routes.
 
 #### Recommendation
 

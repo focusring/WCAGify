@@ -12,10 +12,7 @@ The energy-label chooser in the mortgage calculator is a `<span id="energy-label
 
 The visible label "Energielabel" is a `<label for="energy-label">`, but the element it points at is a `<span>`, and a label cannot bind to a span — so the real label reaches nothing. Because the name shares no word with that label, a speech-input user who says "Energielabel" reaches nothing either (this also fails 2.5.3).
 
-Two further problems in the same widget:
-
-- `aria-controls="pv_id_10_list"` points at an id that does **not exist** while the list is collapsed.
-- There is no `aria-activedescendant`, so while the list is open the highlighted option is not exposed either. Combined with the name being the value, there is nowhere at all that a screen-reader user can read the current selection reliably.
+While the list is open the widget works as a combobox should: the arrow keys move `aria-activedescendant` to the highlighted option. Once it closes, the chosen value is exposed only through the name, the one place it does not belong. In the same widget, `aria-controls="pv_id_10_list"` points at an id that does **not exist** while the list is collapsed.
 
 #### Recommendation
 
@@ -23,7 +20,6 @@ Give the control a name that states its purpose and expose the value separately.
 
     <label id="energy-label-text">Energielabel</label>
     <div role="combobox" aria-labelledby="energy-label-text"
-         aria-expanded="false" aria-controls="energy-label-list"
-         aria-activedescendant="energy-label-option-a">A</div>
+         aria-expanded="false">A</div>
 
-The chosen value belongs in the element's content, not in its `aria-label`, and `aria-controls` must name a list that exists ([ARIA Combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/), [ARIA16](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA16)).
+The chosen value belongs in the element's content, not in its `aria-label`, and `aria-controls` is set only while the list it names exists ([ARIA Combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/), [ARIA16](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA16)).

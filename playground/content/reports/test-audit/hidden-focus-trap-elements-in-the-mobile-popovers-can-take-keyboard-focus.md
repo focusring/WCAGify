@@ -13,7 +13,9 @@ The language popover that opens from **"Taal - NL"** in the phone-width header k
 
 That combination is contradictory: the elements are in the keyboard's tab order, but hidden from assistive technology. If focus lands on one, a screen reader has nothing to announce. axe reports it as an `aria-hidden-focus` violation on page-4. In the keyboard walks the popover's own script moved focus on straight away, so Tab kept cycling between "English" and "Nederlands", which is why this is a minor defect.
 
-The same pair of guards sits in the "Kies Segment" popover, the mobile navigation drawer and the search overlay, where axe asks for them to be reviewed (page-4, page-7, page-12, page-16, page-24, page-26). It is the same component everywhere.
+The same pair of guards sits in the "Kies Segment" popover, the mobile navigation drawer and the search overlay, where axe asks for them to be reviewed (page-4, page-7, page-12, page-16, page-18, page-20, page-23 to page-26; on page-25 also in the "Openingstijden" popover). It is the same component everywhere.
+
+The mortgage calculator on page-14 is built with the same PrimeVue library and adds the same pair of guards around the energy-label option list while it is open; there axe reports them as an `aria-hidden-focus` violation. Tab with the list open commits the option and never lands on them. The calculator is served separately (`hypotheken.abnamro.nl`), so it needs the same fix of its own.
 
 #### Recommendation
 

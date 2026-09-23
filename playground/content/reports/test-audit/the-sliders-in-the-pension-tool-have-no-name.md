@@ -10,7 +10,7 @@ sample: page-21
 
 The result step of the pension tool offers **six sliders** for adjusting the calculation — retirement age, starting capital, monthly contribution and so on. Each is a `<div class="slider-handle" role="slider">` carrying `aria-valuemin`, `aria-valuemax` and `aria-valuenow`, but **none of them has an `aria-label`, an `aria-labelledby` or an `aria-valuetext`**.
 
-A screen-reader user hears "slider, 69" and nothing that says 69 is an age, or "slider, 500" with no indication that it is euros. The visible text that names each slider sits outside the widget and is not associated with it. With six of them on one screen the values are indistinguishable from each other.
+A screen-reader user hears "slider, 69" and nothing that says 69 is an age, or "slider, 500" with no indication that it is euros. The visible text that names each slider sits outside the widget and is not associated with it, which also fails 1.3.1 ([F111](https://www.w3.org/WAI/WCAG22/Techniques/failures/F111)). With six of them on one screen the values are indistinguishable from each other. None of the 11 `<label>` elements in the tool is tied to a control, so the read-only result rows, such as "Opgebouwd aanvullend pensioen" and its amount, are paired only by their position as well.
 
 Each slider does have a visible label beside it ("Start pensioenuitkering", "Eenmalige inleg", "Gemiddelde inleg per maand", "Uitkeringsperiode", "Verwacht rendement", "Later starten met pensioenopbouwen"). With an empty name, that label is not part of the name either, which also fails 2.5.3 (label in name): a speech-input user who says "Eenmalige inleg" reaches nothing.
 

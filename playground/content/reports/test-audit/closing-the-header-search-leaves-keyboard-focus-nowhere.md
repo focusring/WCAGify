@@ -12,7 +12,7 @@ Pressing Enter on **"Open zoekbalk"** ("Open search bar" on the English site) op
 
 The overlay version of the search, which phones get, has the same fault. Under an iPhone user agent, "Sluiten" closes the overlay and leaves focus on `<body>` as well. Escape is worse there: it does not close the overlay but moves focus behind it, to the chat button and then the footer links. The search screen stays in front, so the keyboard user sees nothing change while focus moves through controls they cannot see (this is also a 2.4.11 failure).
 
-This is the shared header search. The cross was checked on page-1, page-2, page-4, page-6, page-8, page-11, page-12, page-16, page-22, page-23, page-24 and page-26, and the phone overlay on page-4.
+This is the shared header search. The cross was checked on page-1, page-2, page-4, page-6, page-8, page-11, page-12, page-16, page-18, page-22, page-23, page-24 and page-26, and the phone overlay on page-4.
 
 #### Recommendation
 

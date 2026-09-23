@@ -16,7 +16,7 @@ When focus moves into one of these popovers, a screen-reader user hears that a d
 The same component, with the same gap, is used for:
 
 - the glossary explanations beside terms in the text, such as "Cookies" (page-10), "Kifid" (page-8) and "Bankrekening" (page-12);
-- the **"Taal"** and **"Kies Segment"** popovers of the phone-width header (page-4, page-7, page-9), which have no visible heading at all.
+- the **"Taal"** and **"Kies Segment"** popovers of the phone-width header (page-4, page-6, page-7, page-9, page-24, and "Taal - EN" on page-26), which have no visible heading at all.
 
 #### Recommendation
 

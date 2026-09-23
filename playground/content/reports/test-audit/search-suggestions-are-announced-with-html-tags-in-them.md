@@ -17,7 +17,7 @@ A screen reader reads the tags out. Instead of "Hypotheek extra aflossen" the us
 
 The visible text is correct; only the name given to assistive technology is broken. That also fails 2.5.3: the name no longer contains the visible label as it is written, so a speech-input user who says "click Hypotheek extra aflossen" may not be matched to a control named `<b>Hypotheek</b> extra aflossen`, and a word split by a tag, as in `<b>Rek</b>ening opzeggen`, no longer exists in the name at all.
 
-It was confirmed on page-1, page-2, page-5, page-6, page-8, page-9, page-10, page-11, page-12, page-13, page-18, page-19, page-22, page-23, page-24, page-25 and page-26, and it is the same shared search component throughout.
+It was confirmed on page-1, page-2, page-4 (the header list and the service page's own search, e.g. `<b>Betaalpas</b> blokkeren`), page-5, page-6, page-7, page-8, page-9, page-10, page-11, page-12, page-13, page-18, page-19, page-22, page-23, page-24, page-25 and page-26, and it is the same shared search component throughout.
 
 #### Recommendation
 

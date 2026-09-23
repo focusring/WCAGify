@@ -12,7 +12,7 @@ In the **"Veelgestelde vragen"** accordion every question button carries `aria-c
 
 So the relationship between a question and its answer is broken in one direction, and any assistive technology that follows `aria-controls` to move the user to the panel lands nowhere. The duplicated id also means a reference to `accordion-content` cannot resolve to a single element.
 
-This is the shared accordion component, not a page-specific mistake. It was confirmed on page-8 (3 panels), page-10 (8), page-13 (12 of 12), page-18 (12), page-19 (5), page-21 (7), page-22 (4) and page-29 (5).
+This is the shared accordion component, not a page-specific mistake. It was confirmed on page-8 (3 panels), page-10 (8), page-12 (5), page-13 (12 of 12), page-14 (6), page-15 (5), page-18 (12), page-19 (5), page-20 (10), page-21 (7), page-22 (4) and page-29 (5).
 
 Automated testing understates this badly: the accordion does not render collapsed panels, so axe-core only ever reports the one panel that happens to be open. On page-18, 13 of the 21 `aria-controls` attributes on the page resolve to nothing.
 

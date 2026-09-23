@@ -13,7 +13,7 @@ At phone widths the header shows a hamburger button (`button#hamburgerMenu`) tha
 
 Assistive technology that follows `aria-controls` to reach the panel finds nothing. The button's name, role and `aria-expanded` state are all correct, so the menu remains usable — only the relationship is broken, which is why this is recorded as a low-severity defect rather than a blocking one.
 
-It only appears below the mega-menu breakpoint, so a desktop-only test will not see it. It was confirmed at phone widths on page-1, page-5, page-6, page-7, page-11, page-18, page-19, page-21, page-24, page-26, page-27, page-28, page-29 and page-30 — the shared header on every page in the audit.
+It only appears below the mega-menu breakpoint, so a desktop-only test will not see it. It was confirmed at phone widths on page-1, page-5 to page-9, page-11 and page-18 to page-30 — the shared header on every page in the audit.
 
 #### Recommendation
 

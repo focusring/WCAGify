@@ -12,7 +12,7 @@ Complete step 1 of the application form — usage, who the account is for, stude
 
 When focus lands on the **already-answered "Ben je student?" radio**, the page **clears that answer, removes the question below it, and removes the "Volgende" button**. No key was pressed other than Tab, and nothing was activated. Simply moving focus onto a control destroys work already done.
 
-The next Tab then drops focus to `<body>` with a validation error showing, so the user is both back at the start of the document and looking at a form that has lost its state.
+The next Tab then drops focus to `<body>` with a validation error showing, so the user is both back at the start of the document and looking at a form that has lost its state. That focus drop also fails 2.4.3.
 
 WCAG 3.2.1 requires that receiving focus does not by itself cause a change of context. Removing questions and removing the submit button is exactly that. For a keyboard user, reviewing answers before submitting — the ordinary, careful thing to do — is what breaks the form.
 

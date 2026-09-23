@@ -11,7 +11,7 @@ sample: page-3
 
 In the e.dentifier login, the first box under the visible label **"Rekening- en pasnummer"** (`input#account-number`) has the accessible name "ABN AMRO Rekeningnummer". It comes from an `aria-label`, which overrides the `<label for>`, and the two share not a single word.
 
-A speech-input user who says "klik Rekening- en pasnummer" reaches nothing, and a screen-reader user hears a name that appears nowhere on screen. This is the first field of the login, on both the Privé and the Zakelijk tab. The small box beside it, named "Pasnummer", carries the last word of the shared label and is fine.
+A speech-input user who says "klik Rekening- en pasnummer" reaches nothing, and a screen-reader user hears a name that appears nowhere on screen. This is the first field of the login, on both the Privé and the Zakelijk tab. The small box beside it (`input#card-number`) has no label of its own, only `aria-label="Pasnummer"`, so the markup ties the one visible label to the first box alone and not to the second. That relationship is visible but not in the code, which also fails 1.3.1 (Info and Relationships).
 
 #### Recommendation
 

@@ -11,7 +11,7 @@ sample: page-1
 
 Open the search bar in the header and type a search term. A round **clear button** (`button#input-close-button`) appears at the right-hand end of the field. It contains only an icon and carries no `aria-label`, no `aria-labelledby`, no `title` and no text, so its accessible name is empty.
 
-Screen-reader users hear only "button" and cannot tell what it does. Speech-recognition users have no name to say to activate it. The search bar sits in the header of every page in the audit, so the button is on every page: it was confirmed on page-2, page-4, page-5, page-6, page-11, page-18, page-19, page-23, page-24, page-26, page-27, page-28, page-29 and page-30, and it is the same component everywhere.
+Screen-reader users hear only "button" and cannot tell what it does. Speech-recognition users have no name to say to activate it. The search bar sits in the header of every page in the audit, so the button is on every page: it was confirmed on page-2, page-4 to page-9, page-11, page-18, page-19 and page-22 to page-30, and it is the same component everywhere.
 
 #### Recommendation
 

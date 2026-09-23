@@ -16,7 +16,7 @@ The three **top-level** buttons are marked up correctly: they carry `aria-expand
 
 Automated testing misses this completely. axe's `aria-allowed-attr` rule does not flag it, because in the states where the attribute is scanned those list items sit inside an `aria-hidden` subtree.
 
-This is the shared header, confirmed on page-1, page-2, page-13 and page-22.
+This is the shared header, confirmed on page-1, page-2, page-4 to page-15, page-17, page-18 and page-21 to page-26.
 
 #### Recommendation
 

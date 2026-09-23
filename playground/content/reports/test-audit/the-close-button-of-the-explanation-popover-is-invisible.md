@@ -14,7 +14,7 @@ The control is there, it is focusable, and clicking the empty space closes the p
 
 This is not the icon being too light — it is the icon being the same colour as what it sits on. The likely cause is an icon utility class resolving `background-color` to white instead of `currentColor`, which means **the same class may be blanking icons elsewhere in the design system**; that is worth checking beyond this component.
 
-The glossary popover is a shared component used across the site.
+The glossary popover is a shared component used across the site: the same blank close button was found in the "Kifid" explanation on page-8 and the "Openingstijden" popover on page-25.
 
 #### Recommendation
 

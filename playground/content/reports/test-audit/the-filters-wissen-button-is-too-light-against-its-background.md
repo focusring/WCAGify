@@ -13,7 +13,7 @@ In the filter panel of the cookie vendor list, the **"Filters wissen"** button (
 
 **The stylesheet will not explain this, so do not go looking for `#787878` in it.** The declared colour is `rgb(105,105,105)` — `#696969` — which on white measures 5.49:1 and passes comfortably. The button sits under an ancestor with **`opacity: 0.9`**, and that is what drags the painted glyphs down to `#787878`. Three independent measurements agree: a compositing walk that multiplies foreground alpha by the cumulative ancestor opacity, a rendered-pixel histogram of a screenshot, and axe-core's own 4.41.
 
-The shortfall is small but it is a real failure, and it lands on the control that undoes a filter choice — the one a user is most likely to need after a mistake.
+The shortfall is small but it is a real failure, and it lands on the control that undoes a filter choice — the one a user is most likely to need after a mistake. axe flags the same button on page-7 and page-9: it is the OneTrust panel every page opens.
 
 Unlike the other contrast results in this audit, this one is measured rather than uncertain: most colour-contrast checks on this site could not be resolved automatically because of the dark overlay behind the cookie panel, but this button sits on plain white.
 

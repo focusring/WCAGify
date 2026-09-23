@@ -21,7 +21,8 @@ The same component behaves the same way wherever it is used, so this is a templa
 - page-15, "Hypotheekrente uitleg";
 - page-18, "Verder goed om te weten";
 - page-19, "Meer informatie" on the travel insurance page;
-- page-20, "Wanneer kun je lenen?".
+- page-20, "Wanneer kun je lenen?";
+- page-14, "Informatie over je hypotheek", where the chosen button does turn `aria-expanded="true"` but the copy it controls (`#tcm-215513-N-content`) stays `display:none`, and the pane actually shown, `div#tcm-undefined` (an id used 26 times), has no role and no name.
 
 On page-9, page-15, page-18, page-19 and page-20 all buttons report `aria-expanded="false"` on load while the first panel is shown, and `aria-controls` names the hidden copy. On page-9 the pressed button's flag does turn `true` after Enter or Space, and a second press does not collapse it: the widget behaves as a selection, not a disclosure, and at no time does `aria-controls` point at the content on screen.
 

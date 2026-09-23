@@ -12,7 +12,7 @@ sample: page-17
 
 After a two-finger zoom on a touchscreen, the price chart shows a **"Reset zoom"** button. Highcharts 7.0.3 binds its action to `touchstart`, so it fires the moment a finger lands on it. Measured with the finger held on the button: the zoomed view was already gone before any up-event, and sliding the finger off before lifting did not bring it back.
 
-A user who touches the button by accident, for instance while trying to pan, loses the zoomed view with no undo; the only way back is to repeat the two-finger gesture, which some users cannot make at all. The button only appears on touch devices. The chart is part of the supplier's application (`beursinfo.abnamro.nl`), shown inside the page.
+A user who touches the button by accident, for instance while trying to pan, loses the zoomed view with no undo; the only way back is to repeat the two-finger gesture, which some users cannot make at all. The button only appears on touch devices. It is also not a button to assistive technology: the SVG group that draws it has no role and no `tabindex`, so a screen reader does not announce it as a button and Tab skips it (4.1.2). Enter on any period link resets the zoom, so keyboard users do have another way back. The chart is part of the supplier's application (`beursinfo.abnamro.nl`), shown inside the page.
 
 #### Recommendation
 

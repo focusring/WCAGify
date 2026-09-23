@@ -12,7 +12,7 @@ The `aab-info-popover` component that puts an (i) button beside a calculator que
 
 Inside an open popover, Tab alternates between the close button and an invisible focus sentinel, `<div id="popover-end-trap" tabindex="0" aria-hidden="true">`, 0 px high. Every second Tab lands on it and stays there. Nothing on screen shows where focus is (this also fails 2.4.7), and a screen reader announces nothing, because `aria-hidden` removes the element from the tree.
 
-Also in the mortgage-rate tool (page-15): seven buttons, beside "Kies een hypotheeksoort" and six fixed-rate periods, are all "Open info-popover", and their dialog is named "popover". The "Woonbudget" dialog in the mortgage wizard (page-31) is named "popover" as well.
+Also in the mortgage-rate tool (page-15): seven buttons, beside "Kies een hypotheeksoort" and six fixed-rate periods, are all "Open info-popover", and their dialog is named "popover". The "Woonbudget" dialog in the mortgage wizard (page-31) is named "popover" as well, and because it is rendered inside the `<h2>`, that heading's name becomes "Woonbudget Open info-popover popover" while it is open.
 
 #### Recommendation
 
