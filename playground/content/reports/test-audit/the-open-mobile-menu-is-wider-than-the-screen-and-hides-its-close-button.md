@@ -14,6 +14,8 @@ The cause is the scroll lock. Opening the menu sets `body` to `position: fixed; 
 
 Page-12 has the same header without a wide table and shows the menu intact, so any page with wide content will do the same. This makes the menu unusable at 400 % zoom and on a phone for anyone who needs its close control.
 
+Text spacing triggers the same cause on pages without wide content, which also fails 1.4.12. On the energy-saving tips article (page-27) the body shrinks to the longest word of the h1, "energiebespaartips": 333 px at 320 px wide, so only the menu's right padding falls off. With the letter and word spacing that 1.4.12 requires, that word grows and the menu becomes 385 px wide. "Sluiten ×" is then cut off after "Sluiten", the row arrows are gone and the "Bankrekening openen" promotion is cut at the right edge.
+
 #### Recommendation
 
 Give the scroll-locked body an explicit width, or lock scrolling without taking the body out of the flow:

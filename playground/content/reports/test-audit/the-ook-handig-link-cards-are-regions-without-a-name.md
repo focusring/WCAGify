@@ -13,7 +13,7 @@ The link cards of the related-links component ("Ook handig" on this page) each c
 
 The same component fills this name on every other card of the page ("Voor mezelf", "Zakelijke bankrekening openen" …), so this is an empty field of the link cards, not a design choice. The links inside each card are a proper list, so the grouping of the links survives; what is lost is the region itself.
 
-The same two unnamed regions are on page-13, page-14 ("Meest gezocht over hypotheken"), page-19, page-21, page-23 (where the section has no heading at all) and page-26 ("Most frequently searched terms about mortgages").
+The same two unnamed regions are on page-13, page-14 ("Meest gezocht over hypotheken"), page-19, page-21, page-23 (where the section has no heading at all), page-26 ("Most frequently searched terms about mortgages") and page-27 (four cards under "Meer over duurzaam wonen" and "Meest gezocht over hypotheken").
 
 #### Recommendation
 

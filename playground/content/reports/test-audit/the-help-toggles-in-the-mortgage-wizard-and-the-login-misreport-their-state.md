@@ -13,7 +13,7 @@ The design system's `aab-accordion` renders the help toggles under each question
 - closed, the button has **no `aria-expanded` at all**; open, it has `aria-expanded=""`, which is not a valid value. The browser exposes no state either way. The only hint is the word "Expand" or "Collapse" in the button's name;
 - in "Kosten koper" the state is put on two `span` elements (`slot="cta-expand"`, `slot="cta-collapse"`) that have no role, where `aria-expanded` is not allowed (axe `aria-allowed-attr`).
 
-A screen-reader user hears "button" and cannot tell whether the explanation is open.
+A screen-reader user hears "button" and cannot tell whether the explanation is open. In the wizard (page-31) the closed help text also stays in the accessibility tree: `div#accordion-content` has height 0 and `overflow: hidden`, but no `hidden` or `aria-hidden`.
 
 The same component on the login page (page-3), "Hulp nodig bij het inloggen?", fails the other way round. It toggles `aria-expanded="false"` and `"true"` correctly, but the closed panel `div#accordion-content` is hidden only by `max-height: 0; overflow: hidden`. The steps "Inloggen met een QR-code" and the link "Kunt u niet inloggen? Bekijk alle hulp" stay in the accessibility tree while the button says the panel is collapsed.
 

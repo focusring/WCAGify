@@ -15,7 +15,9 @@ The pages are Dutch (`lang="nl"`), but a number of shared components carry **Eng
 - `aria-label="Privé selected"` on the current segment in the header, `aria-label="breadcrumb"` on the breadcrumb and `aria-label="newsletter"` on the footer newsletter link (page-8 to page-12, page-15, page-17, page-18, page-20, page-22 to page-25)
 - the off-screen live-preview button **"Edit"** (every page)
 - in the chat: the launcher **"Chat button"**, the message list **"Chat messages"** and the menu item **"Taal / Language"**, whose English half is visible text (page-25, page-14, page-19, page-20)
-- the mobile header's login link, named **"Login"** (page-7, page-8, page-25)
+- the mobile header's login link, named **"Login"** (page-7, page-8, page-25, page-29, page-31)
+- the help toggles under every question of the mortgage wizard, named "… **Expand**" or "… **Collapse**" from an English `aria-label` on their chevron (page-31)
+- the three date-of-birth boxes of the account application, named **"date of birth, day"**, "… month" and "… year" (page-30; reported in full as "The date-of-birth boxes are named in English, not by their labels Dag, Maand, Jaar")
 - **"Close"**, the name the close × of the Qualtrics Feedback survey (`button#QSIFeedbackButton-close-btn`) takes from its `<img alt="Close">`, supplied by Qualtrics (page-2, page-6, page-9, page-25)
 - the status text **"1 items selected"** of the energy-label chooser in the mortgage calculator (page-14)
 - **"Back"**, the name of the back arrow in the search overlay on Android phones (page-13)
@@ -25,7 +27,7 @@ Brand names and adopted words such as "Home", "app" and "cookies" are not counte
 
 #### Recommendation
 
-Translate the strings in the components: "Informatie", "Sluiten", "Privé geselecteerd" (or better `aria-current="true"` on the link), "kruimelpad", "nieuwsbrief", "Chat openen", "Chatberichten", "1 item geselecteerd", "Terug". Where the English word is meant, mark it:
+Translate the strings in the components: "Informatie", "Sluiten", "Privé geselecteerd" (or better `aria-current="true"` on the link), "kruimelpad", "nieuwsbrief", "Chat openen", "Chatberichten", "1 item geselecteerd", "Terug", "Uitklappen" / "Inklappen". Where the English word is meant, mark it:
 
     Taal / <span lang="en">Language</span>
 

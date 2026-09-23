@@ -16,6 +16,8 @@ WCAG 3.3.7 allows re-asking only where the information is essential to re-enter,
 
 Re-entering a figure is a small cost for most people and a real one for anyone who types slowly, uses speech input, or has to find the source document again.
 
+A third answer is asked again further on. The energy label chosen in the calculator on page-14 is not carried over either: after "Voeg een woning toe" on the result, the step "Welk energielabel heeft de woning op dit moment?" (83%) arrives pre-set to "Energielabel A++++ (met EPG > 10 jaar)" instead of the label already given, which has to be picked again from the full list.
+
 Within this page the wizard behaves correctly — pressing "Vorige" keeps what was entered — so the gap is specifically at the hand-over between the two pages.
 
 #### Recommendation

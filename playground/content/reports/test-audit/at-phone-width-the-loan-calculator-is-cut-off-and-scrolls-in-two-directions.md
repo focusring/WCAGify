@@ -18,6 +18,8 @@ The personal-loan calculator is shown in a frame (`iframe#tcm-267699-iframe`). T
 
 To use the calculator at this width, a user has to scroll the frame both sideways and down, inside a page that scrolls too. For people who enlarge text to 400 % or use a phone, the amount they type and the result they came for are partly out of view.
 
+The same `aab-slider` rule cuts off the mortgage wizard (page-31). In "Hypotheekbedrag aanpassen" at 320 px the slider and its label "Max. € 194.149" end 30 px past the edge of the 288 px frame, so the handle at its maximum is cut off and the label reads "Max. € 194". The amount box beside it still works.
+
 #### Recommendation
 
 Let the calculator's controls fill the available width, and let the frame take the height of its content:

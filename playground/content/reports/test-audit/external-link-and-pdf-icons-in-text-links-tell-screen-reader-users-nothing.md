@@ -14,7 +14,7 @@ Text links in the CMS content end in a small icon that tells sighted readers whe
 
 On the cookie statement (page-10) the links "hier", "Google Marketing Platform", "Google Analytics 4" and "Google" all carry `target="_blank"` and the external-link icon. Their accessible names are just the link text, followed by an unnamed image that some screen readers read out as "image" or "unlabelled graphic". A screen-reader user is not told that the link leaves the site in a new tab, or, on the privacy page (page-9), that "Bekijk de privacyverklaring" opens a PDF.
 
-The same link component does this on page-9 ("Bekijk de privacyverklaring", PDF), page-15 ("huisbankkorting"), page-19 ("Voorwaarden kortlopende reisverzekering (975 KB)", the only one of its 14 PDF links whose text leaves out "PDF", and it opens a new window), page-20 ("vrijblijvend je offerte", "Lees onze beoordelingen", "Bereken hoeveel je kunt lenen"), page-22 ("Dagelijkse bankzaken", "contact") and page-26 ("call you back").
+The same link component does this on page-9 ("Bekijk de privacyverklaring", PDF), page-15 ("huisbankkorting"), page-19 ("Voorwaarden kortlopende reisverzekering (975 KB)", the only one of its 14 PDF links whose text leaves out "PDF", and it opens a new window), page-20 ("vrijblijvend je offerte", "Lees onze beoordelingen", "Bereken hoeveel je kunt lenen"), page-22 ("Dagelijkse bankzaken", "contact") and page-26 ("call you back"). The mortgage wizard's own link component (`aab-link`) does the same on its result: "Hoe is dit berekend?" opens a new tab and ends in an unnamed external-link icon (page-31).
 
 #### Recommendation
 

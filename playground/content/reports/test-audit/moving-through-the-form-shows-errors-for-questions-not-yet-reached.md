@@ -14,6 +14,8 @@ Tabbing forward is not a decision not to answer. A keyboard user moving through 
 
 The effect compounds: by the time someone has looked at all four questions in step 1, the page is showing several errors for questions they fully intend to answer.
 
+The same validation also turns up as a dialog. After a minute or more on step 2 (seen after 60 seconds, 5 minutes and 16.5 minutes), pressing **"Vorige"** opens a modal "Fout": "**Salutation** heeft een probleem: Je hebt niets ingevuld. Kies een antwoord om door te gaan." It appears on step 1, about the "Je aanhef" question of the step the user has just left, and it names that question by its internal English attribute name, "Salutation", which the user has never seen. No answers are lost.
+
 WCAG 3.3.1 is about identifying errors that exist. An unanswered question the user has not yet reached is not an error.
 
 #### Recommendation
