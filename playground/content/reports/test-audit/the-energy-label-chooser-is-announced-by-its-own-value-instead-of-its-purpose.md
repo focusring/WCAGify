@@ -10,7 +10,7 @@ sample: page-14
 
 The energy-label chooser in the mortgage calculator is a `<span id="energy-label" role="combobox">` whose accessible name comes from `aria-label="A"` — **the currently chosen value**. A screen-reader user hears "A, combobox" and is told nothing about what the control is for. Worse, the name changes every time the value does: choose B and the control is now called "B".
 
-The visible label "Energielabel" is a `<label for="energy-label">`, but the element it points at is a `<span>`, and a label cannot bind to a span — so the real label reaches nothing.
+The visible label "Energielabel" is a `<label for="energy-label">`, but the element it points at is a `<span>`, and a label cannot bind to a span — so the real label reaches nothing. Because the name shares no word with that label, a speech-input user who says "Energielabel" reaches nothing either (this also fails 2.5.3).
 
 Two further problems in the same widget:
 

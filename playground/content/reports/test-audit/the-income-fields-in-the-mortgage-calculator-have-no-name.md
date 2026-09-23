@@ -15,10 +15,10 @@ The labels are there on screen. **"Bruto jaarinkomen"** and its partner equivale
 The same root cause runs through the whole `aab-*` component family, in three variations:
 
 - **page-14**, here: `for` targets the wrapper `<span>`
-- **page-20**, the loan calculator: `for="term-slider-8"`, where `aab-slider` carries that id only as a JavaScript property and never writes it to the DOM
+- **page-20**, the loan calculator: the loan-term slider "Kies de gewenste looptijd" has no name. Its `<label for="term-slider-8">` binds nothing, because `aab-slider` carries that id only as a JavaScript property and never writes it to the DOM, and the `<label id="slider-label">` inside the component, which the range input points at, is empty
 - **page-31**, the extended mortgage wizard: the age field's label is `<label for="question.id">` — an **unresolved template expression** shipped to production, matching no element at all
 
-One fix in the design system clears all of them.
+In each case the label is visible but the name is empty, so speech-input users cannot reach the control by saying its label, "Bruto jaarinkomen" or "Kies de gewenste looptijd" (this also fails 2.5.3). One fix in the design system clears all of them.
 
 #### Recommendation
 

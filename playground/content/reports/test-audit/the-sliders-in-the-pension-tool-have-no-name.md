@@ -12,7 +12,7 @@ The result step of the pension tool offers **six sliders** for adjusting the cal
 
 A screen-reader user hears "slider, 69" and nothing that says 69 is an age, or "slider, 500" with no indication that it is euros. The visible text that names each slider sits outside the widget and is not associated with it. With six of them on one screen the values are indistinguishable from each other.
 
-The same step also renders **twelve** slider handles rather than six: each slider adds a second `max-slider-handle round hide` handle that is invisible but keeps `tabindex="0"`, so a keyboard user meets six focus stops that do nothing and expose no name at all.
+Each slider does have a visible label beside it ("Start pensioenuitkering", "Eenmalige inleg", "Gemiddelde inleg per maand", "Uitkeringsperiode", "Verwacht rendement", "Later starten met pensioenopbouwen"). With an empty name, that label is not part of the name either, which also fails 2.5.3 (label in name): a speech-input user who says "Eenmalige inleg" reaches nothing.
 
 #### Recommendation
 
@@ -22,4 +22,4 @@ Name each slider from the text that already labels it, and give the value a unit
          aria-valuemin="65" aria-valuemax="74" aria-valuenow="69"
          aria-valuetext="69 years"></div>
 
-Remove the unused second handle from the tab order with `tabindex="-1"` and `aria-hidden="true"`, or do not render it ([ARIA5](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA5), [ARIA16](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA16)).
+Taking the name from the visible label also satisfies label in name ([ARIA5](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA5), [ARIA16](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA16)).

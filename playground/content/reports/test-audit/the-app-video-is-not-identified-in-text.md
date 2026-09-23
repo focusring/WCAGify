@@ -15,6 +15,8 @@ Assistive technology announces it as an unlabelled media element, so a user movi
 
 The heading and introduction do sit immediately before it in the same section, which softens the effect for anyone reading the page in order — that is why this is recorded as Medium rather than High. It does not help a user who reaches the element directly.
 
+The video on the mortgage-interest page (page-15), under "Video over hypotheekrente", has no name either and shows in the tree as a bare `Video`. There the heading and the introduction naming the presenter come **after** the player in the DOM (the layout shows them to its left), so even a user reading in order meets the unnamed player before the text that identifies it.
+
 The overlay play button is named correctly ("Afspelen video") and is not part of this issue.
 
 #### Recommendation

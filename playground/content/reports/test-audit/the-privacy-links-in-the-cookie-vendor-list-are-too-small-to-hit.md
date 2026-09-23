@@ -13,7 +13,7 @@ Open the cookie settings, then the vendor list ("Leverancierslijst"). Every vend
 
 The link is not inline in a sentence, so the inline exception does not apply either. Anyone using a touch screen, a head pointer or an imprecise mouse can easily hit the neighbouring vendor's link instead, and the list holds one of these per vendor.
 
-The same component appears wherever the cookie settings can be opened, which is every page in the audit; it was confirmed on page-2, page-12, page-13, page-23, page-24, page-26, page-27, page-28, page-29 and page-30. On the English pages the same link reads "View Privacy Policy" and measures 117.5 by 18 pixels.
+The same component appears wherever the cookie settings can be opened, which is every page in the audit. It was confirmed on page-2, page-4, page-11, page-12, page-13, page-18, page-19, page-23 and page-24, and earlier on page-26 to page-30. It fails at desktop width only: at a phone width of 390 pixels the link is 36 pixels high (167.75 by 36 on page-11) and passes. On the English pages the same link reads "View Privacy Policy" and measures 117.5 by 18 pixels.
 
 #### Recommendation
 

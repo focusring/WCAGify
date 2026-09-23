@@ -14,7 +14,16 @@ The consequence is that on a fresh page load **all five buttons report `aria-exp
 
 The visible panels carry `role="tabpanel"` with no accessible name and no `tabindex`, and **no `tab` or `tablist` owns them** — the page's only `tablist` is inside the cookie panel and unrelated. The buttons themselves have no role, no `aria-selected`, and no visual selected state: with panel 1 open, all five render identically.
 
-The same component behaves the same way in the "Meer informatie" block on the travel insurance page (page-19) and the step foldouts on page-13, so this is a template, not a page.
+The same component behaves the same way wherever it is used, so this is a template, not a page:
+
+- page-9, "Meer informatie" on the privacy page;
+- page-13, the account-opening step foldouts;
+- page-15, "Hypotheekrente uitleg";
+- page-18, "Verder goed om te weten";
+- page-19, "Meer informatie" on the travel insurance page;
+- page-20, "Wanneer kun je lenen?".
+
+On page-9, page-15, page-18, page-19 and page-20 all buttons report `aria-expanded="false"` on load while the first panel is shown, and `aria-controls` names the hidden copy. On page-9 the pressed button's flag does turn `true` after Enter or Space, and a second press does not collapse it: the widget behaves as a selection, not a disclosure, and at no time does `aria-controls` point at the content on screen.
 
 #### Recommendation
 

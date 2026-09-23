@@ -20,6 +20,8 @@ The icons are decorative: the visible label beside each one already says what th
 
 This is the entry point to the service desk, the route to almost every self-service task on the site.
 
+The same habit shows on the search results page (page-5). When a search finds nothing, the illustration of a cash machine above "We konden niets vinden voor …" carries `alt="atm error"`: the file name `il-atm-error-landscape-3x2.png` with its prefix and suffix cut off. A screen reader reads "atm error", in English, before the actual message, although nothing went wrong with a cash machine. The illustration is decorative, so the fix is the same `alt=""`.
+
 #### Recommendation
 
 Mark the icons as decorative so only the label is announced:

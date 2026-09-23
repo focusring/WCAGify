@@ -23,5 +23,3 @@ Mark the link with the language of its own text:
     <a href="/nl/prive/index.html" lang="nl">Nederlands</a>
 
 See [H58](https://www.w3.org/WAI/WCAG22/Techniques/html/H58).
-
-Two related points for the same template, both found on the English build: the narrow-layout header buttons keep Dutch accessible names (`aria-label="Taal - EN"`, `aria-label="Kies Segment - Personal"`), and the Dutch pages expose `aria-label="Privé selected"` with an English word inside a Dutch name. Those names should be localised with the rest of the component.

@@ -15,7 +15,9 @@ The suggestion list highlights the matched word by wrapping it in `<b>`, and the
 
 A screen reader reads the tags out. Instead of "Hypotheek extra aflossen" the user hears something like "less-than b greater-than Hypotheek less-than slash b greater-than extra aflossen", depending on the synthesiser — six of the nine suggestions for "hypotheek" are affected on this page.
 
-The visible text is correct; only the name given to assistive technology is broken. It was confirmed on page-2, page-11, page-12 and page-26 as well, and it is the same shared search component throughout.
+The visible text is correct; only the name given to assistive technology is broken. That also fails 2.5.3: the name no longer contains the visible label as it is written, so a speech-input user who says "click Hypotheek extra aflossen" may not be matched to a control named `<b>Hypotheek</b> extra aflossen`, and a word split by a tag, as in `<b>Rek</b>ening opzeggen`, no longer exists in the name at all.
+
+It was confirmed on page-1, page-2, page-5, page-6, page-8, page-9, page-10, page-11, page-12, page-13, page-18, page-19, page-22, page-23, page-24, page-25 and page-26, and it is the same shared search component throughout.
 
 #### Recommendation
 

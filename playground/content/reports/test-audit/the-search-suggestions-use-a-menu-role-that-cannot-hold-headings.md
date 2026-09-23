@@ -12,13 +12,13 @@ Typing in the site search opens a suggestion list marked up as `<ul role="menu">
 
 The `menu` role only allows `menuitem`, `menuitemcheckbox`, `menuitemradio`, `group` and `separator` as children. A heading is not among them, so assistive technology is given a structure it cannot present: the group headings are either dropped or announced out of context, and the grouping the sighted user sees is lost.
 
-The field that opens the list also exposes no `aria-expanded`, `aria-controls` or `aria-autocomplete`, so there is nothing to tell a screen-reader user that suggestions have appeared at all.
+The field that opens the list is not exposed as a combobox either. `input#search-input-search-bar` is a plain textbox with no `role="combobox"` and no `aria-expanded`, `aria-controls`, `aria-autocomplete` or `aria-activedescendant`. Nothing tells a screen-reader user that suggestions have appeared, whether the list is open, or which suggestion is current: ArrowDown moves a visible highlight, and all the tree shows is the field's value changing under the cursor (`textbox "Zoeken naar..." : Pincode wijzigen - betaalpas`). That part also fails 4.1.2, and the same rebuild fixes it. It was checked on page-1, page-4 (the header field and the in-page one), page-7 and page-8.
 
 This is the shared header search, confirmed on page-2, page-4, page-6, page-11, page-12, page-18, page-19, page-23, page-24, page-26, page-27, page-28, page-29 and page-30.
 
 #### Recommendation
 
-Use the combobox pattern instead of `menu`, which is meant for application menus rather than autocomplete. Mark the container `role="listbox"`, the suggestions `role="option"`, and each visible group as `role="group"` with `aria-label` carrying the group name instead of an `<h5>`. Connect it to the input:
+Use the combobox pattern instead of `menu`, which is meant for application menus rather than autocomplete. Mark the container `role="listbox"`, the suggestions `role="option"`, and each visible group as `role="group"` with `aria-label` carrying the group name instead of an `<h5>`. Connect it to the input, and point `aria-activedescendant` at the highlighted option as the arrow keys move:
 
     <input role="combobox" aria-expanded="true" aria-controls="suggestions" aria-autocomplete="list">
     <ul id="suggestions" role="listbox">
