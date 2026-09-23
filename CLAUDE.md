@@ -63,3 +63,17 @@ The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends 
 - Formatter: oxfmt
 - Components use `U` prefix (Nuxt UI)
 - Both packages use tsdown for building (ESM, dts generation)
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as local markdown files under `.scratch/<feature-slug>/` (spec plus one file per ticket). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` at the repo root plus ADRs in `docs/adr/`. See `docs/agents/domain.md`.
