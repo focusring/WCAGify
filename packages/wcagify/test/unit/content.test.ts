@@ -27,6 +27,15 @@ describe('defineWcagifyCollections', () => {
     expect(source.exclude).toContain('reports/**/index.md')
   })
 
+  it.each(['reports', 'issues', 'navigation'] as const)(
+    '%s collection excludes evaluator notes folders',
+    (name) => {
+      const collection = defineWcagifyCollections()[name]
+      const source = collection.source as unknown as { exclude?: string[] }
+      expect(source.exclude).toEqual(expect.arrayContaining(['**/.notes', '**/.notes/**']))
+    }
+  )
+
   it('reports collection has page type', () => {
     const { reports } = defineWcagifyCollections()
     expect(reports.type).toBe('page')

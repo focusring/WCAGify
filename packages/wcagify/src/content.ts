@@ -2,12 +2,17 @@ import { defineCollection } from '@nuxt/content'
 import { z } from 'zod'
 import { reportSchema, issueSchema } from './schemas'
 
+// Nuxt Content's dev watcher opens every file under a source's base folder, included or not.
+// Excluding the audit notes from each source keeps a large audit from exhausting file handles.
+const evaluatorNotes = ['**/.notes', '**/.notes/**']
+
 function defineWcagifyCollections() {
   return {
     reports: defineCollection({
       type: 'page' as const,
       source: {
         include: 'reports/**/index.md',
+        exclude: evaluatorNotes,
         prefix: '/reports'
       },
       schema: reportSchema
@@ -16,7 +21,7 @@ function defineWcagifyCollections() {
       type: 'page' as const,
       source: {
         include: 'reports/**/*.md',
-        exclude: ['reports/**/index.md', 'reports/**/.notes/**'],
+        exclude: ['reports/**/index.md', ...evaluatorNotes],
         prefix: '/reports'
       },
       schema: issueSchema
@@ -24,7 +29,8 @@ function defineWcagifyCollections() {
     navigation: defineCollection({
       type: 'data' as const,
       source: {
-        include: '**/.navigation.yml'
+        include: '**/.navigation.yml',
+        exclude: evaluatorNotes
       },
       schema: z.object({
         title: z.string().optional(),
