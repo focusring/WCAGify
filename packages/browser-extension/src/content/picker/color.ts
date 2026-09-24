@@ -22,7 +22,18 @@ function getFillingDescendantBgLayer(el: Element): Rgba | null {
   })
 }
 
-// The element's own background, or for a transparent wrapper the descendant that paints its surface.
+// The element's own ::before/::after fill, when the pseudo generates a box (content !== 'none'). Mirrors getBorderColors's pseudo check: design systems that paint a "state layer" (Material 3 filled buttons: own background-color is transparent, the fill is on :after) put the surface color here instead.
+function getPseudoBgLayer(el: Element): Rgba | null {
+  for (const pseudo of ['::before', '::after'] as const) {
+    const pseudoStyle = getComputedStyle(el, pseudo)
+    if (pseudoStyle.content === 'none') continue
+    const layer = tryParseColor(pseudoStyle.backgroundColor)
+    if (layer && layer.a > 0) return layer
+  }
+  return null
+}
+
+// The element's own background, or for a transparent wrapper the descendant/pseudo-element that paints its surface.
 // CSS-mask icons and background-clip:text return '' their background paints the icon/text, not a surface (clip:text gradients go to getElementGradient).
 export function getElementOwnColor(
   el: Element,
@@ -32,6 +43,7 @@ export function getElementOwnColor(
   if (hasTextClip(style)) return ''
   let layer = tryParseColor(style.backgroundColor)
   if (!layer || layer.a === 0) layer = getFillingDescendantBgLayer(el)
+  if (!layer || layer.a === 0) layer = getPseudoBgLayer(el)
   if (!layer || layer.a === 0) return ''
   return formatLayer(layer)
 }
