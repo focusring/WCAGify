@@ -17,8 +17,6 @@
     "docs:dev": "pnpm --filter @wcagify/docs dev",
     "test": "pnpm -r --filter @focusring/wcagify --filter create-wcagify --filter @wcagify/browser-extension run test",
     "test:e2e": "vitest run --config test/e2e/vitest.config.ts",
-    "test:robot": "test/robot/scripts/run.sh",
-    "test:robot:setup": "test/robot/scripts/setup.sh",
     "test:coverage": "pnpm -r --filter @focusring/wcagify --filter create-wcagify run test:coverage",
     "ext:dev": "pnpm --filter @wcagify/browser-extension dev",
     "ext:build": "pnpm --filter @wcagify/browser-extension build",

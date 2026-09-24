@@ -1,6 +1,0 @@
-# Robot Framework e2e suite for WCAGify
-# Pinned to latest versions available on PyPI as of 2026-04-25.
-# Install:  pip install -r test/robot/requirements.txt
-# Then:     rfbrowser init   # downloads Playwright browsers used by Browser library
-robotframework==7.4.2
-robotframework-browser==19.14.2

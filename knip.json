@@ -4,13 +4,7 @@
     ".": {
       "entry": ["skills/*/scripts/*.{js,mjs}", "skills/*/scripts/probes/*.js"],
       "ignoreDependencies": ["changelogen", "lint-staged"],
-      "ignoreBinaries": [
-        "taskkill",
-        "test/robot/scripts/run.sh",
-        "test/robot/scripts/setup.sh",
-        "agent-browser",
-        "ffmpeg"
-      ]
+      "ignoreBinaries": ["taskkill", "agent-browser", "ffmpeg"]
     },
     "packages/wcagify": {
       "entry": [

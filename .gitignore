@@ -12,9 +12,6 @@ node_modules
 # Tests
 coverage
 *.tgz
-test/robot/.user-data
-test/robot/results
-test/robot/.venv
 
 # Logs
 logs
