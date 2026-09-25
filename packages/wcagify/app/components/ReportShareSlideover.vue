@@ -45,6 +45,16 @@ const password = ref('')
 const copiedToken = ref<string | undefined>()
 const shareError = ref(false)
 
+/**
+ * The date picker gives a calendar date in the viewer's time zone; the link
+ * stays valid until the end of that day there, not until midnight UTC.
+ */
+function endOfLocalDay(date: string): string | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date || undefined
+  const [year, month, day] = date.split('-').map(Number)
+  return new Date(year!, month! - 1, day!, 23, 59, 59, 999).toISOString()
+}
+
 async function createShareLink() {
   shareError.value = false
   try {
@@ -52,7 +62,7 @@ async function createShareLink() {
       method: 'POST',
       body: {
         reportSlug: props.reportSlug,
-        expiresAt: expiresAt.value || undefined,
+        expiresAt: endOfLocalDay(expiresAt.value),
         password: password.value || undefined
       }
     })

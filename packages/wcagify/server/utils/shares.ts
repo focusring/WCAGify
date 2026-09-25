@@ -157,7 +157,7 @@ function verifySharePassword(share: ShareRow, password: string): boolean {
 async function listSharesByReport(reportSlug: string): Promise<Share[]> {
   const conn = await getDb()
   const rows = await conn.all<ShareRow>(
-    "SELECT * FROM shares WHERE report_slug = ? AND (expires_at IS NULL OR expires_at > datetime('now')) ORDER BY created_at DESC",
+    "SELECT * FROM shares WHERE report_slug = ? AND (expires_at IS NULL OR julianday(expires_at) > julianday('now')) ORDER BY created_at DESC",
     [reportSlug]
   )
   return rows.map(toPublicShare)
