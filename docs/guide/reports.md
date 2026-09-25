@@ -127,6 +127,11 @@ A link to an issue, such as `/reports/example#issue-reports-example-focus-style-
 that issue and scrolls it into view. The id is `issue-` followed by the issue's content path with
 the slashes replaced by hyphens. The same ids work on share links.
 
+Add `?lang=nl` or `?lang=en` to force the interface language of that page. An embedding site
+with its own language switch needs this, since browsers drop the locale cookie inside an iframe.
+The report content itself is written in one language; keep one report per language when both are
+needed.
+
 ## EARL Export
 
 Reports can also be downloaded as machine-readable EARL (JSON-LD), the format recommended by
