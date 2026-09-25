@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const { t } = useI18n()
+// The header and footer are interface text, so they carry the interface language:
+// on a report page the document language is the report's own.
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
 
 const route = useRoute()
@@ -7,7 +9,7 @@ const isSettingsPage = computed(() => route.path === localePath('/settings'))
 </script>
 
 <template>
-  <UHeader :toggle="false">
+  <UHeader :toggle="false" :lang="locale">
     <template #left>
       <NuxtLinkLocale class="h-9" to="/">
         <AppLogo />
@@ -34,7 +36,7 @@ const isSettingsPage = computed(() => route.path === localePath('/settings'))
 
   <USeparator aria-hidden="true" />
 
-  <UFooter>
+  <UFooter :lang="locale">
     <template #left>
       <p class="text-sm text-toned">WCAGify &copy; {{ new Date().getFullYear() }}</p>
     </template>

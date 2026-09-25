@@ -17,6 +17,7 @@ catalog:
   '@types/jsonld': ^1.5.15
   jsonld: ^9.0.0
   nanoid: ^6.0.0
+  pdf-lib: ^1.17.1
   sharp: ^0.35.3
   yaml: ^2.9.0
   zod: ^4.4.3
@@ -42,6 +43,7 @@ catalogs:
     '@vueuse/core': ^14.4.0
     nuxt: ^4.4.8
     nuxt-studio: ^1.7.0
+    reka-ui: ^2.10.1
     tailwindcss: ^4.3.3
     zod: ^4.4.3
   dev:

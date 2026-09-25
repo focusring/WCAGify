@@ -4,7 +4,7 @@ import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
 definePageMeta({ layout: 'shared' })
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale, locales } = useI18n()
 const token = route.params.token as string
 
 const password = ref('')
@@ -18,7 +18,11 @@ const { data, error, refresh } = await useAsyncData(`share-${token}`, () =>
 
 if (error.value) {
   if (error.value.statusCode === 404) {
-    throw createError({ statusCode: 404, statusMessage: t('share.notFound') })
+    throw createError({
+      statusCode: 404,
+      statusMessage: t('share.notFound'),
+      data: { messageKey: 'share.notFound' }
+    })
   }
   if (error.value.statusCode !== 401) {
     throw createError({
@@ -48,9 +52,33 @@ if (report.value) {
   authenticated.value = true
 }
 
+// Once shown, the report is the main content, so the document language is its own.
+// The password prompt stays in the interface language.
+const interfaceHead = useLocaleHead()
+const documentLanguage = computed(() => {
+  const code = report.value?.language
+  if (!code) return interfaceHead.value.htmlAttrs?.lang
+  return locales.value.find((entry) => entry.code === code)?.language ?? code
+})
+
+useHead({ htmlAttrs: { lang: documentLanguage } })
+
+// The report title is not known before unlocking, so the prompt gets its own title.
 useSeoMeta({
-  title: () => (report.value ? `${report.value.title} - WCAGify` : 'WCAGify'),
+  title: () => {
+    if (report.value) return `${report.value.title} - WCAGify`
+    if (passwordRequired.value && !authenticated.value) {
+      return `${t('share.passwordRequired')} - WCAGify`
+    }
+    return 'WCAGify'
+  },
   robots: 'noindex, nofollow'
+})
+
+const passwordErrorMessage = computed(() => {
+  if (passwordError.value) return t('share.passwordIncorrect')
+  if (submitError.value) return t('share.error')
+  return ''
 })
 
 async function submitPassword() {
@@ -75,7 +103,7 @@ async function submitPassword() {
   }
 }
 
-const { downloading, download } = useReportDownload()
+const { status: downloadStatus, download, buttonProps: downloadButtonProps } = useReportDownload()
 const reportTitle = computed(() => report.value?.title ?? 'report')
 
 function downloadPdf() {
@@ -105,15 +133,13 @@ function downloadEarl() {
         type="password"
         :placeholder="t('share.password')"
         :aria-label="t('share.password')"
-        :aria-describedby="passwordError ? 'password-error' : undefined"
+        :aria-describedby="passwordErrorMessage ? 'password-error' : undefined"
         autofocus
         required
       />
-      <p v-if="passwordError" id="password-error" role="alert" class="text-sm text-error">
-        {{ t('share.passwordIncorrect') }}
-      </p>
-      <p v-if="submitError" role="alert" class="text-sm text-error">
-        {{ t('share.error') }}
+      <!-- Always rendered so the live region exists before an error is written into it. -->
+      <p id="password-error" role="alert" class="text-sm text-error">
+        {{ passwordErrorMessage }}
       </p>
       <UButton type="submit" :label="t('share.unlock')" block />
     </form>
@@ -121,21 +147,23 @@ function downloadEarl() {
 
   <ReportContent v-else-if="report" :report="report" :issues="issues">
     <template #actions>
-      <UButton
-        :label="t('report.downloadEarl')"
-        icon="i-lucide-file-json"
-        variant="outline"
-        :loading="downloading === 'earl'"
-        :disabled="!!downloading && downloading !== 'earl'"
-        @click="downloadEarl"
-      />
-      <UButton
-        :label="t('report.downloadPdf')"
-        icon="i-lucide-download"
-        :loading="downloading === 'pdf'"
-        :disabled="!!downloading && downloading !== 'pdf'"
-        @click="downloadPdf"
-      />
+      <!-- Interface controls inside the report, which carries the report's language. -->
+      <div class="w-full min-w-0" :lang="locale">
+        <div class="flex flex-wrap justify-end gap-2">
+          <UButton
+            :label="t('report.downloadEarl')"
+            variant="outline"
+            v-bind="downloadButtonProps('earl', 'i-lucide-file-json')"
+            @click="downloadEarl"
+          />
+          <UButton
+            :label="t('report.downloadPdf')"
+            v-bind="downloadButtonProps('pdf', 'i-lucide-download')"
+            @click="downloadPdf"
+          />
+        </div>
+        <p role="status" class="sr-only">{{ downloadStatus }}</p>
+      </div>
     </template>
   </ReportContent>
 </template>

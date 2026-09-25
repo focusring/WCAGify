@@ -1,6 +1,7 @@
 <template>
   <UIcon name="i-logo:wcagify" class="shrink-0 w-28 h-9 text-black dark:text-white" />
-  <span class="visually-hidden">Home</span>
+  <!-- The visible wordmark comes first in the name so "click WCAGify" reaches the link. -->
+  <span class="visually-hidden">{{ $t('app.homeLink') }}</span>
 </template>
 
 <style scoped>

@@ -15,11 +15,14 @@ onMounted(async () => {
   }
 })
 
+// Getters keep `<html lang>` in step with an interface language switched without a reload.
+// Report pages override `lang` with the report's own language.
 useHead({
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
-  link: [{ rel: 'icon', href: '/favicon.ico' }, ...(head.value.link || [])],
+  link: () => [{ rel: 'icon', href: '/favicon.ico' }, ...(head.value.link || [])],
   htmlAttrs: {
-    ...head.value.htmlAttrs
+    lang: () => head.value.htmlAttrs?.lang,
+    dir: () => head.value.htmlAttrs?.dir
   }
 })
 

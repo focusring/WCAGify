@@ -6,9 +6,14 @@ interface NavItem {
   children?: NavItem[]
 }
 
-const props = defineProps<{
-  visiblePrinciples?: Set<string>
-}>()
+const props = withDefaults(
+  defineProps<{
+    visiblePrinciples?: Set<string>
+    /** Hide the visible heading; the nav landmark keeps its aria-label. */
+    heading?: boolean
+  }>(),
+  { heading: true }
+)
 
 const { t } = useI18n()
 
@@ -73,7 +78,7 @@ const navigation = computed<NavItem[]>(() => [
     class="px-2 py-3 rounded-lg border border-accented"
     :aria-label="$t('report.navigationTitle')"
   >
-    <h2 class="mb-3 px-2">
+    <h2 v-if="props.heading" class="mb-3 px-2">
       {{ $t('report.navigationTitle') }}
     </h2>
     <ul class="space-y-1">

@@ -2,13 +2,21 @@ export default {
   app: {
     title: 'WCAGify',
     description: 'WCAG-toegankelijkheidsrapportagetool',
+    homeLink: 'WCAGify startpagina',
     reports: 'Rapporten',
     noReports: 'Geen rapporten gevonden',
     gridView: 'Rasterweergave',
     tableView: 'Tabelweergave',
-    columns: 'Kolommen'
+    columns: 'Kolommen',
+    searchResults: 'Geen rapporten gevonden | {n} rapport gevonden | {n} rapporten gevonden',
+    sortBy: 'Sorteren op: {field}, {direction}',
+    sortedBy: '{field}, {direction} gesorteerd',
+    sortState: '{field}, {direction}',
+    ascending: 'oplopend',
+    descending: 'aflopend'
   },
   report: {
+    notFound: 'Rapport niet gevonden',
     accessibilityConformanceReportFor: 'Toegankelijkheidsrapport voor {title}',
     title: 'Titel',
     evaluatedBy: 'Beoordeeld door',
@@ -67,6 +75,11 @@ export default {
     url: 'URL',
     description: 'Beschrijving',
     externalLink: 'Externe link',
+    opensInNewTab: 'opent in een nieuw tabblad',
+    showResults: 'Toon resultaten',
+    enlargeImage: 'Afbeelding vergroten',
+    enlargeImageNamed: 'Afbeelding vergroten: {alt}',
+    enlargedImage: 'Vergrote afbeelding',
     principles: {
       perceivable: 'Waarneembaar',
       operable: 'Bedienbaar',
@@ -111,6 +124,18 @@ export default {
     },
     downloadPdf: 'Download PDF',
     downloadEarl: 'Download EARL',
+    downloadStatus: {
+      pdf: {
+        generating: 'PDF wordt gegenereerd…',
+        done: 'PDF gedownload',
+        error: 'De PDF kon niet worden gegenereerd. Probeer het opnieuw.'
+      },
+      earl: {
+        generating: 'EARL-bestand wordt gegenereerd…',
+        done: 'EARL-bestand gedownload',
+        error: 'Het EARL-bestand kon niet worden gegenereerd. Probeer het opnieuw.'
+      }
+    },
     searchReports: 'Zoek rapporten...'
   },
   import: {
@@ -127,6 +152,8 @@ export default {
     slug: 'Rapport-slug',
     slugHelp: 'Mapnaam onder content/reports. Kleine letters, cijfers en koppeltekens.',
     slugInvalid: 'Gebruik alleen kleine letters, cijfers en koppeltekens.',
+    slugRequired: 'Vul een rapport-slug in om te importeren.',
+    required: 'verplicht',
     mergeInto: 'Bestaand rapport',
     cancel: 'Annuleren',
     import: 'Importeren',
@@ -165,7 +192,13 @@ export default {
     adminLogin: 'Authenticeren',
     adminError: 'Ongeldig beheerdersgeheim. Probeer het opnieuw.',
     error: 'Er is iets misgegaan. Probeer het opnieuw.',
-    required: 'verplicht'
+    required: 'verplicht',
+    linkField: 'Deellink, aangemaakt op {date}',
+    linkCopied: 'Link gekopieerd',
+    deleteConfirmTitle: 'Deellink verwijderen?',
+    deleteConfirmText:
+      'De link die op {date} is aangemaakt, werkt daarna voor niemand meer. Dit kan niet ongedaan worden gemaakt.',
+    cancel: 'Annuleren'
   },
   admin: {
     loginTitle: 'Inloggen',
@@ -186,6 +219,32 @@ export default {
     backgroundShade: 'Achtergrondtint',
     generalSection: 'Algemeen',
     language: 'Taal',
-    back: 'terug'
+    back: 'terug',
+    colors: {
+      green: 'groen',
+      blue: 'blauw',
+      red: 'rood',
+      orange: 'oranje',
+      teal: 'turquoise',
+      indigo: 'indigo',
+      violet: 'violet',
+      slate: 'leigrijs',
+      gray: 'grijs',
+      zinc: 'zink',
+      neutral: 'neutraal',
+      stone: 'steengrijs'
+    }
+  },
+  codeBlock: {
+    copied: 'Code gekopieerd',
+    copiedLabel: 'Gekopieerd'
+  },
+  error: {
+    statusCode: 'Fout {code}',
+    notFound: 'Pagina niet gevonden',
+    notFoundDescription: 'Het adres klopt niet of de pagina bestaat niet meer.',
+    generic: 'Er is iets misgegaan',
+    genericDescription: 'Probeer het later opnieuw.',
+    goHome: 'Terug naar de startpagina'
   }
 }

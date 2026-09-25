@@ -7,7 +7,8 @@ defineProps<{
 </script>
 
 <template>
-  <div class="space-y-6">
+  <!-- Long unbreakable scope entries (URLs, tool names) wrap instead of widening the page at 320px. -->
+  <div class="space-y-6 [overflow-wrap:anywhere]">
     <div v-if="report.evaluation.target">
       <h3>
         {{ $t('report.evaluatedProduct') }}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
 import type { ReportsCollectionItem } from '@nuxt/content'
 import { h, resolveComponent } from 'vue'
 
@@ -49,6 +49,66 @@ function getSortDirection(field: SortField): false | 'asc' | 'desc' {
   if (sortField.value !== field) return false
   return sortDesc.value ? 'desc' : 'asc'
 }
+
+const sortFieldLabels = computed<Record<SortField, string>>(() => ({
+  title: t('report.title'),
+  evaluation_date: t('report.date')
+}))
+
+function sortDirectionLabel(direction: 'asc' | 'desc') {
+  return direction === 'desc' ? t('app.descending') : t('app.ascending')
+}
+
+/** Name of the icon-only sort button in the grid view, including the current order. */
+const sortButtonLabel = computed(() =>
+  t('app.sortBy', {
+    field: sortFieldLabels.value[sortField.value],
+    direction: sortDirectionLabel(sortDesc.value ? 'desc' : 'asc')
+  })
+)
+
+/** Grid sort menu: one checked item per sort, with the direction in its name. */
+const sortMenuItems = computed<DropdownMenuItem[]>(() =>
+  (['title', 'evaluation_date'] as SortField[]).map((field) => {
+    const direction = getSortDirection(field)
+    const label = sortFieldLabels.value[field]
+    return {
+      label: direction
+        ? t('app.sortState', { field: label, direction: sortDirectionLabel(direction) })
+        : label,
+      icon: sortIcon(direction),
+      type: 'checkbox' as const,
+      checked: direction !== false,
+      onUpdateChecked: () => toggleSort(field)
+    }
+  })
+)
+
+/**
+ * UTable renders the header cells itself and only accepts classes and styles for
+ * them, so `aria-sort` is written onto the rendered <th> elements after each change.
+ */
+function syncAriaSort() {
+  const headers = table.value?.tableApi?.getHeaderGroups()[0]?.headers ?? []
+  const cells = table.value?.tableRef?.querySelectorAll<HTMLElement>('thead th') ?? []
+  headers.forEach((header, index) => {
+    const cell = cells[index]
+    if (!cell) return
+    const sorted = header.column.getIsSorted()
+    if (sorted) {
+      cell.setAttribute('aria-sort', sorted === 'desc' ? 'descending' : 'ascending')
+    } else {
+      cell.removeAttribute('aria-sort')
+    }
+  })
+}
+
+onMounted(syncAriaSort)
+watch([sortField, sortDesc, view], () => nextTick(syncAriaSort))
+
+/** Result announcement for the status region; written shortly after typing stops. */
+const searchStatus = ref('')
+let searchStatusTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 interface FieldConfig {
   id: string
@@ -117,6 +177,18 @@ const filteredAndSortedReports = computed(() => {
   })
 })
 
+watch([search, () => filteredAndSortedReports.value.length], ([query, count]) => {
+  clearTimeout(searchStatusTimer)
+  if (!query) {
+    searchStatus.value = ''
+    return
+  }
+  searchStatusTimer = setTimeout(() => {
+    searchStatus.value = t('app.searchResults', count)
+  }, 400)
+})
+onBeforeUnmount(() => clearTimeout(searchStatusTimer))
+
 function sortIcon(isSorted: false | 'asc' | 'desc') {
   if (isSorted === 'asc') return 'i-lucide-arrow-up-narrow-wide'
   if (isSorted === 'desc') return 'i-lucide-arrow-down-wide-narrow'
@@ -141,6 +213,9 @@ const columns = computed<TableColumn<ReportsCollectionItem>[]>(() => [
         color: 'neutral',
         variant: 'ghost',
         label: t('report.title'),
+        'aria-label': isSorted
+          ? t('app.sortedBy', { field: t('report.title'), direction: sortDirectionLabel(isSorted) })
+          : undefined,
         icon: sortIcon(isSorted),
         class: '-mx-2.5',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
@@ -163,6 +238,9 @@ const columns = computed<TableColumn<ReportsCollectionItem>[]>(() => [
         color: 'neutral',
         variant: 'ghost',
         label: t('report.date'),
+        'aria-label': isSorted
+          ? t('app.sortedBy', { field: t('report.date'), direction: sortDirectionLabel(isSorted) })
+          : undefined,
         icon: sortIcon(isSorted),
         class: '-mx-2.5',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
@@ -213,22 +291,25 @@ const columnLabels = computed<Record<string, string>>(() => ({
 
     <template v-if="reports?.length">
       <div class="mt-6 rounded-lg border border-accented divide-y divide-accented">
-        <div class="flex items-center gap-2 px-4 py-3.5">
+        <div class="flex flex-wrap items-center gap-2 px-4 py-3.5">
           <UInput
             v-model="search"
             :placeholder="t('report.searchReports')"
             icon="i-lucide-search"
             variant="subtle"
-            class="max-w-sm"
+            class="w-full sm:w-auto sm:max-w-sm"
             :ui="{
-              base: '[&::placeholder]:text-toned py-2 pe-8 text-sm ring-neutral-500/75 hover:bg-accented/75',
+              base: '[&::placeholder]:text-toned py-2 text-sm ring-neutral-500 hover:bg-accented/75',
               leadingIcon: 'text-toned'
             }"
           />
+          <!-- Present from load so the search result can be announced when it changes. -->
+          <p role="status" class="sr-only">{{ searchStatus }}</p>
 
           <div class="ml-auto flex items-center gap-1">
             <UDropdownMenu
               v-if="view === 'grid'"
+              :modal="false"
               :items="
                 fields
                   .filter((f) => f.hideable)
@@ -258,6 +339,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
 
             <UDropdownMenu
               v-if="view === 'table'"
+              :modal="false"
               :items="
                 table?.tableApi
                   ?.getAllColumns()
@@ -268,6 +350,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
                     checked: column.getIsVisible(),
                     onUpdateChecked(checked: boolean) {
                       column.toggleVisibility(checked)
+                      nextTick(syncAriaSort)
                     },
                     onSelect(e: Event) {
                       e.preventDefault()
@@ -288,18 +371,8 @@ const columnLabels = computed<Record<string, string>>(() => ({
 
             <UDropdownMenu
               v-if="view === 'grid'"
-              :items="
-                (
-                  [
-                    { field: 'title' as SortField, label: t('report.title') },
-                    { field: 'evaluation_date' as SortField, label: t('report.date') }
-                  ] as const
-                ).map((item) => ({
-                  label: item.label,
-                  icon: sortIcon(getSortDirection(item.field)),
-                  onClick: () => toggleSort(item.field)
-                }))
-              "
+              :modal="false"
+              :items="sortMenuItems"
               :content="{ align: 'end' as const }"
             >
               <UButton
@@ -308,6 +381,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
                 variant="subtle"
                 size="lg"
                 square
+                :aria-label="sortButtonLabel"
               />
             </UDropdownMenu>
 
@@ -344,6 +418,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
               <h2 class="text-base! group-hover:text-primary-700! dark:group-hover:text-primary!">
                 <NuxtLinkLocale
                   :to="report.path"
+                  :lang="report.language"
                   class="hover:underline text-inherit! before:absolute before:inset-0 focus-visible:outline-none! focus-visible:shadow-none!"
                 >
                   {{ report.title }}
@@ -387,6 +462,7 @@ const columnLabels = computed<Record<string, string>>(() => ({
           <template #title-cell="{ row }">
             <NuxtLinkLocale
               :to="row.original.path"
+              :lang="row.original.language"
               class="font-medium text-primary hover:underline flex items-center gap-1"
             >
               <UIcon name="i-lucide-notepad-text" class="size-4!" />

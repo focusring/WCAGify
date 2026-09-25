@@ -9,6 +9,7 @@ export default defineConfig({
     'src/module.ts',
     'src/config.ts',
     'src/content.ts',
+    'src/remark-code-lang.ts',
     'src/cli/new-report.ts',
     'src/cli/import-earl.ts'
   ],

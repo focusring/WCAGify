@@ -12,22 +12,32 @@ const emit = defineEmits<{
   toggle: []
 }>()
 
+/*
+ * Explicit shades rather than the `--ui-*` tokens: the tiles use black text,
+ * and the tokens are tuned for white text (light-mode `--ui-error` is red-700,
+ * 3.27:1 against black). 500 in light and 400 in dark keep the tiles readable
+ * for every configured palette.
+ */
 const config: Record<Status, { icon: string; class: string }> = {
-  passed: { icon: 'i-lucide:check', class: 'bg-success' },
-  failed: { icon: 'i-lucide:x', class: 'bg-error' },
+  passed: { icon: 'i-lucide:check', class: 'bg-success-500 dark:bg-success-400' },
+  failed: { icon: 'i-lucide:x', class: 'bg-error-500 dark:bg-error-400' },
   'not-present': {
     icon: 'i-lucide:book-dashed',
-    class: 'bg-info'
+    class: 'bg-info-500 dark:bg-info-400'
   }
 }
 </script>
 
 <template>
+  <!--
+    A "show only this status" toggle: pressed while the list is filtered to
+    this status, not pressed while every status is shown. The name comes from
+    the visible content in visual order ("15 Passed").
+  -->
   <button
-    role="switch"
-    :aria-checked="active"
-    :aria-label="$t(`report.scStatus.${status}`) + ': ' + count"
-    class="flex flex-col items-center p-2.5 md:max-w-34 w-full rounded-lg text-black font-semibold cursor-pointer transition-all"
+    type="button"
+    :aria-pressed="filtering && active"
+    class="flex flex-col items-center p-2.5 md:max-w-34 w-full rounded-lg border-2 border-current text-black font-semibold cursor-pointer transition-all"
     :class="[
       config[status].class,
       active && filtering

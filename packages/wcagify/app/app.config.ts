@@ -23,7 +23,8 @@ export default defineAppConfig({
         {
           color: 'primary',
           variant: 'link',
-          class: 'p-0 hover:underline text-primary-800 dark:text-primary-400'
+          class:
+            'p-0 hover:underline text-primary-800 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-400'
         },
         {
           color: 'neutral',

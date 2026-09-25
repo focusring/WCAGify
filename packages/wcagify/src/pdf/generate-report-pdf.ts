@@ -1,4 +1,5 @@
 import { prepareForPdf } from './html-processor'
+import { fixTableHeaders } from './struct-tree'
 import { generatePdf } from './weasyprint-client'
 
 type LocalFetch = (url: string, init?: RequestInit) => Promise<Response>
@@ -21,5 +22,6 @@ export async function generateReportPdf(options: ReportPdfOptions): Promise<Uint
   const ssrHtml = await pageResponse.text()
   const html = await prepareForPdf(ssrHtml, options.baseUrl)
 
-  return generatePdf(html, options.filename, options.weasyprintUrl)
+  const pdf = await generatePdf(html, options.filename, options.weasyprintUrl)
+  return fixTableHeaders(pdf)
 }

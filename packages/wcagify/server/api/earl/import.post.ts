@@ -64,6 +64,7 @@ export default defineEventHandler(async (event) => {
     slug,
     mode,
     title: imported.report.title,
+    language: imported.report.language,
     wcagVersion: imported.report.evaluation.targetWcagVersion,
     targetLevel: imported.report.evaluation.targetLevel,
     samples: imported.report.sample.length,

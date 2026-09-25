@@ -7,9 +7,19 @@ a:not([class]) {
   text-decoration: underline;
 }
 
+/* Reserve the sticky header's height when the browser scrolls a focused
+ * element into view (WCAG 2.4.11), so Shift+Tab never lands behind it. */
+html {
+  scroll-padding-top: calc(var(--ui-header-height, 4rem) + 1rem);
+}
+
 .prose {
+  /* Links in running text must not rely on colour alone (WCAG 1.4.1). The
+   * underline replaces Nuxt UI's hover-only bottom border. */
   a {
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    border-bottom-width: 0;
   }
 
   :is(h1, h2, h3, h4, h5, h6) {
@@ -18,6 +28,7 @@ a:not([class]) {
     margin-bottom: 0.25rem;
 
     a {
+      text-decoration: none;
       pointer-events: none;
       cursor: text;
 
@@ -43,11 +54,31 @@ a:not([class]) {
   --ui-text-highlighted: var(--color-slate-950);
   --focus-gap-color: black;
   --ui-radius: 0.125rem;
+
+  /* Contrast overrides for the light theme (WCAG 1.4.3 / 1.4.11). Nuxt UI maps
+   * these to the 500 / 400 / 300 shades, which are too light on white for any
+   * of the configurable accents: e.g. green-500 #00c16a is 2.38:1, red-500
+   * #fb2c36 is 3.81:1, slate-300 #cad5e2 is 1.49:1. The 700 shade of every
+   * accent is >= 4.65:1 on white and on the elevated backgrounds; neutral-500
+   * is >= 4.3:1 as an outline and neutral-600 >= 6.9:1 as placeholder text. */
+  --ui-primary: var(--ui-color-primary-700);
+  --ui-error: var(--ui-color-error-700);
+  --ui-text-dimmed: var(--ui-color-neutral-600);
+  --ui-border-accented: var(--ui-color-neutral-500);
 }
 
 .dark {
   --ui-text-highlighted: white;
   --focus-gap-color: white;
+
+  /* Nuxt UI sets the dark values inside `@layer theme`, so the unlayered
+   * `:root` overrides above would win here too; restore the 400 shades. */
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-error: var(--ui-color-error-400);
+  /* neutral-500 is 3.7:1 on the neutral-900 page and 3.1:1 on the elevated
+   * neutral-800 surface; neutral-400 is >= 5.5:1 as placeholder text. */
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-border-accented: var(--ui-color-neutral-500);
 }
 
 h2 {
@@ -60,16 +91,6 @@ h3 {
 
 .label-title {
   @apply font-medium tracking-wide text-toned;
-}
-
-button[role='switch'] {
-  border: 2px solid currentColor !important;
-}
-
-button[role='switch'] [data-slot='thumb'] {
-  width: 16px !important;
-  height: 16px !important;
-  background-color: black !important;
 }
 
 @theme static {

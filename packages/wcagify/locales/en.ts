@@ -2,13 +2,21 @@ export default {
   app: {
     title: 'WCAGify',
     description: 'WCAG accessibility reporting tool',
+    homeLink: 'WCAGify home',
     reports: 'Reports',
     noReports: 'No reports found',
     gridView: 'Grid view',
     tableView: 'Table view',
-    columns: 'Columns'
+    columns: 'Columns',
+    searchResults: 'No reports found | {n} report found | {n} reports found',
+    sortBy: 'Sort by: {field}, {direction}',
+    sortedBy: '{field}, sorted {direction}',
+    sortState: '{field}, {direction}',
+    ascending: 'ascending',
+    descending: 'descending'
   },
   report: {
+    notFound: 'Report not found',
     accessibilityConformanceReportFor: 'Accessibility Conformance Report for {title}',
     title: 'Title',
     evaluatedBy: 'Evaluated by',
@@ -66,6 +74,11 @@ export default {
     url: 'URL',
     description: 'Description',
     externalLink: 'External link',
+    opensInNewTab: 'opens in a new tab',
+    showResults: 'Show results',
+    enlargeImage: 'Enlarge image',
+    enlargeImageNamed: 'Enlarge image: {alt}',
+    enlargedImage: 'Enlarged image',
     principles: {
       perceivable: 'Perceivable',
       operable: 'Operable',
@@ -108,6 +121,18 @@ export default {
     },
     downloadPdf: 'Download PDF',
     downloadEarl: 'Download EARL',
+    downloadStatus: {
+      pdf: {
+        generating: 'Generating PDF…',
+        done: 'PDF downloaded',
+        error: 'The PDF could not be generated. Please try again.'
+      },
+      earl: {
+        generating: 'Generating EARL file…',
+        done: 'EARL file downloaded',
+        error: 'The EARL file could not be generated. Please try again.'
+      }
+    },
     searchReports: 'Search reports...'
   },
   import: {
@@ -123,6 +148,8 @@ export default {
     slug: 'Report slug',
     slugHelp: 'Directory name under content/reports. Lowercase letters, numbers and hyphens.',
     slugInvalid: 'Use only lowercase letters, numbers and hyphens.',
+    slugRequired: 'Enter a report slug to import.',
+    required: 'required',
     mergeInto: 'Existing report',
     cancel: 'Cancel',
     import: 'Import',
@@ -161,7 +188,13 @@ export default {
     adminLogin: 'Authenticate',
     adminError: 'Invalid admin secret. Please try again.',
     error: 'Something went wrong. Please try again.',
-    required: 'required'
+    required: 'required',
+    linkField: 'Share link, created {date}',
+    linkCopied: 'Link copied',
+    deleteConfirmTitle: 'Delete share link?',
+    deleteConfirmText:
+      'The link created on {date} will stop working for everyone who has it. This cannot be undone.',
+    cancel: 'Cancel'
   },
   admin: {
     loginTitle: 'Sign in',
@@ -182,6 +215,32 @@ export default {
     backgroundShade: 'Background shade',
     generalSection: 'General',
     language: 'Language',
-    back: 'return'
+    back: 'return',
+    colors: {
+      green: 'green',
+      blue: 'blue',
+      red: 'red',
+      orange: 'orange',
+      teal: 'teal',
+      indigo: 'indigo',
+      violet: 'violet',
+      slate: 'slate',
+      gray: 'gray',
+      zinc: 'zinc',
+      neutral: 'neutral',
+      stone: 'stone'
+    }
+  },
+  codeBlock: {
+    copied: 'Code copied',
+    copiedLabel: 'Copied'
+  },
+  error: {
+    statusCode: 'Error {code}',
+    notFound: 'Page not found',
+    notFoundDescription: 'The address is wrong or the page no longer exists.',
+    generic: 'Something went wrong',
+    genericDescription: 'Please try again later.',
+    goHome: 'Go back home'
   }
 }

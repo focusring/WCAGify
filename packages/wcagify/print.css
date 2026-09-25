@@ -231,7 +231,12 @@
     break-inside: avoid;
   }
 
+  /* WeasyPrint emits one link annotation per box that carries the link. Nuxt UI
+   * renders links as `inline-flex` (a blockified flex container plus its inline
+   * content), which yields two overlapping annotations and two tab stops per
+   * link in the PDF. Plain inline links produce exactly one. */
   a {
+    display: inline !important;
     color: #007f45 !important;
     text-decoration: none;
   }
@@ -241,6 +246,8 @@
     font-size: 9pt;
     color: #6b7280 !important;
     word-break: break-all;
+    /* The generated URL text would otherwise become a second link annotation. */
+    -weasy-link: none;
   }
 
   a[href^='#']::after {
@@ -286,6 +293,34 @@
   .prose {
     max-width: none !important;
     color: #374151 !important;
+  }
+
+  /* The "copy code" button of code blocks is absolutely positioned over the
+   * first line; in the PDF it would be painted as an opaque box hiding the
+   * code. Selectors do not depend on the button's classes or label. */
+  .prose div.group > button,
+  .prose button:has(+ pre),
+  .prose pre ~ button,
+  pre button,
+  [data-slot='pre'] button {
+    display: none !important;
+  }
+
+  /* Shiki emits every token colour as CSS variables and switches on
+   * `html.dark` / the `default` theme. The PDF is always printed on the light
+   * code background, so force the light theme's variables regardless of the
+   * colour mode the page was rendered in (a browser print of the dark theme
+   * would otherwise paint dark-theme colours on #f3f4f6 too). */
+  html .shiki span,
+  html.dark .shiki span {
+    color: var(--shiki-light, var(--shiki-default)) !important;
+    background: var(--shiki-light-bg, var(--shiki-default-bg)) !important;
+    font-style: var(--shiki-light-font-style, var(--shiki-default-font-style)) !important;
+    font-weight: var(--shiki-light-font-weight, var(--shiki-default-font-weight)) !important;
+    text-decoration: var(
+      --shiki-light-text-decoration,
+      var(--shiki-default-text-decoration)
+    ) !important;
   }
 
   .prose pre {

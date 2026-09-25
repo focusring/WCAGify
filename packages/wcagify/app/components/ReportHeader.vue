@@ -24,15 +24,15 @@ const metaRows = computed(() => [
 
 <template>
   <header class="py-12">
-    <h1 class="text-4xl font-bold tracking-tight text-highlighted sm:text-5xl">
+    <h1 class="text-4xl font-bold tracking-tight text-highlighted sm:text-5xl wrap-anywhere">
       {{ t('report.accessibilityConformanceReportFor', { title: report.title }) }}
     </h1>
     <dl class="mt-6 grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:grid-cols-3">
-      <div v-for="row in metaRows" :key="row.label">
-        <dt class="text-toned">
+      <div v-for="row in metaRows" :key="row.label" class="min-w-0">
+        <dt class="text-toned wrap-anywhere">
           {{ row.label }}
         </dt>
-        <dd class="mt-0.5 text-highlighted">
+        <dd class="mt-0.5 text-highlighted wrap-anywhere">
           {{ row.value }}
         </dd>
       </div>

@@ -7,16 +7,19 @@ const props = defineProps<{
   issues: IssuesCollectionItem[]
 }>()
 
-const { t } = useI18n()
+// `locale` is the interface language and `language` the report's own (WCAG 3.1.2).
+// The root carries the report's language; the interface labels inside it carry theirs.
+const { t, locale } = useI18n()
 const { groupIssuesByPrinciple, filterTips } = useWcagData()
+
+const language = computed(() => (props.report.language === 'nl' ? 'nl' : 'en') as Language)
 
 const issuesByPrinciple = computed(() => {
   const wcagVersion = (props.report.evaluation.targetWcagVersion ?? '2.2') as WcagVersion
-  const language = (props.report.language === 'nl' ? 'nl' : 'en') as Language
   const targetLevel = (props.report.evaluation.targetLevel ?? 'AA') as Level
   return groupIssuesByPrinciple(props.issues, targetLevel, {
     wcagVersion,
-    language,
+    language: language.value,
     scStatuses: props.report.scStatuses
   })
 })
@@ -73,16 +76,16 @@ defineExpose({ visiblePrinciples })
 </script>
 
 <template>
-  <div>
+  <div :lang="language">
     <ReportCoverPage :report="report" :issues="issues" />
     <ReportHeader :report="report" :issues="issues" />
 
-    <div class="mt-4 flex justify-end gap-2 print:hidden">
+    <div class="mt-4 flex flex-wrap justify-end gap-2 print:hidden">
       <slot name="actions" />
     </div>
 
     <section id="executive-summary" class="mt-12 scroll-mt-20">
-      <h2 class="flex items-center gap-2">
+      <h2 class="flex items-center gap-2" :lang="locale">
         <UIcon name="i-lucide-file-text" class="size-6 shrink-0" />
         {{ t('report.executiveSummary') }}
       </h2>
@@ -94,7 +97,7 @@ defineExpose({ visiblePrinciples })
     <hr class="my-12 border-accented" />
 
     <section id="scorecard" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2">
+      <h2 class="flex items-center gap-2" :lang="locale">
         <UIcon name="i-lucide-list-checks" class="size-6 shrink-0" />
         {{ t('report.resultsPerPrinciple') }}
       </h2>
@@ -110,7 +113,7 @@ defineExpose({ visiblePrinciples })
 
     <hr class="my-12 border-accented" />
 
-    <section id="about" class="scroll-mt-20">
+    <section id="about" class="scroll-mt-20" :lang="locale">
       <h2 class="flex items-center gap-2">
         <UIcon name="i-lucide-info" class="size-6 shrink-0" />
         {{ t('report.aboutThisReport') }}
@@ -125,7 +128,7 @@ defineExpose({ visiblePrinciples })
     <hr class="my-12 border-accented" />
 
     <section id="scope" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2">
+      <h2 class="flex items-center gap-2" :lang="locale">
         <UIcon name="i-lucide-target" class="size-6 shrink-0" />
         {{ t('report.scope') }}
       </h2>
@@ -135,7 +138,7 @@ defineExpose({ visiblePrinciples })
     <hr class="my-12 border-accented" />
 
     <section id="sample" class="scroll-mt-20">
-      <h2 class="flex items-center gap-2">
+      <h2 class="flex items-center gap-2" :lang="locale">
         <UIcon name="i-lucide-layers" class="size-6 shrink-0" />
         {{ t('report.representativeSample') }}
       </h2>
@@ -146,12 +149,15 @@ defineExpose({ visiblePrinciples })
       <hr class="my-12 border-accented" />
 
       <section id="issues" class="min-h-screen scroll-mt-20">
-        <h2 class="flex items-center gap-2">
+        <h2 class="flex items-center gap-2" :lang="locale">
           <UIcon name="i-lucide-bar-chart-2" class="size-6 shrink-0" />
           {{ t('report.results') }}
         </h2>
 
         <div
+          role="group"
+          :lang="locale"
+          :aria-label="t('report.showResults')"
           class="results-indicators md:flex grid grid-cols-2 grid-rows-2 gap-4 mt-4 max-w-lg md:max-w-none"
         >
           <ResultsIndicator
@@ -179,6 +185,7 @@ defineExpose({ visiblePrinciples })
 
         <div
           v-if="emptyFilterStatus"
+          :lang="locale"
           class="mt-8 flex flex-col items-center justify-center gap-3 rounded-xl border border-default py-16 text-center bg-muted"
         >
           <h3 class="font-semibold!">
@@ -204,7 +211,7 @@ defineExpose({ visiblePrinciples })
       <hr class="my-12 border-accented" />
 
       <section id="tips">
-        <h2>
+        <h2 :lang="locale">
           {{ t('report.tips') }}
         </h2>
         <ol class="mt-6 list-decimal list-outside space-y-8 pl-6">
@@ -212,7 +219,7 @@ defineExpose({ visiblePrinciples })
             <h3 class="text-base!">
               {{ tip.title }}
             </h3>
-            <p class="mt-1 text-sm text-toned">
+            <p class="mt-1 text-sm text-toned" :lang="locale">
               {{ $t('report.difficulty') }}:
               {{
                 tip.difficulty ? $t(`report.difficultyLevel.${tip.difficulty.toLowerCase()}`) : ''

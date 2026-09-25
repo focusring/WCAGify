@@ -11,6 +11,7 @@
         "locales/*.ts",
         "app/app.config.ts",
         "app/app.vue",
+        "app/error.vue",
         "app/pages/**/*.vue",
         "app/layouts/**/*.vue",
         "app/components/**/*.vue",
@@ -32,7 +33,8 @@
         "vue",
         "nitropack",
         "h3"
-      ]
+      ],
+      "ignoreUnresolved": ["#app", "#build/ui/prose/pre"]
     },
     "packages/create-wcagify": {},
     "packages/browser-extension": {

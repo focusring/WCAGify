@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SelectMenuProps } from '@nuxt/ui'
 import { ACCENT_COLORS, NEUTRAL_COLORS } from '../composables/useSettings'
 import type { AccentColor, NeutralColor } from '../composables/useSettings'
 
@@ -24,17 +25,73 @@ const NEUTRAL_HEX: Record<NeutralColor, string> = {
   stone: '#78716c'
 }
 
-const accentColorSwatches = ACCENT_COLORS.map((name) => ({
-  name,
-  value: ACCENT_HEX[name]
-}))
+const LOCALE_FLAGS: Record<string, string> = {
+  en: '🇺🇸',
+  nl: '🇳🇱'
+}
 
-const neutralColorSwatches = NEUTRAL_COLORS.map((name) => ({
-  name,
-  value: NEUTRAL_HEX[name]
-}))
+const accentColorSwatches = computed(() =>
+  ACCENT_COLORS.map((name) => ({
+    name,
+    value: ACCENT_HEX[name],
+    label: t(`settings.colors.${name}`)
+  }))
+)
 
-async function onLocaleChange(code: string) {
+const neutralColorSwatches = computed(() =>
+  NEUTRAL_COLORS.map((name) => ({
+    name,
+    value: NEUTRAL_HEX[name],
+    label: t(`settings.colors.${name}`)
+  }))
+)
+
+const accentColorLabel = computed(
+  () => `${t('settings.accentColor')} - ${t(`settings.colors.${settings.value.accentColor}`)}`
+)
+
+interface LocaleItem {
+  code?: string
+  name: string
+  flag?: string
+  type?: 'label'
+  class?: string
+}
+
+const localeOptions = computed<LocaleItem[]>(() =>
+  locales.value.map((item) => ({
+    code: item.code,
+    name: item.name ?? item.code,
+    flag: LOCALE_FLAGS[item.code]
+  }))
+)
+
+/**
+ * Reka's ComboboxGroup always emits aria-labelledby; a visually hidden label
+ * item makes it point at a real element instead of an empty id.
+ */
+const localeItems = computed<LocaleItem[]>(() => [
+  { type: 'label', name: t('settings.language'), class: 'sr-only' },
+  ...localeOptions.value
+])
+
+const currentLocaleName = computed(
+  () => localeOptions.value.find((item) => item.code === locale.value)?.name ?? locale.value
+)
+
+/*
+ * Nuxt UI forwards `content` as attrs to Reka's listbox, which is how the open option list
+ * gets its accessible name; the prop type does not list aria attributes, hence the cast.
+ */
+const languageListContent = {
+  'aria-labelledby': 'language-label'
+} as unknown as SelectMenuProps['content']
+const themeListContent = {
+  'aria-labelledby': 'theme-label'
+} as unknown as SelectMenuProps['content']
+
+async function onLocaleChange(code: string | undefined) {
+  if (!code) return
   await setNuxtLocale(code as 'en' | 'nl')
 }
 
@@ -72,22 +129,46 @@ useSeoMeta({
           {{ t('settings.generalSection') }}
         </h2>
         <UFormField
-          :label="t('settings.language')"
           name="language"
           orientation="horizontal"
           :ui="{ label: 'label-title', root: 'bg-elevated rounded-sm p-4 sm:p-6' }"
         >
+          <template #label>
+            <span id="language-label">{{ t('settings.language') }}</span>
+          </template>
           <ClientOnly>
-            <ULocaleSelect
-              :locales="locales as any"
+            <USelectMenu
+              id="language"
+              :items="localeItems"
+              value-key="code"
+              label-key="name"
+              :search-input="false"
               :model-value="locale"
-              @update:model-value="onLocaleChange($event)"
+              :aria-label="undefined"
+              aria-labelledby="language-label language"
+              :content="languageListContent"
               :ui="{
                 base: 'cursor-pointer min-w-32 ring-neutral-500',
                 item: 'cursor-pointer',
                 trailingIcon: 'text-toned icon-animation'
               }"
-            />
+              @update:model-value="onLocaleChange($event)"
+            >
+              <template #leading>
+                <span class="size-5 text-center" aria-hidden="true">{{
+                  LOCALE_FLAGS[locale]
+                }}</span>
+              </template>
+              <template #default>
+                <span :lang="locale" class="truncate">{{ currentLocaleName }}</span>
+              </template>
+              <template #item-leading="{ item }">
+                <span class="size-5 text-center" aria-hidden="true">{{ item.flag }}</span>
+              </template>
+              <template #item-label="{ item }">
+                <span :lang="item.code">{{ item.name }}</span>
+              </template>
+            </USelectMenu>
           </ClientOnly>
         </UFormField>
 
@@ -98,13 +179,19 @@ useSeoMeta({
         <div class="bg-elevated rounded-sm p-4 sm:p-6 space-y-6">
           <!-- Theme -->
           <UFormField
-            :label="t('settings.theme')"
             name="theme-select"
             orientation="horizontal"
             :ui="{ label: 'label-title' }"
             class="items-center"
           >
+            <template #label>
+              <span id="theme-label">{{ t('settings.theme') }}</span>
+            </template>
             <UColorModeSelect
+              id="theme-select"
+              :aria-label="undefined"
+              aria-labelledby="theme-label theme-select"
+              :content="themeListContent"
               :ui="{
                 base: 'cursor-pointer max-w-48 ring-neutral-500',
                 item: 'cursor-pointer',
@@ -116,15 +203,15 @@ useSeoMeta({
 
           <!-- Accent Color -->
           <UFormField
-            :label="t('settings.accentColor') + ` - ${settings.accentColor}`"
+            :label="accentColorLabel"
             name="accent-color"
-            :ui="{ label: 'label-title' }"
-            class="flex flex-row items-center justify-between"
+            :ui="{ label: 'label-title', container: 'min-w-0' }"
+            class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <SettingsColorPicker
               :colors="accentColorSwatches"
               :model-value="settings.accentColor"
-              :label="t('settings.accentColor') + ` - ${settings.accentColor}`"
+              :label="accentColorLabel"
               name="accent-color"
               @update:model-value="settings.accentColor = $event as AccentColor"
             />
@@ -134,8 +221,8 @@ useSeoMeta({
           <UFormField
             :label="t('settings.backgroundShade')"
             name="background-shade"
-            :ui="{ label: 'label-title' }"
-            class="flex flex-row items-center justify-between"
+            :ui="{ label: 'label-title', container: 'min-w-0' }"
+            class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <SettingsColorPicker
               :colors="neutralColorSwatches"

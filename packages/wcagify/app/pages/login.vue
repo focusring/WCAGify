@@ -25,6 +25,8 @@ if (isAuthenticated.value) {
 }
 
 async function submit() {
+  // The button stays focusable while busy (aria-disabled), so ignore repeat submits.
+  if (loading.value) return
   error.value = false
   loading.value = true
   try {
@@ -80,15 +82,28 @@ WCAGIFY_ADMIN_SECRET=your-secret-here</pre>
           id="admin-secret"
           v-model="secret"
           type="password"
+          autocomplete="current-password"
           :placeholder="t('admin.secret')"
           aria-required="true"
           autofocus
           required
         />
-        <p v-if="error" role="alert" class="text-sm text-error">
-          {{ t('admin.invalidSecret') }}
-        </p>
-        <UButton type="submit" :label="t('admin.signIn')" :loading="loading" block />
+        <div>
+          <!-- Always in the DOM so the live region exists before the message is written into it. -->
+          <p id="login-error" role="alert" class="text-sm text-error" :class="{ 'mb-4': error }">
+            {{ error ? t('admin.invalidSecret') : '' }}
+          </p>
+          <!-- Not `disabled`/`loading` while submitting: a disabled button drops focus to the page. -->
+          <UButton
+            type="submit"
+            :label="t('admin.signIn')"
+            :icon="loading ? 'i-lucide-loader-circle' : undefined"
+            :ui="{ leadingIcon: 'animate-spin' }"
+            :aria-disabled="loading || undefined"
+            :aria-busy="loading || undefined"
+            block
+          />
+        </div>
       </form>
     </div>
   </div>

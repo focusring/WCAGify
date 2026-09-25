@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SelectProps } from '@nuxt/ui'
+import type { SelectItem } from '@nuxt/ui'
 import type { ReportsCollectionItem } from '@nuxt/content'
 import { toSlug } from '@focusring/wcagify'
 
@@ -12,7 +14,7 @@ const emit = defineEmits<{
   imported: [slug: string]
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 
 interface IssueSummary {
@@ -30,6 +32,8 @@ interface IssueSummary {
 interface ImportSummary {
   slug: string
   title: string
+  /** Language of the imported evaluation, when the server reports it. */
+  language?: string
   wcagVersion: string
   targetLevel: string
   samples: number
@@ -47,13 +51,15 @@ const document = ref('')
 const preview = ref<ImportSummary>()
 const slug = ref('')
 const mode = ref<'create' | 'merge'>('create')
-const mergeSlug = ref('')
 const busy = ref(false)
 const error = ref('')
 /** Indices of previewed issues the user chose not to import. */
 const skipped = ref(new Set<number>())
 
 const issueList = computed(() => preview.value?.issueList ?? [])
+
+/** Text taken from the imported file is in the evaluation's language, not the interface's. */
+const previewLanguage = computed(() => preview.value?.language ?? locale.value)
 const selectedCount = computed(() => issueList.value.length - skipped.value.size)
 
 function isSelected(index: number) {
@@ -72,12 +78,20 @@ function selectAll(selected: boolean) {
 }
 
 // Titles are not unique, an imported copy keeps its title, so the label includes the slug.
-const existingReports = computed(() =>
+const reportOptions = computed(() =>
   props.reports.map((report) => {
     const value = report.path?.replace('/reports/', '') ?? ''
     return { label: `${report.title} (${value})`, value }
   })
 )
+
+const mergeSlug = ref(reportOptions.value[0]?.value ?? '')
+
+// The leading label item names the option group; Reka points the group's aria-labelledby at it.
+const existingReports = computed<SelectItem[]>(() => [
+  { type: 'label', label: t('import.mergeInto'), class: 'sr-only' },
+  ...reportOptions.value
+])
 
 const modeItems = computed(() => [
   { label: t('import.modeCreate'), value: 'create' },
@@ -87,6 +101,49 @@ const modeItems = computed(() => [
 const targetSlug = computed(() => (mode.value === 'merge' ? mergeSlug.value : slug.value))
 const slugValid = computed(() => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(targetSlug.value))
 
+/** Why the slug blocks the import, or '' when it is fine. Shown in a live region below the field. */
+const slugError = computed(() => {
+  if (mode.value !== 'create' || !preview.value) return ''
+  if (!slug.value) return t('import.slugRequired')
+  return slugValid.value ? '' : t('import.slugInvalid')
+})
+
+const canImport = computed(() => Boolean(preview.value) && slugValid.value && !busy.value)
+
+// Names the option list of the "Existing report" select after its visible label.
+// Forwarded as attrs to Reka's listbox; the prop type does not list aria attributes.
+const mergeListContent = {
+  'aria-labelledby': 'import-merge-label'
+} as unknown as SelectProps['content']
+
+/**
+ * Reka dismisses a dialog as soon as the pointer goes down outside it, which loses
+ * everything entered on an accidental press. Cancel that and only remember the
+ * press; the panel then closes on a completed click on the overlay (press and
+ * release both beside the panel). Reka reports the press only while this panel is
+ * the top layer, so a click that merely closes an open select inside it does not
+ * close the panel. Escape and the close button work as before.
+ */
+let pressedOutside = false
+
+function onPointerDownOutside(event: Event) {
+  event.preventDefault()
+  pressedOutside = true
+}
+
+function onDocumentClick(event: MouseEvent) {
+  const onOverlay = (event.target as Element | null)?.matches('[data-slot="overlay"]') ?? false
+  // On touch, Reka reports the press during this same click, after this listener ran.
+  setTimeout(() => {
+    if (pressedOutside && onOverlay && open.value) open.value = false
+    pressedOutside = false
+  }, 0)
+}
+
+// `document` is shadowed by the EARL text ref above.
+onMounted(() => globalThis.document.addEventListener('click', onDocumentClick))
+onBeforeUnmount(() => globalThis.document.removeEventListener('click', onDocumentClick))
+
 function reset() {
   fileName.value = ''
   document.value = ''
@@ -94,7 +151,7 @@ function reset() {
   skipped.value = new Set()
   slug.value = ''
   mode.value = 'create'
-  mergeSlug.value = existingReports.value[0]?.value ?? ''
+  mergeSlug.value = reportOptions.value[0]?.value ?? ''
   error.value = ''
 }
 
@@ -148,7 +205,8 @@ async function loadPreview(text: string, request: number) {
 }
 
 async function runImport() {
-  if (!preview.value || !slugValid.value) return
+  // The button stays focusable while unavailable or busy (aria-disabled), so guard here.
+  if (!canImport.value || !preview.value) return
   busy.value = true
   error.value = ''
   try {
@@ -183,6 +241,7 @@ async function runImport() {
     v-model:open="open"
     :title="$t('import.title')"
     :description="$t('import.description')"
+    :content="{ onPointerDownOutside }"
   >
     <template #body>
       <div class="space-y-6">
@@ -197,23 +256,23 @@ async function runImport() {
               type="file"
               accept=".json,.jsonld,application/json,application/ld+json"
               class="block w-full text-sm text-default file:mr-3 file:rounded-md file:border-0 file:bg-elevated file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-highlighted hover:file:bg-accented"
-              :disabled="busy"
+              :aria-busy="busy || undefined"
               @change="onFileChange"
             />
           </div>
           <p id="earl-file-help" class="mt-1 text-sm text-muted">
             {{ $t('import.fileHelp') }}
           </p>
+          <!-- Always in the DOM so the live region exists before a message is written into it. -->
+          <p role="alert" class="text-sm text-error" :class="{ 'mt-2': error }">
+            {{ error }}
+          </p>
         </div>
-
-        <p v-if="error" role="alert" class="text-sm text-error">
-          {{ error }}
-        </p>
 
         <template v-if="preview">
           <dl class="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border border-default p-4 text-sm">
             <dt class="text-toned">{{ $t('report.title') }}</dt>
-            <dd class="text-highlighted">{{ preview.title }}</dd>
+            <dd class="text-highlighted" :lang="previewLanguage">{{ preview.title }}</dd>
             <dt class="text-toned">{{ $t('report.wcagVersion') }}</dt>
             <dd class="text-highlighted">
               WCAG {{ preview.wcagVersion }} {{ preview.targetLevel }}
@@ -243,7 +302,7 @@ async function runImport() {
                 size="xs"
                 variant="ghost"
                 color="neutral"
-                :disabled="skipped.size === 0"
+                :aria-disabled="skipped.size === 0 || undefined"
                 @click="selectAll(true)"
               />
               <UButton
@@ -251,11 +310,11 @@ async function runImport() {
                 size="xs"
                 variant="ghost"
                 color="neutral"
-                :disabled="selectedCount === 0"
+                :aria-disabled="selectedCount === 0 || undefined"
                 @click="selectAll(false)"
               />
             </div>
-            <ul class="mt-3 max-h-72 space-y-2 overflow-y-auto pr-1">
+            <ul class="mt-3 max-h-72 space-y-2 overflow-y-auto pr-1" :lang="previewLanguage">
               <li v-for="issue in issueList" :key="issue.index">
                 <UCheckbox
                   :model-value="isSelected(issue.index)"
@@ -277,23 +336,54 @@ async function runImport() {
             </ul>
           </div>
 
-          <UFormField :label="$t('import.mode')" name="mode">
-            <URadioGroup v-model="mode" :items="modeItems" />
-          </UFormField>
+          <URadioGroup v-model="mode" :items="modeItems" :legend="$t('import.mode')" />
 
-          <UFormField
-            v-if="mode === 'create'"
-            :label="$t('import.slug')"
-            :help="$t('import.slugHelp')"
-            :error="slug && !slugValid ? $t('import.slugInvalid') : undefined"
-            name="slug"
-          >
-            <UInput v-model="slug" class="w-full" />
-          </UFormField>
+          <div v-if="mode === 'create'" class="text-sm">
+            <label for="import-slug" class="block font-medium text-default">
+              {{ $t('import.slug') }}
+              <span class="font-normal text-muted">({{ $t('import.required') }})</span>
+            </label>
+            <UInput
+              id="import-slug"
+              v-model="slug"
+              class="mt-1 w-full"
+              required
+              aria-required="true"
+              :aria-invalid="slugError ? 'true' : undefined"
+              :aria-describedby="
+                slugError ? 'import-slug-error' : 'import-slug-error import-slug-help'
+              "
+            />
+            <!-- Always in the DOM so the live region exists before a message is written into it. -->
+            <p
+              id="import-slug-error"
+              role="alert"
+              class="text-error"
+              :class="{ 'mt-2': slugError }"
+            >
+              {{ slugError }}
+            </p>
+            <p v-if="!slugError" id="import-slug-help" class="mt-2 text-muted">
+              {{ $t('import.slugHelp') }}
+            </p>
+          </div>
 
-          <UFormField v-else :label="$t('import.mergeInto')" name="merge-slug">
-            <USelect v-model="mergeSlug" :items="existingReports" class="w-full" />
-          </UFormField>
+          <div v-else class="text-sm">
+            <label
+              id="import-merge-label"
+              for="import-merge"
+              class="block font-medium text-default"
+            >
+              {{ $t('import.mergeInto') }}
+            </label>
+            <USelect
+              id="import-merge"
+              v-model="mergeSlug"
+              :items="existingReports"
+              :content="mergeListContent"
+              class="mt-1 w-full"
+            />
+          </div>
         </template>
       </div>
     </template>
@@ -306,11 +396,13 @@ async function runImport() {
           color="neutral"
           @click="open = false"
         />
+        <!-- Not `disabled`/`loading`: a disabled button drops focus out of the dialog. -->
         <UButton
           :label="$t('import.import')"
-          icon="i-lucide-upload"
-          :loading="busy"
-          :disabled="!preview || !slugValid"
+          :icon="busy ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
+          :ui="{ leadingIcon: busy ? 'animate-spin' : '' }"
+          :aria-disabled="!canImport || undefined"
+          :aria-busy="busy || undefined"
           @click="runImport"
         />
       </div>
