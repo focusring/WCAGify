@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs'
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import { join } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
@@ -85,6 +87,32 @@ describe('outcomeStatus', () => {
 describe('parseEarlReport', () => {
   it('rejects non-objects', async () => {
     await expect(parseEarlReport(42)).rejects.toThrow('JSON object')
+  })
+
+  it('never fetches a remote @context', async () => {
+    const requests: string[] = []
+    const server = createServer((request, response) => {
+      requests.push(request.url ?? '')
+      response.setHeader('Content-Type', 'application/ld+json')
+      response.end('{"@context": {}}')
+    })
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+    const { port } = server.address() as AddressInfo
+    const url = `http://127.0.0.1:${port}/context.jsonld`
+    try {
+      for (const context of [
+        url,
+        [url, { earl: 'http://www.w3.org/ns/earl#' }],
+        { '@import': url }
+      ]) {
+        await expect(
+          parseEarlReport({ '@context': context, '@type': 'earl:Assertion' })
+        ).rejects.toThrow('remote JSON-LD contexts are not supported')
+      }
+      expect(requests).toEqual([])
+    } finally {
+      server.close()
+    }
   })
 
   describe('WCAGify export', () => {

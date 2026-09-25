@@ -362,6 +362,33 @@ function enumValue<T extends string>(
 }
 
 /**
+ * Expands the document without ever fetching: a remote `@context` would
+ * otherwise make the server request any URL an uploaded file names (request
+ * forgery). Every known EARL producer inlines its context, so only inline
+ * contexts are read.
+ */
+async function expandOffline(doc: object): ReturnType<typeof jsonld.expand> {
+  let remoteUrl: string | undefined = undefined
+  try {
+    return await jsonld.expand(doc as never, {
+      documentLoader: async (url: string) => {
+        remoteUrl = url
+        throw new Error(`Refused to load ${url}`)
+      }
+    })
+  } catch (error) {
+    // The jsonld error only says dereferencing failed; name the real cause.
+    if (remoteUrl) {
+      throw new Error(
+        `remote JSON-LD contexts are not supported, inline the context (${remoteUrl})`,
+        { cause: error }
+      )
+    }
+    throw error
+  }
+}
+
+/**
  * Reads an EARL document (JSON-LD, any context) into a WCAGify report with
  * issues. Works with WCAGify exports, W3C WCAG-EM Report Tool exports and
  * assertion lists from automated tools such as axe-core.
@@ -375,7 +402,7 @@ async function parseEarlReport(
     throw new Error('EARL document must be a JSON object')
   }
 
-  const expanded = await jsonld.expand(doc as never)
+  const expanded = await expandOffline(doc)
   const nodes = collectNodes(expanded)
   const warnings: string[] = []
 
