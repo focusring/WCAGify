@@ -121,6 +121,12 @@ Everything else is derived. A criterion fails when an issue records it, and pass
 otherwise. Recording an issue against a criterion overrides its `not-present` entry, since
 finding a failure proves the content is there after all.
 
+## Linking to an issue
+
+A link to an issue, such as `/reports/example#issue-reports-example-focus-style-missing`, opens
+that issue and scrolls it into view. The id is `issue-` followed by the issue's content path with
+the slashes replaced by hyphens. The same ids work on share links.
+
 ## EARL Export
 
 Reports can also be downloaded as machine-readable EARL (JSON-LD), the format recommended by

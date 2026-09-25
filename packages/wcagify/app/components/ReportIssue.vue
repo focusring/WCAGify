@@ -17,10 +17,52 @@ const samplePage = computed(() => resolveSamplePage(props.report.sample, props.i
 
 const sanitizedPath = props.issue.path.split('/').filter(Boolean).join('-')
 const issueId = `issue-${sanitizedPath}`
+
+const open = ref(false)
+
+/*
+ * A link to an issue lands on a closed collapsible, so a deep link (the report
+ * navigation, a shared URL, an embed) opens it and scrolls it under the sticky
+ * header. The scroll is done on the window rather than with scrollIntoView so
+ * that an embedding page is never scrolled along with the iframe, and it runs
+ * again once the content has expanded, since near the end of the report the
+ * page is only tall enough to reach the issue after it has opened.
+ */
+const STICKY_HEADER_OFFSET = 80
+const EXPAND_ANIMATION_MS = 300
+
+function scrollUnderHeader() {
+  const element = document.getElementById(issueId)
+  if (!element) return
+  const top = element.getBoundingClientRect().top + globalThis.scrollY - STICKY_HEADER_OFFSET
+  globalThis.scrollTo({ top, behavior: 'smooth' })
+}
+
+function revealFromHash() {
+  if (globalThis.location.hash !== `#${issueId}`) return
+  open.value = true
+  nextTick(scrollUnderHeader)
+  setTimeout(scrollUnderHeader, EXPAND_ANIMATION_MS)
+}
+
+onMounted(() => {
+  revealFromHash()
+  globalThis.addEventListener('hashchange', revealFromHash)
+})
+
+onBeforeUnmount(() => {
+  globalThis.removeEventListener('hashchange', revealFromHash)
+})
 </script>
 
 <template>
-  <UCollapsible :unmount-on-hide="false" :id="issueId" as="article">
+  <UCollapsible
+    :id="issueId"
+    v-model:open="open"
+    :unmount-on-hide="false"
+    as="article"
+    class="scroll-mt-20"
+  >
     <UButton
       class="group"
       color="neutral"

@@ -6,7 +6,7 @@ baseline:
   - Android with Chrome and TalkBack
 description: Accessibility audit for Example Website according to WCAG 2.2 level AA.
 evaluation:
-  evaluator: WCAGify
+  evaluator: Focusring
   commissioner: Example Organisation
   target: Example Website
   targetLevel: AA
@@ -29,10 +29,15 @@ sample:
     id: page-3
     url: https://example.com/products
     description: Overview of all products
+  - title: Blog post
+    id: page-4
+    url: https://example.com/blog/example-post
+    description: An example of a blog post
 scope:
   - https://example.com
   - https://example.com/contact
   - https://example.com/products
+  - https://example.com/blog
 technologies:
   - HTML
   - CSS
@@ -60,4 +65,6 @@ scStatuses:
     - '3.3.8'
 ---
 
-This is an example report for a WCAG accessibility audit of Example Website.
+This is an example report for a WCAG accessibility audit of Example Website. It shows how findings are reported: every issue names the page it was found on, the success criterion it fails, its severity and a recommendation with the corrected markup, so a development team can pick it up without further explanation.
+
+The evaluated pages contain six issues across the four WCAG principles. None of them block a task completely, but together they keep keyboard and screen reader users from using the contact form and the product search with confidence.
