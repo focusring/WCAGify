@@ -8,7 +8,7 @@ sample: page-4
 
 ![The "Waarmee kunnen we je vooruit helpen?" topic chooser, showing six buttons each with an icon above a label such as "Passen" or "Overboeken".](/api/uploads/test-audit/menu-buttons-are-announced-with-the-file-name-of-their-icon-1-1-1-ae09c484.webp)
 
-The six topic buttons in the "Waarmee kunnen we je vooruit helpen?" chooser each pair an icon with a visible label. The icons carry the **name of their image file** as their text alternative:
+The six topic buttons in the "<span lang="nl">Waarmee kunnen we je vooruit helpen?</span>" chooser each pair an icon with a visible label. The icons carry the **name of their image file** as their text alternative:
 
 - `alt="sy-account-debitcard"` on **Passen**
 - `alt="sy-account-transfer"` on Overboeken
@@ -20,7 +20,7 @@ The icons are decorative: the visible label beside each one already says what th
 
 This is the entry point to the service desk, the route to almost every self-service task on the site.
 
-The same habit shows on the search results page (page-5). When a search finds nothing, the illustration of a cash machine above "We konden niets vinden voor …" carries `alt="atm error"`: the file name `il-atm-error-landscape-3x2.png` with its prefix and suffix cut off. A screen reader reads "atm error", in English, before the actual message, although nothing went wrong with a cash machine. The illustration is decorative, so the fix is the same `alt=""`.
+The same habit shows on the search results page (page-5). When a search finds nothing, the illustration of a cash machine above "<span lang="nl">We konden niets vinden voor …</span>" carries `alt="atm error"`: the file name `il-atm-error-landscape-3x2.png` with its prefix and suffix cut off. A screen reader reads "atm error", in English, before the actual message, although nothing went wrong with a cash machine. The illustration is decorative, so the fix is the same `alt=""`.
 
 #### Recommendation
 

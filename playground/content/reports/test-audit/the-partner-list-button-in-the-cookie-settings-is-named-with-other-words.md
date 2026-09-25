@@ -11,7 +11,7 @@ sample: page-2
 
 Each cookie category in the cookie settings ("Functional cookies", "Analytical cookies", "Personal cookies") has a link-styled button that opens the vendor list. On the English pages it reads **"View list of used cookies"**, but its `aria-label` replaces that text with "Personal cookies - List of used cookies button opens list of used cookies". The visible word "View" is not in the name.
 
-On the Dutch pages the gap is wider. The button reads **"Bekijk lijst van partners"** and is named "Persoonlijke cookies - De knop "Bekijk lijst van cookies" opent de lijst met cookies.", so "partners" is missing and the words in the name describe a different list. A speech-input user who says "click Bekijk lijst van partners" does not reach the button. A screen-reader user hears a label that differs from the one a sighted colleague would refer to.
+On the Dutch pages the gap is wider. The button reads **"<span lang="nl">Bekijk lijst van partners</span>"** and is named "Persoonlijke cookies - De knop "Bekijk lijst van cookies" opent de lijst met cookies.", so "partners" is missing and the words in the name describe a different list. A speech-input user who says "click Bekijk lijst van partners" does not reach the button. A screen-reader user hears a label that differs from the one a sighted colleague would refer to.
 
 This is the OneTrust consent component, which opens from every page. It was confirmed on page-1, page-4 to page-13, page-18, page-19 and page-22 to page-24, on all three category tabs and at phone width as well.
 

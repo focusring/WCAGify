@@ -8,7 +8,7 @@ sample: page-1
 
 ![The search suggestion list open under the search field, with the grey group heading "Meteen naar..." above a set of suggestion links.](/api/uploads/test-audit/the-search-suggestions-use-a-menu-role-that-cannot-hold-headings-1-3-1-b1aed955.webp)
 
-Typing in the site search opens a suggestion list marked up as `<ul role="menu">` (`#pv_id_0_0_0_49_list`). Inside it the suggestions are grouped under visible headings such as **"Meteen naar…"** and "Zelf regelen…", which are `<h5>` elements, and the list also contains `role="separator"` items.
+Typing in the site search opens a suggestion list marked up as `<ul role="menu">` (`#pv_id_0_0_0_49_list`). Inside it the suggestions are grouped under visible headings such as **"<span lang="nl">Meteen naar…</span>"** and "<span lang="nl">Zelf regelen…</span>", which are `<h5>` elements, and the list also contains `role="separator"` items.
 
 The `menu` role only allows `menuitem`, `menuitemcheckbox`, `menuitemradio`, `group` and `separator` as children. A heading is not among them, so assistive technology is given a structure it cannot present: the group headings are either dropped or announced out of context, and the grouping the sighted user sees is lost.
 

@@ -10,11 +10,11 @@ sample: page-30
 
 Two fields on step 2 of the application refuse values written in a common way, and say what they accept only after refusing:
 
-- **Je voorletter(s)**: "T. T.", with a space as Dutch initials are often written, is rewritten by the field to "T. .T." and refused with "De ingevulde intitialen zijn ongeldig. Gebruik alleen hoofdletters en punten." "T T" is refused as well. The label says only "Je voorletter(s)" and there is no hint.
-- **Wat is je fiscaal identificatienummer in België?** (after answering that you also pay tax in Belgium): the number as it is printed on a Belgian identity card, "85.07.30-033.28", is refused with "Ongeldig nummer". Nothing says to type digits only, or how many.
+- **Je voorletter(s)**: "T. T.", with a space as Dutch initials are often written, is rewritten by the field to "T. .T." and refused with "<span lang="nl">De ingevulde intitialen zijn ongeldig. Gebruik alleen hoofdletters en punten.</span>" "T T" is refused as well. The label says only "<span lang="nl">Je voorletter(s)</span>" and there is no hint.
+- **Wat is je fiscaal identificatienummer in België?** (after answering that you also pay tax in Belgium): the number as it is printed on a Belgian identity card, "85.07.30-033.28", is refused with "<span lang="nl">Ongeldig nummer</span>". Nothing says to type digits only, or how many.
 
 Users find out the rule by making the mistake. For people who find forms hard, each refusal is a point where they may give up.
 
 #### Recommendation
 
-State the expected form under the label and tie it to the field with `aria-describedby`, for example "Bijvoorbeeld: J.P." and "Alleen cijfers, zonder punten of streepjes" ([G89](https://www.w3.org/WAI/WCAG22/Techniques/general/G89)). Better still, accept the variants by removing spaces, dots and dashes before validating.
+State the expected form under the label and tie it to the field with `aria-describedby`, for example "<span lang="nl">Bijvoorbeeld: J.P.</span>" and "<span lang="nl">Alleen cijfers, zonder punten of streepjes</span>" ([G89](https://www.w3.org/WAI/WCAG22/Techniques/general/G89)). Better still, accept the variants by removing spaces, dots and dashes before validating.

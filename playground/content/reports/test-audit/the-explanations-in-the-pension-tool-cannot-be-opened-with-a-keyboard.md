@@ -14,7 +14,7 @@ Each one is `<a type="button" class="btn">` with **no `href`, no `role` and no `
 
 There is no alternative route. The explanation panels are `display:none` until the icon is clicked, so their text is in no accessibility tree and cannot be read another way. A keyboard user is simply shut out of every explanation in the tool — including the nine on the result step, which explain what the projected figures mean.
 
-A related problem in the same component: when a panel **is** opened with a mouse and then closed with its "Klik om te sluiten" button, focus is dropped to the page body instead of returning to the icon (this also fails 2.4.3).
+A related problem in the same component: when a panel **is** opened with a mouse and then closed with its "<span lang="nl">Klik om te sluiten</span>" button, focus is dropped to the page body instead of returning to the icon (this also fails 2.4.3).
 
 The tool is supplied by an outside party on `rekentools.webbridge.nl` and shown inside this page. The same icons also fail 1.1.1, because they carry no text alternative — that is filed separately, and both are fixed by the same change.
 

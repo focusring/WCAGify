@@ -8,7 +8,7 @@ sample: page-23
 
 ![The pathfinder Kies je situatie en pas de juiste limiet aan with Online betalen en overboeken chosen in the first column and three further columns outlined to its right, each holding the sub-choices of the grey item to its left.](/api/uploads/test-audit/the-pathfinder-s-sub-choices-are-tied-to-their-topic-only-by-their-position-1-3-1-d88750ca.webp)
 
-In the pathfinder "Kies je situatie en pas de juiste limiet aan", choosing a topic ("Online betalen en overboeken") opens its sub-choices as a new column to the right, up to three columns deep, and then the answer below. On screen each column plainly belongs to the grey item to its left.
+In the pathfinder "<span lang="nl">Kies je situatie en pas de juiste limiet aan</span>", choosing a topic ("<span lang="nl">Online betalen en overboeken</span>") opens its sub-choices as a new column to the right, up to three columns deep, and then the answer below. On screen each column plainly belongs to the grey item to its left.
 
 In the markup every column is a separate `ul` in its own grid cell, not nested in the item that opened it. The opening button has `aria-expanded` but no `aria-controls`, and the lists have no name and no heading. A screen reader reads the expanded button, then the four other topic buttons, then an unnamed list, then another unnamed list: which list belongs to which choice is conveyed by column position alone. The chosen answer link is marked only by its grey fill (`li.answer.active`), with no `aria-current`.
 

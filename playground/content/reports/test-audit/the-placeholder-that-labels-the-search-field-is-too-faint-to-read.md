@@ -11,8 +11,8 @@ sample: page-1
 
 The search field's placeholder is drawn in `#9ca3af` on the field's own grey fill:
 
-- **"Zoeken naar…"** in the greeting panel: `#9ca3af` on `#e9e9e9` = **2.09:1**
-- **"Waar ben je naar op zoek?"** in the open header bar: `#9ca3af` on `#dedede` = **1.89:1**
+- **"<span lang="nl">Zoeken naar…</span>"** in the greeting panel: `#9ca3af` on `#e9e9e9` = **2.09:1**
+- **"<span lang="nl">Waar ben je naar op zoek?</span>"** in the open header bar: `#9ca3af` on `#dedede` = **1.89:1**
 - the greeting panel field at 640 and 320 pixels: also **1.89:1**
 
 At 16 pixels and regular weight, 4.5:1 is required. These are less than half of it.

@@ -10,9 +10,9 @@ sample: page-18
 
 Three videos show information that is not in their soundtrack, and none of them has an audio-described version, a description track or a switch to one:
 
-- the app page (page-18), **"Waarom anderen vertrouwen op de ABN AMRO app"**: six full-screen text cards, five interview questions and the closing call to action, shown over silence (measured at −72 to −100 dB against −21 dB for the rest of the film);
-- the payments page (page-11), **"Een kijkje achter de schermen"**: the opening title, the presenter's name card, two full-screen text cards and an app screen with account names and balances;
-- the mortgage-interest page (page-15), **"Video over hypotheekrente"**: the worked example with a € 450.000 house, a loan rising from € 360.000 to € 450.000 and the rate climbing from 3,50 % to 4,75 %, and the closing card "Meer weten? abnamro.nl/hypotheekrente".
+- the app page (page-18), **"<span lang="nl">Waarom anderen vertrouwen op de ABN AMRO app</span>"**: six full-screen text cards, five interview questions and the closing call to action, shown over silence (measured at −72 to −100 dB against −21 dB for the rest of the film);
+- the payments page (page-11), **"<span lang="nl">Een kijkje achter de schermen</span>"**: the opening title, the presenter's name card, two full-screen text cards and an app screen with account names and balances;
+- the mortgage-interest page (page-15), **"<span lang="nl">Video over hypotheekrente</span>"**: the worked example with a € 450.000 house, a loan rising from € 360.000 to € 450.000 and the rate climbing from 3,50 % to 4,75 %, and the closing card "<span lang="nl">Meer weten? abnamro.nl/hypotheekrente</span>".
 
 Level AA asks for audio description of this information. A transcript next to the player, the cheaper fix proposed in the two issues on these videos under 1.2.3 ("The app video shows text on screen that the soundtrack never says" and "The mortgage-interest video shows figures that the presenter never says"), is enough for level A but not for this criterion. Blind and low-vision viewers hear answers to questions nobody asks and a principle without the figures that show what it costs.
 

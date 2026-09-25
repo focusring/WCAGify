@@ -8,16 +8,16 @@ sample: page-21
 
 ![An open main-menu panel with seven category buttons down the left; one has a light grey background and the rest are white.](/api/uploads/test-audit/the-chosen-menu-category-is-marked-by-a-grey-background-alone-4-1-2-562e626a.webp)
 
-Opening a main-menu panel shows seven category buttons down the left ("Betalen & creditcards", "Hypotheken" … "Pensioen"). Choosing one loads its links into the panel beside it, and the chosen button turns `#dedede` (`rgb(222,222,222)`) while the other six stay white.
+Opening a main-menu panel shows seven category buttons down the left ("<span lang="nl">Betalen & creditcards</span>", "Hypotheken" … "Pensioen"). Choosing one loads its links into the panel beside it, and the chosen button turns `#dedede` (`rgb(222,222,222)`) while the other six stay white.
 
 That grey is the **only** mark of the chosen category, and against the white panel it reaches **1.35:1**. Text colour, weight, border and arrow do not change, while a visual state indicator needs 3:1 (1.4.11), so many low-vision users cannot see which category is showing. The button does not expose the state to assistive technology either: its `aria-expanded` sits on the surrounding `<li>`, where it is ignored (reported as "The menu category buttons do not say whether their panel is open").
 
 The same grey fill, one design token, is the only mark of the chosen item in every component that switches content with a list of buttons:
 
 - the topic chooser on the service pages (page-4, page-23)
-- the numbered steps of "Hoe open ik een betaalrekening?" (page-13)
-- the section switchers beside a content panel: "Informatie over je hypotheek" (page-14), "Hypotheekrente uitleg" (page-15), "Verder goed om te weten" (page-18), "Meer informatie" (page-19) and "Of e-mail, telefoonnummer of naam" (page-22)
-- the "Meer informatie" list on page-9
+- the numbered steps of "<span lang="nl">Hoe open ik een betaalrekening?</span>" (page-13)
+- the section switchers beside a content panel: "<span lang="nl">Informatie over je hypotheek</span>" (page-14), "<span lang="nl">Hypotheekrente uitleg</span>" (page-15), "<span lang="nl">Verder goed om te weten</span>" (page-18), "<span lang="nl">Meer informatie</span>" (page-19) and "<span lang="nl">Of e-mail, telefoonnummer of naam</span>" (page-22)
+- the "<span lang="nl">Meer informatie</span>" list on page-9
 
 In most of them the panel heading repeats the chosen item's name, which helps, but the item itself cannot be picked out. Several also show a panel on first load with no item marked at all. The mega-menu is in the shared header, so it is on every page.
 

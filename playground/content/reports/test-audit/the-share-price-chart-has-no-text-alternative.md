@@ -8,7 +8,7 @@ sample: page-17
 
 ![The AEX price chart for the last month, a line from 24 August to 21 September between 1,090 and 1,125. Nothing on or around it describes the course the line shows.](/api/uploads/test-audit/the-share-price-chart-has-no-text-alternative-1-1-1-8ef23434.webp)
 
-The price chart under "Grafieken" is an `<svg>` drawn by Highstock 7.0.3 with **no role, no `aria-label` and no `<title>`**; its only `<desc>` is "Created with Highstock 7.0.3". A screen reader finds the axis labels only, a list of dates ("24 aug" … "21 sep") and prices ("1.090,00" … "1.125,00"), and nothing about the line itself: how the AEX moved over the chosen period.
+The price chart under "Grafieken" is an `<svg>` drawn by Highstock 7.0.3 with **no role, no `aria-label` and no `<title>`**; its only `<desc>` is "Created with Highstock 7.0.3". A screen reader finds the axis labels only, a list of dates ("<span lang="nl">24 aug</span>" … "<span lang="nl">21 sep</span>") and prices ("1.090,00" … "1.125,00"), and nothing about the line itself: how the AEX moved over the chosen period.
 
 The values of single points appear only in the tooltip on mouse hover. The chart cannot be focused, so neither keyboard nor screen-reader users can reach them, and there is no summary or data table beside it. The chart on the page of each share is built the same way. Highstock's accessibility module, which would describe the series and make its points navigable, is not loaded.
 

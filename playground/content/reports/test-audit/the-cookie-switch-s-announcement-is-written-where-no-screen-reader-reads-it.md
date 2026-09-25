@@ -9,7 +9,7 @@ sample: page-18
 
 ![The cookie centre on the "Persoonlijke cookies" tab with the category switch just turned on. Nothing else on screen changes.](/api/uploads/test-audit/the-cookie-switch-s-announcement-is-written-where-no-screen-reader-reads-it-4-1-2-8e882e8b.webp)
 
-Toggle the **"Persoonlijke cookies"** switch in the cookie settings. OneTrust then writes `aria-label="Persoonlijke cookies"` onto an empty, invisible `span.ot-scrn-rdr` that has `aria-live="assertive"` but no role, and clears the attribute again one to three seconds later. No text is ever put inside the span.
+Toggle the **"<span lang="nl">Persoonlijke cookies</span>"** switch in the cookie settings. OneTrust then writes `aria-label="Persoonlijke cookies"` onto an empty, invisible `span.ot-scrn-rdr` that has `aria-live="assertive"` but no role, and clears the attribute again one to three seconds later. No text is ever put inside the span.
 
 `aria-label` is not allowed on an element without a role, and a live region announces content that is added to it, not a change of attribute. So the announcement OneTrust apparently intends does not reach assistive technology, and the markup is invalid while it lasts (axe `aria-prohibited-attr`). The impact is small: the switch is a native checkbox and exposes its new checked state itself.
 

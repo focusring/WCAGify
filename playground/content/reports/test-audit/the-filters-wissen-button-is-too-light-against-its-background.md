@@ -9,7 +9,7 @@ sample: page-10
 
 ![The filter panel of the cookie vendor list, with the grey "Filters wissen" button at the bottom left next to the darker "Toepassen" button.](/api/uploads/test-audit/the-filters-wissen-button-is-too-light-against-its-background-1-4-3-7da4d9ed.webp)
 
-In the filter panel of the cookie vendor list, the **"Filters wissen"** button (`#clear-filters-handler`) draws its label at an effective `#787878` on `#ffffff`. That is a contrast ratio of **4.42:1** at 14.4 pixels, just under the 4.5:1 that WCAG requires for text this size.
+In the filter panel of the cookie vendor list, the **"<span lang="nl">Filters wissen</span>"** button (`#clear-filters-handler`) draws its label at an effective `#787878` on `#ffffff`. That is a contrast ratio of **4.42:1** at 14.4 pixels, just under the 4.5:1 that WCAG requires for text this size.
 
 **The stylesheet will not explain this, so do not go looking for `#787878` in it.** The declared colour is `rgb(105,105,105)` — `#696969` — which on white measures 5.49:1 and passes comfortably. The button sits under an ancestor with **`opacity: 0.9`**, and that is what drags the painted glyphs down to `#787878`. Three independent measurements agree: a compositing walk that multiplies foreground alpha by the cumulative ancestor opacity, a rendered-pixel histogram of a screenshot, and axe-core's own 4.41.
 

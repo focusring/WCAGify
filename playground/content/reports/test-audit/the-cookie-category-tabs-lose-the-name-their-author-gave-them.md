@@ -11,7 +11,7 @@ sample: page-26
 
 The four category tabs in the cookie settings sit in a `ul.ot-cat-grp[role="tablist"]`, wrapped in a `div.ot-tab-list`. The name meant for the tab list, **"Cookie Categories"** ("Cookiecategorieën" on the Dutch pages), is put on that wrapper `div` as `aria-label`, but the `div` has no role.
 
-`aria-label` is not allowed on an element without a role, so browsers and screen readers ignore it (axe `aria-prohibited-attr`), and the real tab list is exposed without a name. A screen-reader user entering the tabs hears "tab list" with nothing saying what the tabs are for. On page-10 the category panels also have no name once a category tab is selected, while the "Jouw privacy" panel is named correctly.
+`aria-label` is not allowed on an element without a role, so browsers and screen readers ignore it (axe `aria-prohibited-attr`), and the real tab list is exposed without a name. A screen-reader user entering the tabs hears "tab list" with nothing saying what the tabs are for. On page-10 the category panels also have no name once a category tab is selected, while the "<span lang="nl">Jouw privacy</span>" panel is named correctly.
 
 This is the OneTrust consent component, which is on every page. Also recorded on page-1, page-2, page-4, page-10 and page-12.
 

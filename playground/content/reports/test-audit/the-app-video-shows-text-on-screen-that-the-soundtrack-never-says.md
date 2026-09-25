@@ -8,13 +8,13 @@ sample: page-18
 
 ![A full-screen brand-green card in the video reading "WAAROM GEBRUIKT U DE APP NOG NIET?" in white capitals, with no speaker on screen.](/api/uploads/test-audit/the-app-video-shows-text-on-screen-that-the-soundtrack-never-says-1-2-3-018fd223.webp)
 
-The video **"Waarom anderen vertrouwen op de ABN AMRO app"** is structured around six full-screen text cards. Five of them are the interview questions the speakers answer — "GEBRUIKT U DE ABN AMRO APP?", "WAAROM GEBRUIKT U DE APP NOG NIET?", "DENKT U DE APP OOIT TE GAAN GEBRUIKEN?", "HOE VEILIG VINDT U DE APP?", "DUS TEVREDEN OVER DE APP?" — and the sixth is the closing call to action "REGEL UW BANKZAKEN ZOALS U DAT WILT #ABNAMROAPP".
+The video **"<span lang="nl">Waarom anderen vertrouwen op de ABN AMRO app</span>"** is structured around six full-screen text cards. Five of them are the interview questions the speakers answer — "<span lang="nl">GEBRUIKT U DE ABN AMRO APP?</span>", "<span lang="nl">WAAROM GEBRUIKT U DE APP NOG NIET?</span>", "<span lang="nl">DENKT U DE APP OOIT TE GAAN GEBRUIKEN?</span>", "<span lang="nl">HOE VEILIG VINDT U DE APP?</span>", "<span lang="nl">DUS TEVREDEN OVER DE APP?</span>" — and the sixth is the closing call to action "<span lang="nl">REGEL UW BANKZAKEN ZOALS U DAT WILT #ABNAMROAPP</span>".
 
 **Nobody reads these cards aloud and there is nothing else on the soundtrack while they are shown.** The audio was measured second by second: the six cards sit at −91, −72, −91, −91, −77 and −100 dB against a median of −21 dB for the rest of the video — four of them are digital silence. A viewer who cannot see the screen hears four people answering questions that are never asked, and misses the call to action entirely.
 
 There is no audio-described version, no descriptions track, and no transcript or text alternative anywhere on the page. The only link near the player downloads the original MP4.
 
-**The same gap is on the "Een kijkje achter de schermen" video on the payments page (page-11)**, which uses the same video component: its opening title, the presenter's name card ("SJOERD MESKER / Presentator"), two full-screen text cards and an app screen showing account names and balances all carry information the audio never gives. Both videos need the same fix.
+**The same gap is on the "<span lang="nl">Een kijkje achter de schermen</span>" video on the payments page (page-11)**, which uses the same video component: its opening title, the presenter's name card ("SJOERD MESKER / Presentator"), two full-screen text cards and an app screen showing account names and balances all carry information the audio never gives. Both videos need the same fix.
 
 The video does carry burned-in Dutch captions throughout, so deaf viewers are served; this issue is about blind and low-vision viewers. The same gap fails **1.2.5 Audio Description (Prerecorded)** at level AA.
 

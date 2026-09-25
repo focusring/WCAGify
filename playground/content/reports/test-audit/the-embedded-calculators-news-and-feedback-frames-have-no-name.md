@@ -16,7 +16,7 @@ The component that embeds sub-applications on the site never sets a title, and t
 - page-17, the share prices: the financial-news frame `iframe#iFrameResizer0` that the beursinfo market-data application nests inside its own frame (the beursinfo frame itself is named);
 - page-20, the personal-loan calculator `iframe#tcm-267699-iframe` (also a Tab stop);
 - page-31, the extended mortgage wizard `iframe#tcm-212927-iframe` (also a Tab stop);
-- page-2, page-4, page-6, page-10 to page-13, page-15, page-18, page-19 and page-22 to page-26: the inline Qualtrics thumbs widget "Wat vind je van deze informatie?" (for example `iframe[name="survey-iframe-SI_bqNvG0YpbqpqHAy"]` on page-22), which is supplied by Qualtrics and shown on phone-sized screens. The Qualtrics Feedback survey frame is titled "Survey window" and is fine.
+- page-2, page-4, page-6, page-10 to page-13, page-15, page-18, page-19 and page-22 to page-26: the inline Qualtrics thumbs widget "<span lang="nl">Wat vind je van deze informatie?</span>" (for example `iframe[name="survey-iframe-SI_bqNvG0YpbqpqHAy"]` on page-22), which is supplied by Qualtrics and shown on phone-sized screens. The Qualtrics Feedback survey frame is titled "Survey window" and is fine.
 
 #### Recommendation
 

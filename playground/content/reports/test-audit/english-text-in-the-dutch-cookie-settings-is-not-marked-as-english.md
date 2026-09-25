@@ -20,7 +20,7 @@ This is the OneTrust consent component, which is on every page. Also recorded on
 
 #### Recommendation
 
-Translate the strings in OneTrust: the cookie descriptions and type values in the cookie database ("Cookie van derden" / "Eigen cookie"), and the interface and status texts in the Dutch language settings ("1 leverancier gevonden.", "Terug", "Filter"). Where a text must stay English, have the template mark it:
+Translate the strings in OneTrust: the cookie descriptions and type values in the cookie database ("<span lang="nl">Cookie van derden</span>" / "<span lang="nl">Eigen cookie</span>"), and the interface and status texts in the Dutch language settings ("<span lang="nl">1 leverancier gevonden.</span>", "Terug", "Filter"). Where a text must stay English, have the template mark it:
 
     <dd lang="en">This domain is owned by Awin, …</dd>
 

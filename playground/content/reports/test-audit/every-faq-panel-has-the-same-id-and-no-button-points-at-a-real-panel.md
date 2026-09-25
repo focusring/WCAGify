@@ -8,7 +8,7 @@ sample: page-13
 
 ![The "Veelgestelde vragen" section with one question expanded, showing the answer panel below the question button.](/api/uploads/test-audit/every-faq-panel-has-the-same-id-and-no-button-points-at-a-real-panel-4-1-2-bcb7cfd9.webp)
 
-In the **"Veelgestelde vragen"** accordion every question button carries `aria-controls="pv_id_0_0_0_0_7_accordioncontent_<n>"`, and **no element with any of those ids exists in the document**. The panels that are actually rendered all carry the same literal `id="accordion-content"` — twelve elements sharing one id on this page.
+In the **"<span lang="nl">Veelgestelde vragen</span>"** accordion every question button carries `aria-controls="pv_id_0_0_0_0_7_accordioncontent_<n>"`, and **no element with any of those ids exists in the document**. The panels that are actually rendered all carry the same literal `id="accordion-content"` — twelve elements sharing one id on this page.
 
 So the relationship between a question and its answer is broken in one direction, and any assistive technology that follows `aria-controls` to move the user to the panel lands nowhere. The duplicated id also means a reference to `accordion-content` cannot resolve to a single element.
 

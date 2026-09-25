@@ -8,15 +8,15 @@ sample: page-31
 
 ![The income question in the extended wizard, with an empty field, after an income had already been entered in the calculator on the previous page.](/api/uploads/test-audit/the-mortgage-wizard-asks-again-for-answers-already-given-3-3-7-8f89c138.webp)
 
-The mortgage calculation runs across two pages. On the first (page-14) the visitor chooses whether they are buying alone or together and enters a gross annual income. Pressing **"Reken verder"** carries them to the extended wizard on this page — which asks **both questions again, with empty fields**.
+The mortgage calculation runs across two pages. On the first (page-14) the visitor chooses whether they are buying alone or together and enters a gross annual income. Pressing **"<span lang="nl">Reken verder</span>"** carries them to the extended wizard on this page — which asks **both questions again, with empty fields**.
 
-"Koopt u alleen of samen?" comes back unanswered at 2%, and "Wat is uw bruto inkomen per jaar?" comes back empty at 27%. Neither is pre-filled, and neither offers the earlier answer as a choice.
+"<span lang="nl">Koopt u alleen of samen?</span>" comes back unanswered at 2%, and "<span lang="nl">Wat is uw bruto inkomen per jaar?</span>" comes back empty at 27%. Neither is pre-filled, and neither offers the earlier answer as a choice.
 
 WCAG 3.3.7 allows re-asking only where the information is essential to re-enter, where it is needed for security, or where the earlier answer is no longer valid. None of those applies: this is the same calculation continuing, moments later, in the same session.
 
 Re-entering a figure is a small cost for most people and a real one for anyone who types slowly, uses speech input, or has to find the source document again.
 
-A third answer is asked again further on. The energy label chosen in the calculator on page-14 is not carried over either: after "Voeg een woning toe" on the result, the step "Welk energielabel heeft de woning op dit moment?" (83%) arrives pre-set to "Energielabel A++++ (met EPG > 10 jaar)" instead of the label already given, which has to be picked again from the full list.
+A third answer is asked again further on. The energy label chosen in the calculator on page-14 is not carried over either: after "<span lang="nl">Voeg een woning toe</span>" on the result, the step "<span lang="nl">Welk energielabel heeft de woning op dit moment?</span>" (83%) arrives pre-set to "<span lang="nl">Energielabel A++++ (met EPG > 10 jaar)</span>" instead of the label already given, which has to be picked again from the full list.
 
 Within this page the wizard behaves correctly — pressing "Vorige" keeps what was entered — so the gap is specifically at the hand-over between the two pages.
 

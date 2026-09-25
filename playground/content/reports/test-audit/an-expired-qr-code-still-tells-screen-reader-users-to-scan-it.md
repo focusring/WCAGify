@@ -9,7 +9,7 @@ sample: page-3
 
 ![The login page after the QR code has expired. The code is greyed out and overlaid with a refresh icon and the text "Klik om een nieuwe QR-code te maken".](/api/uploads/test-audit/an-expired-qr-code-still-tells-screen-reader-users-to-scan-it-1-1-1-4d1ac48a.webp)
 
-After about 80 to 110 seconds the login QR code expires: it turns grey and a refresh control "Klik om een nieuwe QR-code te maken" is laid over it. The graphic (`qr-code[role="img"]`) keeps its text alternative, **"Scan de QR-code met de ABN AMRO app op uw telefoon of tablet om in te loggen"**.
+After about 80 to 110 seconds the login QR code expires: it turns grey and a refresh control "<span lang="nl">Klik om een nieuwe QR-code te maken</span>" is laid over it. The graphic (`qr-code[role="img"]`) keeps its text alternative, **"<span lang="nl">Scan de QR-code met de ABN AMRO app op uw telefoon of tablet om in te loggen</span>"**.
 
 A sighted user sees at once that the code can no longer be used. A screen-reader user is still told to scan it, and only the refresh button's own name hints that something changed. The text alternative no longer describes the image.
 

@@ -13,7 +13,7 @@ The account-opening page is declared Dutch (`<html lang="nl">`), but it holds a 
 
 A screen reader therefore reads these English sentences with Dutch pronunciation rules, which makes them hard to understand, exactly for the international visitors the card is aimed at. These are full sentences, not names or loan words, so no exception applies.
 
-The link **"International clients"** in the "Ook handig" list of the same page is the same case in two words, and so is the "International client" link in the "Ook handig" block of the payment-account page (page-13).
+The link **"International clients"** in the "<span lang="nl">Ook handig</span>" list of the same page is the same case in two words, and so is the "International client" link in the "<span lang="nl">Ook handig</span>" block of the payment-account page (page-13).
 
 #### Recommendation
 

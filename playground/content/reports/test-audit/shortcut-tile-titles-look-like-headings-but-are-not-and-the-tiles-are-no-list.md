@@ -10,8 +10,8 @@ sample: page-7
 
 The shortcut tiles (`a.segment-tile`) present each route as a titled card, but the markup carries neither the titles nor the grouping.
 
-- **The titles are not headings.** On the accessibility page (page-7) the three tiles "Ik ben blind of slechtziend", "Ik ben doof of slechthorend" and "Ik wil leren bankieren" open with a title set at 26 px (`p.emc-h4`), the same size as the real headings of the cards just below them. They are `<p>` elements, so the heading list jumps from "Bankieren voor iedereen" straight to "Samen lossen we het op". A screen-reader user who navigates by headings never meets the page's three main routes.
-- **The tiles are not a list.** Each tile is a bare link in its own `div`, with no `ul`/`li`, so the set and its size are not exposed. The comparable link blocks on the site ("Je situatie", "Direct regelen", every footer column) are lists.
+- **The titles are not headings.** On the accessibility page (page-7) the three tiles "<span lang="nl">Ik ben blind of slechtziend</span>", "<span lang="nl">Ik ben doof of slechthorend</span>" and "<span lang="nl">Ik wil leren bankieren</span>" open with a title set at 26 px (`p.emc-h4`), the same size as the real headings of the cards just below them. They are `<p>` elements, so the heading list jumps from "<span lang="nl">Bankieren voor iedereen</span>" straight to "<span lang="nl">Samen lossen we het op</span>". A screen-reader user who navigates by headings never meets the page's three main routes.
+- **The tiles are not a list.** Each tile is a bare link in its own `div`, with no `ul`/`li`, so the set and its size are not exposed. The comparable link blocks on the site ("<span lang="nl">Je situatie</span>", "<span lang="nl">Direct regelen</span>", every footer column) are lists.
 
 The same component is used on the homepage (page-1, eight tiles), the English homepage (page-2), the payments page (page-11, two grids of six), the account-opening page (page-12), the app page (page-18) and the online-banking page (page-24). The titles are `p.emc-h4` on each sample where they were checked.
 

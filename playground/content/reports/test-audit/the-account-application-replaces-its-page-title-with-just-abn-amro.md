@@ -7,9 +7,9 @@ difficulty: Low
 sample: page-30
 ---
 
-The application page for a personal payment account is sent with a descriptive title, "Bankrekening voor uzelf openen - ABN AMRO". About 1.5 seconds after load, when the embedded Mendix form starts, its client rewrites `document.title` to **"ABN AMRO"**, the bank's name and nothing else. The value comes from the Mendix navigation profile (`uiconfig.profile.title`). At the same moment it changes `html lang` from `nl` to `nl-NL`. The title stays "ABN AMRO" on step 1, on step 2 "Je gegevens", in the error state and after going back.
+The application page for a personal payment account is sent with a descriptive title, "<span lang="nl">Bankrekening voor uzelf openen - ABN AMRO</span>". About 1.5 seconds after load, when the embedded Mendix form starts, its client rewrites `document.title` to **"ABN AMRO"**, the bank's name and nothing else. The value comes from the Mendix navigation profile (`uiconfig.profile.title`). At the same moment it changes `html lang` from `nl` to `nl-NL`. The title stays "ABN AMRO" on step 1, on step 2 "<span lang="nl">Je gegevens</span>", in the error state and after going back.
 
-Screen-reader users hear "ABN AMRO" when the tab gets focus. In the tab bar, the history and a bookmark, this page cannot be told apart from any other. It is the one step of the "Open a payment account" process where the visitor actually applies. The steps before it have their own titles: "Bankrekening openen - ABN AMRO", "Bankrekening openen voor jezelf - ABN AMRO", "Klant worden - ABN AMRO". No other sample loses its title this way, so the cause is the Mendix form host, not the CMS template.
+Screen-reader users hear "ABN AMRO" when the tab gets focus. In the tab bar, the history and a bookmark, this page cannot be told apart from any other. It is the one step of the "Open a payment account" process where the visitor actually applies. The steps before it have their own titles: "<span lang="nl">Bankrekening openen - ABN AMRO</span>", "<span lang="nl">Bankrekening openen voor jezelf - ABN AMRO</span>", "<span lang="nl">Klant worden - ABN AMRO</span>". No other sample loses its title this way, so the cause is the Mendix form host, not the CMS template.
 
 #### Recommendation
 

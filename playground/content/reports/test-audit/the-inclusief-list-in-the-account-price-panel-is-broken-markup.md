@@ -9,7 +9,7 @@ sample: page-30
 
 ![The account application page with, in the right-hand column, the green price panel "Je betaalt per maand € 4,30" and under "Inclusief:" a list of six features with check marks, the last being "Veilig bankieren tips en hulp".](/api/uploads/test-audit/the-inclusief-list-in-the-account-price-panel-is-broken-markup-1-3-1-3c06a1de.webp)
 
-The price panel beside step 1 of the application lists what the account includes under **"Inclusief:"**. The sixth item, "Veilig bankieren tips en hulp", is wrapped in a Mendix container `div` inside the `ul`, so the list has a `div` child and that item has no list parent:
+The price panel beside step 1 of the application lists what the account includes under **"Inclusief:"**. The sixth item, "<span lang="nl">Veilig bankieren tips en hulp</span>", is wrapped in a Mendix container `div` inside the `ul`, so the list has a `div` child and that item has no list parent:
 
     <ul class="… mx-name-hTMLElement18">
       <li>Betaalrekening</li> … <li>Apple Pay en Google Pay</li>

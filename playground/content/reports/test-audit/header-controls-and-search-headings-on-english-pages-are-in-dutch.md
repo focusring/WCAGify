@@ -11,10 +11,10 @@ sample: page-26
 
 The English build of the site (`lang="en"`) carries Dutch text in the shared header, and none of it is marked `lang="nl"`. An English speech synthesiser reads it with English pronunciation rules.
 
-- In the phone-width header the two buttons at the top are named **"Taal - EN"** and **"Kies Segment - Personal"**. Their visible text is "EN" and "Personal", but the names a screen reader announces are Dutch phrases ("Taal" is language, "Kies Segment" is choose segment). They are the first two controls in that header.
-- The search overlay that phones and zoomed windows get groups its English suggestions under the Dutch headings **"Zelf regelen"** and **"Meteen naar"**. The desktop search bar on the same page shows "Self service…" and "Straight to…", so the overlay simply misses the translation.
+- In the phone-width header the two buttons at the top are named **"Taal - EN"** and **"Kies Segment - Personal"**. Their visible text is "EN" and "Personal", but the names a screen reader announces are Dutch phrases ("Taal" is language, "<span lang="nl">Kies Segment</span>" is choose segment). They are the first two controls in that header.
+- The search overlay that phones and zoomed windows get groups its English suggestions under the Dutch headings **"<span lang="nl">Zelf regelen</span>"** and **"<span lang="nl">Meteen naar</span>"**. The desktop search bar on the same page shows "Self service…" and "Straight to…", so the overlay simply misses the translation.
 
-The button names were found on page-2, page-26 and page-28, the Dutch headings on page-26 and page-28 ("Meteen naar" at 640 and 320 px). It is the same header on every English page.
+The button names were found on page-2, page-26 and page-28, the Dutch headings on page-26 and page-28 ("<span lang="nl">Meteen naar</span>" at 640 and 320 px). It is the same header on every English page.
 
 #### Recommendation
 

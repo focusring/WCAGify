@@ -10,7 +10,7 @@ sample: page-17
 
 ![The page of one share with the tabs Details, Opties and Nieuws; Details, the open tab, is shown only by an underline.](/api/uploads/test-audit/screen-readers-are-not-told-which-chart-period-or-share-tab-is-chosen-4-1-2-09d8dd9c.webp)
 
-Under the price chart the period links "Dag" to "10 Jaar" show the chosen period in bold (`class="selected"`), and nothing more: there is no `aria-pressed`, `aria-current` or `aria-selected`, and the accessibility tree reads `link "1 Maand"` exactly like the other six. The periods are `href="#"` links that act as toggle buttons.
+Under the price chart the period links "Dag" to "<span lang="nl">10 Jaar</span>" show the chosen period in bold (`class="selected"`), and nothing more: there is no `aria-pressed`, `aria-current` or `aria-selected`, and the accessibility tree reads `link "1 Maand"` exactly like the other six. The periods are `href="#"` links that act as toggle buttons.
 
 On the page of a share, the open tab ("Details", "Opties", "Nieuws") is marked only by an underline (`.activeTab`), again with no state in the markup.
 

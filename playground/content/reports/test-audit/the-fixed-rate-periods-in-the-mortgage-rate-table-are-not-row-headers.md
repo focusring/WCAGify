@@ -8,9 +8,9 @@ sample: page-15
 
 ![The mortgage-rate table with the column headers "Rentevaste periode", "NHG", "≤ 65%", "≤ 85%", "≤ 90%" and "> 90%". Down the left, set off by a vertical rule, run the periods "Variabel", "1 jaar", "2 jaar" and so on, each followed by five rates.](/api/uploads/test-audit/the-fixed-rate-periods-in-the-mortgage-rate-table-are-not-row-headers-1-3-1-b38af95a.webp)
 
-The rate table in the mortgage-rate tool (`table#primaryTable`) is a grid. Each rate belongs to a fixed-rate period, given by the row ("Variabel", "5 jaar", "10 jaar" …), and to a loan-to-value band, given by the column ("NHG", "≤ 65%" … "> 90%"). The column headers are correct `<th>` cells in a `<thead>`. The period cells are plain `<td>`, with no `scope`, `headers` or `role="rowheader"`, although the vertical rule and the heading "Rentevaste periode" present them as a header column.
+The rate table in the mortgage-rate tool (`table#primaryTable`) is a grid. Each rate belongs to a fixed-rate period, given by the row ("Variabel", "<span lang="nl">5 jaar</span>", "<span lang="nl">10 jaar</span>" …), and to a loan-to-value band, given by the column ("NHG", "≤ 65%" … "> 90%"). The column headers are correct `<th>` cells in a `<thead>`. The period cells are plain `<td>`, with no `scope`, `headers` or `role="rowheader"`, although the vertical rule and the heading "<span lang="nl">Rentevaste periode</span>" present them as a header column.
 
-A screen-reader user moving down the "≤ 65%" column hears "4,15%", "4,35%", "4,40%" with no period, and has to leave the column to find out which term each rate is for. The table has 6 rows, or 14 after "Toon alle periodes".
+A screen-reader user moving down the "≤ 65%" column hears "4,15%", "4,35%", "4,40%" with no period, and has to leave the column to find out which term each rate is for. The table has 6 rows, or 14 after "<span lang="nl">Toon alle periodes</span>".
 
 This is a different table from the savings rates on page-16, which have their own issue.
 

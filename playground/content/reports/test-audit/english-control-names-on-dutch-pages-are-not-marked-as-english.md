@@ -21,13 +21,13 @@ The pages are Dutch (`lang="nl"`), but a number of shared components carry **Eng
 - **"Close"**, the name the close × of the Qualtrics Feedback survey (`button#QSIFeedbackButton-close-btn`) takes from its `<img alt="Close">`, supplied by Qualtrics (page-2, page-6, page-9, page-25)
 - the status text **"1 items selected"** of the energy-label chooser in the mortgage calculator (page-14)
 - **"Back"**, the name of the back arrow in the search overlay on Android phones (page-13)
-- the review-score image **"9 on Klantenvertellen.nl"** in the customer reviews on the mortgage-interest page (page-15), whose two sibling images are Dutch ("Cijfer 10 op Klantenvertellen.nl"); write it as "Cijfer 9 op Klantenvertellen.nl"
+- the review-score image **"9 on Klantenvertellen.nl"** in the customer reviews on the mortgage-interest page (page-15), whose two sibling images are Dutch ("<span lang="nl">Cijfer 10 op Klantenvertellen.nl</span>"); write it as "<span lang="nl">Cijfer 9 op Klantenvertellen.nl</span>"
 
 Brand names and adopted words such as "Home", "app" and "cookies" are not counted. The "English" language link has the same problem and is reported separately.
 
 #### Recommendation
 
-Translate the strings in the components: "Informatie", "Sluiten", "Privé geselecteerd" (or better `aria-current="true"` on the link), "kruimelpad", "nieuwsbrief", "Chat openen", "Chatberichten", "1 item geselecteerd", "Terug", "Uitklappen" / "Inklappen". Where the English word is meant, mark it:
+Translate the strings in the components: "Informatie", "Sluiten", "<span lang="nl">Privé geselecteerd</span>" (or better `aria-current="true"` on the link), "kruimelpad", "nieuwsbrief", "<span lang="nl">Chat openen</span>", "Chatberichten", "<span lang="nl">1 item geselecteerd</span>", "Terug", "Uitklappen" / "Inklappen". Where the English word is meant, mark it:
 
     Taal / <span lang="en">Language</span>
 

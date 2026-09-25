@@ -9,15 +9,15 @@ sample: page-18
 
 ![The video in the page before playback, showing a poster image of a person holding a phone with a large round play button over it.](/api/uploads/test-audit/the-app-video-is-not-identified-in-text-1-1-1-fe4f462f.webp)
 
-The `<video>` element in the "Waarom anderen vertrouwen op de ABN AMRO app" section carries **no accessible name**: no `aria-label`, no `title`, no `aria-labelledby` and no `<figure>`/`<figcaption>`. Its only child text is the fallback paragraph that a modern browser never renders.
+The `<video>` element in the "<span lang="nl">Waarom anderen vertrouwen op de ABN AMRO app</span>" section carries **no accessible name**: no `aria-label`, no `title`, no `aria-labelledby` and no `<figure>`/`<figcaption>`. Its only child text is the fallback paragraph that a modern browser never renders.
 
 Assistive technology announces it as an unlabelled media element, so a user moving through the page by elements is told there is a video but not what it contains.
 
 The heading and introduction do sit immediately before it in the same section, which softens the effect for anyone reading the page in order — that is why this is recorded as Medium rather than High. It does not help a user who reaches the element directly.
 
-The video on the mortgage-interest page (page-15), under "Video over hypotheekrente", has no name either and shows in the tree as a bare `Video`. There the heading and the introduction naming the presenter come **after** the player in the DOM (the layout shows them to its left), so even a user reading in order meets the unnamed player before the text that identifies it.
+The video on the mortgage-interest page (page-15), under "<span lang="nl">Video over hypotheekrente</span>", has no name either and shows in the tree as a bare `Video`. There the heading and the introduction naming the presenter come **after** the player in the DOM (the layout shows them to its left), so even a user reading in order meets the unnamed player before the text that identifies it.
 
-The overlay play button is named correctly ("Afspelen video") and is not part of this issue.
+The overlay play button is named correctly ("<span lang="nl">Afspelen video</span>") and is not part of this issue.
 
 #### Recommendation
 

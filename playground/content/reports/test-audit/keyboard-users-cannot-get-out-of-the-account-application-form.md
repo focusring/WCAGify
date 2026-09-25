@@ -10,7 +10,7 @@ sample: page-30
 
 The account application form traps keyboard focus. `div.mx-dataview-content` cancels the browser's own Tab handling and wraps focus back inside itself, so **Tab and Shift+Tab cycle through the form's controls forever**.
 
-On first load that cycle is **three stops** — the privacy link, the radio "Prive" and the radio "Voor mezelf" — repeating endlessly in both directions. **Escape does not release it. F6 does not release it.** At step 2 the loop simply grows to that step's 16 stops; it never opens.
+On first load that cycle is **three stops** — the privacy link, the radio "Prive" and the radio "<span lang="nl">Voor mezelf</span>" — repeating endlessly in both directions. **Escape does not release it. F6 does not release it.** At step 2 the loop simply grows to that step's 16 stops; it never opens.
 
 It is worse than a trap a user can back out of, because **the page moves focus into the container by itself after load**. Someone who reloads the page is placed inside the trap before they have pressed anything, and from there the header, the search, the breadcrumb and the entire footer are unreachable. There is no way to leave except closing the tab or using browser chrome.
 

@@ -10,7 +10,7 @@ sample: page-15
 
 ![One Tab later. The table has collapsed back to six periods, the bar now reads "Toon alle periodes", and nothing on screen shows focus.](/api/uploads/test-audit/tabbing-onto-toon-minder-periodes-collapses-the-rate-table-and-loses-focus-3-2-1-3fb7653c.webp)
 
-Expand the rate table in the mortgage-rate tool with "Toon alle periodes" and keep pressing Tab. When focus reaches the button, now labelled **"Toon minder periodes"**, the table collapses **as soon as the button receives focus**. No key is pressed, yet the rows drop from 14 to 6 and focus falls to the document body. A scripted `focus()` alone has the same effect, so the collapse is tied to focus, not to activation.
+Expand the rate table in the mortgage-rate tool with "<span lang="nl">Toon alle periodes</span>" and keep pressing Tab. When focus reaches the button, now labelled **"<span lang="nl">Toon minder periodes</span>"**, the table collapses **as soon as the button receives focus**. No key is pressed, yet the rows drop from 14 to 6 and focus falls to the document body. A scripted `focus()` alone has the same effect, so the collapse is tied to focus, not to activation.
 
 The next Tab expands the table again and puts focus on it, and the cycle repeats: table, six info buttons, collapse, expand. On the host page, 20 Tab presses after expanding never left the tool, so the video, the explanations, the FAQ and the footer cannot be reached with forward Tab. Only Shift+Tab gets out. It reproduced in 7 of 9 runs (it depends on timing). When the button does keep focus, Enter collapses the table and also drops focus to the body.
 

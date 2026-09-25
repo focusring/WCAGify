@@ -8,13 +8,13 @@ sample: page-30
 
 ![The application form with a red error message "Je hebt niets ingevuld" under a question the user has not answered yet.](/api/uploads/test-audit/moving-through-the-form-shows-errors-for-questions-not-yet-reached-3-3-1-fce861a7.webp)
 
-Validation on this form fires on **blur**. Tabbing from one radio group to the next — without answering, because the user is still reading — inserts `div.alert.alert-danger[role=alert]` reading **"Je hebt niets ingevuld…"** under the group just left.
+Validation on this form fires on **blur**. Tabbing from one radio group to the next — without answering, because the user is still reading — inserts `div.alert.alert-danger[role=alert]` reading **"<span lang="nl">Je hebt niets ingevuld…</span>"** under the group just left.
 
 Tabbing forward is not a decision not to answer. A keyboard user moving through the form to see what it asks before committing is told, question by question, that they have done something wrong. A screen-reader user gets the error announced immediately, because it is a `role="alert"`.
 
 The effect compounds: by the time someone has looked at all four questions in step 1, the page is showing several errors for questions they fully intend to answer.
 
-The same validation also turns up as a dialog. After a minute or more on step 2 (seen after 60 seconds, 5 minutes and 16.5 minutes), pressing **"Vorige"** opens a modal "Fout": "**Salutation** heeft een probleem: Je hebt niets ingevuld. Kies een antwoord om door te gaan." It appears on step 1, about the "Je aanhef" question of the step the user has just left, and it names that question by its internal English attribute name, "Salutation", which the user has never seen. No answers are lost.
+The same validation also turns up as a dialog. After a minute or more on step 2 (seen after 60 seconds, 5 minutes and 16.5 minutes), pressing **"Vorige"** opens a modal "Fout": "**Salutation** heeft een probleem: Je hebt niets ingevuld. Kies een antwoord om door te gaan." It appears on step 1, about the "<span lang="nl">Je aanhef</span>" question of the step the user has just left, and it names that question by its internal English attribute name, "Salutation", which the user has never seen. No answers are lost.
 
 WCAG 3.3.1 is about identifying errors that exist. An unanswered question the user has not yet reached is not an error.
 

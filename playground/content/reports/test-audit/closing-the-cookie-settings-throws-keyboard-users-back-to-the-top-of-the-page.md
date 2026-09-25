@@ -8,7 +8,7 @@ sample: page-10
 
 ![The cookie settings panel is closed with the keyboard; the focus outline disappears entirely, and pressing Tab twice moves focus to the skip link at the very top of the page.](/api/uploads/test-audit/closing-the-cookie-settings-throws-keyboard-users-back-to-the-top-of-the-page-2-4-3-20679c73.gif)
 
-Open the cookie settings from the footer, then close them again. **All three ways out** — Enter on "Sluit voorkeurscentrum", Escape inside the dialog, and Escape inside the vendor-list filter popover — leave `document.activeElement` on `<body>`.
+Open the cookie settings from the footer, then close them again. **All three ways out** — Enter on "<span lang="nl">Sluit voorkeurscentrum</span>", Escape inside the dialog, and Escape inside the vendor-list filter popover — leave `document.activeElement` on `<body>`.
 
 Focus is not returned to the button that opened the panel, and it is not placed anywhere else either. Because it sits on `<body>`, the next Tab leaves the document altogether and the one after that restarts at the first skip link.
 

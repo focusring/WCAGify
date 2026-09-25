@@ -9,9 +9,9 @@ sample: page-30
 
 ![The date-of-birth question on step 2 of the account application, outlined in red, with three boxes and the small labels "Dag", "Maand" and "Jaar" underneath them.](/api/uploads/test-audit/the-date-of-birth-boxes-are-named-in-english-not-by-their-labels-dag-maand-jaar-2-5-3-3122ddd8.webp)
 
-On step 2 of the application ("Je gegevens"), the question **"Geboortedatum"** has three boxes with the labels "Dag", "Maand" and "Jaar" underneath. Those words are plain `span` text tied to nothing. The boxes take their names from `aria-label` instead: "date of birth, day", "date of birth, month" and "date of birth, year".
+On step 2 of the application ("<span lang="nl">Je gegevens</span>"), the question **"Geboortedatum"** has three boxes with the labels "Dag", "Maand" and "Jaar" underneath. Those words are plain `span` text tied to nothing. The boxes take their names from `aria-label` instead: "date of birth, day", "date of birth, month" and "date of birth, year".
 
-- Speech-input users who say "klik Dag" reach nothing, because the visible word is not in the name.
+- Speech-input users who say "<span lang="nl">klik Dag</span>" reach nothing, because the visible word is not in the name.
 - The relationship the eye reads, that this box is the day, reaches assistive technology only as different words in another language. This also fails 1.3.1.
 - On this Dutch page the English names have no `lang="en"`, so a Dutch voice mispronounces them (3.1.2, also listed in "English control names on Dutch pages are not marked as English").
 

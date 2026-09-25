@@ -13,10 +13,10 @@ sample: page-21
 
 Step 1 of the pension planner enforces two rules that nothing tells the visitor before they submit:
 
-- **"Je huidige leeftijd"** must be 18 to 70 (17 and 71 are refused);
-- **"Je maandelijkse inleg"** must be at least € 1 (0 is refused with "Vul een bedrag in.").
+- **"<span lang="nl">Je huidige leeftijd</span>"** must be 18 to 70 (17 and 71 are refused);
+- **"<span lang="nl">Je maandelijkse inleg</span>"** must be at least € 1 (0 is refused with "<span lang="nl">Vul een bedrag in.</span>").
 
-There is no hint beside either field and no instruction above the form. The age field has no help, and the monthly deposit's help says only "Hoeveel geld wil je gemiddeld per maand investeren in je pensioen?". The age range first appears in the error message; the minimum deposit appears nowhere. A visitor who wants to see the effect of a one-time deposit alone is refused without being told why.
+There is no hint beside either field and no instruction above the form. The age field has no help, and the monthly deposit's help says only "<span lang="nl">Hoeveel geld wil je gemiddeld per maand investeren in je pensioen?</span>". The age range first appears in the error message; the minimum deposit appears nowhere. A visitor who wants to see the effect of a one-time deposit alone is refused without being told why.
 
 The planner is Webbridge's application (`rekentools.webbridge.nl`), shown inside the page.
 

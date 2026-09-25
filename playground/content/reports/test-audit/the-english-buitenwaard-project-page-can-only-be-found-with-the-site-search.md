@@ -13,7 +13,7 @@ sample: page-26
 
 The English page for the **Buitenwaard** new-build project (page-26) can be reached only through the site search. Its breadcrumb parent, the region page "New construction projects in Noord-Holland", lists ten projects (The Hive, Hof Legmeer, NOVA Vennep, Elzenhagen, Green Gallery, Bajeskwartier, Dialogue, SPOT, Bolspark, De Oost) but not Buitenwaard. The new-housing overview and the regions page link only to the region page, and no header, menu or footer link leads to the project. A search for "buitenwaard" finds it as the only result.
 
-The Dutch region page does list Buitenwaard ("Lees meer over Buitenwaard"), so the English list seems to be out of date. People who cannot use the search well, or who browse by region, will not find the page. Pages outside the sample may still link to it.
+The Dutch region page does list Buitenwaard ("<span lang="nl">Lees meer over Buitenwaard</span>"), so the English list seems to be out of date. People who cannot use the search well, or who browse by region, will not find the page. Pages outside the sample may still link to it.
 
 #### Recommendation
 

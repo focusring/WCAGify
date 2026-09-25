@@ -12,16 +12,16 @@ sample: page-17
 
 Several controls of the market data application are `div`s with a click handler and nothing else: no role, no `tabindex`, no key handler. Tab passes them by, `focus()` does nothing, and they cannot be operated from the keyboard:
 
-- the three market choosers beside "Grafieken", "Top 5 stijgers" and "Top 5 dalers" (`div#exchange`, `#exchangeA`, `#exchangeB`) and their 13 options each;
-- on the page of a share, opened from any ticker or table link: the tabs "Details", "Opties" and "Nieuws", the yellow **"Order opgeven"** button, "Meer nieuws" and the chart period chooser ("Laatste jaar").
+- the three market choosers beside "Grafieken", "<span lang="nl">Top 5 stijgers</span>" and "<span lang="nl">Top 5 dalers</span>" (`div#exchange`, `#exchangeA`, `#exchangeB`) and their 13 options each;
+- on the page of a share, opened from any ticker or table link: the tabs "Details", "Opties" and "Nieuws", the yellow **"<span lang="nl">Order opgeven</span>"** button, "<span lang="nl">Meer nieuws</span>" and the chart period chooser ("<span lang="nl">Laatste jaar</span>").
 
-A keyboard user sees AEX figures only: the other twelve markets, the options and news of a share, the period of its chart and starting an order for it are all out of reach. The page of a share has four Tab stops in total. The frame's own `aria-label` promises the market choice ("Voor de tabellen en de grafiek kan zelf een beurs geselecteerd worden").
+A keyboard user sees AEX figures only: the other twelve markets, the options and news of a share, the period of its chart and starting an order for it are all out of reach. The page of a share has four Tab stops in total. The frame's own `aria-label` promises the market choice ("<span lang="nl">Voor de tabellen en de grafiek kan zelf een beurs geselecteerd worden</span>").
 
 The same controls also fail 4.1.2: they expose no role, name or state, so an open chooser reads as a list of loose words and nothing says which option is chosen. The loupe that runs the news search (`span#searchNewsIcon`) is an unnamed clickable `span` too. The application is the supplier's (`beursinfo.abnamro.nl`), shown inside the page.
 
 #### Recommendation
 
-Use native elements, which bring keyboard support, role and state with them: a labelled `<select>` for the market and period choosers, links for the tabs, and `<button>` for "Order opgeven", "Meer nieuws" and the loupe (`aria-label="Zoeken in nieuws"`):
+Use native elements, which bring keyboard support, role and state with them: a labelled `<select>` for the market and period choosers, links for the tabs, and `<button>` for "<span lang="nl">Order opgeven</span>", "<span lang="nl">Meer nieuws</span>" and the loupe (`aria-label="Zoeken in nieuws"`):
 
     <label for="exchangeA">Beurs</label>
     <select id="exchangeA">

@@ -8,7 +8,7 @@ sample: page-1
 
 ![The main navigation with the "Producten" panel open below it, showing the category links.](/api/uploads/test-audit/the-main-menu-buttons-do-not-say-whether-their-panel-is-open-4-1-2-ae03e5bd.webp)
 
-Opening a top-level menu ("Producten", "Je situatie", "App en Internet Bankieren") reveals a panel of **category buttons** — "Betalen & creditcards", "Hypotheken", "Geld lenen" and the rest. Each of those sits inside an `<li>`, and it is **the `<li>` that carries `aria-expanded`, not the `<button>` inside it**.
+Opening a top-level menu ("Producten", "<span lang="nl">Je situatie</span>", "<span lang="nl">App en Internet Bankieren</span>") reveals a panel of **category buttons** — "<span lang="nl">Betalen & creditcards</span>", "Hypotheken", "<span lang="nl">Geld lenen</span>" and the rest. Each of those sits inside an `<li>`, and it is **the `<li>` that carries `aria-expanded`, not the `<button>` inside it**.
 
 `aria-expanded` is not allowed on a `listitem`, so it is ignored there, and the button — the element a user actually focuses and activates — exposes no state at all. A screen-reader user pressing Enter on "Hypotheken" is not told that anything opened, and cannot tell from the button whether its category is currently showing.
 

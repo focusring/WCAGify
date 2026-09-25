@@ -8,7 +8,7 @@ sample: page-30
 
 ![Step 2 of the account application after "Volgende" with empty fields. The Postcode and Huisnummer boxes have a red border and the message "Je hebt niets ingevuld" under them; both are outlined.](/api/uploads/test-audit/fields-shown-as-wrong-in-the-account-application-are-not-all-exposed-as-wrong-4-1-2-09cef52a.webp)
 
-Press **"Volgende"** on step 2 of the application ("Je gegevens") with fields left empty, and each required field gets the message "Je hebt niets ingevuld. …" with a red icon. How the error reaches assistive technology differs from field to field:
+Press **"Volgende"** on step 2 of the application ("<span lang="nl">Je gegevens</span>") with fields left empty, and each required field gets the message "<span lang="nl">Je hebt niets ingevuld. …</span>" with a red icon. How the error reaches assistive technology differs from field to field:
 
 - **Postcode** and **Huisnummer** get a red border but neither `aria-invalid` nor `aria-describedby`. In the accessibility tree they are valid fields with no link to their message.
 - **Je voornamen**, **Je achternaam** and **Wat is je burgerservicenummer?** get `aria-invalid="true"`, but their `aria-describedby` still points only at the hint (`…HelperText1`), not at the `…-error` message beside it.

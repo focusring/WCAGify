@@ -8,7 +8,7 @@ sample: page-31
 
 ![The income question in the mortgage wizard. The continue button is pressed with the field empty and nothing happens; pressed a second time, a red error message appears under the field.](/api/uploads/test-audit/the-mortgage-wizard-refuses-the-first-attempt-to-continue-without-saying-why-3-3-1-ce8b374d.gif)
 
-On the two currency questions in the mortgage wizard — **"Wat is uw bruto inkomen per jaar?"** and **"Hoeveel geld wilt u zelf inbrengen?"** — pressing **"Ok, ga verder"** with the field empty does nothing at all. No error message, no change on screen, no focus move. Only the **second** press produces "Dit veld is verplicht."
+On the two currency questions in the mortgage wizard — **"<span lang="nl">Wat is uw bruto inkomen per jaar?</span>"** and **"<span lang="nl">Hoeveel geld wilt u zelf inbrengen?</span>"** — pressing **"<span lang="nl">Ok, ga verder</span>"** with the field empty does nothing at all. No error message, no change on screen, no focus move. Only the **second** press produces "<span lang="nl">Dit veld is verplicht.</span>"
 
 Reproduced three times across two page loads, with focus both inside and outside the field.
 

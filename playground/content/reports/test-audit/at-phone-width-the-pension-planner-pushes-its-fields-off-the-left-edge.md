@@ -10,7 +10,7 @@ sample: page-21
 
 The pension planner is supplied by Webbridge and shown in a frame (`#tcm-275659-iframe`). On a 320-pixel screen the frame is 256 pixels wide, and the planner's first step does not fit: its rows keep the label, the field and the help button side by side with fixed widths.
 
-The result is worse than a sideways scroll. The fields are pushed past the **left** edge, where scrolling cannot reach: the age field `#leeftijd` sits entirely outside the frame (from −44 to −6 pixels), and "Eenmalige inleg" and "Je maandelijkse inleg" start at −25 pixels, so only the last digits of their values show. The age is the only required field of the step, so on a phone the user cannot see what they are typing or that anything is there to fill in. The content is also 14 pixels wider than the frame, so it scrolls sideways as well. The page around the frame reflows correctly, and the planner's second step fits.
+The result is worse than a sideways scroll. The fields are pushed past the **left** edge, where scrolling cannot reach: the age field `#leeftijd` sits entirely outside the frame (from −44 to −6 pixels), and "<span lang="nl">Eenmalige inleg</span>" and "<span lang="nl">Je maandelijkse inleg</span>" start at −25 pixels, so only the last digits of their values show. The age is the only required field of the step, so on a phone the user cannot see what they are typing or that anything is there to fill in. The content is also 14 pixels wider than the frame, so it scrolls sideways as well. The page around the frame reflows correctly, and the planner's second step fits.
 
 #### Recommendation
 

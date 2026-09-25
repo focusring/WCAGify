@@ -9,7 +9,7 @@ sample: page-30
 
 ![Step 2 "Je gegevens" of the account application, empty, with the fields for initials, first names, surname, date of birth, citizen service number, nationality, postcode and house number.](/api/uploads/test-audit/the-personal-details-fields-of-the-account-application-do-not-identify-their-pur-1-3-5-44b88a7b.webp)
 
-Every text field on step 2 of the application ("Je gegevens") carries `autocomplete="on"`. That value only switches autofill on. It does not say what the field asks for, so neither browsers nor assistive tools can fill in or mark up the visitor's own details:
+Every text field on step 2 of the application ("<span lang="nl">Je gegevens</span>") carries `autocomplete="on"`. That value only switches autofill on. It does not say what the field asks for, so neither browsers nor assistive tools can fill in or mark up the visitor's own details:
 
 - **Je voornamen**: `on`, should be `given-name`
 - **Je achternaam**: `on`, should be `family-name`

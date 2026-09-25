@@ -14,7 +14,7 @@ It is not exposed as one. `div[data-component-type="chat-window"]` carries **no 
 
 The launcher button has the matching gap: `button[aria-label="Chat button"]` **never carries `aria-expanded`**, so nothing says whether the chat is open or closed.
 
-The keyboard behaviour is correct and deserves saying so: focus is trapped deliberately, never escapes behind the window, and both Escape and the "Minimaliseer chat" control close it and return focus to the launcher. What is missing is only the markup that tells assistive technology what this thing is.
+The keyboard behaviour is correct and deserves saying so: focus is trapped deliberately, never escapes behind the window, and both Escape and the "<span lang="nl">Minimaliseer chat</span>" control close it and return focus to the launcher. What is missing is only the markup that tells assistive technology what this thing is.
 
 A second, separate fault in the same component: the chat menu button carries `aria-controls="icon_menu"`, and **no element with that id exists** in the shadow root or the document — the menu is `ul#icon_menu_list`. It also has `aria-haspopup="true"` with **no `aria-expanded`** in either state.
 

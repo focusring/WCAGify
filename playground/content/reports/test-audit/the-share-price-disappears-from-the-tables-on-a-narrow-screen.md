@@ -8,7 +8,7 @@ sample: page-17
 
 ![The "Top 5 stijgers" table at a narrow viewport, showing only the company name and a percentage; the price and change columns are gone.](/api/uploads/test-audit/the-share-price-disappears-from-the-tables-on-a-narrow-screen-1-4-10-2dd5acfc.webp)
 
-As the viewport narrows, the "Top 5 stijgers" and "Top 5 dalers" tables **remove columns instead of reflowing them**:
+As the viewport narrows, the "<span lang="nl">Top 5 stijgers</span>" and "<span lang="nl">Top 5 dalers</span>" tables **remove columns instead of reflowing them**:
 
 - the absolute-change column goes `display:none` below about **560 px**
 - **"Huidig" — the share price itself — goes below about 440 px**

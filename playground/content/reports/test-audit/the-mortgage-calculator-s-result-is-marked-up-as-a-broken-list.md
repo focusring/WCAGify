@@ -9,7 +9,7 @@ sample: page-14
 
 ![The mortgage calculator's result "Dit is wat je maximaal kunt lenen", with "Maximale hypotheek € 170.484" and "Bruto maandbedrag € 836" outlined in red, and below them "Rente bij Annuïteit, 10 jaar rentevast 4,22%".](/api/uploads/test-audit/the-mortgage-calculator-s-result-is-marked-up-as-a-broken-list-1-3-1-06a14e28.webp)
 
-The result the mortgage calculator exists to give, three pairs of a term and a value ("Maximale hypotheek" / "€ 170.484", "Bruto maandbedrag" / "€ 836", "Rente bij Annuïteit, 10 jaar rentevast" / "4,22%"), is built from parts that do not fit together:
+The result the mortgage calculator exists to give, three pairs of a term and a value ("<span lang="nl">Maximale hypotheek</span>" / "€ 170.484", "<span lang="nl">Bruto maandbedrag</span>" / "€ 836", "<span lang="nl">Rente bij Annuïteit, 10 jaar rentevast</span>" / "4,22%"), is built from parts that do not fit together:
 
     <ul class="mortgage-data__list">
       <div role="group">

@@ -12,7 +12,7 @@ On the English site, the header at full width offers five sections: Home, Produc
 
 The missing section holds five categories (ABN AMRO app, Internet Banking, Help with online banking, More apps, Secure banking) with links to 16 pages. A walk through every other menu branch and the footer at 640 px found only 4 of them anywhere else. The other 12 cannot be reached at 200 % zoom, among them About the ABN AMRO app, Activate the app, Help using Internet Banking, E.dentifier, Tikkie and the pages on recognising, reporting and preventing fraud. The same is true at 320 px, so this also fails 1.4.10.
 
-Moving the navigation into a hamburger menu is fine; leaving a whole section out of it is lost content. The Dutch menu is complete: "App en Internet Bankieren" is there (checked on page-8, page-11, page-12 and page-16). Seen on page-2, page-26 and page-28 (at 640 and 320 px), so it affects the English build of the shared header.
+Moving the navigation into a hamburger menu is fine; leaving a whole section out of it is lost content. The Dutch menu is complete: "<span lang="nl">App en Internet Bankieren</span>" is there (checked on page-8, page-11, page-12 and page-16). Seen on page-2, page-26 and page-28 (at 640 and 320 px), so it affects the English build of the shared header.
 
 #### Recommendation
 

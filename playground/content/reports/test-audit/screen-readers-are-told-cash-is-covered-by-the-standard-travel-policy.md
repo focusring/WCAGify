@@ -8,7 +8,7 @@ sample: page-19
 
 ![The "Standaard dekking" card listing what the policy covers, with "Contant geld" shown in grey with a line through it and a cross beside it, while the items above have ticks.](/api/uploads/test-audit/screen-readers-are-told-cash-is-covered-by-the-standard-travel-policy-1-3-1-852ee0af.webp)
 
-The **"Standaard dekking"** card lists what the standard travel policy covers. One item — **"Contant geld"** — is _not_ covered, and the page shows that in three visual ways: the text is struck through, it is greyed out, and the tick beside it is replaced by a cross.
+The **"<span lang="nl">Standaard dekking</span>"** card lists what the standard travel policy covers. One item — **"<span lang="nl">Contant geld</span>"** — is _not_ covered, and the page shows that in three visual ways: the text is struck through, it is greyed out, and the tick beside it is replaced by a cross.
 
 None of those reach assistive technology. There is no `<del>` or `<s>` element, no word anywhere saying the item is excluded, and the accessibility tree exposes it as an ordinary list item — `listitem → StaticText "Contant geld"` — **identical to the eight items that are covered**.
 

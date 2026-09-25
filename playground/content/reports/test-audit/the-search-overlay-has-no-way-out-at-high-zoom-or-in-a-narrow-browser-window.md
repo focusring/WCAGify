@@ -8,7 +8,7 @@ sample: page-13
 
 ![At 640 px wide the search opens as a grey screen holding only the search field. A term is typed and cleared with the cross, the grey area is clicked, Escape and Tab are pressed, and the grey screen with the field stays every time.](/api/uploads/test-audit/the-search-overlay-has-no-way-out-at-high-zoom-or-in-a-narrow-browser-window-2-1-2-c6933ec7.gif)
 
-Below the desktop breakpoint, **"Open zoekbalk"** opens the search as a full-screen overlay (`div.search-overlay`, `position: fixed`, `z-index: 999`) that covers the whole page, header included. In a desktop browser that happens from 853 px wide, so for anyone who zooms a 1280 px window to 150 % or more, and in any narrow window.
+Below the desktop breakpoint, **"<span lang="nl">Open zoekbalk</span>"** opens the search as a full-screen overlay (`div.search-overlay`, `position: fixed`, `z-index: 999`) that covers the whole page, header included. In a desktop browser that happens from 853 px wide, so for anyone who zooms a 1280 px window to 150 % or more, and in any narrow window.
 
 In that overlay the text field is the only thing that can take focus. Tab, Shift+Tab and Escape all leave focus in the field. The cross that appears after typing only empties the field, and clicking the grey area does nothing. There is no close button. The only ways out are running a search or following a suggestion, which both leave the page. The site does ship a close control, but it picks it by user agent: an iPhone gets "Sluiten" and an Android phone gets "Back", and a desktop browser gets neither.
 
@@ -16,7 +16,7 @@ This is a keyboard trap, and it also means that the zoomed layout loses a functi
 
 #### Recommendation
 
-Render the close button for every visitor, based on the layout rather than the user agent, and let Escape close the overlay too. Both must return focus to "Open zoekbalk":
+Render the close button for every visitor, based on the layout rather than the user agent, and let Escape close the overlay too. Both must return focus to "<span lang="nl">Open zoekbalk</span>":
 
     <div class="search-overlay">
       <input id="search-input-overlay" type="search" …>
