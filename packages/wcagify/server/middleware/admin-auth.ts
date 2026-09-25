@@ -22,7 +22,7 @@ function isApiRoute(pathname: string): boolean {
 }
 
 export default defineEventHandler((event) => {
-  const { pathname } = getRequestURL(event)
+  const { pathname, search } = getRequestURL(event)
 
   if (isPublicRoute(pathname)) return
 
@@ -40,5 +40,5 @@ export default defineEventHandler((event) => {
   if (isApiRoute(pathname)) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
-  return sendRedirect(event, '/login')
+  return sendRedirect(event, `/login?redirect=${encodeURIComponent(pathname + search)}`)
 })

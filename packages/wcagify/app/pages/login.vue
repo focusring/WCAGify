@@ -9,10 +9,19 @@ const secret = ref('')
 const error = ref(false)
 const loading = ref(false)
 
+/** The page asked for before signing in; only paths on this site, never another origin. */
+const redirectTo = computed(() => {
+  const { redirect } = route.query
+  if (typeof redirect !== 'string' || !redirect.startsWith('/') || /^\/[/\\]/.test(redirect)) {
+    return '/'
+  }
+  return redirect === '/login' || redirect.startsWith('/login?') ? '/' : redirect
+})
+
 await refresh()
 
 if (isAuthenticated.value) {
-  await navigateTo((route.query.redirect as string) || '/')
+  await navigateTo(redirectTo.value)
 }
 
 async function submit() {
@@ -21,7 +30,7 @@ async function submit() {
   try {
     await login(secret.value)
     secret.value = ''
-    await navigateTo((route.query.redirect as string) || '/')
+    await navigateTo(redirectTo.value)
   } catch {
     error.value = true
   } finally {
