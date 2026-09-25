@@ -10,7 +10,7 @@ export default defineConfig({
   lang: 'en-US',
   cleanUrls: true,
   // Agent-facing docs (docs/agents, docs/adr) are not part of the published site.
-  srcExclude: ['agents/**', 'adr/**'],
+  srcExclude: ['agents/**', 'adr/**', 'research/**'],
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/wcagify.svg' }],
