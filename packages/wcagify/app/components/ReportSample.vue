@@ -29,11 +29,6 @@ const columns = computed<TableColumn<SamplePage>[]>(() => [
 </script>
 
 <template>
-  <!--
-    `contain-inline-size` keeps the table's minimum content width from
-    widening the page column at narrow viewports: the table scrolls inside
-    its own `overflow-auto` wrapper instead of the whole page.
-  -->
   <!-- Mobile: one stacked card per page, so no column is squeezed into a narrow strip. -->
   <ul :aria-label="t('report.representativeSample')" class="mt-4 space-y-4 md:hidden">
     <li
@@ -68,9 +63,15 @@ const columns = computed<TableColumn<SamplePage>[]>(() => [
     </li>
   </ul>
 
-  <!-- Desktop: the full table. -->
+  <!--
+    Desktop: the full table. `contain-inline-size` keeps the table's minimum
+    content width from widening the page column at narrow viewports: the table
+    scrolls inside its own `overflow-auto` wrapper instead of the whole page.
+    Both roots carry their own `mt-4`: with two roots, a class set on
+    <ReportSample> would not be inherited by either of them.
+  -->
   <UTable
-    class="hidden md:block"
+    class="mt-4 hidden md:block"
     :data="report.sample"
     :columns="columns"
     :ui="{
