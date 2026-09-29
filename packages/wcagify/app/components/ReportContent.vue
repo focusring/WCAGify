@@ -142,7 +142,7 @@ defineExpose({ visiblePrinciples })
         <UIcon name="i-lucide-layers" class="size-6 shrink-0" />
         {{ t('report.representativeSample') }}
       </h2>
-      <ReportSample :report="report" class="mt-4" />
+      <ReportSample :report="report" />
     </section>
 
     <template v-if="issuesByPrinciple.length">

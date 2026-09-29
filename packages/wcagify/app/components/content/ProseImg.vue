@@ -49,7 +49,13 @@ const buttonLabel = computed(() =>
       class="block w-full cursor-zoom-in rounded-md print:hidden"
       :aria-label="buttonLabel"
     >
-      <img :src="refinedSrc" :alt="alt" :width="width" :height="height" class="w-full rounded-md" />
+      <img
+        :src="refinedSrc"
+        :alt="alt"
+        :width="width"
+        :height="height"
+        class="max-h-200 rounded-md"
+      />
     </button>
 
     <template #body>

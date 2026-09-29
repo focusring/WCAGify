@@ -95,14 +95,18 @@ onBeforeUnmount(() => {
           base: 'px-4 py-3 flex-wrap items-start justify-start gap-3 text-left rounded-none ring-0 border-t border-muted'
         }"
       >
-        <h5 class="font-medium text-highlighted text-base min-w-0 flex-[1_1_10rem]">
+        <h5
+          class="font-medium text-highlighted text-base min-w-0 flex-[1_1_10rem] max-sm:basis-[calc(100%-2.5rem)]"
+        >
           <span v-if="index !== undefined && index !== null">{{ index }}. </span>{{ issue.title }}
         </h5>
 
         <!--
           Below `sm` the badges move to their own line under the title (visual
           order only, via `order`) and the sample title may wrap, so nothing is
-          clipped at 320px or with user text spacing.
+          clipped at 320px or with user text spacing. The title's mobile basis
+          fills the row minus the chevron (size-5 + gap-3, with slack for
+          rounding), so even a short badge can never fit beside it.
         -->
         <template #trailing>
           <UBadge
