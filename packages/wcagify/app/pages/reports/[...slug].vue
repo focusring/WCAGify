@@ -62,7 +62,7 @@ const visiblePrinciples = computed(
 </script>
 
 <template>
-  <div class="mx-6 flex gap-20 mb-8">
+  <div class="md:mx-6 mx-3 flex gap-20 mb-8">
     <div v-if="report" class="mx-auto w-full min-w-0 max-w-prose lg:max-w-none">
       <ReportContent ref="reportContentRef" :report="report" :issues="issues ?? []">
         <template #actions>
