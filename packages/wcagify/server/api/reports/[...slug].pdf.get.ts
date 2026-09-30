@@ -1,6 +1,7 @@
 import { queryCollection } from '@nuxt/content/server'
 import { generateReportPdf } from '@focusring/wcagify/pdf'
 import { createAuthLocalFetch } from '../../utils/local-fetch'
+import { sendPdf } from '../../utils/pdf-response'
 
 export default defineEventHandler(async (event) => {
   const raw = getRouterParam(event, 'slug.pdf')
@@ -27,7 +28,5 @@ export default defineEventHandler(async (event) => {
     localFetch: createAuthLocalFetch(localFetch)
   })
 
-  setHeader(event, 'Content-Type', 'application/pdf')
-  setHeader(event, 'Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`)
-  return pdfBuffer
+  return sendPdf(event, pdfBuffer, filename)
 })

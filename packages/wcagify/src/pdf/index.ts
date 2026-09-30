@@ -1,4 +1,5 @@
 export { prepareForPdf } from './html-processor'
+export { inlineImages } from './images'
 export { generatePdf } from './weasyprint-client'
 export { fixTableHeaders } from './struct-tree'
 export { generateReportPdf } from './generate-report-pdf'

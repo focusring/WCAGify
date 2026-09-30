@@ -2,6 +2,7 @@ import { queryCollection } from '@nuxt/content/server'
 import { generateReportPdf } from '@focusring/wcagify/pdf'
 import { createAuthLocalFetch } from '../../../utils/local-fetch'
 import { requireShare, verifyShareUnlock } from '../../../utils/share-access'
+import { sendPdf } from '../../../utils/pdf-response'
 
 export default defineEventHandler(async (event) => {
   const share = await requireShare(event)
@@ -31,7 +32,5 @@ export default defineEventHandler(async (event) => {
     reportPath: `/reports/${share.report_slug}`
   })
 
-  setHeader(event, 'Content-Type', 'application/pdf')
-  setHeader(event, 'Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`)
-  return pdfBuffer
+  return sendPdf(event, pdfBuffer, filename)
 })

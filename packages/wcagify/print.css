@@ -336,20 +336,37 @@
     break-inside: auto;
   }
 
+  /* Running text: Tailwind's `leading-7` is a fixed 28px, which double-spaces
+   * the 10.5pt issue text in the PDF. */
+  .prose p,
+  .prose li {
+    line-height: 1.5 !important;
+  }
+
+  /* Inline code is `inline-block` on screen; as a block it pushes every line
+   * that holds one apart. Inline, it keeps the line height of the text. */
   .prose code {
+    display: inline !important;
     font-size: 9pt;
+    line-height: inherit;
     background-color: #f3f4f6 !important;
-    padding: 1pt 3pt;
+    padding: 0 2pt !important;
+    border: 0.5pt solid #e5e7eb !important;
     border-radius: 2pt;
   }
 
   .prose pre code {
     background: none !important;
-    padding: 0;
+    padding: 0 !important;
+    border: 0 !important;
   }
 
+  /* Portrait screenshots (a phone-width page, an animated GIF) are taller
+   * than an A4 page at full width; scale them down to fit on one. */
   .prose img {
+    width: auto !important;
     max-width: 100%;
+    max-height: 190mm;
     break-inside: avoid;
   }
 
@@ -412,28 +429,39 @@
     -webkit-box-decoration-break: clone;
   }
 
-  article[id^='issue-'] > button {
-    width: 96%;
+  /* The issue header is a flex row on screen. WeasyPrint sizes the title at
+   * its one-line width there, so long titles run under the sample and status
+   * badges. As blocks, the title wraps and the badges follow on their own line.
+   * The PDF pipeline turns the trigger button into a `[data-issue-header]` div. */
+  article[id^='issue-'] > button,
+  article[id^='issue-'] > [data-issue-header] {
+    width: auto !important;
     background: white !important;
     border: 0 !important;
-    padding: 8pt 0pt !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    align-items: baseline;
-    gap: 8pt;
+    padding: 8pt 10pt 0 !important;
+    margin: 0 !important;
+    display: block !important;
     text-align: left;
     break-after: avoid;
   }
 
-  article[id^='issue-'] > button h5 {
-    flex: 1;
-    margin: 0;
+  article[id^='issue-'] > button h5,
+  article[id^='issue-'] > [data-issue-header] h5 {
+    display: block;
+    margin: 0 0 4pt;
     font-size: 11pt;
     font-weight: 600;
   }
 
+  article[id^='issue-'] > button > span[data-slot='base'],
+  article[id^='issue-'] > [data-issue-header] > span[data-slot='base'] {
+    margin: 0 4pt 0 0;
+    vertical-align: middle;
+  }
+
   /* Hide collapsible chevron in PDF — content is always expanded */
-  article[id^='issue-'] > button .iconify[class*='chevron-down'] {
+  article[id^='issue-'] > button .iconify[class*='chevron-down'],
+  article[id^='issue-'] > [data-issue-header] .iconify[class*='chevron-down'] {
     display: none !important;
   }
 
@@ -454,6 +482,17 @@
     padding: 0pt 8pt !important;
   }
 
+  /* Success criterion card: white, with only its header on grey. When an
+   * issue moves to the next page, the space it leaves at the bottom of the
+   * card would otherwise print as a grey block. */
+  .sc-list > div {
+    background: white !important;
+  }
+
+  .sc-list > div > .sc-header {
+    background: #f9fafb !important;
+  }
+
   .sc-list > * + * {
     margin-top: 8pt !important;
   }
@@ -461,7 +500,7 @@
   /* Issue footer (Type / Severity / Success criteria / Sample) */
   article[id^='issue-'] dl {
     display: grid !important;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto 1fr;
     column-gap: 16pt;
     row-gap: 4pt;
     margin: 0 !important;

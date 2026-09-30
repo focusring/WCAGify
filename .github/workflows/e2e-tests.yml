@@ -38,8 +38,8 @@ jobs:
         # Pinned by version + SHA-256: the release publishes no checksum file, so
         # the hash is hard-pinned here and must be bumped when upgrading Horn.
         env:
-          HORN_VERSION: v0.2.1
-          HORN_SHA256: 3bf3e7a574bc44c3a72af39b7c74bc3f6661d926d4cdc738add300c657aad2f4
+          HORN_VERSION: v0.4.0
+          HORN_SHA256: 12408bfaa8a1f26311ee092f11f9f203ae2f042e3397f8a4575a51c42f8e47df
         run: |
           curl -fsSL "https://github.com/focusring/horn/releases/download/${HORN_VERSION}/horn-linux-x86_64" \
             -o /usr/local/bin/horn

@@ -135,4 +135,55 @@ describe('prepareForPdf', () => {
     expect(result).not.toContain('print:hidden')
     expect(result).toContain('<p>visible</p>')
   })
+
+  it('removes print:hidden buttons and the empty status spans beside them', async () => {
+    const html =
+      '<html><head></head><body><div class="relative group">' +
+      '<span role="status" class="sr-only print:hidden"></span>' +
+      '<button type="button" aria-label="Copy code" class="absolute print:hidden"><span class="iconify"></span></button>' +
+      '<pre><code>x</code></pre></div></body></html>'
+    vi.mocked(fetch).mockResolvedValue(new Response(''))
+    const result = await prepareForPdf(html, 'http://localhost:3000')
+    expect(result).not.toContain('Copy code')
+    expect(result).not.toContain('role="status"')
+    expect(result).toContain('<pre><code>x</code></pre>')
+  })
+
+  it('drops visually hidden text from links that have visible text', async () => {
+    const html =
+      '<html><head></head><body><a href="https://example.com/">https://example.com/ ' +
+      '<span class="sr-only">(Home, opens in a new tab)</span>' +
+      '<span class="iconify" aria-hidden="true"></span></a></body></html>'
+    vi.mocked(fetch).mockResolvedValue(new Response(''))
+    const result = await prepareForPdf(html, 'http://localhost:3000')
+    expect(result).toContain('<a href="https://example.com/">https://example.com/ </a>')
+    expect(result).not.toContain('opens in a new tab')
+  })
+
+  it('keeps visually hidden text that is the only text of a link', async () => {
+    const html =
+      '<html><head></head><body><a href="/next"><span class="sr-only">Next page</span></a></body></html>'
+    vi.mocked(fetch).mockResolvedValue(new Response(''))
+    const result = await prepareForPdf(html, 'http://localhost:3000')
+    expect(result).toContain('<a href="/next">Next page</a>')
+  })
+
+  it('opens issues and turns their toggle button into a header', async () => {
+    const html =
+      '<html><head></head><body>' +
+      '<article data-state="closed" id="issue-a"><!--[-->' +
+      '<button type="button" aria-controls="issue-a-content" aria-expanded="false" class="flex w-full">' +
+      '<h5>1. Title</h5><span data-slot="base">Home</span></button>' +
+      '<div data-slot="content" hidden><p>Body</p><button type="button">Other</button></div>' +
+      '</article></body></html>'
+    vi.mocked(fetch).mockResolvedValue(new Response(''))
+    const result = await prepareForPdf(html, 'http://localhost:3000')
+    expect(result).toContain(
+      '<!--[--><div data-issue-header class="flex w-full"><h5>1. Title</h5><span data-slot="base">Home</span></div>'
+    )
+    expect(result).toContain('<article data-state="open" id="issue-a">')
+    expect(result).toContain(
+      '<div data-slot="content"><p>Body</p><button type="button">Other</button>'
+    )
+  })
 })

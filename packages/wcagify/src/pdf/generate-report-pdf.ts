@@ -1,4 +1,5 @@
 import { prepareForPdf } from './html-processor'
+import { inlineImages } from './images'
 import { fixTableHeaders } from './struct-tree'
 import { generatePdf } from './weasyprint-client'
 
@@ -20,7 +21,7 @@ export async function generateReportPdf(options: ReportPdfOptions): Promise<Uint
     throw new Error(`Failed to fetch report page ${fetchPath}: ${pageResponse.status}`)
   }
   const ssrHtml = await pageResponse.text()
-  const html = await prepareForPdf(ssrHtml, options.baseUrl)
+  const html = await inlineImages(await prepareForPdf(ssrHtml, options.baseUrl), options.localFetch)
 
   const pdf = await generatePdf(html, options.filename, options.weasyprintUrl)
   return fixTableHeaders(pdf)

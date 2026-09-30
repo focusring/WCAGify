@@ -3,9 +3,22 @@ const HREF_RE = /href=["']([^"']+)["']/i
 const SCRIPT_RE = /<script\b[^>]*>[\s\S]*?<\/script>/gi
 const PRELOAD_RE = /<link\s+[^>]*rel=["'](?:modulepreload|preload)["'][^>]*>/gi
 const PRINT_HIDDEN_RE = /<div[^>]*class="[^"]*print:hidden[^"]*"[^>]*>[\s\S]*?<\/div>/gi
+/*
+ * Buttons cannot nest, so the first `</button>` closes the match. Removing the
+ * code block's copy button and the image zoom button keeps them out of the PDF even
+ * when a stylesheet fails to hide them, and saves fetching every image twice.
+ */
+const PRINT_HIDDEN_BUTTON_RE =
+  /<button\b[^>]*class="[^"]*\bprint:hidden\b[^"]*"[^>]*>[\s\S]*?<\/button>/gi
+const PRINT_HIDDEN_EMPTY_SPAN_RE =
+  /<span\b[^>]*class="[^"]*\bprint:hidden\b[^"]*"[^>]*>[^<]*<\/span>/gi
+const SR_ONLY_SPAN_RE = /<span\b[^>]*class="[^"]*\bsr-only\b[^"]*"[^>]*>[^<]*<\/span>/g
 const APP_SEPARATOR_RE = /<\/main>\s*<div[^>]*role="separator"[^>]*>[\s\S]*?<\/div>/gi
 const TABLE_SEPARATOR_TR_RE = /<tr\s+data-slot="separator"[^>]*>[\s\S]*?<\/tr>/gi
 const ISSUE_ARTICLE_RE = /<article[^>]*\sid="issue-[^"]*"[^>]*>[\s\S]*?<\/article>/g
+// The first button of an issue article is its collapsible trigger (buttons cannot nest).
+const ISSUE_TRIGGER_RE =
+  /^(?<open><article\b[^>]*>(?:<!--[\s\S]*?-->)*)<button\b(?<attrs>[^>]*)>(?<body>[\s\S]*?)<\/button>/
 const HIDDEN_ATTR_ON_CONTENT_RE = /(<div[^>]*data-slot="content"[^>]*?)\shidden(?=[\s/>])/g
 
 /**
@@ -15,12 +28,18 @@ const HIDDEN_ATTR_ON_CONTENT_RE = /(<div[^>]*data-slot="content"[^>]*?)\shidden(
  * `<span data-slot="label">` and decorative icons; flattening the link
  * content to plain text gives WeasyPrint a clean /Link > text mapping.
  * Decorative `aria-hidden` icons are dropped, label text is preserved.
+ *
+ * Visually hidden `sr-only` text is dropped too when the link has visible
+ * text: unwrapped, it would be printed ("…index.html (Home, opens in a new
+ * tab)"), and "opens in a new tab" is not true of a link in a PDF.
  */
 function flattenLinks(html: string): string {
   return html.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/g, (_match, attrs: string, body: string) => {
     let stripped = body
     stripped = stripped.replace(/<!--[\s\S]*?-->/g, '')
     stripped = stripped.replace(/<span\b[^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/span>/g, '')
+    const withoutSrOnly = stripped.replace(SR_ONLY_SPAN_RE, '')
+    if (withoutSrOnly.replace(/<[^>]*>/g, '').trim()) stripped = withoutSrOnly
     let prev: string
     do {
       prev = stripped
@@ -30,12 +49,23 @@ function flattenLinks(html: string): string {
   })
 }
 
+/**
+ * Opens every issue and turns its collapsible trigger into a plain header.
+ * A toggle button means nothing in a PDF, and WeasyPrint does not paint the
+ * badges of a `<button>` laid out as a block (the print stylesheet needs block
+ * layout so long titles wrap instead of running under the badges).
+ */
 function expandIssueCollapsibles(html: string): string {
   return html.replace(ISSUE_ARTICLE_RE, (match) =>
     match
       .replace(/data-state="closed"/g, 'data-state="open"')
       .replace(/aria-expanded="false"/g, 'aria-expanded="true"')
       .replace(HIDDEN_ATTR_ON_CONTENT_RE, '$1')
+      .replace(ISSUE_TRIGGER_RE, (...args) => {
+        const { open, attrs, body } = args.at(-1) as Record<'open' | 'attrs' | 'body', string>
+        const kept = attrs.replace(/\s(?:type|aria-controls|aria-expanded)="[^"]*"/g, '')
+        return `${open}<div data-issue-header${kept}>${body}</div>`
+      })
   )
 }
 
@@ -219,6 +249,11 @@ const PDF_OVERRIDES = `<style>
    * inside a table (caption.sr-only), which trips horn 09-006 Table-in-
    * Table. Render sr-only inline-but-tiny instead so the text stays in
    * the tag tree exactly where it lives in the source.
+   *
+   * "Tiny" must still be a size WeasyPrint measures glyphs at correctly: it
+   * writes a font's /W widths from the first run that uses each glyph, and at
+   * 0.001pt the rounding made them disagree with the embedded font program
+   * (horn 31-016) whenever hidden text was the first to use a glyph.
    */
   .sr-only {
     position: static !important;
@@ -230,7 +265,7 @@ const PDF_OVERRIDES = `<style>
     clip: auto !important;
     white-space: normal !important;
     border-width: 0 !important;
-    font-size: 0.001pt !important;
+    font-size: 3pt !important;
     line-height: 0 !important;
     color: transparent !important;
   }
@@ -273,6 +308,8 @@ async function prepareForPdf(html: string, baseUrl: string): Promise<string> {
   result = result.replace(SCRIPT_RE, '')
   result = result.replace(PRELOAD_RE, '')
   result = result.replace(PRINT_HIDDEN_RE, '')
+  result = result.replace(PRINT_HIDDEN_BUTTON_RE, '')
+  result = result.replace(PRINT_HIDDEN_EMPTY_SPAN_RE, '')
   result = result.replace(APP_SEPARATOR_RE, '</main>')
   result = result.replace(TABLE_SEPARATOR_TR_RE, '')
   result = expandIssueCollapsibles(result)
