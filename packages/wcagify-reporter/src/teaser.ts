@@ -6,14 +6,18 @@ import { scorecardByLevel } from './wcag'
 const levels = ['A', 'AA', 'AAA'] as const satisfies Level[]
 const wcagVersions = ['2.0', '2.1', '2.2'] as const satisfies WcagVersion[]
 
-const teaserCountsSchema = z.strictObject({
-  conforming: z.int().min(0),
-  failed: z.int().min(0),
-  total: z.int().min(0)
-})
+/* The schemas are built in pure immediately invoked functions; see `schemas.ts`. */
 
-const levelSchema = z.enum(levels)
-const levelCountsSchema = teaserCountsSchema.extend({ level: levelSchema })
+const teaserCountsSchema = /* @__PURE__ */ (() =>
+  z.strictObject({
+    conforming: z.int().min(0),
+    failed: z.int().min(0),
+    total: z.int().min(0)
+  }))()
+
+const levelSchema = /* @__PURE__ */ (() => z.enum(levels))()
+const levelCountsSchema = /* @__PURE__ */ (() =>
+  teaserCountsSchema.extend({ level: levelSchema }))()
 
 /**
  * What a reader may see of a report before they get the report itself: the
@@ -21,13 +25,14 @@ const levelCountsSchema = teaserCountsSchema.extend({ level: levelSchema })
  * total. Strict, so a stored teaser cannot carry titles, criteria or other
  * report content.
  */
-const teaserSchema = z.strictObject({
-  wcagVersion: z.enum(wcagVersions),
-  targetLevel: levelSchema,
-  findings: z.int().min(0),
-  levels: z.array(levelCountsSchema),
-  total: teaserCountsSchema
-})
+const teaserSchema = /* @__PURE__ */ (() =>
+  z.strictObject({
+    wcagVersion: z.enum(wcagVersions),
+    targetLevel: levelSchema,
+    findings: z.int().min(0),
+    levels: z.array(levelCountsSchema),
+    total: teaserCountsSchema
+  }))()
 
 type Teaser = z.output<typeof teaserSchema>
 
