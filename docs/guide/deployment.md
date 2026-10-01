@@ -44,6 +44,8 @@ WCAGify includes `@libsql/client` out of the box and automatically detects `DATA
 | `DATABASE_AUTH_TOKEN`  | No               | Auth token for the remote database           |
 | `PORT`                 | No               | Server port (defaults to `3000`)             |
 
+With `WCAGIFY_ADMIN_SECRET` set, everything needs the admin sign-in except the sign-in page, share links (`/share/…` and `/api/share/…`) and the assets those pages load. Nuxt Content's collection data (`/__nuxt_content/…`) is served only to a signed-in admin.
+
 Create a `.env` file from the included example:
 
 ```bash

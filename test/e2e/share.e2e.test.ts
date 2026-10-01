@@ -3,12 +3,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright'
 
 import {
+  buildProject,
   cleanupProject,
   installDependencies,
   packWcagify,
   patchPackageJsonForLocalWcagify,
   scaffoldProject,
-  startPreviewServer,
+  startBuiltServer,
   stopDevServer
 } from './setup/test-utils.js'
 
@@ -22,14 +23,29 @@ interface ShareResponse {
   delete_token: string
 }
 
+async function createShare(
+  baseUrl: string,
+  body: { reportSlug: string; password?: string },
+  headers: Record<string, string> = {}
+): Promise<ShareResponse> {
+  const response = await fetch(`${baseUrl}/api/shares`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify(body)
+  })
+  expect(response.status).toBe(201)
+  return (await response.json()) as ShareResponse
+}
+
 describe('Share E2E', () => {
   let browser: Browser
+  let projectPath: string
   let serverProcess: ChildProcess
   let baseUrl: string
 
   beforeAll(async () => {
     cleanupProject(PROJECT_NAME)
-    const projectPath = scaffoldProject(PROJECT_NAME)
+    projectPath = scaffoldProject(PROJECT_NAME)
     const tarball = packWcagify()
     patchPackageJsonForLocalWcagify(projectPath, tarball)
     installDependencies(projectPath)
@@ -40,7 +56,8 @@ describe('Share E2E', () => {
     // so hydration is slow and wildly variable (tens of seconds, sometimes minutes
     // on a loaded CI runner) and the form submit can't be timed reliably. A
     // prebuilt app hydrates deterministically in well under a second.
-    const server = await startPreviewServer(projectPath, 3102)
+    buildProject(projectPath)
+    const server = await startBuiltServer(projectPath, 3102)
     serverProcess = server.process
     baseUrl = server.url
 
@@ -60,13 +77,7 @@ describe('Share E2E', () => {
     let page: Page
 
     beforeAll(async () => {
-      const response = await fetch(`${baseUrl}/api/shares`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportSlug: REPORT_SLUG })
-      })
-      expect(response.status).toBe(201)
-      share = (await response.json()) as ShareResponse
+      share = await createShare(baseUrl, { reportSlug: REPORT_SLUG })
     })
 
     afterAll(async () => {
@@ -100,13 +111,7 @@ describe('Share E2E', () => {
     let page: Page
 
     beforeAll(async () => {
-      const response = await fetch(`${baseUrl}/api/shares`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportSlug: REPORT_SLUG, password })
-      })
-      expect(response.status).toBe(201)
-      share = (await response.json()) as ShareResponse
+      share = await createShare(baseUrl, { reportSlug: REPORT_SLUG, password })
     })
 
     afterAll(async () => {
@@ -156,6 +161,122 @@ describe('Share E2E', () => {
     it('returns 404 for non-existent token', async () => {
       const response = await fetch(`${baseUrl}/api/share/nonexistent123`)
       expect(response.status).toBe(404)
+    })
+  })
+
+  // A deployment with WCAGIFY_ADMIN_SECRET: only share links and the sign-in
+  // page are public. A second server runs from the same build with the secret.
+  describe('with an admin secret', () => {
+    const secret = 'e2e-admin-secret'
+    let lockedProcess: ChildProcess
+    let lockedUrl: string
+    let adminCookie: string
+
+    beforeAll(async () => {
+      const server = await startBuiltServer(projectPath, 3107, { WCAGIFY_ADMIN_SECRET: secret })
+      lockedProcess = server.process
+      lockedUrl = server.url
+
+      const login = await fetch(`${lockedUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret })
+      })
+      expect(login.status).toBe(200)
+      adminCookie = login.headers.getSetCookie()[0]!.split(';')[0]!
+    })
+
+    afterAll(() => {
+      if (lockedProcess) stopDevServer(lockedProcess)
+    })
+
+    // Records every response a viewer's page gets that the admin auth refused:
+    // a 401, or a redirect to the sign-in page.
+    function trackRefusals(page: Page): string[] {
+      const refused: string[] = []
+      page.on('response', (response) => {
+        const location = response.headers()['location'] ?? ''
+        if (response.status() === 401 || location.startsWith('/login')) {
+          refused.push(`${response.status()} ${response.url()}`)
+        }
+      })
+      return refused
+    }
+
+    it.each(['reports', 'issues'])(
+      'refuses the %s collection dump to a visitor',
+      async (collection) => {
+        const response = await fetch(`${lockedUrl}/__nuxt_content/${collection}/sql_dump.txt`)
+        expect(response.status).toBe(401)
+      }
+    )
+
+    it('serves the collection dump to a signed-in admin', async () => {
+      const response = await fetch(`${lockedUrl}/__nuxt_content/issues/sql_dump.txt`, {
+        headers: { cookie: adminCookie }
+      })
+      expect(response.status).toBe(200)
+      expect((await response.text()).length).toBeGreaterThan(0)
+    })
+
+    it('sends a visitor of the report list to the sign-in page', async () => {
+      const response = await fetch(`${lockedUrl}/`, { redirect: 'manual' })
+      expect(response.status).toBe(302)
+      expect(response.headers.get('location')).toMatch(/^\/login/)
+    })
+
+    it('shows a shared report to a viewer without an admin session', async () => {
+      const share = await createShare(
+        lockedUrl,
+        { reportSlug: REPORT_SLUG },
+        { cookie: adminCookie }
+      )
+      const context = await browser.newContext()
+      const page = await context.newPage()
+      const refused = trackRefusals(page)
+
+      await page.goto(`${lockedUrl}/share/${share.token}`)
+      await page.waitForSelector('#executive-summary', { timeout: 30_000 })
+      await page.waitForLoadState('networkidle')
+
+      expect(await page.$('#scorecard')).toBeTruthy()
+      expect(await page.$('#issues')).toBeTruthy()
+      expect(refused).toEqual([])
+      await context.close()
+    })
+
+    it('unlocks a password-protected share for a viewer without an admin session', async () => {
+      const password = 'test-password-123'
+      const share = await createShare(
+        lockedUrl,
+        { reportSlug: REPORT_SLUG, password },
+        { cookie: adminCookie }
+      )
+      const context = await browser.newContext()
+      const page = await context.newPage()
+      const refused = trackRefusals(page)
+
+      await page.goto(`${lockedUrl}/share/${share.token}`)
+      await page.waitForSelector('input[type="password"]', { timeout: 30_000 })
+      await page.fill('input[type="password"]', password)
+      await page.click('button[type="submit"]')
+      await page.waitForSelector('#executive-summary', { timeout: 30_000 })
+      await page.waitForLoadState('networkidle')
+
+      expect(await page.$('#issues')).toBeTruthy()
+      expect(refused).toEqual([])
+      await context.close()
+    })
+
+    it('shows the not-found page for an unknown share link, not the sign-in page', async () => {
+      const context = await browser.newContext()
+      const page = await context.newPage()
+
+      const response = await page.goto(`${lockedUrl}/share/nonexistent123`)
+
+      expect(response?.status()).toBe(404)
+      expect(new URL(page.url()).pathname).toBe('/share/nonexistent123')
+      await context.close()
     })
   })
 })
