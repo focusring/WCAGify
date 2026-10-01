@@ -16,6 +16,7 @@ export {
   samplePageSchema,
   scStatusesSchema
 } from './schemas'
+export { minimarkSchema, reportDocumentSchema, issueDocumentSchema } from './document'
 export {
   filterIssues,
   sortIssuesBySc,
@@ -24,6 +25,8 @@ export {
   groupIssuesByPrinciple
 } from './issues'
 export { resolveSamplePage } from './report'
+export { reportTeaser, teaserSchema } from './teaser'
+export { rewriteUploadUrls } from './uploads'
 export { defineWcagifyConfig } from './config'
 export {
   toSlug,
@@ -50,3 +53,5 @@ export type {
   PrincipleGroup
 } from './types'
 export type { ScorecardOptions } from './wcag'
+export type { MinimarkNode, Minimark, ReportDocument, IssueDocument } from './document'
+export type { Teaser, TeaserReport } from './teaser'

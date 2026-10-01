@@ -1,6 +1,6 @@
 import { queryCollection } from '@nuxt/content/server'
+import { rewriteUploadUrls } from '@focusring/wcagify'
 import { requireShare, verifyShareUnlock } from '../../utils/share-access'
-import { rewriteUploadUrls } from '../../utils/share-uploads'
 
 export default defineEventHandler(async (event) => {
   const share = await requireShare(event)
@@ -22,7 +22,11 @@ export default defineEventHandler(async (event) => {
 
   return {
     report,
-    issues: rewriteUploadUrls(issues, share.report_slug, share.token),
+    issues: rewriteUploadUrls(
+      issues,
+      `/api/uploads/${share.report_slug}/`,
+      `/api/share/${share.token}/uploads/`
+    ),
     token: share.token
   }
 })

@@ -44,3 +44,58 @@ This depends on Nitro internals (h3's `fetchWithEvent` and node-mock-http's `__u
 `nuxt-studio`, its enabling condition, its dependency and catalog entry, its knip entry, the `shims/` folder with its Vite alias and `optimizeDeps` entry, and its documentation are gone. The allow-list needed no further change. Projects that still want Studio can add `nuxt-studio` to their own modules.
 
 If `nuxt prepare` fails with "Could not load @nuxtjs/mdc" after pulling this change, run `pnpm install --force --frozen-lockfile`; a stale pnpm link record can survive the dependency removal. Fresh installs are fine.
+
+## Step 1: core additions
+
+Three framework-free modules in today's `packages/wcagify/src`, exported from the package root (`dist/index.js` still imports only zod and the package's own framework-free modules). Step 3 moves them into `@focusring/wcagify-reporter` unchanged.
+
+| Module        | Exports                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `document.ts` | `reportDocumentSchema`, `issueDocumentSchema`, `minimarkSchema`; types `ReportDocument`, `IssueDocument`, `Minimark`, `MinimarkNode` |
+| `teaser.ts`   | `reportTeaser`, `teaserSchema`; types `Teaser`, `TeaserReport`                                                                       |
+| `uploads.ts`  | `rewriteUploadUrls`                                                                                                                  |
+
+They are ports of WCAGify-reporter's temporary stand-in `packages/report-snapshot` (described in that repo's `docs/portal/report-publish.md`), so the portal and its publish CLI can switch to this package and get identical results. A check against every report in the playground's and WCAGify-reporter's Nuxt Content databases (`.data/content/contents.sqlite`, 7 reports, up to 159 issues) gave the same parse results, teasers and rewritten content from the stand-in (on 0.6.6) and from this build.
+
+### Documents
+
+`reportSchema` and `issueSchema` extended with the page fields Nuxt Content adds and the report components read: `title` (trimmed, not empty), `description?`, `path` and `body` (Nuxt Content v3's minimark tree: `{ type: 'minimark', value, toc? }`). A report's `path` must be `/reports/<slug>` with a `toSlug`-style slug, an issue's `/reports/<slug>/<file>`. Other fields of a Nuxt Content item (`id`, `stem`, `seo`, `meta`, `navigation`) are stripped. Step 2 types the components with `ReportDocument` / `IssueDocument`; the body type is declared here, not imported from `minimark`, so the core keeps zod as its only dependency. Whether Nuxt Content's generated item types are assignable to these is for step 2 to confirm with `pnpm typecheck`.
+
+### The teaser
+
+`reportTeaser(report, issues)` returns, for the report's `evaluation.targetLevel` and `targetWcagVersion`:
+
+```json
+{
+  "wcagVersion": "2.2",
+  "targetLevel": "AA",
+  "findings": 3,
+  "levels": [
+    { "level": "A", "conforming": 30, "failed": 1, "total": 31 },
+    { "level": "AA", "conforming": 23, "failed": 1, "total": 24 }
+  ],
+  "total": { "conforming": 53, "failed": 2, "total": 55 }
+}
+```
+
+- `findings` counts the issues `groupIssuesByPrinciple` places under a criterion of the target, which is what `ReportContent` lists: tips (`sc: none`) are left out, and so are issues against a criterion outside the target version or level, or obsolete in 2.2 (4.1.1). This answers the split doc's open question 2 the way the stand-in did.
+- The counts are the `all` counts of `scorecardByLevel`, per level up to the target and in total. No principles, no criterion numbers.
+- `teaserSchema` is strict, so a stored teaser cannot carry anything else.
+
+Deviations from the split doc's section 4, both taken from the stand-in because portal teasers are already stored in that shape: the levels are an array of `{ level, conforming, failed, total }` (not a `perLevel` object of full scorecards), and there is no separate `criteria` block (`total` holds the same met / failed / total; fully conforming is `total.failed === 0`). The function takes the target from the report instead of a third `target` argument, as the stand-in did; the portal refuses a report whose target differs from the order's before it compares teasers, so the results are the same. Its input is `TeaserReport` (`evaluation` target and `scStatuses`) plus `{ sc }[]`, so no other report content reaches it.
+
+### Upload URLs
+
+`rewriteUploadUrls(value, from, to)` replaces the prefix `from` with `to` in every string of a copy of `value`. The share route now imports it from `@focusring/wcagify` and passes `/api/uploads/<slug>/` and `/api/share/<token>/uploads/`; it still rewrites the issues only, as before. `server/utils/share-uploads.ts` is gone, so the Nitro auto-import `rewriteUploadUrls(value, reportSlug, token)` no longer exists: worth a changelog line for projects that used it from their own server code. Like the other server routes that import the package by name, the share route resolves `@focusring/wcagify` to `dist/`, so after pulling this step run `pnpm --filter @focusring/wcagify build` (the e2e setup and `pnpm install` do it already).
+
+The share e2e suite now writes an issue with an `/api/uploads/example/…` image into the scaffolded report and checks that `/api/share/<token>` answers with the token-scoped URL and no `/api/uploads/`. Nothing covered the rewrite end to end before.
+
+### Not ported from the stand-in
+
+These stay portal-side for now, as `report-publish.md` planned: `reportSnapshotSchema` (`{ report, issues }` with every issue under the report's path), `referencedUploads`, `reporterUploadPrefix`, `reportImageRoute`, `imageContentType`. If the portal and the publish CLI should share `reportSnapshotSchema` from here, add it to `document.ts` in step 3.
+
+### For later steps
+
+- Step 2: type the components with `ReportDocument` / `IssueDocument` from `../../src/document` or the package root, and check that the share and report pages still typecheck with the Nuxt Content items they pass.
+- Step 3: move `document.ts`, `teaser.ts`, `uploads.ts` and their tests (`test/unit/{document,teaser,uploads}.test.ts`) with the rest of the core; the share route's import becomes `@focusring/wcagify-reporter` or stays on the re-export.
+- None of the split doc's `[verify]` risks is touched by this step.

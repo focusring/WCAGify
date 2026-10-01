@@ -1,4 +1,6 @@
 import { type ChildProcess } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright'
 
@@ -15,6 +17,7 @@ import {
 
 const PROJECT_NAME = 'share-test'
 const REPORT_SLUG = 'example'
+const EVIDENCE = 'hero-without-alt-1-1-1-0a1b2c3d.png'
 
 interface ShareResponse {
   token: string
@@ -49,6 +52,19 @@ describe('Share E2E', () => {
     const tarball = packWcagify()
     patchPackageJsonForLocalWcagify(projectPath, tarball)
     installDependencies(projectPath)
+    writeFileSync(
+      join(projectPath, 'content', 'reports', REPORT_SLUG, 'hero-without-alt.md'),
+      [
+        '---',
+        'title: The hero image has no text alternative',
+        'sample: page-1',
+        'sc: 1.1.1',
+        '---',
+        '',
+        `![The hero image](/api/uploads/${REPORT_SLUG}/${EVIDENCE})`,
+        ''
+      ].join('\n')
+    )
 
     // Run against a production build + Nitro node server rather than `nuxt dev`.
     // The password flow is driven through the real form, which only works once the
@@ -101,6 +117,14 @@ describe('Share E2E', () => {
       expect(await page.$('#executive-summary')).toBeTruthy()
       expect(await page.$('#scorecard')).toBeTruthy()
       expect(await page.$('#issues')).toBeTruthy()
+    })
+
+    it('points the evidence of the shared report at the token-scoped route', async () => {
+      const response = await fetch(`${baseUrl}/api/share/${share.token}`)
+      const body = JSON.stringify(await response.json())
+
+      expect(body).toContain(`/api/share/${share.token}/uploads/${EVIDENCE}`)
+      expect(body).not.toContain('/api/uploads/')
     })
   })
 
