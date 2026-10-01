@@ -26,7 +26,6 @@
     "server",
     "public",
     "locales",
-    "shims",
     "highlight",
     "nuxt.config.ts",
     "print.css"
@@ -96,7 +95,6 @@
     "@vueuse/core": "catalog:core",
     "jsonld": "catalog:",
     "nanoid": "catalog:",
-    "nuxt-studio": "catalog:core",
     "pdf-lib": "catalog:",
     "reka-ui": "catalog:core",
     "sharp": "catalog:",

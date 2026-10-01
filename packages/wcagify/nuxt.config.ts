@@ -4,13 +4,6 @@ import { githubLightA11y } from './highlight/github-light-a11y'
 
 const dir = fileURLToPath(new URL('.', import.meta.url))
 
-const hasStudioRepoInfo = Boolean(
-  (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG) ||
-  process.env.NETLIFY ||
-  process.env.NUXT_STUDIO ||
-  process.env.NODE_ENV !== 'production'
-)
-
 const nuxtConfig = {
   devtools: { enabled: false },
 
@@ -19,7 +12,6 @@ const nuxtConfig = {
     '@nuxt/content',
     '@nuxtjs/i18n',
     '@nuxt/fonts',
-    ...(hasStudioRepoInfo ? ['nuxt-studio' as const] : []),
     '@nuxt/a11y',
     '@focusring/wcagify/nuxt'
   ],
@@ -67,15 +59,8 @@ const nuxtConfig = {
     ]
   },
 
-  // CJS packages used by nuxt-studio that lack ESM default exports, breaking Vite's @fs serving in the layer architecture
-  alias: {
-    extend: join(dir, 'shims/extend-esm.js'),
-    debug: join(dir, 'shims/debug-esm.js')
-  },
-
   vite: {
     optimizeDeps: {
-      include: ['debug'],
       exclude: [
         'axe-core',
         'remark-gfm',

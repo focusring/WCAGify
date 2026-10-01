@@ -17,8 +17,7 @@ interface NitroServerAssets {
 /**
  * The slice of Nuxt Content's config this module sets. Content imports each remark plugin
  * by its key at parse time (Node), and @nuxtjs/mdc bundles it from `src` for its runtime
- * renderer (Vite), so the key is a file URL and `src` the matching path. A function
- * `instance` is avoided because nuxt-studio copies this config into runtime config.
+ * renderer (Vite), so the key is a file URL and `src` the matching path.
  */
 interface ContentRemarkPlugins {
   content?: {

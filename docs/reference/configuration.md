@@ -8,7 +8,7 @@ The main configuration file is `nuxt.config.ts` in the project root.
 
 ```ts
 export default defineNuxtConfig({
-  modules: ['@nuxt/content', '@nuxt/ui', '@nuxtjs/i18n', 'nuxt-studio']
+  modules: ['@nuxt/content', '@nuxt/ui', '@nuxtjs/i18n']
 })
 ```
 

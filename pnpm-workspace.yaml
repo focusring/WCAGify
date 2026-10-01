@@ -42,7 +42,6 @@ catalogs:
     '@nuxtjs/i18n': ^10.6.0
     '@vueuse/core': ^14.4.0
     nuxt: ^4.4.8
-    nuxt-studio: ^1.7.0
     reka-ui: ^2.10.1
     tailwindcss: ^4.3.3
     zod: ^4.4.3

@@ -123,8 +123,7 @@
   }
 
   header,
-  footer,
-  nuxt-studio {
+  footer {
     display: none !important;
   }
 

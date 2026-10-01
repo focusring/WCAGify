@@ -7,7 +7,6 @@ WCAG accessibility audit tool — pnpm monorepo.
 - **Nuxt 4** with TypeScript (playground)
 - **Nuxt UI v4** (components, includes Tailwind CSS 4 + color mode)
 - **Nuxt Content v3** (markdown-driven content, SQLite-backed)
-- **Nuxt Studio** (visual content editing)
 - **@nuxtjs/i18n v10** (Dutch default, English secondary)
 - **@nuxt/a11y** (accessibility checks)
 - **@nuxt/icon** (icon support)

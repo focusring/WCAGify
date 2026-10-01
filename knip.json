@@ -29,7 +29,6 @@
         "@nuxt/icon",
         "@nuxtjs/i18n",
         "@vueuse/core",
-        "nuxt-studio",
         "vue",
         "nitropack",
         "h3"
