@@ -1,0 +1,5 @@
+# Shadows the monorepo's workspace, so the fixture installs on its own.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  vue-demi: true

@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": ["test/e2e/fixtures/**"],
   "workspaces": {
     ".": {
       "entry": ["skills/*/scripts/*.{js,mjs}", "skills/*/scripts/probes/*.js"],

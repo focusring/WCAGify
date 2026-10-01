@@ -51,7 +51,7 @@ The core package (`@focusring/wcagify`) is a Nuxt layer. The playground extends 
   - `playground/content.config.ts` — content collection definitions (uses `defineWcagifyCollections`)
 - `docs/` — VitePress documentation site (@wcagify/docs)
 - `skills/` — agent skills (`skills/<name>/SKILL.md`), one per WCAG-EM step; symlinked from `.claude/skills/` so they are active in this repo, exposed as the `wcagify` Claude Code plugin via `.claude-plugin/`, and installable elsewhere with `npx skills add focusring/WCAGify`. See `skills/README.md`.
-- `test/` — tests (e2e)
+- `test/` — tests (e2e); `test/e2e/fixtures/reporter-layer/` is an app that extends only the report layer, built by `reporter-layer.e2e.test.ts` to guard its boundary
 
 ## i18n
 

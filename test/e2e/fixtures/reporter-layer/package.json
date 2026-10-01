@@ -1,0 +1,15 @@
+{
+  "name": "reporter-layer-fixture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@focusring/wcagify-reporter": "file:./wcagify-reporter.tgz",
+    "@nuxt/ui": "^4.10.0",
+    "nuxt": "^4.4.8",
+    "tailwindcss": "^4.3.3"
+  }
+}
