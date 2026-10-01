@@ -1,6 +1,6 @@
 {
   "name": "@focusring/wcagify-reporter",
-  "version": "0.6.8",
+  "version": "0.7.0",
   "description": "WCAGify's report schemas, scoring and render-only Nuxt layer, for apps that show WCAG reports without the WCAGify editor",
   "keywords": [
     "a11y",
