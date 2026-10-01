@@ -316,6 +316,11 @@ export async function startPreviewServer(
   process: ChildProcess
   url: string
 }> {
+  buildProject(projectPath)
+  return startBuiltServer(projectPath, port)
+}
+
+export function buildProject(projectPath: string): void {
   // The PDF pipeline depends on production-built CSS: WeasyPrint raises
   // NotImplementedError on the dev server's unminified Tailwind/Nuxt UI CSS
   // (oklch(), @property, cascade layers, …). So report-PDF e2e tests must run
@@ -354,7 +359,18 @@ export async function startPreviewServer(
   }
 
   copyLibsqlNativeBinding(projectPath)
+}
 
+// Starts the Nitro node server of a project built with buildProject. Several
+// servers can run from one build, e.g. with and without an admin secret.
+export async function startBuiltServer(
+  projectPath: string,
+  port: number,
+  env: Record<string, string> = {}
+): Promise<{
+  process: ChildProcess
+  url: string
+}> {
   const url = `http://localhost:${port}`
   // Absolute script path: with a relative path the process command line is
   // just "node .output/server/index.mjs", which killOrphanedTmpProcesses
@@ -365,7 +381,7 @@ export async function startPreviewServer(
     stdio: 'ignore',
     shell: true,
     detached: true,
-    env: { ...process.env, NO_COLOR: '1', PORT: String(port) }
+    env: { ...process.env, NO_COLOR: '1', PORT: String(port), ...env }
   })
 
   child.on('error', (err) => {

@@ -30,11 +30,22 @@ interface ContentRemarkPlugins {
   }
 }
 
+/**
+ * The `nitro:config` hook, with the slice of Nitro's config this module changes. Nitro
+ * declares this hook on `NuxtHooks` through the same `nitropack` augmentation.
+ */
+type NitroConfigHook = (
+  name: 'nitro:config',
+  handler: (config: { routeRules?: Record<string, { prerender?: boolean }> }) => void
+) => void
+
 /** Sibling plugin file: `.ts` next to this source file, `.js` next to the built module. */
 const remarkCodeLangUrl = new URL(
   import.meta.url.endsWith('.ts') ? './remark-code-lang.ts' : './remark-code-lang.js',
   import.meta.url
 )
+
+const CONTENT_DUMP_ROUTE = /^\/__nuxt_content\/[^/]+\/sql_dump\.txt$/
 
 const module: NuxtModule = defineNuxtModule({
   meta: {
@@ -71,6 +82,21 @@ const module: NuxtModule = defineNuxtModule({
       src: fileURLToPath(remarkCodeLangUrl),
       options: {}
     }
+
+    /*
+     * Nuxt Content prerenders each collection's SQL dump (`/__nuxt_content/<name>/sql_dump.txt`)
+     * as a static file, for its client-side database. A static file is served before any
+     * server middleware runs, and on Vercel or Netlify straight from the CDN, so the admin
+     * auth never sees the request and the whole collection is public. Serve the dumps from
+     * their server handler instead, behind the admin auth. Only the report and report-list
+     * pages query collections in the browser, and only signed-in admins open those.
+     */
+    const hookNitroConfig = nuxt.hook.bind(nuxt) as unknown as NitroConfigHook
+    hookNitroConfig('nitro:config', (nitroConfig) => {
+      for (const [route, rules] of Object.entries(nitroConfig.routeRules ?? {})) {
+        if (CONTENT_DUMP_ROUTE.test(route)) rules.prerender = false
+      }
+    })
 
     if (nuxt.options.dev) {
       nuxt.hook('listen', () => {
