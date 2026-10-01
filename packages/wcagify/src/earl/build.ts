@@ -1,12 +1,18 @@
-import wcag20Ids from '../data/wcag20-ids.json'
-import type { Level, SamplePage, ScStatus, ScStatuses, WcagVersion } from '../types'
+import { wcag20Ids } from '@focusring/wcagify-reporter/data'
+import type {
+  Level,
+  SamplePage,
+  ScStatus,
+  ScStatuses,
+  WcagVersion
+} from '@focusring/wcagify-reporter'
 import {
   allScEntries,
   levelIncludes,
   normalizeScStatuses,
   resolveScStatus,
   scorecard
-} from '../wcag'
+} from '@focusring/wcagify-reporter'
 import { buildEarlContext } from './context'
 import { minimarkToText } from './minimark'
 import type { MinimarkBody } from './minimark'

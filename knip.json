@@ -6,10 +6,20 @@
       "ignoreDependencies": ["changelogen", "lint-staged"],
       "ignoreBinaries": ["taskkill", "agent-browser", "ffmpeg"]
     },
-    "packages/wcagify": {
+    "packages/wcagify-reporter": {
       "entry": [
         "locales/*.ts",
         "app/app.config.ts",
+        "app/components/**/*.vue",
+        "app/composables/**/*.ts"
+      ],
+      "project": ["src/**/*.ts", "app/**/*.{ts,vue}", "locales/**/*.ts"],
+      "ignoreDependencies": ["@iconify-json/lucide", "@nuxt/fonts", "@nuxtjs/i18n", "vue"],
+      "ignoreUnresolved": ["#build/ui/prose/pre"]
+    },
+    "packages/wcagify": {
+      "entry": [
+        "locales/*.ts",
         "app/app.vue",
         "app/error.vue",
         "app/pages/**/*.vue",
@@ -25,15 +35,13 @@
         "@iconify-json/lucide",
         "@iconify-json/simple-icons",
         "@nuxt/a11y",
-        "@nuxt/fonts",
         "@nuxt/icon",
         "@nuxtjs/i18n",
-        "@vueuse/core",
         "vue",
         "nitropack",
         "h3"
       ],
-      "ignoreUnresolved": ["#app", "#build/ui/prose/pre"]
+      "ignoreUnresolved": ["#app"]
     },
     "packages/create-wcagify": {},
     "packages/browser-extension": {

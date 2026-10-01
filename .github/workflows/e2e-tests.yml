@@ -27,7 +27,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Build packages
-        run: pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
+        run: pnpm --filter @focusring/wcagify-reporter build && pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
 
       - run: pnpm nuxt prepare
         working-directory: playground

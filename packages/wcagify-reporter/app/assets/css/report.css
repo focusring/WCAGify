@@ -1,0 +1,118 @@
+/* The report's styles: theme, contrast overrides, prose and focus styling.
+ * No `@import 'tailwindcss'` here, so Tailwind's base styles load once: a
+ * consumer imports this file from its own stylesheet, after `tailwindcss` and
+ * `@nuxt/ui`:
+ *
+ *   @import 'tailwindcss';
+ *   @import '@nuxt/ui';
+ *   @import '@focusring/wcagify-reporter/report.css';
+ *
+ * `@source` is relative to this file, so the report components' classes are
+ * generated wherever the package is installed. */
+@source "../../components";
+
+a:not([class]) {
+  text-decoration: underline;
+}
+
+.prose {
+  /* Links in running text must not rely on colour alone (WCAG 1.4.1). The
+   * underline replaces Nuxt UI's hover-only bottom border. */
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    border-bottom-width: 0;
+  }
+
+  :is(h1, h2, h3, h4, h5, h6) {
+    text-decoration: none;
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+
+    a {
+      text-decoration: none;
+      pointer-events: none;
+      cursor: text;
+
+      > span {
+        display: none;
+      }
+    }
+  }
+
+  p {
+    margin-top: 0;
+  }
+}
+
+:root {
+  --ui-text-highlighted: var(--color-slate-950);
+  --focus-gap-color: black;
+  --ui-radius: 0.125rem;
+
+  /* Contrast overrides for the light theme (WCAG 1.4.3 / 1.4.11). Nuxt UI maps
+   * these to the 500 / 400 / 300 shades, which are too light on white for any
+   * of the configurable accents: e.g. green-500 #00c16a is 2.38:1, red-500
+   * #fb2c36 is 3.81:1, slate-300 #cad5e2 is 1.49:1. The 700 shade of every
+   * accent is >= 4.65:1 on white and on the elevated backgrounds; neutral-500
+   * is >= 4.3:1 as an outline and neutral-600 >= 6.9:1 as placeholder text. */
+  --ui-primary: var(--ui-color-primary-700);
+  --ui-error: var(--ui-color-error-700);
+  --ui-text-dimmed: var(--ui-color-neutral-600);
+  --ui-border-accented: var(--ui-color-neutral-500);
+}
+
+.dark {
+  --ui-text-highlighted: white;
+  --focus-gap-color: white;
+
+  /* Nuxt UI sets the dark values inside `@layer theme`, so the unlayered
+   * `:root` overrides above would win here too; restore the 400 shades. */
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-error: var(--ui-color-error-400);
+  /* neutral-500 is 3.7:1 on the neutral-900 page and 3.1:1 on the elevated
+   * neutral-800 surface; neutral-400 is >= 5.5:1 as placeholder text. */
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-border-accented: var(--ui-color-neutral-500);
+}
+
+h2 {
+  @apply text-2xl font-semibold text-highlighted;
+}
+
+h3 {
+  @apply text-lg font-medium text-highlighted;
+}
+
+@theme static {
+  --font-sans: 'Public Sans', sans-serif;
+
+  --color-green-50: #effdf5;
+  --color-green-100: #d9fbe8;
+  --color-green-200: #b3f5d1;
+  --color-green-300: #75edae;
+  --color-green-400: #00dc82;
+  --color-green-500: #00c16a;
+  --color-green-600: #00a155;
+  --color-green-700: #007f45;
+  --color-green-800: #016538;
+  --color-green-900: #0a5331;
+  --color-green-950: #052e16;
+}
+
+.icon-animation {
+  @apply group-data-[state=open]:rotate-180 transition-transform duration-200;
+}
+
+/* ************* */
+/* Focus styling */
+/* ************* */
+
+/* Default focus style */
+:focus-visible {
+  outline: 0.375rem double var(--ui-color-primary-500);
+  outline-offset: -1px;
+  border-radius: var(--ui-radius);
+  box-shadow: 0 0 0 0.25rem var(--focus-gap-color);
+  transition: none;
+}

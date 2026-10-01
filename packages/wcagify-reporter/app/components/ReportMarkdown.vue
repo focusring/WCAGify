@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import type { Minimark } from '@focusring/wcagify'
+import type { Minimark } from '@focusring/wcagify-reporter'
 import { toHast } from 'minimark/hast'
 import MDCRenderer from '@nuxtjs/mdc/runtime/components/MDCRenderer.vue'
 
@@ -54,10 +54,18 @@ const prose: Record<string, Component | string> = {
 
 type MDCRendererProps = InstanceType<typeof MDCRenderer>['$props']
 
+/*
+ * `@nuxtjs/mdc`'s public runtime config. It exists only where that module is
+ * installed, so an app that extends just this layer has it untyped.
+ */
+interface MdcPublicConfig {
+  components?: { map?: Record<string, string> }
+}
+
 const hast = computed(
   () => toHast({ type: 'minimark', value: props.body.value }) as MDCRendererProps['body']
 )
-const { mdc } = useRuntimeConfig().public
+const mdc = useRuntimeConfig().public.mdc as MdcPublicConfig | undefined
 const tags = computed(
   () =>
     ({ ...prose, ...mdc?.components?.map, ...props.components }) as MDCRendererProps['components']

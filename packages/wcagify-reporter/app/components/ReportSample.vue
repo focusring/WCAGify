@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReportDocument } from '@focusring/wcagify'
+import type { ReportDocument } from '@focusring/wcagify-reporter'
 import type { TableColumn } from '@nuxt/ui'
 
 defineProps<{

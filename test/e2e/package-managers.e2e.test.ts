@@ -105,6 +105,16 @@ describe('Package Manager Smoke Tests', () => {
         expect(existsSync(join(projectPath, 'node_modules', 'nuxt'))).toBe(true)
         expect(existsSync(join(projectPath, 'node_modules', '@focusring', 'wcagify'))).toBe(true)
       }, 360_000)
+
+      // The WCAGify layer extends @focusring/wcagify-reporter/layer, a
+      // dependency of WCAGify and not of the project. The install's
+      // `nuxt prepare` registers the report components only if that resolves
+      // from the installed WCAGify, which pnpm's strict layout tests hardest.
+      it(`resolves the report layer with ${manager}`, () => {
+        const components = readFileSync(join(projectPath, '.nuxt', 'components.d.ts'), 'utf-8')
+        expect(components).toMatch(/wcagify-reporter\/app\/components\/ReportContent\.vue/)
+        expect(components).toMatch(/wcagify-reporter\/app\/components\/prose\/ProseImg\.vue/)
+      })
     })
   }
 

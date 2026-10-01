@@ -1,4 +1,4 @@
 {
   "installCommand": "pnpm install --ignore-scripts",
-  "buildCommand": "pnpm --filter @focusring/wcagify build && nuxt prepare && pnpm build"
+  "buildCommand": "pnpm --filter @focusring/wcagify-reporter build && pnpm --filter @focusring/wcagify build && nuxt prepare && pnpm build"
 }

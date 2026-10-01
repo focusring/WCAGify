@@ -5,7 +5,7 @@ import type {
   Language,
   IssueDocument,
   ReportDocument
-} from '@focusring/wcagify'
+} from '@focusring/wcagify-reporter'
 
 const props = defineProps<{
   report: ReportDocument

@@ -3,12 +3,24 @@ import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { cleanupTmpDir, getTmpDir, packWcagify, scaffoldProject } from './test-utils.js'
+import {
+  cleanupTmpDir,
+  getTmpDir,
+  packWcagify,
+  packWcagifyReporter,
+  scaffoldProject
+} from './test-utils.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = join(__dirname, '../../..')
 
 function buildPackages(): void {
+  console.log('Building @focusring/wcagify-reporter...')
+  execSync('pnpm --filter @focusring/wcagify-reporter build', {
+    cwd: ROOT_DIR,
+    stdio: 'inherit'
+  })
+
   console.log('Building @focusring/wcagify...')
   execSync('pnpm --filter @focusring/wcagify build', {
     cwd: ROOT_DIR,
@@ -35,7 +47,8 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
 
   buildPackages()
 
-  console.log('Packing @focusring/wcagify tarball...')
+  console.log('Packing @focusring/wcagify-reporter and @focusring/wcagify tarballs...')
+  packWcagifyReporter()
   packWcagify()
 
   console.log('Scaffolding base project for e2e tests...')
@@ -43,10 +56,12 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   console.log('Base project scaffolded.')
 
   return async () => {
-    const wcagifyDir = join(ROOT_DIR, 'packages/wcagify')
-    for (const file of readdirSync(wcagifyDir)) {
-      if (file.endsWith('.tgz')) {
-        rmSync(join(wcagifyDir, file))
+    for (const folder of ['wcagify', 'wcagify-reporter']) {
+      const packageDir = join(ROOT_DIR, 'packages', folder)
+      for (const file of readdirSync(packageDir)) {
+        if (file.endsWith('.tgz')) {
+          rmSync(join(packageDir, file))
+        }
       }
     }
 

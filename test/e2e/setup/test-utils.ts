@@ -156,32 +156,57 @@ export function cleanupProject(name: string): void {
   }
 }
 
-export function packWcagify(): string {
-  const wcagifyDir = join(ROOT_DIR, 'packages/wcagify')
+function packPackage(folder: string): string {
+  const packageDir = join(ROOT_DIR, 'packages', folder)
 
   // Reuse existing tarball if already packed (avoids races when files run in parallel)
-  const existing = existsSync(wcagifyDir)
-    ? readdirSync(wcagifyDir).find((f) => f.endsWith('.tgz'))
+  const existing = existsSync(packageDir)
+    ? readdirSync(packageDir).find((f) => f.endsWith('.tgz'))
     : undefined
-  if (existing) return join(wcagifyDir, existing)
+  if (existing) return join(packageDir, existing)
 
   const output = execSync('pnpm pack --pack-destination .', {
-    cwd: wcagifyDir,
+    cwd: packageDir,
     encoding: 'utf-8',
     timeout: 30_000
   }).trim()
-  const tarball = join(wcagifyDir, output.split('\n').pop()!)
+  const tarball = join(packageDir, output.split('\n').pop()!)
   if (!existsSync(tarball)) {
     throw new Error(`pnpm pack did not create expected tarball: ${tarball}`)
   }
   return tarball
 }
 
+export function packWcagify(): string {
+  return packPackage('wcagify')
+}
+
+// @focusring/wcagify depends on @focusring/wcagify-reporter at the exact
+// version both are released with, which the registry may not have yet.
+export function packWcagifyReporter(): string {
+  return packPackage('wcagify-reporter')
+}
+
+// Points the project at the local @focusring/wcagify tarball, and overrides
+// its @focusring/wcagify-reporter dependency with the local tarball too:
+// pnpm v11 reads overrides from pnpm-workspace.yaml, npm and bun from
+// package.json.
 export function patchPackageJsonForLocalWcagify(projectPath: string, tarballPath: string): void {
+  const reporterSpec = `file:${packWcagifyReporter()}`
+
   const pkgPath = join(projectPath, 'package.json')
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
   pkg.dependencies['@focusring/wcagify'] = `file:${tarballPath}`
+  pkg.overrides = { ...pkg.overrides, '@focusring/wcagify-reporter': reporterSpec }
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), 'utf-8')
+
+  const workspacePath = join(projectPath, 'pnpm-workspace.yaml')
+  const workspace = existsSync(workspacePath) ? readFileSync(workspacePath, 'utf-8') : ''
+  writeFileSync(
+    workspacePath,
+    `${workspace.trimEnd()}\n\noverrides:\n  '@focusring/wcagify-reporter': '${reporterSpec}'\n`,
+    'utf-8'
+  )
 }
 
 export function installDependencies(projectPath: string): void {

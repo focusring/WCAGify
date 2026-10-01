@@ -27,8 +27,7 @@
     "public",
     "locales",
     "highlight",
-    "nuxt.config.ts",
-    "print.css"
+    "nuxt.config.ts"
   ],
   "type": "module",
   "main": "./nuxt.config.ts",
@@ -71,7 +70,6 @@
     },
     "./locales/en": "./locales/en.ts",
     "./locales/nl": "./locales/nl.ts",
-    "./print.css": "./print.css",
     "./layer": "./nuxt.config.ts"
   },
   "scripts": {
@@ -82,23 +80,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@focusring/wcagify-reporter": "workspace:*",
     "@iconify-json/lucide": "catalog:core",
     "@iconify-json/simple-icons": "catalog:core",
     "@libsql/client": "catalog:core",
     "@nuxt/a11y": "catalog:core",
     "@nuxt/content": "catalog:core",
-    "@nuxt/fonts": "catalog:",
     "@nuxt/icon": "catalog:core",
     "@nuxt/kit": "catalog:core",
     "@nuxt/ui": "catalog:core",
     "@nuxtjs/i18n": "catalog:core",
-    "@nuxtjs/mdc": "catalog:core",
-    "@vueuse/core": "catalog:core",
     "jsonld": "catalog:",
-    "minimark": "catalog:core",
     "nanoid": "catalog:",
     "pdf-lib": "catalog:",
-    "reka-ui": "catalog:core",
     "sharp": "catalog:",
     "tailwindcss": "catalog:core",
     "yaml": "catalog:",

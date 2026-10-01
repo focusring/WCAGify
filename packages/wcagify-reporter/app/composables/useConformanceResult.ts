@@ -1,5 +1,5 @@
-import type { IssueDocument, ReportDocument } from '@focusring/wcagify'
-import { conformanceSummary } from '@focusring/wcagify'
+import type { IssueDocument, ReportDocument } from '@focusring/wcagify-reporter'
+import { conformanceSummary } from '@focusring/wcagify-reporter'
 
 /**
  * Formats the WCAG-EM outcome of a report as "{met} of {total} criteria met".

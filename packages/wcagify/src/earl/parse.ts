@@ -1,8 +1,7 @@
 import jsonld from 'jsonld'
-import scToSlug from '../data/sc-to-slug.json'
-import wcag20Ids from '../data/wcag20-ids.json'
-import type { Level, SamplePage, WcagVersion } from '../types'
-import { scName } from '../wcag'
+import { scToSlug, wcag20Ids } from '@focusring/wcagify-reporter/data'
+import type { Level, SamplePage, WcagVersion } from '@focusring/wcagify-reporter'
+import { scName } from '@focusring/wcagify-reporter'
 import { toSlug } from '../content-utils'
 
 /*

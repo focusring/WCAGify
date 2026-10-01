@@ -12,7 +12,7 @@ import {
   groupIssuesBySc,
   groupIssuesByPrinciple,
   resolveSamplePage
-} from '@focusring/wcagify'
+} from '@focusring/wcagify-reporter'
 
 export function useWcagData() {
   return {

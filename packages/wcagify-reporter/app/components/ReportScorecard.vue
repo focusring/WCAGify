@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IssueDocument, ReportDocument } from '@focusring/wcagify'
+import type { IssueDocument, ReportDocument } from '@focusring/wcagify-reporter'
 
 const props = defineProps<{
   issues: IssueDocument[]

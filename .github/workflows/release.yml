@@ -27,11 +27,23 @@ jobs:
 
       - run: pnpm install --ignore-scripts
 
+      - name: Build wcagify-reporter
+        run: pnpm --filter @focusring/wcagify-reporter build
+
       - name: Build wcagify
         run: pnpm --filter @focusring/wcagify build
 
       - name: Build create-wcagify
         run: pnpm --filter create-wcagify build
+
+      # Before wcagify, which depends on this exact version.
+      - name: Publish wcagify-reporter
+        working-directory: packages/wcagify-reporter
+        continue-on-error: true
+        env:
+          NPM_CONFIG_PROVENANCE: true
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish --access public --no-git-checks
 
       - name: Publish wcagify
         working-directory: packages/wcagify

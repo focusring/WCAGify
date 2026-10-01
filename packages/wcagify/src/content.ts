@@ -1,6 +1,6 @@
 import { defineCollection } from '@nuxt/content'
 import { z } from 'zod'
-import { reportSchema, issueSchema } from './schemas'
+import { reportSchema, issueSchema } from '@focusring/wcagify-reporter'
 
 // Nuxt Content's dev watcher opens every file under a source's base folder, included or not.
 // Excluding the audit notes from each source keeps a large audit from exhausting file handles.

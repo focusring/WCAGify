@@ -1,4 +1,4 @@
-import type { WcagVersion } from '../types'
+import type { WcagVersion } from '@focusring/wcagify-reporter'
 
 /** Namespace of the WCAGify-specific terms used in EARL exports. */
 const WCAGIFY_NS = 'https://github.com/focusring/WCAGify/blob/main/docs/reference/earl.md#'

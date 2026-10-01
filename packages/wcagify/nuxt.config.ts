@@ -1,33 +1,26 @@
+import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { githubLightA11y } from './highlight/github-light-a11y'
 
 const dir = fileURLToPath(new URL('.', import.meta.url))
+const require = createRequire(import.meta.url)
 
 const nuxtConfig = {
   devtools: { enabled: false },
 
-  modules: [
-    '@nuxt/ui',
-    '@nuxt/content',
-    '@nuxtjs/i18n',
-    '@nuxt/fonts',
-    '@nuxt/a11y',
-    '@focusring/wcagify/nuxt'
-  ],
+  /* The report layer brings `@nuxt/ui`, `@nuxtjs/i18n` and `@nuxt/fonts`,
+   * the report components, their translations and the app config. */
+  extends: ['@focusring/wcagify-reporter/layer'],
 
-  css: [join(dir, 'app/assets/css/main.css'), join(dir, 'print.css')],
+  modules: ['@nuxt/content', '@nuxt/a11y', '@focusring/wcagify/nuxt'],
 
-  /* The prose overrides (`ProseImg`, `ProsePre`) replace Nuxt UI's global
-   * prose components of the same name, so they are registered globally too,
-   * without a path prefix. They no longer rely on Nuxt Content registering
-   * `components/content`. A layer's components rank above Nuxt UI's (priority
-   * 0) and below the project's, so a project's own `ProseImg` still wins.
-   * Setting `components` replaces the layer's default directories, so
-   * `app/components` is listed as well. */
-  components: [
-    { path: join(dir, 'app/components/prose'), global: true },
-    { path: join(dir, 'app/components') }
+  /* `main.css` imports the report layer's `report.css`. The print styles come
+   * last so they win over screen rules of the same specificity. Resolved from
+   * here, because under pnpm the project cannot resolve the report package. */
+  css: [
+    join(dir, 'app/assets/css/main.css'),
+    require.resolve('@focusring/wcagify-reporter/print.css')
   ],
 
   runtimeConfig: {

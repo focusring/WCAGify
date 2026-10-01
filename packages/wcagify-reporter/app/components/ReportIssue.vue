@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ScGroup, IssueDocument, ReportDocument } from '@focusring/wcagify'
+import type { ScGroup, IssueDocument, ReportDocument } from '@focusring/wcagify-reporter'
 import { CollapsibleRoot, CollapsibleTrigger, CollapsibleContent } from 'reka-ui'
 import ProseHNested, { issueIdKey } from './prose/ProseHNested.vue'
 

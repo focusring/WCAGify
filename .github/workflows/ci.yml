@@ -22,7 +22,7 @@ jobs:
       - run: pnpm install --ignore-scripts
 
       - name: Build packages
-        run: pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
+        run: pnpm --filter @focusring/wcagify-reporter build && pnpm --filter @focusring/wcagify build && pnpm --filter create-wcagify build
 
       - run: pnpm nuxt prepare
         working-directory: playground

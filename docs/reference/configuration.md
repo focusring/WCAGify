@@ -32,10 +32,13 @@ Language settings are configured through `@nuxtjs/i18n`:
 | Secondary | `nl` (Dutch)   |
 | Strategy  | `no_prefix`    |
 
-Translation files live in the core layer at `packages/wcagify/locales/`:
+Translation files live in two layers, which `@nuxtjs/i18n` merges. The report's own texts are in the report layer, the rest of the app's in the WCAGify layer:
 
 ```text
-packages/wcagify/locales/
+packages/wcagify-reporter/locales/   # report, codeBlock
+├── en.ts
+└── nl.ts
+packages/wcagify/locales/            # app, import, share, admin, settings, error
 ├── en.ts
 └── nl.ts
 ```

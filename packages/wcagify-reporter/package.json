@@ -1,0 +1,71 @@
+{
+  "name": "@focusring/wcagify-reporter",
+  "version": "0.6.8",
+  "description": "WCAGify's report schemas, scoring and render-only Nuxt layer, for apps that show WCAG reports without the WCAGify editor",
+  "keywords": [
+    "a11y",
+    "accessibility",
+    "nuxt",
+    "report",
+    "wcag"
+  ],
+  "license": "MIT",
+  "author": "Focusring",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/focusring/WCAGify.git",
+    "directory": "packages/wcagify-reporter"
+  },
+  "files": [
+    "dist",
+    "app",
+    "locales",
+    "nuxt.config.ts",
+    "print.css"
+  ],
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
+    "./data": {
+      "types": "./dist/data/index.d.ts",
+      "import": "./dist/data/index.js",
+      "default": "./src/data/index.ts"
+    },
+    "./locales/en": "./locales/en.ts",
+    "./locales/nl": "./locales/nl.ts",
+    "./report.css": "./app/assets/css/report.css",
+    "./print.css": "./print.css",
+    "./layer": "./nuxt.config.ts"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "prepare": "tsdown",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@iconify-json/lucide": "catalog:core",
+    "@nuxt/fonts": "catalog:",
+    "@nuxt/ui": "catalog:core",
+    "@nuxtjs/i18n": "catalog:core",
+    "@nuxtjs/mdc": "catalog:core",
+    "@vueuse/core": "catalog:core",
+    "minimark": "catalog:core",
+    "reka-ui": "catalog:core",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:dev",
+    "tsdown": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
+  }
+}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GuidelineGroup, IssueDocument, ReportDocument } from '@focusring/wcagify'
+import type { GuidelineGroup, IssueDocument, ReportDocument } from '@focusring/wcagify-reporter'
 
 const props = defineProps<{
   guideline: GuidelineGroup<IssueDocument>
