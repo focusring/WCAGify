@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
+import type { IssueDocument, ReportDocument } from '@focusring/wcagify'
 
 const props = defineProps<{
-  issues: IssuesCollectionItem[]
+  issues: IssueDocument[]
   targetLevel: string
   wcagVersion: string
-  scStatuses?: ReportsCollectionItem['scStatuses']
+  scStatuses?: ReportDocument['scStatuses']
 }>()
 
 const { scorecardByLevel, PRINCIPLES } = useWcagData()

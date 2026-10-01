@@ -99,3 +99,49 @@ These stay portal-side for now, as `report-publish.md` planned: `reportSnapshotS
 - Step 2: type the components with `ReportDocument` / `IssueDocument` from `../../src/document` or the package root, and check that the share and report pages still typecheck with the Nuxt Content items they pass.
 - Step 3: move `document.ts`, `teaser.ts`, `uploads.ts` and their tests (`test/unit/{document,teaser,uploads}.test.ts`) with the rest of the core; the share route's import becomes `@focusring/wcagify-reporter` or stays on the re-export.
 - None of the split doc's `[verify]` risks is touched by this step.
+
+## Step 2: components decoupled in place
+
+The report components no longer depend on Nuxt Content, but nothing moved package yet. Step 3 can move the render set as it is.
+
+### Document types
+
+`ReportContent`, `ReportCoverPage`, `ReportHeader`, `ReportScorecard`, `ReportPrinciple`, `ReportGuideline`, `ReportSuccessCriterion`, `ReportIssue`, `ReportIssueFooter`, `ReportScope`, `ReportSample` and `useConformanceResult` take `ReportDocument` / `IssueDocument` from the package root instead of `ReportsCollectionItem` / `IssuesCollectionItem`. Only the pages and `ReportImportSlideover`, which stay in the full layer, still use the Nuxt Content types.
+
+Nuxt Content's items were not assignable to the step 1 types. The only mismatch was `body.toc`: Nuxt Content types it as `Toc` from `@nuxtjs/mdc`, an interface, and an interface is not assignable to the index signature `z.looseObject({})` produces. `document.ts` now types the toc schema as `z.ZodType<object>`; parsing is unchanged (any object, kept as is). The playground typecheck proves the fit: `pages/reports/[...slug].vue` passes `queryCollection` results straight to `<ReportContent>`.
+
+### `ReportMarkdown`
+
+`app/components/ReportMarkdown.vue` replaces `ContentRenderer` at its three call sites (executive summary, tips, issue bodies). It takes the minimark `body`, converts it with `toHast` from `minimark/hast`, and renders it with `MDCRenderer`, imported from `@nuxtjs/mdc/runtime/components/MDCRenderer.vue` as `ContentRenderer` does. The `@nuxtjs/mdc` module is not registered, so no `/api/_mdc/highlight` route; `@nuxtjs/mdc` and `minimark` are now direct dependencies (catalog `core`, same versions Nuxt Content resolves).
+
+Tag map, in increasing precedence: the prose map `ContentRenderer` uses, `@nuxtjs/mdc`'s runtime `components.map` when present (Nuxt UI's MDC names and Nuxt Content's `renderer.alias`), then the `components` prop (`ReportIssue`'s `ProseHNested` for headings). The prose names are resolved with literal `resolveComponent('LazyProseImg')` calls, which Nuxt's component loader replaces at build time with a dynamic import of whichever component won the name. That works whether or not the winner is global, and `MDCRenderer` awaits the loaders in its async setup, as it did for the lazy global components `ContentRenderer` resolved. The `Lazy` prefix matters: with plain `resolveComponent('ProseImg')` all 23 prose components landed in the share page's initial chunk, its hydration got slower, and the share e2e test "unlocks a password-protected share for a viewer without an admin session" failed in all three suite runs (see the follow-ups). `h5` and `h6` are left out of the map because Nuxt UI has no `ProseH5`/`ProseH6`; under Nuxt Content `MDCRenderer` still maps them to `@nuxtjs/mdc`'s own from its runtime config, so the full layer renders them as before. Without `@nuxtjs/mdc` (the portal) they render as plain `h5`/`h6`.
+
+### Prose overrides
+
+`ProseImg`, `ProsePre` and `ProseHNested` moved from `app/components/content/` (registered only by Nuxt Content) to `app/components/prose/`, which the layer's `nuxt.config.ts` registers itself with `global: true`, next to `app/components`. Setting `components` in a layer replaces that layer's default directories, hence both entries, with absolute paths built from the config file's own directory, like the layer's `css` entries. Layer directories get priority `layerCount - index` (at least 1), Nuxt UI's prose directory 0, so the layer's overrides win over Nuxt UI's and lose to the project's.
+
+`[verify]` resolved, no breaking change. Checked on the playground with `nuxt prepare` (`.nuxt/components.d.ts`) and at runtime in a dev server, with a marker `ProseImg` in the project:
+
+| Project override                      | Before (main)      | After              |
+| ------------------------------------- | ------------------ | ------------------ |
+| `app/components/ProseImg.vue`         | project's wins     | project's wins     |
+| `app/components/content/ProseImg.vue` | project's wins (*) | project's wins (*) |
+
+(*) with Nuxt's "Two component files resolving to the same name" warning, before and after: Nuxt Content registers the project's `components/content` at priority 1, equal to the layer's, and it comes first. Without Nuxt Content (the portal) only `app/components/` applies.
+
+`ProseImg`, `ProsePre` and `ProseHNested` are now global components. Under Nuxt Content they were not: Content's registration has no `global`, so its `ProseImg` replaced Nuxt UI's global one and was reachable only through `ContentRenderer`. A project's own `<MDC>` or `MDCRenderer` now resolves them too.
+
+### `useReportDownload`
+
+Not moved: it already sits in `app/composables/` beside `useConformanceResult` and `useWcagData`, the other two composables of the render set, and needs nothing from the full layer (`useI18n`, `$fetch`, the `report.downloadStatus.*` keys). Step 3 moves all three.
+
+### Rendering unchanged
+
+The playground's three reports were built on `main` (v0.6.8) and on this step and served side by side. Server-rendered HTML and, after opening all 159 issues of `test-audit`, the client DOM of the executive summary, issues and tips (352 images, 143 code blocks with Shiki classes, a table) are identical, apart from one attribute: the executive summary's wrapper `div` now has an empty `class=""`. `MDCRenderer` always passes `class: ctx.class` to its root and Vue's SSR prints `class=""` for an undefined class; `ContentRenderer` hid it by forwarding a fallthrough attribute (`data-content-id`), which makes Vue merge the props and drop the undefined class. No visual or semantic difference. The dev server logs no hydration mismatch or unresolved component.
+
+### For later steps
+
+- Step 3 moves `ReportMarkdown.vue` and `app/components/prose/` with the other report components, and the `components` entries with them into the report layer's `nuxt.config.ts`. That layer should set `ui: { prose: true }` (Nuxt UI then registers its prose components and the `#build/ui/prose/pre` template `ProsePre` imports; today Nuxt Content triggers both), and list `@nuxtjs/mdc` and `minimark` as dependencies.
+- Without `@nuxtjs/mdc` there is no `runtimeConfig.public.mdc`: Nuxt UI's `ProseH2`–`ProseH4` then render no anchor links (`mdc.headings.anchorLinks`), and MDC block components (`::callout`) have no map. Report bodies in the playground and in WCAGify-reporter use neither MDC components nor bindings (checked in both content databases), so the portal renders them the same. Step 4's fixture can assert that `MDCRenderer.vue`, imported from `node_modules` without the module, builds there.
+- Follow-up, not caused by this step: the share page's password field loses what was typed before hydration (the `v-model` resets it to empty, and `required` then blocks the submit). The share e2e test above types right after the field appears, so it races hydration and only passes while hydration wins. Waiting for hydration in the test (for example until `#__nuxt` has `__vue_app__`) would make it deterministic; keeping typed input across hydration would fix it for slow connections.
+- `useRuntimeConfig().public.mdc` is untyped without the module; the playground typecheck passes because Nuxt Content installs it. Step 3's typecheck of the report layer on its own will show whether it needs a cast.

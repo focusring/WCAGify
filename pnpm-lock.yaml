@@ -46,9 +46,15 @@ catalogs:
     '@nuxtjs/i18n':
       specifier: ^10.6.0
       version: 10.6.0
+    '@nuxtjs/mdc':
+      specifier: ^0.22.2
+      version: 0.22.2
     '@vueuse/core':
       specifier: ^14.4.0
       version: 14.4.0
+    minimark:
+      specifier: ^0.2.0
+      version: 0.2.0
     nuxt:
       specifier: ^4.4.8
       version: 4.4.8
@@ -352,12 +358,18 @@ importers:
       '@nuxtjs/i18n':
         specifier: catalog:core
         version: 10.6.0(@vue/compiler-dom@3.5.40)(db0@0.3.4(@libsql/client@0.17.4))(esbuild@0.28.0)(eslint@10.4.1(jiti@2.7.0)(supports-color@10.2.2))(ioredis@5.11.1(supports-color@10.2.2))(magicast@0.5.3)(rolldown@1.2.1)(rollup@4.61.1)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.2.0(@types/node@24.13.3)(esbuild@0.28.0)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0))(vue@3.5.40(typescript@6.0.3))
+      '@nuxtjs/mdc':
+        specifier: catalog:core
+        version: 0.22.2(magic-string@0.30.21)(magicast@0.5.3)(oxc-parser@0.141.0)(rolldown@1.2.1)(supports-color@10.2.2)(unplugin@3.3.0(esbuild@0.28.0)(rolldown@1.2.1)(rollup@4.61.1)(vite@8.2.0(@types/node@24.13.3)(esbuild@0.28.0)(jiti@2.7.0)(terser@5.48.0)(yaml@2.9.0)))
       '@vueuse/core':
         specifier: catalog:core
         version: 14.4.0(vue@3.5.40(typescript@6.0.3))
       jsonld:
         specifier: 'catalog:'
         version: 9.0.0
+      minimark:
+        specifier: catalog:core
+        version: 0.2.0
       nanoid:
         specifier: 'catalog:'
         version: 6.0.0

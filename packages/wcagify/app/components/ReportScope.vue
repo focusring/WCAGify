@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ReportsCollectionItem } from '@nuxt/content'
+import type { ReportDocument } from '@focusring/wcagify'
 
 defineProps<{
-  report: ReportsCollectionItem
+  report: ReportDocument
 }>()
 </script>
 

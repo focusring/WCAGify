@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
-import type { Level, WcagVersion, Language } from '@focusring/wcagify'
+import type {
+  Level,
+  WcagVersion,
+  Language,
+  IssueDocument,
+  ReportDocument
+} from '@focusring/wcagify'
 
 const props = defineProps<{
-  report: ReportsCollectionItem
-  issues: IssuesCollectionItem[]
+  report: ReportDocument
+  issues: IssueDocument[]
 }>()
 
 // `locale` is the interface language and `language` the report's own (WCAG 3.1.2).
@@ -90,7 +95,7 @@ defineExpose({ visiblePrinciples })
         {{ t('report.executiveSummary') }}
       </h2>
       <div class="mt-4 prose dark:prose-invert">
-        <ContentRenderer :value="report" />
+        <ReportMarkdown :body="report.body" />
       </div>
     </section>
 
@@ -226,7 +231,7 @@ defineExpose({ visiblePrinciples })
               }}
             </p>
             <div class="mt-3 prose dark:prose-invert">
-              <ContentRenderer :value="tip" />
+              <ReportMarkdown :body="tip.body" />
             </div>
           </li>
         </ol>

@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { ScGroup } from '@focusring/wcagify'
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
+import type { ScGroup, IssueDocument, ReportDocument } from '@focusring/wcagify'
 import { CollapsibleRoot, CollapsibleTrigger, CollapsibleContent } from 'reka-ui'
-import ProseHNested, { issueIdKey } from './content/ProseHNested.vue'
+import ProseHNested, { issueIdKey } from './prose/ProseHNested.vue'
 
 const props = defineProps<{
-  issue: IssuesCollectionItem
-  report: ReportsCollectionItem
-  criterion: ScGroup<IssuesCollectionItem>
+  issue: IssueDocument
+  report: ReportDocument
+  criterion: ScGroup<IssueDocument>
   scName: string
   index?: number
 }>()
@@ -138,8 +137,8 @@ onBeforeUnmount(() => {
       class="data-[state=open]:animate-[collapsible-down_200ms_ease-out] data-[state=closed]:animate-[collapsible-up_200ms_ease-out] data-[state=closed]:overflow-hidden"
     >
       <div :id="contentId">
-        <ContentRenderer
-          :value="issue"
+        <ReportMarkdown
+          :body="issue.body"
           :components="bodyComponents"
           class="pt-4 pb-2 px-4 prose dark:prose-invert"
         />

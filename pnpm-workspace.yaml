@@ -40,7 +40,9 @@ catalogs:
     '@nuxt/kit': ^4.4.8
     '@nuxt/ui': ^4.10.0
     '@nuxtjs/i18n': ^10.6.0
+    '@nuxtjs/mdc': ^0.22.2
     '@vueuse/core': ^14.4.0
+    minimark: ^0.2.0
     nuxt: ^4.4.8
     reka-ui: ^2.10.1
     tailwindcss: ^4.3.3

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { ReportsCollectionItem } from '@nuxt/content'
+import type { ReportDocument } from '@focusring/wcagify'
 import type { TableColumn } from '@nuxt/ui'
 
 defineProps<{
-  report: ReportsCollectionItem
+  report: ReportDocument
 }>()
 
 const { t } = useI18n()
 
-type SamplePage = ReportsCollectionItem['sample'][number]
+type SamplePage = ReportDocument['sample'][number]
 
 const columns = computed<TableColumn<SamplePage>[]>(() => [
   {

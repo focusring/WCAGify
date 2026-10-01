@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { GuidelineGroup } from '@focusring/wcagify'
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
+import type { GuidelineGroup, IssueDocument, ReportDocument } from '@focusring/wcagify'
 
 const props = defineProps<{
-  guideline: GuidelineGroup<IssuesCollectionItem>
-  report: ReportsCollectionItem
+  guideline: GuidelineGroup<IssueDocument>
+  report: ReportDocument
 }>()
 
 const statusFilters = inject<Ref<Set<string>>>('statusFilters')

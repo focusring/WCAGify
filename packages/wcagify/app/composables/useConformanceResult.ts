@@ -1,4 +1,4 @@
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
+import type { IssueDocument, ReportDocument } from '@focusring/wcagify'
 import { conformanceSummary } from '@focusring/wcagify'
 
 /**
@@ -6,8 +6,8 @@ import { conformanceSummary } from '@focusring/wcagify'
  * A criterion is met when it passed or is not present in the sample.
  */
 export function useConformanceResult(
-  report: MaybeRefOrGetter<ReportsCollectionItem>,
-  issues: MaybeRefOrGetter<IssuesCollectionItem[]>
+  report: MaybeRefOrGetter<ReportDocument>,
+  issues: MaybeRefOrGetter<IssueDocument[]>
 ) {
   const { t } = useI18n()
 

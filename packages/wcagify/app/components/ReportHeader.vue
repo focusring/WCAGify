@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
+import type { IssueDocument, ReportDocument } from '@focusring/wcagify'
 
 const props = defineProps<{
-  report: ReportsCollectionItem
-  issues: IssuesCollectionItem[]
+  report: ReportDocument
+  issues: IssueDocument[]
 }>()
 
 const { t } = useI18n()

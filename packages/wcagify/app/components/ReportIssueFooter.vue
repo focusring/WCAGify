@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { ScGroup } from '@focusring/wcagify'
-import type { IssuesCollectionItem, ReportsCollectionItem } from '@nuxt/content'
+import type { ScGroup, IssueDocument, ReportDocument } from '@focusring/wcagify'
 
 const props = defineProps<{
-  issue: IssuesCollectionItem
-  report: ReportsCollectionItem
-  criterion: ScGroup<IssuesCollectionItem>
+  issue: IssueDocument
+  report: ReportDocument
+  criterion: ScGroup<IssueDocument>
 }>()
 
 const { t } = useI18n()

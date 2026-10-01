@@ -14,13 +14,22 @@ const minimarkNodeSchema: z.ZodType<MinimarkNode> = z.lazy(() =>
 )
 
 /**
+ * The table of contents Nuxt Content stores with a body. Nothing renders it,
+ * so any object is kept as is. Typed as `object` rather than an index
+ * signature: Nuxt Content's `Toc` is an interface, and an interface is not
+ * assignable to an index signature, so its collection items would not fit
+ * `ReportDocument` and `IssueDocument`.
+ */
+const tocSchema: z.ZodType<object> = z.looseObject({})
+
+/**
  * A parsed markdown body as Nuxt Content v3 stores it. Code blocks are already
  * highlighted, so rendering the body needs no Shiki.
  */
 const minimarkSchema = z.object({
   type: z.literal('minimark'),
   value: z.array(minimarkNodeSchema),
-  toc: z.looseObject({}).optional()
+  toc: tocSchema.optional()
 })
 
 type Minimark = z.output<typeof minimarkSchema>

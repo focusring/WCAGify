@@ -4,8 +4,8 @@ import theme from '#build/ui/prose/pre'
 
 <script setup lang="ts">
 /**
- * Override of Nuxt UI's `ProsePre` (Nuxt Content resolves `components/content`
- * before the module's prose components).
+ * Override of Nuxt UI's `ProsePre` (the layer registers `components/prose`
+ * with a higher priority than the module's prose components).
  *
  * Differences from the stock component, all for accessibility:
  * - the copy button is always visible and the `pre` reserves room for it, so it

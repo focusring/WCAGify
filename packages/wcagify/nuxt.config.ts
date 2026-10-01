@@ -18,6 +18,18 @@ const nuxtConfig = {
 
   css: [join(dir, 'app/assets/css/main.css'), join(dir, 'print.css')],
 
+  /* The prose overrides (`ProseImg`, `ProsePre`) replace Nuxt UI's global
+   * prose components of the same name, so they are registered globally too,
+   * without a path prefix. They no longer rely on Nuxt Content registering
+   * `components/content`. A layer's components rank above Nuxt UI's (priority
+   * 0) and below the project's, so a project's own `ProseImg` still wins.
+   * Setting `components` replaces the layer's default directories, so
+   * `app/components` is listed as well. */
+  components: [
+    { path: join(dir, 'app/components/prose'), global: true },
+    { path: join(dir, 'app/components') }
+  ],
+
   runtimeConfig: {
     weasyprintUrl: 'https://magnificent-encouragement-production.up.railway.app'
   },
