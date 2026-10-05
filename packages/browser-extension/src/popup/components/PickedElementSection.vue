@@ -220,7 +220,6 @@ const gradientCss = (g?: GradientInfo | null) => {
         </template>
         <ColorSwatch v-if="info.background.color" :color="info.background.color" />
       </div>
-      <div v-if="info.hasHoverStyles" class="text-toned">{{ t('picker.hasHoverStyles') }}</div>
     </div>
   </div>
 </template>

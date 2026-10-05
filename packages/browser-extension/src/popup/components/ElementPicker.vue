@@ -448,9 +448,21 @@ async function pickElement() {
         </UTooltip>
 
         <!-- Page URL -->
-        <div>
-          <span class="label-title">{{ t('picker.url') }}</span>
-          <span class="ml-1 break-all text-highlighted">{{ pageUrl }}</span>
+        <div class="flex min-w-0">
+          <span class="label-title shrink-0">{{ t('picker.url') }}</span>
+          <UTooltip
+            :text="pageUrl"
+            :ui="{
+              content: 'h-auto max-w-(--reka-tooltip-content-available-width)',
+              text: 'whitespace-normal break-all'
+            }"
+          >
+            <span
+              tabindex="0"
+              class="ml-1 min-w-0 truncate text-highlighted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >{{ pageUrl }}</span
+            >
+          </UTooltip>
         </div>
 
         <!-- Page Title -->

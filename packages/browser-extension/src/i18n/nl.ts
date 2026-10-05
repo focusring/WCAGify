@@ -69,7 +69,6 @@ export default {
     iframeEmpty: 'leeg',
     iframeCrossOrigin: 'cross-origin',
     iframeInaccessible: 'ontoegankelijk',
-    hasHoverStyles: 'heeft hover-stijlen',
     copyColor: 'Kopieer kleur',
     foundOn: 'gevonden op',
     copied: 'Gekopieerd',

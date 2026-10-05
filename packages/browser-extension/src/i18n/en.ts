@@ -66,7 +66,6 @@ export default {
     iframeEmpty: 'empty',
     iframeCrossOrigin: 'cross-origin',
     iframeInaccessible: 'inaccessible',
-    hasHoverStyles: 'has hover styles',
     copyColor: 'Copy color',
     foundOn: 'found on',
     copied: 'Copied',
