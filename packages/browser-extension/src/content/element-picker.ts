@@ -1,23 +1,19 @@
+import { messages, supportedLocales } from '../i18n'
+import type { Locale } from '../i18n'
 import { getUniqueSelector } from './unique-selector'
 import { collectChildSections, collectElementInfo } from './picker/collect'
 import { resetHoverStylesCache } from './picker/hover'
 import { getNavigableParent } from './picker/navigate'
+import { isPanelMoveKey } from './picker/panel-keys'
 import { getPickTarget, recoverSkippedTarget } from './picker/pick-target'
 
 const OVERLAY_ID = 'wcagify-picker-overlay'
 const PANEL_ID = 'wcagify-picker-panel'
+const PANEL_TOP_CLASS = 'wcagify-picker-panel--top'
 const BRAND_COLOR = '#15803d'
 const BRAND_COLOR_ALPHA = 'rgba(21, 128, 61, 0.1)'
 
-const pickerStrings = {
-  en: { hoverHint: 'Hover over an element...', clickHint: 'Click to select · Esc to cancel' },
-  nl: {
-    hoverHint: 'Beweeg over een element...',
-    clickHint: 'Klik om te selecteren · Esc om te annuleren'
-  }
-}
-
-let pickerLocale: 'en' | 'nl' = 'en'
+let pickerLocale: Locale = 'en'
 let activeOverlay: HTMLElement | undefined = undefined
 let infoPanel: HTMLElement | undefined = undefined
 let currentTarget: Element | undefined = undefined
@@ -34,21 +30,28 @@ let repositionRaf = 0
 let previewing = false
 // Whether an outline was on screen when the preview started, so leaving the button restores the page to exactly that.
 let hadHighlightBeforePreview = false
+// Whether the info bar sits at the top instead of the bottom. Persists across picks on this page (not cleared by cleanup()), so testing a footer doesn't mean moving it every pick.
+let panelOnTop = false
 
 function injectStyles() {
   if (document.getElementById('wcagify-picker-styles')) return
 
   const style = document.createElement('style')
   style.id = 'wcagify-picker-styles'
+  // The bar sits at the bottom via top: 100% + translateY(-100%) rather than bottom: 0, so moving it to the top is a transition between two numeric values (top/bottom auto can't animate).
+  // Not translateY(100vh - 100%) alone: 100vh includes a horizontal scrollbar, which would push the bar partly off-screen.
+  // Both borders exist so the green line can fade from one edge to the other instead of jumping.
   style.textContent = `
     #${PANEL_ID} {
       position: fixed;
-      bottom: 0;
+      top: 100%;
       left: 0;
       right: 0;
+      transform: translateY(-100%);
       z-index: 2147483647;
       background-color: #fff;
       border-top: 2px solid ${BRAND_COLOR};
+      border-bottom: 2px solid transparent;
       padding: 10px 16px;
       font-family: system-ui, -apple-system, sans-serif;
       font-size: 14px;
@@ -58,6 +61,20 @@ function injectStyles() {
       align-items: center;
       gap: 12px;
       pointer-events: none;
+    }
+    #${PANEL_ID}.${PANEL_TOP_CLASS} {
+      top: 0;
+      transform: translateY(0);
+      border-top-color: transparent;
+      border-bottom-color: ${BRAND_COLOR};
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      #${PANEL_ID} {
+        transition-property: top, transform, border-color, box-shadow;
+        transition-duration: 250ms;
+        transition-timing-function: ease-in-out;
+      }
     }
     #${PANEL_ID} .wcagify-logo {
       font-weight: 700;
@@ -109,6 +126,7 @@ function injectStyles() {
 function createInfoPanel(): HTMLElement {
   const panel = document.createElement('div')
   panel.id = PANEL_ID
+  panel.classList.toggle(PANEL_TOP_CLASS, panelOnTop)
 
   const logo = document.createElement('span')
   logo.className = 'wcagify-logo'
@@ -116,7 +134,7 @@ function createInfoPanel(): HTMLElement {
 
   const selectorText = document.createElement('code')
   selectorText.id = 'wcagify-selector-text'
-  const strings = pickerStrings[pickerLocale]
+  const strings = messages[pickerLocale].picker
   selectorText.textContent = strings.hoverHint
 
   const hint = document.createElement('span')
@@ -133,6 +151,11 @@ function createInfoPanel(): HTMLElement {
 function updateInfoPanel(selector: string) {
   const text = document.getElementById('wcagify-selector-text')
   if (text) text.textContent = selector
+}
+
+function setPanelOnTop(top: boolean) {
+  panelOnTop = top
+  infoPanel?.classList.toggle(PANEL_TOP_CLASS, top)
 }
 
 function highlightElement(el: Element) {
@@ -359,6 +382,10 @@ function handleKeyDown(e: KeyboardEvent) {
     cleanup()
     chrome.runtime.sendMessage({ type: 'picker-cancelled' })
   }
+  if (isPanelMoveKey(e)) {
+    e.preventDefault()
+    setPanelOnTop(e.key === 'ArrowUp')
+  }
 }
 
 async function startPicker() {
@@ -367,7 +394,8 @@ async function startPicker() {
 
   try {
     const result = await chrome.storage.local.get(['locale'])
-    pickerLocale = result.locale === 'nl' ? 'nl' : 'en'
+    const stored = result.locale as Locale
+    pickerLocale = supportedLocales.includes(stored) ? stored : 'en'
   } catch {
     /* Default to en */
   }
@@ -384,12 +412,16 @@ async function startPicker() {
   document.addEventListener('keydown', handleKeyDown)
 }
 
-chrome.runtime.onMessage.addListener((message: { type: string; index?: number }) => {
+chrome.runtime.onMessage.addListener((message: { type: string; index?: number; top?: boolean }) => {
   if (message.type === 'start-picker') {
     startPicker()
   }
   if (message.type === 'cancel-picker') {
     cleanup()
+  }
+  // Sent by the side panel, which usually has keyboard focus while picking (the pick button was just clicked there).
+  if (message.type === 'move-picker-panel' && typeof message.top === 'boolean') {
+    setPanelOnTop(message.top)
   }
   if (message.type === 'select-parent') {
     selectParent()

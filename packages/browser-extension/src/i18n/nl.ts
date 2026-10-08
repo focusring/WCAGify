@@ -74,7 +74,7 @@ export default {
     copied: 'Gekopieerd',
     unknown: 'onbekend',
     hoverHint: 'Beweeg over een element...',
-    clickHint: 'Klik om te selecteren · Esc om te annuleren',
+    clickHint: 'Klik om te selecteren · ↑↓ balk verplaatsen · Esc om te annuleren',
     noPageTab:
       'Geen paginatab gevonden om uit te selecteren. Ga naar een gewoon browsertabblad en probeer het opnieuw.'
   },

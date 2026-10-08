@@ -2,6 +2,7 @@
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 import PickedElementSection from './PickedElementSection.vue'
+import { isPanelMoveKey } from '../../content/picker/panel-keys'
 import type { ElementInfo } from '../../content/picker/types'
 
 const { t } = useI18n()
@@ -271,6 +272,13 @@ const childIndex = (i: number) => (childPage.value - 1) * CHILD_PAGE_SIZE + i
 
 function onKeyDown(e: KeyboardEvent) {
   if (e.key === 'Escape') cancelPicker()
+  // Focus usually stays here after clicking the pick button, so the page never sees the key itself.
+  if (picking.value && pickerTabId.value !== undefined && isPanelMoveKey(e)) {
+    e.preventDefault()
+    chrome.tabs
+      .sendMessage(pickerTabId.value, { type: 'move-picker-panel', top: e.key === 'ArrowUp' })
+      .catch(() => {})
+  }
 }
 
 onMounted(() => {

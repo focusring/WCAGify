@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
+import { mount, flushPromises, enableAutoUnmount } from '@vue/test-utils'
 import ui from '@nuxt/ui/vue-plugin'
 import UApp from '@nuxt/ui/components/App.vue'
 import ElementPicker from '../src/popup/components/ElementPicker.vue'
@@ -136,6 +136,8 @@ describe('ElementPicker pick session', () => {
   beforeEach(() => {
     vi.unstubAllGlobals()
   })
+  // A picker left mounted (and mid-pick) by an earlier test would still react to window keydowns.
+  enableAutoUnmount(afterEach)
 
   it('starts a pick session on the active eligible tab', async () => {
     const { wrapper, chrome } = await mountPicker()
@@ -209,6 +211,35 @@ describe('ElementPicker pick session', () => {
     expect(historyButton).toBeDefined()
     await historyButton?.trigger('click')
     expect(wrapper2.text()).toContain('Saved')
+  })
+
+  it('forwards arrow keys to the picking tab to move its info bar, except from a text field', async () => {
+    const { wrapper, chrome } = await mountPicker()
+    const pressKey = (key: string, target: EventTarget = globalThis) =>
+      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+    const moveMessages = () =>
+      chrome.chromeMock.tabs.sendMessage.mock.calls.filter(
+        (call: unknown[]) => (call[1] as { type: string }).type === 'move-picker-panel'
+      )
+
+    // Not picking: there's no bar to move.
+    pressKey('ArrowUp')
+    expect(moveMessages()).toHaveLength(0)
+
+    await wrapper.find('button').trigger('click')
+    await flushPromises()
+    pressKey('ArrowUp')
+    pressKey('ArrowDown')
+    expect(moveMessages()).toEqual([
+      [1, { type: 'move-picker-panel', top: true }],
+      [1, { type: 'move-picker-panel', top: false }]
+    ])
+
+    const input = document.createElement('input')
+    document.body.appendChild(input)
+    pressKey('ArrowUp', input)
+    input.remove()
+    expect(moveMessages()).toHaveLength(2)
   })
 
   it('resets the selection while keeping history', async () => {

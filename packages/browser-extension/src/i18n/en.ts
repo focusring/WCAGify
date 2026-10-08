@@ -71,7 +71,7 @@ export default {
     copied: 'Copied',
     unknown: 'unknown',
     hoverHint: 'Hover over an element...',
-    clickHint: 'Click to select · Esc to cancel',
+    clickHint: 'Click to select · ↑↓ move bar · Esc to cancel',
     noPageTab: 'No page tab found to pick from. Switch to a regular browser tab and try again.'
   },
   form: {
