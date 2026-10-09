@@ -52,6 +52,7 @@ export default {
     noName: '(geen toegankelijke naam)',
     disabled: 'uitgeschakeld',
     text: 'Tekst',
+    underline: 'Onderstreping',
     icon: 'Icon',
     element: 'Element',
     background: 'Achtergrond',

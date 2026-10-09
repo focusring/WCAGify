@@ -49,6 +49,10 @@ export interface ElementInfo {
   // Presentational only, so they stay out of the section merge key see sectionKey.
   textColorSources?: string[][]
   iconColorSources?: string[][]
+  // Underlines (own or inherited from an ancestor) whose color differs from the text they run under, with the element
+  // setting each one. Optional for the same history reason; the sources stay out of the merge key like the ones above.
+  underlineColors?: string[]
+  underlineColorSources?: string[][]
   elementColor: string
   elementGradient: GradientInfo | null
   background: BackgroundInfo

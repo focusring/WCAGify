@@ -49,6 +49,7 @@ export default {
     noName: '(no accessible name)',
     disabled: 'disabled',
     text: 'Text',
+    underline: 'Underline',
     icon: 'Icon',
     element: 'Element',
     background: 'Background',

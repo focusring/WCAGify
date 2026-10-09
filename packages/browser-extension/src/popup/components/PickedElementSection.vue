@@ -129,6 +129,17 @@ const gradientCss = (g?: GradientInfo | null) => {
         />
       </div>
 
+      <!-- Underline Colors -->
+      <div v-if="info.underlineColors?.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.underline') }}:</span>
+        <ColorSwatch
+          v-for="(color, i) in info.underlineColors"
+          :key="`underline-${i}`"
+          :color="color"
+          :sources="info.underlineColorSources?.[i]"
+        />
+      </div>
+
       <!-- Media -->
       <div v-if="info.media">
         <span class="label-title">{{ t('picker.media') }}:</span>

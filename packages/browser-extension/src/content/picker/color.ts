@@ -10,6 +10,7 @@ import {
   hasTextClip,
   isHtmlTag,
   isOwnScope,
+  sameColor,
   scanDescendants,
   tryParseColor
 } from './css-utils'
@@ -141,14 +142,60 @@ function getFieldPlaceholder(field: Element): string {
   return ''
 }
 
+// An underline and the element whose text-decoration draws it.
+interface Underline {
+  color: string
+  el: Element
+}
+
+// Parent in the flat (rendered) tree: a slotted element's <slot>, and a shadow root's host — decorations propagate along it.
+function flatParent(el: Element): Element | null {
+  return el.assignedSlot ?? el.parentElement ?? (el.parentNode as ShadowRoot | null)?.host ?? null
+}
+
+// An ancestor's text decoration doesn't reach into an out-of-flow box or an atomic inline (inline-block/-flex/-grid/-table).
+// float is checked as set-and-not-none: an unrendered element's computed values are all ''.
+function blocksDecorationPropagation(style: CSSStyleDeclaration): boolean {
+  if (style.position === 'absolute' || style.position === 'fixed') return true
+  if (style.float && style.float !== 'none') return true
+  return style.display.startsWith('inline-')
+}
+
+// Underlines drawn on text directly inside el: its own plus those propagated from ancestors. A descendant's computed
+// text-decoration-line reads `none` even while an ancestor's underline runs through it (e.g. a "By" prefix span inside
+// an underlined author span), so the ancestors have to be walked. Memoised per element across one text walk.
+function underlinesAt(el: Element, cache: Map<Element, Underline[]>): Underline[] {
+  const cached = cache.get(el)
+  if (cached) return cached
+  const style = getComputedStyle(el)
+  const parent = flatParent(el)
+  const inherited = parent && !blocksDecorationPropagation(style) ? underlinesAt(parent, cache) : []
+  // text-decoration-color is resolved (currentColor → the decorating element's own `color`), as the line is painted.
+  const result = style.textDecorationLine.includes('underline')
+    ? [...inherited, { color: style.textDecorationColor, el }]
+    : inherited
+  cache.set(el, result)
+  return result
+}
+
+// Text colors plus the underlines on that text whose color differs from it — an underline matching its text adds no
+// color of its own. Sources name the element that sets the underline, not the text it runs under.
+export interface TextColors extends ColorSources {
+  underline: ColorSources
+}
+
 // Unique computed `color` values for visible text el owns: text nodes, input/textarea values, and ::placeholder when empty.
 // `isBoundary` marks descendants surfaced as their own section they report their own text there, so it stays out of el's row entirely. An element whose text all belongs to such children gets an empty row, not a summary of theirs:
 // every surfaced section is rendered in the panel (paginated at most), so nothing goes missing, and a value that does show up here is one no child section accounts for.
 export function getTextColors(
   el: Element,
   isBoundary: (child: Element) => boolean = () => false
-): ColorSources {
+): TextColors {
   const own: ColorTally = new Map()
+  const underlines: ColorTally = new Map()
+  const underlineCache = new Map<Element, Underline[]>()
+  // One underlining element spans many text nodes; count it once, so sources read as elements like the text row's.
+  const counted = new Set<Underline>()
   const add = (source: Element, color: string): void => {
     if (isOwnScope(source, el, isBoundary)) tallyColor(own, color, source)
   }
@@ -165,7 +212,17 @@ export function getTextColors(
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     // A slotted text node's color comes from its assigned <slot>, not parentElement (the host) — e.g. Stencil's <nes-button> slots its label into a styled <a>.
     const parent = (node as Text).assignedSlot ?? node.parentElement
-    if (parent) add(parent, getComputedStyle(parent).color)
+    if (!parent || !isOwnScope(parent, el, isBoundary)) continue
+    const color = getComputedStyle(parent).color
+    tallyColor(own, color, parent)
+    const textColor = tryParseColor(color)
+    for (const line of underlinesAt(parent, underlineCache)) {
+      if (counted.has(line)) continue
+      const lineColor = tryParseColor(line.color)
+      if (lineColor && textColor && sameColor(lineColor, textColor)) continue
+      counted.add(line)
+      tallyColor(underlines, line.color, line.el)
+    }
   }
 
   // Form fields don't expose value/placeholder as DOM text nodes check explicitly.
@@ -181,7 +238,7 @@ export function getTextColors(
     }
   }
 
-  return tallyResult(own)
+  return { ...tallyResult(own), underline: tallyResult(underlines) }
 }
 
 // Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.
