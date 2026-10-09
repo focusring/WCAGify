@@ -49,10 +49,15 @@ export interface ElementInfo {
   // Presentational only, so they stay out of the section merge key see sectionKey.
   textColorSources?: string[][]
   iconColorSources?: string[][]
-  // Underlines (own or inherited from an ancestor) whose color differs from the text they run under, with the element
-  // setting each one. Optional for the same history reason; the sources stay out of the merge key like the ones above.
-  underlineColors?: string[]
-  underlineColorSources?: string[][]
+  // Text-decoration lines (own or inherited from an ancestor) whose color differs from the text they run under.
+  // Each decorationLines[i] names the line(s) drawn in decorationColors[i] ('underline', 'line-through', 'underline overline').
+  // The highlight fields cover inline highlights (a <mark>, a span's background-color) behind the element's text.
+  // Sources name the element setting each one. Optional for the same history reason; sources stay out of the merge key like the ones above.
+  decorationColors?: string[]
+  decorationLines?: string[]
+  decorationColorSources?: string[][]
+  highlightColors?: string[]
+  highlightColorSources?: string[][]
   elementColor: string
   elementGradient: GradientInfo | null
   background: BackgroundInfo

@@ -1,5 +1,6 @@
 import type { Rgba } from './types'
 import type { DescendantScan } from './css-utils'
+import { firstSolidBackgroundColor } from './background'
 import {
   SVG_SHAPE_SELECTOR,
   collectSvgRoots,
@@ -142,46 +143,103 @@ function getFieldPlaceholder(field: Element): string {
   return ''
 }
 
-// An underline and the element whose text-decoration draws it.
-interface Underline {
+// Decoration line(s) one element's text-decoration draws, all in its one text-decoration-color.
+// The `line` field holds one or more of underline / overline / line-through, space-separated.
+interface Decoration {
+  line: string
   color: string
   el: Element
 }
 
-// Parent in the flat (rendered) tree: a slotted element's <slot>, and a shadow root's host — decorations propagate along it.
+const DECORATION_LINES = ['underline', 'overline', 'line-through']
+
+// The drawn lines in a computed text-decoration-line, in a fixed order; '' when there are none.
+function drawnLines(textDecorationLine: string): string {
+  const tokens = textDecorationLine.split(' ')
+  return DECORATION_LINES.filter((line) => tokens.includes(line)).join(' ')
+}
+
+// Parent in the flat (rendered) tree, which decorations propagate along: a slotted element's <slot>, a shadow root's host.
 function flatParent(el: Element): Element | null {
   return el.assignedSlot ?? el.parentElement ?? (el.parentNode as ShadowRoot | null)?.host ?? null
 }
 
 // An ancestor's text decoration doesn't reach into an out-of-flow box or an atomic inline (inline-block/-flex/-grid/-table).
-// float is checked as set-and-not-none: an unrendered element's computed values are all ''.
+// The float check is set-and-not-none because an unrendered element's computed values are all ''.
 function blocksDecorationPropagation(style: CSSStyleDeclaration): boolean {
   if (style.position === 'absolute' || style.position === 'fixed') return true
   if (style.float && style.float !== 'none') return true
   return style.display.startsWith('inline-')
 }
 
-// Underlines drawn on text directly inside el: its own plus those propagated from ancestors. A descendant's computed
-// text-decoration-line reads `none` even while an ancestor's underline runs through it (e.g. a "By" prefix span inside
-// an underlined author span), so the ancestors have to be walked. Memoised per element across one text walk.
-function underlinesAt(el: Element, cache: Map<Element, Underline[]>): Underline[] {
+// Decorations drawn on text directly inside el: its own plus those propagated from ancestors.
+// A descendant's computed text-decoration-line reads `none` even while an ancestor's underline runs through it (e.g. a "By" prefix span inside an underlined author span), so the ancestors have to be walked.
+// Memoised per element across one text walk.
+function decorationsAt(el: Element, cache: Map<Element, Decoration[]>): Decoration[] {
   const cached = cache.get(el)
   if (cached) return cached
   const style = getComputedStyle(el)
   const parent = flatParent(el)
-  const inherited = parent && !blocksDecorationPropagation(style) ? underlinesAt(parent, cache) : []
-  // text-decoration-color is resolved (currentColor → the decorating element's own `color`), as the line is painted.
-  const result = style.textDecorationLine.includes('underline')
-    ? [...inherited, { color: style.textDecorationColor, el }]
-    : inherited
+  const inherited =
+    parent && !blocksDecorationPropagation(style) ? decorationsAt(parent, cache) : []
+  const line = drawnLines(style.textDecorationLine)
+  // The computed text-decoration-color is already resolved (currentColor → the decorating element's own `color`), as the line is painted.
+  const result = line ? [...inherited, { line, color: style.textDecorationColor, el }] : inherited
   cache.set(el, result)
   return result
 }
 
-// Text colors plus the underlines on that text whose color differs from it — an underline matching its text adds no
-// color of its own. Sources name the element that sets the underline, not the text it runs under.
+// The inline element painting the background directly behind text in `el`, searching up to (not including) `root`.
+// That is the nearest painted background on the way up, kept only when its element is inline (a <mark>, a highlighted span).
+// A block or inline-block background there is a nested surface, not a highlight; none at all means the text sits on root's own surface.
+// Memoised per element like decorationsAt.
+function highlightBehind(
+  el: Element | null,
+  root: Element,
+  cache: Map<Element, Element | null>
+): Element | null {
+  if (!el || el === root) return null
+  const cached = cache.get(el)
+  if (cached !== undefined) return cached
+  const style = getComputedStyle(el)
+  const background = tryParseColor(style.backgroundColor)
+  let found: Element | null = null
+  if (!background || background.a === 0) found = highlightBehind(flatParent(el), root, cache)
+  else if (style.display === 'inline') found = el
+  cache.set(el, found)
+  return found
+}
+
+// A highlight in its surrounding surface's color paints nothing visible.
+// Pasted Word/Docs content often wraps runs in white-background spans on a white page.
+function isVisibleHighlight(highlight: Element, color: string): boolean {
+  const c = tryParseColor(color)
+  const surface = firstSolidBackgroundColor(highlight.parentElement)
+  return !(c && surface && sameColor(c, surface))
+}
+
+// Decoration colors plus, index-aligned, the line(s) each one draws ('underline', 'line-through', 'underline overline').
+interface DecorationColors extends ColorSources {
+  lines: string[]
+}
+
+// Tallies are kept per line, so one color drawn as two different lines stays two entries.
+function decorationResult(byLine: Map<string, ColorTally>): DecorationColors {
+  const result: DecorationColors = { colors: [], sources: [], lines: [] }
+  for (const [line, tally] of byLine) {
+    const { colors, sources } = tallyResult(tally)
+    result.colors.push(...colors)
+    result.sources.push(...sources)
+    result.lines.push(...colors.map(() => line))
+  }
+  return result
+}
+
+// Text colors plus what is painted with that text: decoration lines whose color differs from the text they run under (one matching its text adds no color of its own), and inline highlights behind it.
+// Their sources name the element setting the decoration or background, not the text.
 export interface TextColors extends ColorSources {
-  underline: ColorSources
+  decoration: DecorationColors
+  highlight: ColorSources
 }
 
 // Unique computed `color` values for visible text el owns: text nodes, input/textarea values, and ::placeholder when empty.
@@ -192,10 +250,13 @@ export function getTextColors(
   isBoundary: (child: Element) => boolean = () => false
 ): TextColors {
   const own: ColorTally = new Map()
-  const underlines: ColorTally = new Map()
-  const underlineCache = new Map<Element, Underline[]>()
-  // One underlining element spans many text nodes; count it once, so sources read as elements like the text row's.
-  const counted = new Set<Underline>()
+  const decorations = new Map<string, ColorTally>()
+  const highlights: ColorTally = new Map()
+  const decorationCache = new Map<Element, Decoration[]>()
+  const highlightCache = new Map<Element, Element | null>()
+  // One decorating or highlighting element spans many text nodes; count it once, so sources read as elements like the text row's.
+  const countedDecorations = new Set<Decoration>()
+  const countedHighlights = new Set<Element>()
   const add = (source: Element, color: string): void => {
     if (isOwnScope(source, el, isBoundary)) tallyColor(own, color, source)
   }
@@ -216,12 +277,23 @@ export function getTextColors(
     const color = getComputedStyle(parent).color
     tallyColor(own, color, parent)
     const textColor = tryParseColor(color)
-    for (const line of underlinesAt(parent, underlineCache)) {
-      if (counted.has(line)) continue
-      const lineColor = tryParseColor(line.color)
+    for (const decoration of decorationsAt(parent, decorationCache)) {
+      if (countedDecorations.has(decoration)) continue
+      const lineColor = tryParseColor(decoration.color)
       if (lineColor && textColor && sameColor(lineColor, textColor)) continue
-      counted.add(line)
-      tallyColor(underlines, line.color, line.el)
+      countedDecorations.add(decoration)
+      let tally = decorations.get(decoration.line)
+      if (!tally) {
+        tally = new Map()
+        decorations.set(decoration.line, tally)
+      }
+      tallyColor(tally, decoration.color, decoration.el)
+    }
+    const highlight = highlightBehind(parent, el, highlightCache)
+    if (highlight && !countedHighlights.has(highlight)) {
+      countedHighlights.add(highlight)
+      const background = getComputedStyle(highlight).backgroundColor
+      if (isVisibleHighlight(highlight, background)) tallyColor(highlights, background, highlight)
     }
   }
 
@@ -238,7 +310,11 @@ export function getTextColors(
     }
   }
 
-  return { ...tallyResult(own), underline: tallyResult(underlines) }
+  return {
+    ...tallyResult(own),
+    decoration: decorationResult(decorations),
+    highlight: tallyResult(highlights)
+  }
 }
 
 // Returns the color if this SVG paint renders, else null. Rejects none/transparent, url() paint servers (gradients/patterns parse to phantom black), and paints zeroed by *-opacity.

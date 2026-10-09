@@ -28,7 +28,8 @@ function mapColors(info: ElementInfo): ElementInfo {
     ...info,
     textColors: info.textColors.map(toHex),
     iconColors: info.iconColors.map(toHex),
-    underlineColors: info.underlineColors?.map(toHex),
+    decorationColors: info.decorationColors?.map(toHex),
+    highlightColors: info.highlightColors?.map(toHex),
     elementColor: toHex(info.elementColor),
     elementGradient: info.elementGradient
       ? { type: info.elementGradient.type, colors: info.elementGradient.colors.map(toHex) }

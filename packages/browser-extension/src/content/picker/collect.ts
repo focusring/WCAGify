@@ -201,8 +201,11 @@ function buildElementInfo(el: Element, role: string): ElementInfo {
     textColorSources: text.sources,
     iconColors: icons.colors,
     iconColorSources: icons.sources,
-    underlineColors: text.underline.colors,
-    underlineColorSources: text.underline.sources,
+    decorationColors: text.decoration.colors,
+    decorationLines: text.decoration.lines,
+    decorationColorSources: text.decoration.sources,
+    highlightColors: text.highlight.colors,
+    highlightColorSources: text.highlight.sources,
     elementColor: getElementOwnColor(el, style),
     elementGradient: getElementGradient(el, style, scan.clipTextBackgroundImages),
     background: getBackgroundInfo(el, style),
@@ -252,7 +255,8 @@ function sectionKey(info: ElementInfo): string {
     count: _count,
     textColorSources: _textSources,
     iconColorSources: _iconSources,
-    underlineColorSources: _underlineSources,
+    decorationColorSources: _decorationSources,
+    highlightColorSources: _highlightSources,
     ...values
   } = info
   return JSON.stringify(values)

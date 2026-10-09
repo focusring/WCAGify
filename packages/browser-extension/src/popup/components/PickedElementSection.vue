@@ -129,14 +129,27 @@ const gradientCss = (g?: GradientInfo | null) => {
         />
       </div>
 
-      <!-- Underline Colors -->
-      <div v-if="info.underlineColors?.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.underline') }}:</span>
+      <!-- Text Decoration Colors -->
+      <div v-if="info.decorationColors?.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.textDecoration') }}:</span>
+        <span
+          v-for="(color, i) in info.decorationColors"
+          :key="`decoration-${i}`"
+          class="inline-flex items-center gap-1"
+        >
+          <ColorSwatch :color="color" :sources="info.decorationColorSources?.[i]" />
+          <code class="text-highlighted">{{ info.decorationLines?.[i] }}</code>
+        </span>
+      </div>
+
+      <!-- Highlight Colors -->
+      <div v-if="info.highlightColors?.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span class="label-title">{{ t('picker.highlight') }}:</span>
         <ColorSwatch
-          v-for="(color, i) in info.underlineColors"
-          :key="`underline-${i}`"
+          v-for="(color, i) in info.highlightColors"
+          :key="`highlight-${i}`"
           :color="color"
-          :sources="info.underlineColorSources?.[i]"
+          :sources="info.highlightColorSources?.[i]"
         />
       </div>
 
