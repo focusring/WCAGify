@@ -2,6 +2,7 @@ import type { Rgba } from './types'
 import type { DescendantScan } from './css-utils'
 import { firstSolidBackgroundColor } from './background'
 import {
+  FIELD_SELECTOR,
   SVG_SHAPE_SELECTOR,
   collectSvgRoots,
   findFillingDescendant,
@@ -24,11 +25,18 @@ function getFillingDescendantBgLayer(el: Element): Rgba | null {
   })
 }
 
-// The element's own ::before/::after fill, when the pseudo generates a box (content !== 'none'). Mirrors getBorderColors's pseudo check: design systems that paint a "state layer" (Material 3 filled buttons: own background-color is transparent, the fill is on :after) put the surface color here instead.
-function getPseudoBgLayer(el: Element): Rgba | null {
+// Styles of el's ::before/::after, skipping a pseudo that generates no box (content: none) and so paints nothing.
+// Lazy, so a caller that stops at the first hit doesn't pay for the second computed style.
+function* generatedPseudoStyles(el: Element): Generator<CSSStyleDeclaration> {
   for (const pseudo of ['::before', '::after'] as const) {
     const pseudoStyle = getComputedStyle(el, pseudo)
-    if (pseudoStyle.content === 'none') continue
+    if (pseudoStyle.content !== 'none') yield pseudoStyle
+  }
+}
+
+// The element's own ::before/::after fill. Design systems that paint a "state layer" (Material 3 filled buttons: own background-color is transparent, the fill is on :after) put the surface color here instead.
+function getPseudoBgLayer(el: Element): Rgba | null {
+  for (const pseudoStyle of generatedPseudoStyles(el)) {
     const layer = tryParseColor(pseudoStyle.backgroundColor)
     if (layer && layer.a > 0) return layer
   }
@@ -52,8 +60,6 @@ export function getElementOwnColor(
 
 // Tags whose text content is not rendered visually (filters the text walker).
 const NON_VISIBLE_TEXT_TAGS = new Set(['script', 'style', 'noscript', 'title', 'desc'])
-
-export const FIELD_SELECTOR = 'input, textarea, select'
 
 // Colors plus, per color and index-aligned with it, short names for the elements it was found on.
 // A design system reuses one token across unrelated elements, so a color repeating between an element and one of its
@@ -433,10 +439,6 @@ export function getBorderColors(
 ): string[] {
   const colors = new Set<string>()
   collectBorderColors(style, colors)
-  for (const pseudo of ['::before', '::after'] as const) {
-    const pseudoStyle = getComputedStyle(el, pseudo)
-    if (pseudoStyle.content === 'none') continue // pseudo-element doesn't generate a box → its border isn't rendered
-    collectBorderColors(pseudoStyle, colors)
-  }
+  for (const pseudoStyle of generatedPseudoStyles(el)) collectBorderColors(pseudoStyle, colors)
   return [...colors]
 }

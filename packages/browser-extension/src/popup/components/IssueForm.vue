@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Report } from '../../types'
 import { useSettings } from '../../composables/useSettings'
 import { useI18n } from '../../composables/useI18n'
 import RichTextEditor from './RichTextEditor.vue'
 import ScCombobox from './ScCombobox.vue'
 import ClearableSelect from './ClearableSelect.vue'
+import FieldHintPopover from './FieldHintPopover.vue'
 
 const props = defineProps<{
   reports: Report[]
@@ -36,18 +37,6 @@ function clearTitle() {
   title.value = ''
   titleTouched.value = true
 }
-
-// Every field hint is a popover, not an inline collapsible, so none of them need a live region.
-// Opening one moves focus into the popover's role="dialog" content, which announces the text.
-// Only the open state is tracked, so each toggle can say whether it opens or closes.
-const infoOpen = reactive({
-  sample: false,
-  title: false,
-  sc: false,
-  severity: false,
-  type: false,
-  body: false
-})
 
 const selectedReport = computed(() => props.reports.find((r) => r.slug === reportSlug.value))
 
@@ -175,22 +164,10 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UPopover v-model:open="infoOpen.sample" :content="{ sideOffset: 4, collisionPadding: 16 }">
-          <UButton
-            :aria-label="`${infoOpen.sample ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.samplePage.label')}`"
-            icon="i-lucide-info"
-            size="xs"
-            color="neutral"
-            variant="ghost"
-          />
-          <template #content>
-            <p
-              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
-            >
-              {{ t('form.samplePage.description') }}
-            </p>
-          </template>
-        </UPopover>
+        <FieldHintPopover
+          :label="t('form.samplePage.label')"
+          :description="t('form.samplePage.description')"
+        />
       </template>
 
       <span id="issue-sample-desc" class="sr-only">
@@ -221,22 +198,10 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UPopover v-model:open="infoOpen.title" :content="{ sideOffset: 4, collisionPadding: 16 }">
-          <UButton
-            :aria-label="`${infoOpen.title ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.issueTitle.label')}`"
-            icon="i-lucide-info"
-            size="xs"
-            color="neutral"
-            variant="ghost"
-          />
-          <template #content>
-            <p
-              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
-            >
-              {{ t('form.issueTitle.description') }}
-            </p>
-          </template>
-        </UPopover>
+        <FieldHintPopover
+          :label="t('form.issueTitle.label')"
+          :description="t('form.issueTitle.description')"
+        />
       </template>
 
       <span id="issue-title-desc" class="sr-only">
@@ -288,22 +253,7 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UPopover v-model:open="infoOpen.sc" :content="{ sideOffset: 4, collisionPadding: 16 }">
-          <UButton
-            :aria-label="`${infoOpen.sc ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.sc.label')}`"
-            icon="i-lucide-info"
-            size="xs"
-            color="neutral"
-            variant="ghost"
-          />
-          <template #content>
-            <p
-              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
-            >
-              {{ t('form.sc.description') }}
-            </p>
-          </template>
-        </UPopover>
+        <FieldHintPopover :label="t('form.sc.label')" :description="t('form.sc.description')" />
       </template>
 
       <span id="issue-sc-desc" class="sr-only">
@@ -334,25 +284,10 @@ async function submit() {
         class="w-full"
       >
         <template #hint>
-          <UPopover
-            v-model:open="infoOpen.severity"
-            :content="{ sideOffset: 4, collisionPadding: 16 }"
-          >
-            <UButton
-              :aria-label="`${infoOpen.severity ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.severity.label')}`"
-              icon="i-lucide-info"
-              size="xs"
-              color="neutral"
-              variant="ghost"
-            />
-            <template #content>
-              <p
-                class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
-              >
-                {{ t('form.severity.description') }}
-              </p>
-            </template>
-          </UPopover>
+          <FieldHintPopover
+            :label="t('form.severity.label')"
+            :description="t('form.severity.description')"
+          />
         </template>
 
         <span id="issue-severity-desc" class="sr-only">
@@ -381,22 +316,10 @@ async function submit() {
         class="w-full"
       >
         <template #hint>
-          <UPopover v-model:open="infoOpen.type" :content="{ sideOffset: 4, collisionPadding: 16 }">
-            <UButton
-              :aria-label="`${infoOpen.type ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.type.label')}`"
-              icon="i-lucide-info"
-              size="xs"
-              color="neutral"
-              variant="ghost"
-            />
-            <template #content>
-              <p
-                class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
-              >
-                {{ t('form.type.description') }}
-              </p>
-            </template>
-          </UPopover>
+          <FieldHintPopover
+            :label="t('form.type.label')"
+            :description="t('form.type.description')"
+          />
         </template>
 
         <span id="issue-type-desc" class="sr-only">
@@ -427,22 +350,10 @@ async function submit() {
     >
       <template #hint>
         <span aria-hidden="true">({{ t('form.required') }})</span>
-        <UPopover v-model:open="infoOpen.body" :content="{ sideOffset: 4, collisionPadding: 16 }">
-          <UButton
-            :aria-label="`${infoOpen.body ? t('form.descBtnClose') : t('form.descBtnOpen')} ${t('form.description.label')}`"
-            icon="i-lucide-info"
-            size="xs"
-            color="neutral"
-            variant="ghost"
-          />
-          <template #content>
-            <p
-              class="label-hint text-sm p-2 w-(--reka-popover-content-available-width) sm:w-auto sm:max-w-(--reka-popover-content-available-width)"
-            >
-              {{ t('form.description.description') }}
-            </p>
-          </template>
-        </UPopover>
+        <FieldHintPopover
+          :label="t('form.description.label')"
+          :description="t('form.description.description')"
+        />
       </template>
 
       <span id="issue-description-desc" class="sr-only">

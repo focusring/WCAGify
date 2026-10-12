@@ -1,11 +1,5 @@
 import { getUniqueSelector } from '../unique-selector'
-import {
-  FIELD_SELECTOR,
-  getBorderColors,
-  getElementOwnColor,
-  getIconColors,
-  getTextColors
-} from './color'
+import { getBorderColors, getElementOwnColor, getIconColors, getTextColors } from './color'
 import { getElementGradient } from './gradient'
 import { firstSolidBackgroundColor, getBackgroundInfo } from './background'
 import { getMediaInfo } from './media'
@@ -14,6 +8,7 @@ import { hasHoverStyles } from './hover'
 import { getAriaRole, isAccessibilityHidden } from './role'
 import { getOutlineColor, getShadowColors } from './shadow'
 import {
+  FIELD_SELECTOR,
   boxCoverage,
   isHtmlTag,
   isSvgTag,
@@ -178,7 +173,8 @@ export function collectElementInfo(el: Element, role: string = getAriaRole(el)):
   return buildElementInfo(el, role)
 }
 
-function selectorOf(el: Element): string {
+// getUniqueSelector returns a per-shadow-boundary list for shadow content; flatten it to the one string both the panel and the info bar show.
+export function selectorOf(el: Element): string {
   const sel = getUniqueSelector(el)
   return Array.isArray(sel) ? sel.join(' > ') : sel
 }

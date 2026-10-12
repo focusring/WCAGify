@@ -1,10 +1,14 @@
-import { hasCssMask } from './css-utils'
+import { FIELD_SELECTOR, hasCssMask } from './css-utils'
 
 // True if el has its own text/media/mask or wraps an icon. <a>/<button> are excluded from the descendant check interactive targets, not icon containers.
 const MEDIA_SELECTOR = 'img, svg, i, picture, canvas, video, audio'
+
+// el is itself a media element or a CSS-mask icon (Iconify/Lucide via @nuxt/icon), which has no tag to match on.
+const isIconOrMedia = (el: Element): boolean =>
+  el.matches(MEDIA_SELECTOR) || hasCssMask(getComputedStyle(el))
+
 function hasOwnVisibleContent(el: Element): boolean {
-  if (el.matches(MEDIA_SELECTOR)) return true
-  if (hasCssMask(getComputedStyle(el))) return true
+  if (isIconOrMedia(el)) return true
   for (const node of el.childNodes) {
     if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) return true
   }
@@ -12,18 +16,15 @@ function hasOwnVisibleContent(el: Element): boolean {
   return false
 }
 
-// Form fields that can't nest their own adornments: an <input> is void, and <select>/<textarea> don't render icon children. Components render leading/trailing icons as absolutely-positioned SIBLINGS instead.
-const FIELD_SELECTOR = 'input, select, textarea'
-
 // Separately-selectable elements: a sibling matching one of these is its own pick target, not a decorative adornment, so it must not turn the shared parent into a "field wrapper".
 const INTERACTIVE_SELECTOR = 'a, button, input, select, textarea, [role], [tabindex]'
 
-// Icon/media content anywhere in el (self or descendant): an <svg>/<img>/… or a CSS-mask icon (Iconify/Lucide via @nuxt/icon).
+// Icon/media content anywhere in el (self or descendant). Runs per cursor frame, so the one selector query comes
+// first; only a mask icon needs a computed style per descendant, and only when no media element was found.
 function containsIconOrMedia(el: Element): boolean {
-  if (el.matches(MEDIA_SELECTOR)) return true
-  if (hasCssMask(getComputedStyle(el))) return true
+  if (isIconOrMedia(el) || el.querySelector(MEDIA_SELECTOR)) return true
   for (const child of el.querySelectorAll('*')) {
-    if (child.matches(MEDIA_SELECTOR) || hasCssMask(getComputedStyle(child))) return true
+    if (hasCssMask(getComputedStyle(child))) return true
   }
   return false
 }
@@ -58,10 +59,10 @@ export function getPickTarget(el: Element): Element {
   return el
 }
 
-// Interactive / role-bearing elements worth recovering when the hit test skipped them.
+// Interactive / role-bearing elements worth recovering when the hit test skipped them: the separately-selectable set
+// plus the disabled markers, since a disabled control is exactly what the hit test tends to miss.
 // Decorative <div>/<span> with pointer-events: none (click-through scrims, overlays) are excluded correctly skipped, not meant to be selected.
-const RECOVERABLE_SELECTOR =
-  'a, button, input, select, textarea, [role], [tabindex], [aria-disabled], [disabled]'
+const RECOVERABLE_SELECTOR = `${INTERACTIVE_SELECTOR}, [aria-disabled], [disabled]`
 
 // Cap on descendants scanned per hit; bounds worst-case cost on a pathologically large subtree.
 const MAX_RECOVER_SCAN = 500

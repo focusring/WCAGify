@@ -89,6 +89,8 @@ const selector = computed(() => selected.value?.selector ?? '')
 const CHILD_PAGINATION_THRESHOLD = 3
 const CHILD_PAGE_SIZE = 3
 const isChildPaginated = computed(() => children.value.length > CHILD_PAGINATION_THRESHOLD)
+// Below the threshold this is the whole list (the page size matches it, and childPage resets to 1 with every new
+// selection), so the template renders one loop and only adds the pager when paginating.
 const pagedChildren = computed(() => {
   const start = (childPage.value - 1) * CHILD_PAGE_SIZE
   return children.value.slice(start, start + CHILD_PAGE_SIZE)
@@ -490,42 +492,27 @@ async function pickElement() {
         </div>
         <p v-if="viewingSnapshot" class="text-toned">{{ t('picker.historySnapshot') }}</p>
         <PickedElementSection :info="selected" />
-        <template v-if="isChildPaginated">
-          <template v-for="(child, i) in pagedChildren" :key="`child-${childPage}-${i}`">
-            <USeparator class="my-2" />
-            <PickedElementSection
-              :info="child"
-              child
-              :snapshot="viewingSnapshot"
-              @select="selectChild(childIndex(i))"
-              @preview="previewChild(childIndex(i))"
-              @preview-end="endPreview"
-            />
-          </template>
-          <div class="flex justify-center mt-4">
-            <UPagination
-              v-model:page="childPage"
-              :total="children.length"
-              :items-per-page="CHILD_PAGE_SIZE"
-              :sibling-count="0"
-              show-edges
-              size="sm"
-            />
-          </div>
+        <template v-for="(child, i) in pagedChildren" :key="`child-${childPage}-${i}`">
+          <USeparator class="my-2" />
+          <PickedElementSection
+            :info="child"
+            child
+            :snapshot="viewingSnapshot"
+            @select="selectChild(childIndex(i))"
+            @preview="previewChild(childIndex(i))"
+            @preview-end="endPreview"
+          />
         </template>
-        <template v-else>
-          <template v-for="(child, i) in children" :key="`child-${i}`">
-            <USeparator class="my-2" />
-            <PickedElementSection
-              :info="child"
-              child
-              :snapshot="viewingSnapshot"
-              @select="selectChild(i)"
-              @preview="previewChild(i)"
-              @preview-end="endPreview"
-            />
-          </template>
-        </template>
+        <div v-if="isChildPaginated" class="flex justify-center mt-4">
+          <UPagination
+            v-model:page="childPage"
+            :total="children.length"
+            :items-per-page="CHILD_PAGE_SIZE"
+            :sibling-count="0"
+            show-edges
+            size="sm"
+          />
+        </div>
       </div>
     </Transition>
   </div>

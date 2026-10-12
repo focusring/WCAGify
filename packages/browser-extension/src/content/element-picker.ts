@@ -1,7 +1,6 @@
 import { messages, supportedLocales } from '../i18n'
 import type { Locale } from '../i18n'
-import { getUniqueSelector } from './unique-selector'
-import { collectChildSections, collectElementInfo } from './picker/collect'
+import { collectChildSections, collectElementInfo, selectorOf } from './picker/collect'
 import { resetHoverStylesCache } from './picker/hover'
 import { getNavigableParent } from './picker/navigate'
 import { isPanelMoveKey } from './picker/panel-keys'
@@ -159,14 +158,19 @@ function setPanelOnTop(top: boolean) {
   infoPanel?.classList.toggle(PANEL_TOP_CLASS, top)
 }
 
+// Re-points the existing outline instead of replacing it: this runs on every frame the cursor moves, where a
+// remove-and-recreate costs a document-wide query, a node swap and listener churn per frame. The stale-node sweep
+// in clearHighlight() still runs when a pick starts, which is when a leftover from an earlier injection would show up.
 function highlightElement(el: Element) {
-  clearHighlight()
   highlightTarget = el
-  highlightEl = document.createElement('div')
+  if (!highlightEl?.isConnected) {
+    highlightEl = document.createElement('div')
+    document.body.appendChild(highlightEl)
+    startTracking()
+  }
+  // Base class only, so the previous target's --selected modifier doesn't carry over.
   highlightEl.className = 'wcagify-highlight'
-  document.body.appendChild(highlightEl)
   positionHighlight()
-  startTracking()
 }
 
 // Track the target's live rect so the overlay stays glued on scroll/resize, hiding when off-screen.
@@ -288,8 +292,7 @@ function processMove() {
   const resolved = getPickTarget(recoverSkippedTarget(hit, x, y))
   currentTarget = resolved
   highlightElement(resolved)
-  const selector = getUniqueSelector(resolved)
-  updateInfoPanel(Array.isArray(selector) ? selector.join(' > ') : selector)
+  updateInfoPanel(selectorOf(resolved))
 }
 
 // Runs the full detection suite on el and pushes results to the panel. Shared by picking and the "select parent" button (same code path).

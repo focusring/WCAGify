@@ -2,7 +2,8 @@
 import { computed } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 import ColorSwatch from './ColorSwatch.vue'
-import type { ElementInfo, GradientInfo } from '../../content/picker/types'
+import GradientSwatches from './GradientSwatches.vue'
+import type { ElementInfo } from '../../content/picker/types'
 
 // snapshot: a frozen history restore with no live element, so stepping into a child is disabled rather than silently failing.
 const props = defineProps<{ info: ElementInfo; child?: boolean; snapshot?: boolean }>()
@@ -48,20 +49,14 @@ const backgroundMediaLabel = computed(() => {
   return m.format ? `${type} ${m.format}` : `${type} (${t('picker.unknown')})`
 })
 
-const gradientTypeLabel = (g?: GradientInfo | null) => g?.type.replace('-', ' ') ?? ''
-
-// Caps stops shown as swatches (rest summarised as "+N"); 3 covers common 2-/3-stop gradients without "+N" noise.
-const GRADIENT_STOPS_SHOWN = 3
-const gradientStopsShown = (g?: GradientInfo | null) =>
-  g?.colors.slice(0, GRADIENT_STOPS_SHOWN) ?? []
-const gradientStopsMore = (g?: GradientInfo | null) =>
-  Math.max((g?.colors.length ?? 0) - GRADIENT_STOPS_SHOWN, 0)
-// Preview swatch with a synthesised direction, since stops carry no angle/position.
-const gradientCss = (g?: GradientInfo | null) => {
-  if (!g) return ''
-  const direction = g.type.endsWith('linear') ? '90deg, ' : ''
-  return `${g.type}-gradient(${direction}${g.colors.join(', ')})`
-}
+// Rows that are just a label plus swatches, with no per-color sources; empty ones are dropped so the template needs no guard.
+const colorRows = computed(() =>
+  [
+    { key: 'border', label: t('picker.border'), colors: props.info.borderColors },
+    { key: 'ring', label: t('picker.ring'), colors: props.info.ringColors },
+    { key: 'shadow', label: t('picker.boxShadow'), colors: props.info.boxShadowColors }
+  ].filter((row) => row.colors.length)
+)
 </script>
 
 <template>
@@ -176,43 +171,18 @@ const gradientCss = (g?: GradientInfo | null) => {
         class="flex flex-wrap items-center gap-x-2 gap-y-1"
       >
         <span class="label-title">{{ t('picker.element') }}:</span>
-        <template v-if="info.elementGradient">
-          <ColorSwatch :color="gradientCss(info.elementGradient)" decorative />
-          <span class="text-highlighted">
-            {{ t('picker.gradient') }} {{ gradientTypeLabel(info.elementGradient) }}
-          </span>
-          <ColorSwatch
-            v-for="(color, i) in gradientStopsShown(info.elementGradient)"
-            :key="`egrad-${i}`"
-            :color="color"
-          />
-          <code v-if="gradientStopsMore(info.elementGradient)" class="text-highlighted">
-            +{{ gradientStopsMore(info.elementGradient) }}
-          </code>
-        </template>
+        <GradientSwatches v-if="info.elementGradient" :gradient="info.elementGradient" />
         <ColorSwatch v-if="info.elementColor" :color="info.elementColor" />
       </div>
 
-      <!-- Border Colors -->
-      <div v-if="info.borderColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.border') }}:</span>
-        <ColorSwatch v-for="(color, i) in info.borderColors" :key="`border-${i}`" :color="color" />
-      </div>
-
-      <!-- Ring Colors -->
-      <div v-if="info.ringColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.ring') }}:</span>
-        <ColorSwatch v-for="(color, i) in info.ringColors" :key="`ring-${i}`" :color="color" />
-      </div>
-
-      <!-- Box Shadow Colors -->
-      <div v-if="info.boxShadowColors.length" class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="label-title">{{ t('picker.boxShadow') }}:</span>
-        <ColorSwatch
-          v-for="(color, i) in info.boxShadowColors"
-          :key="`shadow-${i}`"
-          :color="color"
-        />
+      <!-- Border / Ring / Box Shadow Colors -->
+      <div
+        v-for="row in colorRows"
+        :key="row.key"
+        class="flex flex-wrap items-center gap-x-2 gap-y-1"
+      >
+        <span class="label-title">{{ row.label }}:</span>
+        <ColorSwatch v-for="(color, i) in row.colors" :key="`${row.key}-${i}`" :color="color" />
       </div>
 
       <!-- Outline Color -->
@@ -228,20 +198,7 @@ const gradientCss = (g?: GradientInfo | null) => {
           backgroundMediaLabel
         }}</code>
         <span v-if="info.background.blur" class="text-highlighted">{{ t('picker.blur') }}</span>
-        <template v-if="info.background.gradient">
-          <ColorSwatch :color="gradientCss(info.background.gradient)" decorative />
-          <span class="text-highlighted">
-            {{ t('picker.gradient') }} {{ gradientTypeLabel(info.background.gradient) }}
-          </span>
-          <ColorSwatch
-            v-for="(color, i) in gradientStopsShown(info.background.gradient)"
-            :key="`grad-${i}`"
-            :color="color"
-          />
-          <code v-if="gradientStopsMore(info.background.gradient)" class="text-highlighted">
-            +{{ gradientStopsMore(info.background.gradient) }}
-          </code>
-        </template>
+        <GradientSwatches v-if="info.background.gradient" :gradient="info.background.gradient" />
         <ColorSwatch v-if="info.background.color" :color="info.background.color" />
       </div>
     </div>
