@@ -140,6 +140,25 @@ export function* flatDescendants(el: Element): Generator<Element> {
   }
 }
 
+// The element `el` visually sits on (not always parentElement): the <slot> for slotted content, the host at a shadow root,
+// the owning <iframe> at a same-origin frame root. null at the top root or past a cross-origin frame.
+// Not navigate.ts's crossBoundaryParent, which is the DOM parent (for slotted content: the light-DOM parent, not the slot).
+export function surfaceParent(el: Element): Element | null {
+  if (el.assignedSlot) return el.assignedSlot
+  if (el.parentElement) return el.parentElement
+  const root = el.getRootNode()
+  if (root.nodeType === Node.DOCUMENT_FRAGMENT_NODE && 'host' in root)
+    return (root as ShadowRoot).host
+  if (root.nodeType === Node.DOCUMENT_NODE) {
+    try {
+      return (root as Document).defaultView?.frameElement ?? null
+    } catch {
+      return null // cross-origin frame: the embedding page is unreachable
+    }
+  }
+  return null
+}
+
 // For a transparent wrapper (e.g. <a> around a styled <button>), runs extract on the first descendant covering ≥90% of el's box document order yields the outermost filling surface first. Skips CSS-mask icons.
 export function findFillingDescendant<T>(
   el: Element,
@@ -158,7 +177,7 @@ export function findFillingDescendant<T>(
 }
 
 // Whether a value on `node` counts as `root`'s own: no element from `node` up to (excluding) `root` is a boundary.
-// Callers pass the "gets its own child section" test — such a section already reports the value, so an ancestor
+// Callers pass the "gets its own child section" test such a section already reports the value, so an ancestor
 // repeating it is duplication. Walks parentElement (stops at a shadow root), matching the passes that feed it.
 export function isOwnScope(
   node: Element,

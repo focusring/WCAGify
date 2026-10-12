@@ -221,7 +221,7 @@ function buildElementInfo(el: Element, role: string): ElementInfo {
 // reachability (from probeIframe) as an informational label.
 function collectIframeInfo(iframe: HTMLIFrameElement, role: string): ElementInfo {
   const info = buildElementInfo(iframe, role)
-  info.media = iframeMedia(probeIframe(iframe).state)
+  info.media = iframeMedia(probeIframe(iframe))
   return info
 }
 

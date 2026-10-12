@@ -1,5 +1,11 @@
 import type { BackgroundInfo, MediaInfo, Rgba } from './types'
-import { formatLayer, hasCssMask, splitOuterCommas, tryParseColor } from './css-utils'
+import {
+  formatLayer,
+  hasCssMask,
+  splitOuterCommas,
+  surfaceParent,
+  tryParseColor
+} from './css-utils'
 import { parseGradient } from './gradient'
 import { extractMediaFormat, videoFormat } from './media'
 
@@ -45,9 +51,10 @@ function findBackgroundVideo(el: Element): MediaInfo | null {
 }
 
 // First solid (non-transparent) background-color from `start` up to <html> (inclusive), skipping CSS-mask elements (background paints an icon, not a surface).
+// Walks via surfaceParent, so it crosses shadow and same-origin frame boundaries.
 // null when all transparent. Shared "surface an element sits on" walker.
 export function firstSolidBackgroundColor(start: Element | null): Rgba | null {
-  for (let current = start; current; current = current.parentElement) {
+  for (let current = start; current; current = surfaceParent(current)) {
     const style = getComputedStyle(current)
     if (!hasCssMask(style)) {
       const c = tryParseColor(style.backgroundColor)
@@ -58,7 +65,7 @@ export function firstSolidBackgroundColor(start: Element | null): Rgba | null {
   return null
 }
 
-// Structured description of the first visible background behind el: walks parent → <html>, recording the topmost background image/gradient and first solid color behind it (then stops), or a layered <video>. Skips CSS-mask elements.
+// Structured description of the first visible background behind el: walks surfaceParent → <html>, recording the topmost background image/gradient and first solid color behind it (then stops), or a layered <video>. Skips CSS-mask elements.
 export function getBackgroundInfo(
   el: Element,
   elStyle: CSSStyleDeclaration = getComputedStyle(el)
@@ -68,7 +75,7 @@ export function getBackgroundInfo(
   let gradient: BackgroundInfo['gradient'] = null
   let blur = hasBlur(elStyle)
 
-  for (let current: Element | null = el.parentElement; current; current = current.parentElement) {
+  for (let current = surfaceParent(el); current; current = surfaceParent(current)) {
     const style = getComputedStyle(current)
     if (!hasCssMask(style)) {
       const bgImage = style.backgroundImage

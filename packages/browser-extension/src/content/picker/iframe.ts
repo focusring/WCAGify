@@ -1,10 +1,5 @@
 import type { IframeState, MediaInfo } from './types'
 
-export interface IframeProbe {
-  state: IframeState
-  innerRoot: Element | null // the element to run detection on, set only when state === 'content'
-}
-
 // Reaches the iframe's inner document, or reports that the same-origin policy blocks it.
 // A cross-origin `contentDocument` read returns null *silently* (no throw) in modern browsers, so a
 // null result is ambiguous — we disambiguate by touching the content window's `location`, which does
@@ -29,18 +24,17 @@ function accessInnerDocument(iframe: HTMLIFrameElement): {
   }
 }
 
-// Classifies an <iframe> by how reachable its inner content is, and returns the element to detect on
-// when that content is present. The picker can't see through a frame boundary (elementFromPoint stops
-// at it, getComputedStyle/DOM queries don't cross it), so the picked target is always the frame itself.
-export function probeIframe(iframe: HTMLIFrameElement): IframeProbe {
+// Classifies an <iframe> by how reachable its inner content is. The picker reports a frame like an image —
+// what it is, not what is inside it (elementFromPoint stops at the boundary, DOM queries don't cross it) —
+// so this is an informational label and the picked target stays the frame itself.
+export function probeIframe(iframe: HTMLIFrameElement): IframeState {
   const { doc, crossOrigin } = accessInnerDocument(iframe)
-  if (crossOrigin) return { state: 'cross-origin', innerRoot: null }
-  if (!doc) return { state: 'inaccessible', innerRoot: null }
+  if (crossOrigin) return 'cross-origin'
+  if (!doc) return 'inaccessible'
   const body = doc.body
   // A body with no element children and no text is an unfilled shell (an about:blank ad slot before its script runs).
   const hasContent = !!body && (body.children.length > 0 || !!body.textContent?.trim())
-  if (!hasContent) return { state: 'empty', innerRoot: null }
-  return { state: 'content', innerRoot: body }
+  return hasContent ? 'content' : 'empty'
 }
 
 // The media-row descriptor for an iframe, rendered like image/video (kind + parenthetical state).

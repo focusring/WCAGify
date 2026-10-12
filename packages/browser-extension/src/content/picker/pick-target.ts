@@ -66,6 +66,40 @@ const RECOVERABLE_SELECTOR =
 // Cap on descendants scanned per hit; bounds worst-case cost on a pathologically large subtree.
 const MAX_RECOVER_SCAN = 500
 
+interface Point {
+  x: number
+  y: number
+}
+
+const isOutside = (rect: DOMRect, point: Point): boolean =>
+  point.x < rect.left || point.x > rect.right || point.y < rect.top || point.y > rect.bottom
+
+// Longhands and shorthand are both read because happy-dom records only the one that was written.
+// A value set rather than `!== 'visible'`, so an unset property ('') never counts as clipping.
+const CLIPPING_OVERFLOW = new Set(['hidden', 'clip', 'auto', 'scroll', 'overlay'])
+function clipsOverflow(style: CSSStyleDeclaration): boolean {
+  const values = [style.overflowX, style.overflowY, ...style.overflow.split(' ')]
+  return values.some((value) => CLIPPING_OVERFLOW.has(value))
+}
+
+// Rejects a candidate a clipping ancestor hides at the cursor: getBoundingClientRect is the UNCLIPPED box, so a control
+// scrolled out of an overflow container still "contains" the cursor. Ancestors are cached per hit test (shared, costly).
+// Not modelled: escaping the clip via position: fixed/absolute — rare.
+function clipTest(hit: Element, point: Point): (el: Element) => boolean {
+  const cache = new Map<Element, boolean>()
+  return (el) => {
+    for (let p = el.parentElement; p && p !== hit; p = p.parentElement) {
+      let hides = cache.get(p)
+      if (hides === undefined) {
+        hides = clipsOverflow(getComputedStyle(p)) && isOutside(p.getBoundingClientRect(), point)
+        cache.set(p, hides)
+      }
+      if (hides) return true
+    }
+    return false
+  }
+}
+
 // document.elementFromPoint skips elements with pointer-events: none, so a disabled control (e.g. Tailwind disabled:pointer-events-none) is invisible to the hit test and the picker resolves to its wrapper.
 // Recover it: the deepest interactive descendant in the hit's subtree that computes pointer-events: none and whose box holds the cursor.
 // Returns the hit unchanged when there's nothing to recover. Ties resolve to later document order (on top).
@@ -73,11 +107,18 @@ export function recoverSkippedTarget(hit: Element, x: number, y: number): Elemen
   let best: Element = hit
   let bestDepth = -1
   let scanned = 0
+  const point = { x, y }
+  const isClipped = clipTest(hit, point)
   for (const el of hit.querySelectorAll(RECOVERABLE_SELECTOR)) {
     if (++scanned > MAX_RECOVER_SCAN) break
-    if (getComputedStyle(el).pointerEvents !== 'none') continue
+    const style = getComputedStyle(el)
+    if (style.pointerEvents !== 'none') continue
+    // Not painted. visibility, not opacity: an opacity:0 <input> behind a custom checkbox should stay reachable.
+    if (style.visibility === 'hidden' || style.visibility === 'collapse') continue
     const rect = el.getBoundingClientRect()
-    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) continue
+    if (rect.width === 0 || rect.height === 0) continue // display:none, or a box with no area
+    if (isOutside(rect, point)) continue
+    if (isClipped(el)) continue
     let depth = 0
     for (let p: Element | null = el.parentElement; p && p !== hit; p = p.parentElement) depth++
     if (depth >= bestDepth) {

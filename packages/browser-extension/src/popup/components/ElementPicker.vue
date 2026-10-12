@@ -3,24 +3,24 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 import PickedElementSection from './PickedElementSection.vue'
 import { isPanelMoveKey } from '../../content/picker/panel-keys'
+import { tryParseColor } from '../../content/picker/css-utils'
 import type { ElementInfo } from '../../content/picker/types'
 
 const { t } = useI18n()
 
+// Detector colors arrive as CSS strings (mostly rgb()/rgba()); the panel shows hex. Uses css-utils' tryParseColor
+// instead of a canvas per call (this runs over every color of up to 21 sections): shared context, an rgb() fast path,
+// and it detects unparseable input, which a bare fillStyle silently turned into #000000.
+const HEX_COLOR = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/
+const channel = (value: number): string => value.toString(16).padStart(2, '0')
 function toHex(color: string): string {
   if (!color) return color
-  const hex = color.match(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/)
-  if (hex) return color.toLowerCase()
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = 1
-  const ctx = canvas.getContext('2d')!
-  ctx.fillStyle = color
-  ctx.fillRect(0, 0, 1, 1)
-  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
-  if (a === 255) {
-    return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')
-  }
-  return '#' + [r, g, b, a].map((v) => v.toString(16).padStart(2, '0')).join('')
+  if (HEX_COLOR.test(color)) return color.toLowerCase()
+  const parsed = tryParseColor(color)
+  // Unparseable (e.g. color-mix()): show the raw value rather than a black swatch that was never on the page.
+  if (!parsed) return color
+  const { r, g, b, a } = parsed
+  return `#${channel(r)}${channel(g)}${channel(b)}${a === 255 ? '' : channel(a)}`
 }
 
 function mapColors(info: ElementInfo): ElementInfo {
@@ -140,13 +140,14 @@ function onMessage(
     hasParent.value = message.hasParent ?? false
     childPage.value = 1
     // Fresh pick: pickerTabId holds the source tab. Parent step: it's undefined, so keep the existing tab.
+    const isFreshPick = pickerTabId.value !== undefined
     selectedTabId.value = pickerTabId.value ?? selectedTabId.value
     picking.value = false
     pickerTabId.value = undefined
     viewingSnapshot.value = false
     // A completed pick (fresh or parent/child step) always wins the shared slot back from the history view.
     showHistory.value = false
-    recordHistory()
+    recordHistory(isFreshPick)
   }
   if (message.type === 'picker-cancelled') {
     picking.value = false
@@ -195,11 +196,16 @@ function persistHistory() {
 }
 
 // Re-picking an element already in history refreshes it in place instead of adding a duplicate.
-function recordHistory() {
+// A parent/child step refines the pick in progress, so it rewrites that entry instead of adding one per level
+// (a five-level walk would otherwise evict real picks from the 20 slots).
+function recordHistory(isFreshPick: boolean) {
   const info = selected.value
   if (!info) return
+  const refined = isFreshPick
+    ? undefined
+    : history.value.find((item) => item.id === activeEntryId.value)
   const entry: HistoryEntry = {
-    id: crypto.randomUUID(),
+    id: refined?.id ?? crypto.randomUUID(),
     pageUrl: pageUrl.value,
     pageTitle: pageTitle.value,
     selected: info,
@@ -208,7 +214,9 @@ function recordHistory() {
   history.value = [
     entry,
     ...history.value.filter(
-      (item) => item.pageUrl !== entry.pageUrl || item.selected.selector !== entry.selected.selector
+      (item) =>
+        item.id !== entry.id &&
+        (item.pageUrl !== entry.pageUrl || item.selected.selector !== entry.selected.selector)
     )
   ].slice(0, HISTORY_LIMIT)
   activeEntryId.value = entry.id

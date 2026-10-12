@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest'
-import { flatDescendants, isOwnScope } from '../src/content/picker/css-utils'
+import { flatDescendants, isOwnScope, surfaceParent } from '../src/content/picker/css-utils'
 
 const tags = (el: Element): string[] => [...flatDescendants(el)].map((e) => e.localName)
 
@@ -72,5 +72,29 @@ describe('isOwnScope', () => {
     const shadow = root.attachShadow({ mode: 'open' })
     shadow.innerHTML = '<a href="#"><span id="inner"></span></a>'
     expect(isOwnScope(shadow.getElementById('inner')!, root, isLink)).toBe(true)
+  })
+})
+
+describe('surfaceParent', () => {
+  beforeEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('follows parentElement in an ordinary tree', () => {
+    document.body.innerHTML = '<div id="r"><p id="t"></p></div>'
+    expect(surfaceParent(document.getElementById('t')!)?.id).toBe('r')
+  })
+
+  it('steps from shadow content to the host, where parentElement is null', () => {
+    document.body.innerHTML = '<div id="r"></div>'
+    const shadow = document.getElementById('r')!.attachShadow({ mode: 'open' })
+    shadow.innerHTML = '<b id="inner"></b>'
+    const inner = shadow.getElementById('inner')!
+    expect(inner.parentElement).toBeNull()
+    expect(surfaceParent(inner)?.id).toBe('r')
+  })
+
+  it('ends at the top document root', () => {
+    expect(surfaceParent(document.documentElement)).toBeNull()
   })
 })

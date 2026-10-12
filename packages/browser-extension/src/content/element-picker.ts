@@ -5,6 +5,7 @@ import { collectChildSections, collectElementInfo } from './picker/collect'
 import { resetHoverStylesCache } from './picker/hover'
 import { getNavigableParent } from './picker/navigate'
 import { isPanelMoveKey } from './picker/panel-keys'
+import { frameTransform } from './picker/frame-transform'
 import { getPickTarget, recoverSkippedTarget } from './picker/pick-target'
 
 const OVERLAY_ID = 'wcagify-picker-overlay'
@@ -168,27 +169,6 @@ function highlightElement(el: Element) {
   startTracking()
 }
 
-// Offset from the target's own viewport to the top document's, walking out through same-origin frames.
-// A child section can live in an iframe (rect relative to that frame) while the overlay is positioned in the top document without this shift the outline lands wrong.
-// Zero for a top-document target. Frame borders count via clientLeft/clientTop.
-function frameOffset(el: Element): { x: number; y: number } {
-  let x = 0
-  let y = 0
-  try {
-    let win = el.ownerDocument.defaultView
-    while (win?.frameElement) {
-      const frame = win.frameElement
-      const rect = frame.getBoundingClientRect()
-      x += rect.left + frame.clientLeft
-      y += rect.top + frame.clientTop
-      win = frame.ownerDocument.defaultView
-    }
-  } catch {
-    /* Cross-origin ancestor: nothing better available than the unshifted rect */
-  }
-  return { x, y }
-}
-
 // Track the target's live rect so the overlay stays glued on scroll/resize, hiding when off-screen.
 function positionHighlight() {
   if (!highlightEl || !highlightTarget) return
@@ -199,14 +179,14 @@ function positionHighlight() {
   }
 
   const rect = highlightTarget.getBoundingClientRect()
-  const offset = frameOffset(highlightTarget)
-  const top = rect.top + offset.y
-  const left = rect.left + offset.x
+  // A framed target reports its rect in its own viewport, and a scaled frame reports it unscaled.
+  const frame = frameTransform(highlightTarget)
+  const top = frame.y + rect.top * frame.scaleY
+  const left = frame.x + rect.left * frame.scaleX
+  const width = rect.width * frame.scaleX
+  const height = rect.height * frame.scaleY
   const offScreen =
-    top + rect.height <= 0 ||
-    left + rect.width <= 0 ||
-    top >= window.innerHeight ||
-    left >= window.innerWidth
+    top + height <= 0 || left + width <= 0 || top >= window.innerHeight || left >= window.innerWidth
 
   if (offScreen) {
     highlightEl.style.display = 'none'
@@ -217,8 +197,8 @@ function positionHighlight() {
     display: 'block',
     top: `${top}px`,
     left: `${left}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`
+    width: `${width}px`,
+    height: `${height}px`
   })
 }
 
@@ -267,6 +247,16 @@ function cleanup(keepHighlight = false) {
   infoPanel = undefined
   currentTarget = undefined
   document.removeEventListener('keydown', handleKeyDown)
+}
+
+// cleanup() plus what it keeps for the panel's select-parent/child buttons. With the panel gone nothing can
+// ask for those anymore, and holding them would keep (possibly detached) page nodes alive. panelOnTop stays: a preference, not a node reference.
+function teardown() {
+  cleanup()
+  selectedElement = undefined
+  childElements = []
+  previewing = false
+  hadHighlightBeforePreview = false
 }
 
 function handleMouseMove(e: MouseEvent) {
@@ -444,5 +434,5 @@ chrome.runtime.onMessage.addListener((message: { type: string; index?: number; t
 // The side panel holds an open port while the picker/highlight is alive; its disconnect on close tears everything down.
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== 'wcagify-picker') return
-  port.onDisconnect.addListener(() => cleanup())
+  port.onDisconnect.addListener(teardown)
 })

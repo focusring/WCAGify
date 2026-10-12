@@ -38,14 +38,12 @@ describe('probeIframe', () => {
     document.body.innerHTML = ''
   })
 
-  it('classifies a same-origin frame with element content as "content", rooted at its body', () => {
+  it('classifies a same-origin frame with element content as "content"', () => {
     document.body.innerHTML = '<iframe></iframe>'
     const iframe = document.querySelector('iframe')!
     iframe.contentDocument!.body.innerHTML = '<div class="ad">Buy now</div>'
 
-    const probe = probeIframe(iframe)
-    expect(probe.state).toBe('content')
-    expect(probe.innerRoot).toBe(iframe.contentDocument!.body)
+    expect(probeIframe(iframe)).toBe('content')
   })
 
   it('treats text-only body content as "content"', () => {
@@ -53,16 +51,14 @@ describe('probeIframe', () => {
     const iframe = document.querySelector('iframe')!
     iframe.contentDocument!.body.append(document.createTextNode('bare text'))
 
-    expect(probeIframe(iframe).state).toBe('content')
+    expect(probeIframe(iframe)).toBe('content')
   })
 
   it('classifies a same-origin frame with an empty body as "empty"', () => {
     document.body.innerHTML = '<iframe></iframe>'
     const iframe = document.querySelector('iframe')!
 
-    const probe = probeIframe(iframe)
-    expect(probe.state).toBe('empty')
-    expect(probe.innerRoot).toBeNull()
+    expect(probeIframe(iframe)).toBe('empty')
   })
 
   it('treats a whitespace-only body as "empty"', () => {
@@ -70,7 +66,7 @@ describe('probeIframe', () => {
     const iframe = document.querySelector('iframe')!
     iframe.contentDocument!.body.append(document.createTextNode('   \n  '))
 
-    expect(probeIframe(iframe).state).toBe('empty')
+    expect(probeIframe(iframe)).toBe('empty')
   })
 
   it('classifies a frame whose contentDocument read returns null and window is opaque as "cross-origin"', () => {
@@ -82,19 +78,17 @@ describe('probeIframe', () => {
         }
       } as unknown as Window
     })
-    const probe = probeIframe(iframe)
-    expect(probe.state).toBe('cross-origin')
-    expect(probe.innerRoot).toBeNull()
+    expect(probeIframe(iframe)).toBe('cross-origin')
   })
 
   it('classifies a frame whose contentDocument getter throws as "cross-origin"', () => {
     const iframe = fakeIframe({ contentDocument: throwSecurity })
-    expect(probeIframe(iframe).state).toBe('cross-origin')
+    expect(probeIframe(iframe)).toBe('cross-origin')
   })
 
   it('classifies a frame with no browsing context as "inaccessible"', () => {
     const iframe = fakeIframe({ contentDocument: null, contentWindow: null })
-    expect(probeIframe(iframe).state).toBe('inaccessible')
+    expect(probeIframe(iframe)).toBe('inaccessible')
   })
 
   it('classifies a same-origin frame that has a window but no document yet as "inaccessible"', () => {
@@ -102,7 +96,7 @@ describe('probeIframe', () => {
       contentDocument: null,
       contentWindow: { location: { href: 'about:blank' } } as unknown as Window
     })
-    expect(probeIframe(iframe).state).toBe('inaccessible')
+    expect(probeIframe(iframe)).toBe('inaccessible')
   })
 })
 

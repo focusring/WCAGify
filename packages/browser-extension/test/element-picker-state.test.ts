@@ -213,10 +213,17 @@ describe('ElementPicker pick session', () => {
     expect(wrapper2.text()).toContain('Saved')
   })
 
-  it('forwards arrow keys to the picking tab to move its info bar, except from a text field', async () => {
+  it('forwards Alt+arrow keys to the picking tab to move its info bar, except from a text field', async () => {
     const { wrapper, chrome } = await mountPicker()
-    const pressKey = (key: string, target: EventTarget = globalThis) =>
-      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+    const pressKey = (key: string, options: { target?: EventTarget; altKey?: boolean } = {}) =>
+      (options.target ?? globalThis).dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key,
+          bubbles: true,
+          cancelable: true,
+          altKey: options.altKey ?? true
+        })
+      )
     const moveMessages = () =>
       chrome.chromeMock.tabs.sendMessage.mock.calls.filter(
         (call: unknown[]) => (call[1] as { type: string }).type === 'move-picker-panel'
@@ -235,9 +242,13 @@ describe('ElementPicker pick session', () => {
       [1, { type: 'move-picker-panel', top: false }]
     ])
 
+    // A bare arrow key belongs to whatever is scrolling, not to the bar.
+    pressKey('ArrowUp', { altKey: false })
+    expect(moveMessages()).toHaveLength(2)
+
     const input = document.createElement('input')
     document.body.appendChild(input)
-    pressKey('ArrowUp', input)
+    pressKey('ArrowUp', { target: input })
     input.remove()
     expect(moveMessages()).toHaveLength(2)
   })
@@ -255,5 +266,60 @@ describe('ElementPicker pick session', () => {
 
     expect(picker.vm.selector).toBe('')
     expect(chrome.getStorage().pickHistory).toHaveLength(1)
+  })
+
+  it('renders detected colors as hex', async () => {
+    const { wrapper, chrome } = await mountPicker()
+    await pickAndSelect(
+      wrapper,
+      chrome,
+      mockElementInfo({ textColors: ['rgb(255, 0, 0)', 'rgba(0, 0, 255, 0.5)'] })
+    )
+    expect(wrapper.text()).toContain('#ff0000')
+    expect(wrapper.text()).toContain('#0000ff80')
+  })
+
+  // Used to come out as #000000 (canvas fillStyle ignores input it can't parse). happy-dom has no 2D context,
+  // so tryParseColor declines for that reason here; a browser reaches the same result via its sentinel check.
+  it('leaves a color it cannot parse alone instead of showing it as black', async () => {
+    const { wrapper, chrome } = await mountPicker()
+    await pickAndSelect(wrapper, chrome, mockElementInfo({ textColors: ['not-a-color'] }))
+    expect(wrapper.text()).toContain('not-a-color')
+    expect(wrapper.text()).not.toContain('#000000')
+  })
+
+  // A select-parent/child result is another element-picked with no pick in flight (pickerTabId unset).
+  function emitNavStep(chrome: ReturnType<typeof installChromeMock>, selector: string) {
+    chrome.emit(
+      {
+        type: 'element-picked',
+        url: 'https://example.com',
+        pageTitle: 'Example',
+        selected: mockElementInfo({ selector })
+      },
+      1
+    )
+  }
+
+  it('rewrites the history entry on a parent step instead of stacking one per level', async () => {
+    const { wrapper, chrome } = await mountPicker()
+    await pickAndSelect(wrapper, chrome, mockElementInfo({ selector: 'button.buy' }))
+    emitNavStep(chrome, 'div.card')
+    emitNavStep(chrome, 'section.offers')
+    await flushPromises()
+
+    const stored = chrome.getStorage().pickHistory as Array<{ selected: { selector: string } }>
+    expect(stored).toHaveLength(1)
+    expect(stored[0]?.selected.selector).toBe('section.offers')
+  })
+
+  it('still records the next fresh pick as its own entry', async () => {
+    const { wrapper, chrome } = await mountPicker()
+    await pickAndSelect(wrapper, chrome, mockElementInfo({ selector: 'button.buy' }))
+    emitNavStep(chrome, 'div.card')
+    await pickAndSelect(wrapper, chrome, mockElementInfo({ selector: 'a.logo' }))
+
+    const stored = chrome.getStorage().pickHistory as Array<{ selected: { selector: string } }>
+    expect(stored.map((item) => item.selected.selector)).toEqual(['a.logo', 'div.card'])
   })
 })

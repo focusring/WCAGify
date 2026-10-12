@@ -140,4 +140,39 @@ describe('recoverSkippedTarget', () => {
     stubRect(document.getElementById('btn')!, 10, 10, 100, 30)
     expect(recoverSkippedTarget(hit, 50, 20)).toBe(document.getElementById('btn'))
   })
+
+  it('skips a visibility:hidden control — nothing is painted where the cursor is', () => {
+    document.body.innerHTML =
+      '<a href="#" id="link"><button id="btn" disabled style="pointer-events:none;visibility:hidden">Buy</button></a>'
+    const link = document.getElementById('link')!
+    stubRect(document.getElementById('btn')!, 10, 10, 100, 30)
+    expect(recoverSkippedTarget(link, 50, 20)).toBe(link)
+  })
+
+  // An unstubbed rect is all zeros here, which is also what a display:none box reports in a browser.
+  // The cursor sits at the origin, so the old box test ("not outside") accepted it.
+  it('skips a control with no painted area', () => {
+    document.body.innerHTML =
+      '<a href="#" id="link"><button id="btn" disabled style="pointer-events:none">Buy</button></a>'
+    const link = document.getElementById('link')!
+    expect(recoverSkippedTarget(link, 0, 0)).toBe(link)
+  })
+
+  it('skips a control scrolled out of a clipping ancestor', () => {
+    document.body.innerHTML =
+      '<a href="#" id="link"><div id="scroller" style="overflow:hidden"><button id="btn" disabled style="pointer-events:none">Buy</button></div></a>'
+    const link = document.getElementById('link')!
+    stubRect(document.getElementById('scroller')!, 0, 0, 200, 50)
+    stubRect(document.getElementById('btn')!, 0, 100, 100, 30) // below the scroller's visible box
+    expect(recoverSkippedTarget(link, 50, 110)).toBe(link)
+  })
+
+  it('still recovers a control inside a clipping ancestor the cursor is within', () => {
+    document.body.innerHTML =
+      '<a href="#" id="link"><div id="scroller" style="overflow:hidden"><button id="btn" disabled style="pointer-events:none">Buy</button></div></a>'
+    const link = document.getElementById('link')!
+    stubRect(document.getElementById('scroller')!, 0, 0, 200, 200)
+    stubRect(document.getElementById('btn')!, 10, 10, 100, 30)
+    expect(recoverSkippedTarget(link, 50, 20)).toBe(document.getElementById('btn'))
+  })
 })

@@ -25,8 +25,17 @@ beforeAll(async () => {
 
 const panel = () => document.getElementById('wcagify-picker-panel')
 const isOnTop = () => panel()?.classList.contains('wcagify-picker-panel--top')
-const pressKey = (key: string, target: EventTarget = document) =>
-  target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+// Alt is what separates a bar-move from an ordinary arrow key the page should still scroll with, so it
+// defaults to on here and the bare-key case passes altKey: false. Returns false once preventDefault() ran.
+const pressKey = (key: string, options: { target?: EventTarget; altKey?: boolean } = {}) =>
+  (options.target ?? document).dispatchEvent(
+    new KeyboardEvent('keydown', {
+      key,
+      bubbles: true,
+      cancelable: true,
+      altKey: options.altKey ?? true
+    })
+  )
 
 async function startPicker() {
   sendToPage({ type: 'start-picker' })
@@ -39,7 +48,7 @@ describe('picker info bar position', () => {
     pressKey('ArrowDown')
   })
 
-  it('starts at the bottom and moves with the arrow keys', () => {
+  it('starts at the bottom and moves with Alt+arrow keys', () => {
     expect(isOnTop()).toBe(false)
     pressKey('ArrowUp')
     expect(isOnTop()).toBe(true)
@@ -61,10 +70,15 @@ describe('picker info bar position', () => {
     expect(isOnTop()).toBe(true)
   })
 
+  it('leaves a bare arrow key to the page, so keyboard scrolling still works', () => {
+    expect(pressKey('ArrowUp', { altKey: false })).toBe(true)
+    expect(isOnTop()).toBe(false)
+  })
+
   it('leaves arrow keys typed in a page text field alone', () => {
     const input = document.createElement('input')
     document.body.appendChild(input)
-    pressKey('ArrowUp', input)
+    pressKey('ArrowUp', { target: input })
     input.remove()
     expect(isOnTop()).toBe(false)
   })
